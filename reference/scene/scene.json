@@ -1,0 +1,111 @@
+{
+    "id": "scene",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneConfig",
+    "description": "An instance of <a href=\"#scene\">a scene.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the scene.",
+            "example": "scene-0"
+        },
+
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the scene or its i18n key.",
+            "example": "My Scene"
+        },
+
+        "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "The slug name of the scene or its i18n key.",
+            "example": "my-scene"
+        },
+
+        "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "The description of the scene or its i18n key.",
+            "example": "This is a super scene with awesome things in it"
+        },
+
+        "background": {
+            "type": "string",
+            "title": "Background",
+            "description": "The background color of the scene.",
+            "example": "#000"
+        },
+
+        "fx": {
+            "type": "string",
+            "title": "FX",
+            "description": "The UID of the special effect (FX) set to apply to the scene.",
+            "example": "fx-0"
+        },
+
+        "tags": {
+            "type": "array",
+            "title": "Tags",
+            "description": "The list of tags associated to the scene.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "awesome", "beach", "surf" ]
+        },
+
+        "thumbnails": {
+            "type": "array",
+            "title": "Thumbnails",
+            "description": "The configuration of a thumbnail associated to a scene. Each member is an instance of <a href=\"#scene-thumbnail\">a scene thumbnail.</a>",
+            "items": {
+                "$ref": "scene-thumbnail"
+            }
+        },
+
+        "media": {
+            "$ref": "scene-media"
+        },
+
+        "sound": {
+            "$ref": "sound"
+        },
+
+        "playlists": {
+            "$ref": "playlist"
+        },
+
+        "view": {
+            "$ref": "view"
+        },
+
+        "camera": {
+            "$ref": "camera"
+        },
+
+        "audio": {
+            "$ref": "audio"
+        },
+
+        "hotspots": {
+            "type": "array",
+            "title": "Hotspots",
+            "description": "The list of hotspots associated to this scene. Each member is and instance of <a href=\"#hotspot\">a hotspot.</a>",
+            "items": {
+                "$ref": "hotspot"
+            }
+        },
+
+        "director": {
+            "$ref": "director"
+        },
+
+        "plugins": {
+            "$ref": "plugin"
+        }
+    }
+}

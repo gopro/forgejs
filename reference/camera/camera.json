@@ -1,0 +1,38 @@
+{
+    "id": "camera",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "CameraConfig",
+    "description": "An instance of <a href=\"#camera\">the camera object.</a>",
+    "type": "object",
+
+    "properties": {
+        "parallax": {
+            "type": "number",
+            "title": "Parallax",
+            "description": "Parallax factor.",
+            "minimum": 0,
+            "maximum": 1,
+            "example": 0.2
+        },
+
+        "yaw": {
+            "$ref": "camera-value"
+        },
+
+        "pitch": {
+            "$ref": "camera-value"
+        },
+
+        "roll": {
+            "$ref": "camera-value"
+        },
+
+        "fov": {
+            "$ref": "camera-value"
+        },
+
+        "gaze": {
+            "$ref": "camera-gaze"
+        }
+    }
+}

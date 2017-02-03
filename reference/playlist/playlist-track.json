@@ -1,0 +1,46 @@
+{
+    "id": "playlist-track",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "AudioTrackConfig",
+    "description": "An instance of <a href=\"#playlist-track\">a track.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the track.",
+            "example": "track-0"
+        },
+
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the track.",
+            "example": "My awesome song"
+        },
+
+        "author": {
+            "type": "string",
+            "title": "Author",
+            "description": "The author of the track.",
+            "example": "John Doo"
+        },
+
+        "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "The file URL of the track.",
+            "example": "audio/track-0.mp3"
+        },
+
+        "loop": {
+            "type": "boolean",
+            "title": "Loop",
+            "description": "This sets whether or not the track repeats after a script tells it to play.",
+            "default": false
+        }
+    },
+
+    "required": [ "uid", "url" ]
+}

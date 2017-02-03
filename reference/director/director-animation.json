@@ -1,0 +1,70 @@
+{
+    "id": "director-animation",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "DirectorAnimationConfig",
+    "description": "An instance of <a href=\"#director-animation\">a director animation</a>.",
+    "type": "object",
+
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Is the animation enabled ?",
+            "example": true
+        },
+
+        "delay": {
+            "type": "number",
+            "title": "Delay",
+            "description": "Is there a timer to wait for start ? If yes, specify a time in ms.",
+            "example": 2000
+        },
+
+        "smooth": {
+            "type": "boolean",
+            "title": "Smooth",
+            "description": "Does the animation have a smooth start from the actual point the camera is looking at.",
+            "example": true
+        },
+
+        "stoppable": {
+            "type": "boolean",
+            "title": "Stoppable",
+            "description": "Can the user stop the animation ?",
+            "example": false
+        },
+
+        "idleTime": {
+            "type": "number",
+            "title": "Idle time",
+            "description": "Is there a time to wait for start after user interaction ? If yes, specify a time in ms. If the time is negative, it is considered that the animation never resume.",
+            "example": 3000
+        },
+
+        "random": {
+            "type": "boolean",
+            "title": "Randomly",
+            "description": "Are the tracks played randomly ?",
+            "example": false
+        },
+
+        "loop": {
+            "type": "boolean",
+            "title": "Looping",
+            "description": "Does the animation loop ?",
+            "example": false
+        },
+
+        "tracks": {
+            "type": "array",
+            "title": "Tracks",
+            "description": "The list of tracks UID ot execute. The tracks are executed in the order they are written in this array.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "track-0", "track-2" ]
+        }
+    },
+
+    "required": [ "tracks" ]
+}

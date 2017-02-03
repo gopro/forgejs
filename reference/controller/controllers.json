@@ -1,0 +1,25 @@
+{
+    "id": "controller",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllersConfig",
+    "description": "An instance of <a href=\"#controller\">the controllers configuration.</a>",
+    "type": "object",
+
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Enables or not all the controllers.",
+            "default": true
+        },
+
+        "instances": {
+            "type": "array",
+            "title": "Instances",
+            "description": "The list of each controller. Each member is an instance of <a href=\"#controller-instance\">a controller.</a>",
+            "items": {
+                "$ref": "controller-instance"
+            }
+        }
+    }
+}

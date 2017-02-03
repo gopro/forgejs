@@ -1,0 +1,23 @@
+{
+    "id": "hotspot-transform",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotTransformConfig",
+    "description": "An instance of <a href='#hotspot-transform'>a hotspot transform.</a>",
+    "type": "object",
+
+    "properties": {
+        "position": {
+            "$ref": "hotspot-transform-position"
+        },
+
+        "rotation": {
+            "$ref": "hotspot-transform-rotation"
+        },
+
+        "scale": {
+            "$ref": "hotspot-transform-scale"
+        }
+    },
+
+    "required": [ "position", "rotation", "scale" ]
+}

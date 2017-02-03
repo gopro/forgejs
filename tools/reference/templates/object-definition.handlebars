@@ -1,0 +1,52 @@
+{{#each this}}{{#unless @last}}
+    <tr>
+        <th scope="row" class="param-name">
+            {{@key}}
+        </th>
+        <td class="param-type">
+            {{#if anyOf}}
+                <dl>
+                {{#each anyOf}}
+                    {{#if this._original.items}}
+                    <li class="param-anyof"><em>array&lt;{{this._original.items.type}}&gt;</em></li>
+                    {{else}}
+                    <li class="param-anyof"><em>{{this._original.type}}</em></li>
+                    {{/if}}
+                {{/each}}
+                </dl>
+            {{else}}
+                {{#if items}}
+                <em>array&lt;{{items.type}}&gt;</em>
+                {{else}}
+                <em>{{type}}</em>
+                {{/if}}
+            {{/if}}
+        </td>
+        <td class="param-value">
+            {{#if ../required}}
+            <span class="param-required"><small><mark>required</mark></small></span><br>
+            {{/if}}
+
+            {{#if default}}
+            <span class="param-default"><small>default: <code>{{default}}</code></small></span><br>
+            {{/if}}
+
+            {{#if minimum}}
+            <span class="param-min"><small>min: <code>{{minimum}}</code></small></span><br>
+            {{/if}}
+
+            {{#if maximum}}
+            <span class="param-max"><small>max: <code>{{maximum}}</code></small></span><br>
+            {{/if}}
+        </td>
+        <td class="param-description object-definition-param-description">
+            {{#if description}}{{{description}}}<br><br>{{/if}}
+
+            {{#if example}}{{#unless anyOf}}{{#unless id}}{{#unless items}}
+                <strong>Example :</strong>
+                <br/>
+                <small class="example-code"><pre>{{example}}</pre></small>
+            {{/unless}}{{/unless}}{{/unless}}{{/if}}
+        </td>
+    </tr>
+{{/unless}}{{/each}}

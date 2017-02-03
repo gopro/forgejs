@@ -1,0 +1,30 @@
+{
+    "id": "hotspot-track-keyframe",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotTrackKeyframeConfig",
+    "description": "An instance of <a href='#hotspot-track-keyframe'>a hotspot track.</a>",
+    "type": "object",
+
+    "properties": {
+        "time": {
+            "type": "number",
+            "title": "Time",
+            "description": "The time to trigger the action.",
+            "example": 20
+        },
+
+        "position": {
+            "$ref": "hotspot-transform-position"
+        },
+
+        "rotation": {
+            "$ref": "hotspot-transform-rotation"
+        },
+
+        "scale": {
+            "$ref": "hotspot-transform-scale"
+        }
+    },
+
+    "required": [ "position", "rotation", "scale" ]
+}

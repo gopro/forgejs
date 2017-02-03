@@ -1,0 +1,24 @@
+{
+    "id": "animation-track-easing",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "AnimationTrackEasingConfig",
+    "description": "An instance of <a href=\"#animation-track-easing\">an animation track</a>.",
+    "type": "object",
+
+    "properties": {
+        "default": {
+            "type": "string",
+            "title": "Default",
+            "description": "The default easing to apply; available values are : <ul><li>linear</li><li>easeInSine</li><li>easeInOutSine</li><li>easeOutSine</li><li>easeInQuad</li><li>easeInOutQuad</li><li>easeOutQuad</li><li>easeInCubic</li><li>easeInOutCubic</li><li>easeOutCubic</li><li>easeOutBounce</li><li>easeInBounce</li></ul>Default is <b>linear</b>.",
+            "example": "easeInQuad"
+        },
+
+        "start": {
+            "type": "number",
+            "title": "Start",
+            "description": "The time (in ms) to reach the first position of the track from the current position of the camera.",
+            "default": 0,
+            "example": 5000
+        }
+    }
+}

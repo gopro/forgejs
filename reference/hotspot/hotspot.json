@@ -1,0 +1,81 @@
+{
+    "id": "hotspot",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotConfig",
+    "description": "A hotspot configuration",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "The UID of the hotspot",
+            "description": "The UID of the hotspot.",
+            "example": "hotspot-0"
+        },
+
+        "tags": {
+            "type": "array",
+            "title": "Tags",
+            "description": "The list of tags associated to the hotspot.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "awesome", "hotspot", "turtle" ]
+        },
+
+        "type": {
+            "type": "string",
+            "enum": [ "3d" ],
+            "title": "The type of the hotspot",
+            "description": "The type of the hotspot. Can be one of :<ul><li>3d</li></ul>",
+            "default": "3d"
+        },
+
+        "visible": {
+            "type": "boolean",
+            "title": "Visibility of the hotspot",
+            "description": "Is the hotspot visible ?",
+            "default": true
+        },
+
+        "fx": {
+            "type": "string",
+            "title": "FX to apply",
+            "description": "The UID of the special effect (FX) to apply to the hotspot.",
+            "example": "fx-0"
+        },
+
+        "facingCenter": {
+            "type": "boolean",
+            "title": "Facing Center",
+            "description": "Is the hotspot (for a flat 3D one) facing the center of the scene (the camera) constantly ? Its rotation will be determined given this facing.",
+            "example": true
+        },
+
+        "transform": {
+            "$ref": "hotspot-transform"
+        },
+
+        "geometry": {
+            "$ref": "hotspot-geometry"
+        },
+
+        "animation": {
+            "$ref": "hotspot-animation"
+        },
+
+        "material": {
+            "$ref": "hotspot-material"
+        },
+
+        "sound": {
+            "$ref": "sound"
+        },
+
+        "events": {
+            "$ref": "hotspot-events"
+        }
+    },
+
+    "required": [ "uid", "tags", "type", "visible", "transform" ]
+}

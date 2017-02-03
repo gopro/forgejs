@@ -1,0 +1,23 @@
+{
+    "id": "sound-source",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SoundSourceConfig",
+    "description": "An instance of <a href='#sound-options'>sound source.</a>",
+    "type": "object",
+
+    "properties": {
+        "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "URL of the sound: can be either a local sound or one on a distant server, as long as it is a valid sound file.",
+            "example": "audio/scene-0-hotspot.mp3"
+        },
+
+        "target": {
+            "type": "string",
+            "title": "Target",
+            "description": "The UID of the sound source target: can be either a video or an audio media.",
+            "example": "video-0"
+        }
+    }
+}

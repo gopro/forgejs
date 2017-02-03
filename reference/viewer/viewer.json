@@ -1,0 +1,17 @@
+{
+    "id": "viewer",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ViewerConfig",
+    "description": "An instance of <a href=\"#viewer\">the viewer global configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "background": {
+            "type": "string",
+            "title": "Background",
+            "description": "The color of the background for the viewer, shown when there is no media displayed.",
+            "default": "#000000",
+            "example": "#ff645d"
+        }
+    }
+}

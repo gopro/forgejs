@@ -1,0 +1,18 @@
+{
+    "id": "hotspot-anim",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotsConfig",
+    "description": "An instance of <a href=\"#hotspot-anim\">the hotspot animation configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "tracks": {
+            "type": "array",
+            "title": "Tracks",
+            "description": "A list of the tracks that can be used for animating hotspot-anim. Each member is an instance of <a href=\"#hotspot-track\">a hotspot track</a>.",
+            "items": {
+                "$ref": "hotspot-track"
+            }
+        }
+    }
+}

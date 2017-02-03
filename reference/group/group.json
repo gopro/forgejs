@@ -1,0 +1,56 @@
+{
+    "id": "group",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "GroupConfig",
+    "description": "An instance of <a href=\"#group\">a group.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the group.",
+            "example": "group-0"
+        },
+
+        "children": {
+            "type": "array",
+            "title": "Children",
+            "description": "The UID of scenes included in this group.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "scene-0", "scene-1" ]
+        },
+
+        "default": {
+            "type": "string",
+            "title": "Default",
+            "description": "The default child of the group.",
+            "example": 1
+        },
+
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the group or its i18n key.",
+            "example": "My Group"
+        },
+
+        "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "The slug name of the group or its i18n key.",
+            "example": "my-group"
+        },
+
+        "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "The description of the group or its i18n key.",
+            "example": "This a group with two awesome scenes"
+        }
+    },
+
+    "required": [ "uid" ]
+}

@@ -1,0 +1,70 @@
+{
+    "id": "root",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "MainConfig",
+    "description": "The root of the project json configuration",
+    "type": "object",
+
+    "properties": {
+        "viewer": {
+            "$ref": "viewer"
+        },
+
+        "history": {
+            "$ref": "history"
+        },
+
+        "i18n": {
+            "$ref": "i18n"
+        },
+
+        "view": {
+            "$ref": "view"
+        },
+
+        "camera": {
+            "$ref": "camera"
+        },
+
+        "controllers": {
+            "$ref": "controller"
+        },
+
+        "audio": {
+            "$ref": "audio"
+        },
+
+        "playlists": {
+            "$ref": "playlist"
+        },
+
+        "postProcessing": {
+            "$ref": "postprocessing"
+        },
+
+        "story": {
+            "$ref": "story"
+        },
+
+        "director": {
+            "$ref": "director"
+        },
+
+        "hotspots": {
+            "$ref": "hotspot-anim"
+        },
+
+        "actions": {
+            "type": "array",
+            "title": "Actions",
+            "description": "The list of available actions in the project. Each member is an instance of <a href=\"#action\">an action.</a>",
+            "items": {
+                "$ref": "action"
+            }
+        },
+
+        "plugins": {
+            "$ref": "plugin"
+        }
+    }
+}

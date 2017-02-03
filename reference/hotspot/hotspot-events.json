@@ -1,0 +1,36 @@
+{
+    "id": "hotspot-events",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotEventConfig",
+    "description": "An instance of <a href='#hotspot-sound-events'>the hotspot events object.</a>",
+    "type": "object",
+
+    "properties": {
+        "onClick": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "On Click",
+            "description": "The action uids to trigger on click."
+        },
+
+        "onOver": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "On Over",
+            "description": "The action uids to trigger on over."
+        },
+
+        "onOut": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "On Out",
+            "description": "The action uids to trigger on out."
+        }
+    }
+}

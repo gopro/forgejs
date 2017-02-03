@@ -1,0 +1,31 @@
+{
+    "id": "postprocessing-fx",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "FX",
+    "description": "An instance of the <a href=\"#postprocessing-fx\"> special effect</a>.",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the special effect.",
+            "example": "fx-0"
+        },
+
+        "type": {
+            "type": "string",
+            "title": "Type",
+            "description": "The type of the special effet.",
+            "example": "HorizontalBlurShader"
+        },
+
+        "params": {
+            "type": "object",
+            "title": "FX",
+            "description": "The list of parameters to pass to the shader doing the special effect."
+        }
+    },
+
+    "required": [ "uid", "type" ]
+}

@@ -1,0 +1,57 @@
+{
+    "id": "hotspot-track",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotTrackConfig",
+    "description": "An instance of <a href=\"#hotspot-track\">a hotspot track</a>.",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "Track UID",
+            "description": "The UID of the track.",
+            "example": "track-0"
+        },
+
+        "name": {
+            "type": "string",
+            "title": "Name of the track",
+            "description": "The name of the track.",
+            "example": "Sea to beach"
+        },
+
+        "description": {
+            "type": "string",
+            "title": "Track description",
+            "description": "The description of the track.",
+            "example": "This is the track going from the sea to the beach."
+        },
+
+        "smooth": {
+            "type": "boolean",
+            "title": "Smoothing",
+            "description": "Is the track smooth ?",
+            "example": true
+        },
+
+        "cancelRoll": {
+            "type": "boolean",
+            "title": "Cancelling roll",
+            "description": "Is the roll cancelled ?",
+            "example": false
+        },
+
+        "easing": {
+            "$ref": "animation-track-easing"
+        },
+
+        "keyframes": {
+            "type": "array",
+            "title": "Keyframes",
+            "description": "A list of the keyframes composing the track. Each member is an instance of <a href=\"#hotspot-track-keyframe\">a hotspot track keyframe</a>.",
+            "items": {
+                "$ref": "hotspot-track-keyframe"
+            }
+        }
+    }
+}

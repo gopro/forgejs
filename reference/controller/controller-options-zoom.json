@@ -1,0 +1,26 @@
+{
+    "id": "controller-options-zoom",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerZoomConfig",
+    "description": "An instance of <a href=\"#controller-options-zoom\">a controller zoom configuration.</a>",
+    "type": "object",
+
+    "properties": {
+        "hardness": {
+            "type": "number",
+            "title": "Hardness",
+            "description": "Hardness (instant contribution).",
+            "example": 5
+
+        },
+
+         "invert": {
+            "type": "boolean",
+            "title": "Invert",
+            "description": "Inversion of axis.",
+            "example": false
+        }
+    },
+
+    "required": [ "hardness", "invert" ]
+}

@@ -1,0 +1,39 @@
+{
+    "id": "plugin-engine",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "PluginEngineConfig",
+    "description": "An instance of <a href=\"#plugin-engine\">a plugin engine</a>.",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the engine.",
+            "example": "com.awesome.plugin"
+        },
+
+        "prefix": {
+            "type": "string",
+            "title": "Prefix",
+            "description": "The prefix of the url.",
+            "example": "./other-plugin-folder/"
+        },
+
+        "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "The url/root of the Plugin relative to the prefix.",
+            "example": "AwesomePlugin"
+        },
+
+        "manifest": {
+            "type": "string",
+            "title": "Manifest",
+            "description": "The manifest to read to know the configuration of the plugin.",
+            "example": "manifest.json"
+        }
+    },
+
+    "required": [ "uid" ]
+}

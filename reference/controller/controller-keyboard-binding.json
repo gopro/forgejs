@@ -1,0 +1,39 @@
+{
+    "id": "controller-keyboard-binding",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerKeyboardBindingConfig",
+    "description": "A custom <a href=\"#controller-keyboard\">controller keyboard</a> key binding.",
+    "type": "object",
+
+    "properties": {
+        "name":{
+            "type": "string",
+            "title": "Name",
+            "description": "The name of this key binding"
+        },
+
+        "in":{
+            "anyOf":[
+                {"type": "number"},
+                {"type": "array", "items": "number"}
+            ],
+            "title": "In",
+            "description": "The key code or array of keycodes that are associated to this key binding. Corresponds to a <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode\" class=\"out\">KeyboardEvent.keyCode</a>"
+        },
+
+        "out":{
+            "anyOf":[
+                {"type": "number"},
+                {"type": "array", "items": "number"}
+            ],
+            "title": "In",
+            "description": "The key code or array of keycodes that are associated to this key binding. Corresponds to a <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode\">KeyboardEvent.keyCode</a>"
+        },
+
+        "events":{
+            "$ref": "controller-keyboard-binding-events"
+        }
+    },
+
+    "required": ["in", "events"]
+}

@@ -1,0 +1,36 @@
+{
+    "id": "action",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ActionConfig",
+    "description": "An instance of <a href=\"#action\">an action.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the action.",
+            "example": "action-more-awesome"
+        },
+
+        "target": {
+            "anyOf": [
+                { "type": "string" },
+                { "$ref": "action-target" }
+            ],
+            "title": "Target",
+            "description": "The UID of the target of the action, the list of accessor to get the target from the <b>Viewer</b> object, or a <a href=\"#action-target\">combination of both</a>.",
+            "example": "viewer.renderer.camera"
+        },
+
+        "method": {
+            "$ref": "action-method"
+        },
+
+        "property": {
+            "$ref": "action-property"
+        }
+    },
+
+    "required": [ "uid", "target" ]
+}

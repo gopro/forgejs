@@ -1,0 +1,79 @@
+{
+    "id": "scene-media-source",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneMediaSourceConfig",
+    "description": "The source of a media object. An instance of <a href=\"#scene-media-source\">a scene media source.</a>",
+    "type": "object",
+
+    "properties": {
+        "format": {
+            "type": "string",
+            "enum": [ "equi", "cube" ],
+            "title": "Format",
+            "description": "The format of the media: equi is for an equirectangular ressource (the most common one) and cube is for a cubemap ressource (less common but more efficient to display). Can be :<ul><li>equi</li><li>cube</li><li>flat</li><li>hotspot</li></ul>",
+            "example": "equi"
+        },
+
+        "streaming": {
+            "type": "string",
+            "enum": [ "html5", "dash" ],
+            "title": "Streaming",
+            "description": "The streaming method: either a html5 video (usually .mp4 or .webm), or a dash flux (.mpd). The authorized values are :<ul><li>html5</li><li>dash</li></ul>",
+            "example": "html5"
+        },
+
+        "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "This property is only set when the media is an image. The file can be local or on a distant server, but must be a valid image format.",
+            "example": "./images/scene-0.jpg"
+        },
+
+        "pattern": {
+            "type": "string",
+            "title": "Pattern",
+            "description": "The pattern to respect in case of a multi tiles media. Four parameters are authorized:<ul><li><code>{f}</code> is for the face, in case of a cubemap media</li><li><code>{z}</code> is for the quality of the tile, in case of a multi resolution media</li><li><code>{x}</code> if for the <b>x</b> coordinates of the tile</li><li><code>{y}</code> if for the <b>y</b> coordinates of the tile</li>",
+            "example": "multi/equi/{z}/{y}/{x}.jpg"
+        },
+
+        "levels": {
+            "type": "array",
+            "title": "Levels",
+            "description": "This property is only set when the media is a video. The files can be local or on a distant server, but must be a valid video format. If the array is composed of multiple URLs, it is considered that there are multiple qualities to consider. Each member is an instance of <a href=\"#scene-media-level\">a scene source level</a>.",
+            "items": {
+                "$ref": "scene-media-level"
+            }
+        },
+
+        "order": {
+            "type": "string",
+            "title": "Order",
+            "description": "Order of the layout in the cubemap media, ie where are the faces in the media, starting from the top left of the media. Needs to be a 6-char string, constitued with all of the following letter: <ul><li>R for Right</li><li>L for Left</li><li>U for Up</li><li>D for Down</li><li>B for Back</li><li>F for Front</li></ul>",
+            "default": "RLUDBF"
+        },
+
+        "tile": {
+            "type": "number",
+            "title": "Tile",
+            "description": "The size of a tile, in case the chosen format is cube. The size corresponds to the width and the height of a face.",
+            "example": 512
+        },
+
+        "faces": {
+            "type": "array",
+            "title": "Faces",
+            "description": "",
+            "items": {
+                "type": "object"
+            },
+            "example": [
+                { "F": "front" },
+                { "B": "back" },
+                { "R": "right" },
+                { "L": "left" },
+                { "D": "down" },
+                { "U": "up" }
+            ]
+        }
+    }
+}

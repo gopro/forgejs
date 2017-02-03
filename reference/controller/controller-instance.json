@@ -1,0 +1,40 @@
+{
+    "id": "controller-instance",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerInstanceConfig",
+    "description": "An instance of <a href=\"#controllers\">a controller.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "UID of the controller instance.",
+            "example": "controller-0"
+        },
+
+        "type": {
+            "type": "string",
+            "enum": ["pointer"],
+            "title": "Type",
+            "description": "Type of the controller to instanciate. Can either be :<ul><li>pointer</li><li>keyboard</li></ul>",
+            "example": "pointer"
+        },
+
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Is this controller enabled at its creation ?",
+            "example": true
+        },
+
+        "options":{
+            "anyOf": [
+                { "$ref": "controller-pointer" },
+                { "$ref": "controller-keyboard" }
+            ]
+        }
+    },
+
+    "required": [ "uid", "type", "enabled", "options" ]
+}

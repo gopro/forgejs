@@ -1,0 +1,33 @@
+{
+    "id": "controller-keyboard",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerKeyboardConfig",
+    "description": "An instance of <a href=\"#controller-pointer\">a controller pointer.</a>",
+    "type": "object",
+
+    "properties": {
+        "orientation":{
+            "$ref": "controller-options-orientation"
+        },
+
+        "zoom":{
+            "$ref": "controller-options-zoom"
+        },
+
+        "default":{
+            "type": "boolean",
+            "title": "Default",
+            "description": "Loads the default controller bindings if not set to false.",
+            "default": true
+        },
+
+        "bindings":{
+            "type": "array",
+            "title": "Bindings",
+            "description": "Array of <a href=\"#controller-keyboard-binding\">custom keyboard key bindings</a>.",
+            "items": {
+                "$ref": "controller-keyboard-binding"
+            }
+        }
+    }
+}

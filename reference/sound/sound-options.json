@@ -1,0 +1,52 @@
+{
+    "id": "sound-options",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SoundOptionsConfig",
+    "description": "An instance of <a href='#sound-options'>sound options.</a>",
+    "type": "object",
+
+    "properties": {
+        "volume": {
+            "anyOf": [
+                { "type": "number" },
+                { "$ref": "sound-volume" }
+            ],
+            "title": "Volume",
+            "description": "The volume of the sound."
+        },
+
+        "loop": {
+            "type": "boolean",
+            "title": "Loop",
+            "description": "Does the sound need to be looped automatically at the end of playing ?",
+            "default": false,
+            "example": true
+        },
+
+        "autoPlay": {
+            "type": "boolean",
+            "title": "Autoplay",
+            "description": "Does the sound need to be played automatically at start ?",
+            "default": false,
+            "example": true
+        },
+
+        "startTime": {
+            "type": "number",
+            "title": "Start Time",
+            "description": "The starting time of the sound in milliseconds, if it needs to start after a certain time",
+            "default": 0,
+            "example": 0
+        },
+
+        "range": {
+            "type": "number",
+            "title": "Range of the sound (only available with 3d sound)",
+            "description": "The range of the sound in degrees, where sound can be played from it's position before it can't be heared anymore. From 1 to 360.",
+            "minimum": 1,
+            "maximum": 360,
+            "default": 360,
+            "example": 180
+        }
+    }
+}

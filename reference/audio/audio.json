@@ -1,0 +1,20 @@
+{
+    "id": "audio",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "AudioConfig",
+    "description": "An instance of <a href=\"#audio\">the audio configuration.</a>",
+    "type": "object",
+
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Is the audio interface enabled ?",
+            "default": true
+        },
+
+        "volume": {
+            "$ref": "audio-volume"
+        }
+    }
+}

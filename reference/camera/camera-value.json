@@ -1,0 +1,30 @@
+{
+    "id": "camera-value",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "CameraValueConfig",
+    "description": "An instance of <a href=\"#camera-value\">a camera value.</a>",
+    "type": "object",
+
+    "properties": {
+        "default": {
+            "type": "number",
+            "title": "Default",
+            "description": "The default value.",
+            "example": 45
+        },
+
+        "min": {
+            "type": "number",
+            "title": "Minimum",
+            "description": "The minimum value.",
+            "example": 0
+        },
+
+        "max": {
+            "type": "number",
+            "title": "Maximum",
+            "description": "The maximum value",
+            "example": 90
+        }
+    }
+}

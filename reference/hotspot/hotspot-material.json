@@ -1,0 +1,56 @@
+{
+    "id": "hotspot-material",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotMaterialConfig",
+    "description": "An instance of <a href='#hotspot-material'>a hotspot material.</a>",
+    "type": "object",
+
+    "properties": {
+        "color": {
+            "type": "string",
+            "title": "Color",
+            "description": "The color of the hotspot if there is no texture.",
+            "example": "red"
+        },
+
+        "opacity": {
+            "type": "number",
+            "title": "Opacity",
+            "description": "The opacity of the texture.",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 1,
+            "example": 0.5
+        },
+
+        "transparent": {
+            "type": "boolean",
+            "title": "Transparent",
+            "description": "Does the texture needs to renderer transparency (like a PNG) ?",
+            "default": false,
+            "example": false
+        },
+
+        "image": {
+            "type": "string",
+            "title": "Image",
+            "description": "The image configuration that will be used for the texture.",
+            "example": "images/scene-0-hotspot.jpg"
+        },
+
+        "plugin": {
+            "type": "string",
+            "title": "Plugin",
+            "description": "The plugin UID that will provide a texture property.",
+            "example": "plugin-0"
+        },
+
+        "update": {
+            "type": "boolean",
+            "title": "Update",
+            "description": "Does the texture need update ?",
+            "default": false,
+            "example": false
+        }
+    }
+}

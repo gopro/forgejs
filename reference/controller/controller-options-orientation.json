@@ -1,0 +1,39 @@
+{
+    "id": "controller-options-orientation",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerOrientationConfig",
+    "description": "An instance of <a href=\"#controller-options-orientation\">a controller orientation configuration.</a>",
+    "type": "object",
+
+    "properties": {
+        "hardness": {
+            "type": "number",
+            "title": "Hardness",
+            "description": "Hardness (instant contribution).",
+            "example": 0.6
+        },
+
+         "damping": {
+            "type": "number",
+            "title": "Damping",
+            "description": "Damping (inertia).",
+            "example": 0.15
+        },
+
+         "velocityMax": {
+            "type": "number",
+            "title": "Velocity Max",
+            "description": "Maximum velocity .",
+            "example": 300
+        },
+
+         "invert": {
+            "type": "boolean",
+            "title": "Invert",
+            "description": "Inversion of axis.",
+            "example": false
+        }
+    },
+
+    "required": [ "hardness", "damping", "velocityMax", "invert" ]
+}

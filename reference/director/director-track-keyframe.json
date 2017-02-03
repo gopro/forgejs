@@ -1,0 +1,20 @@
+{
+    "id": "director-track-keyframe",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "DirectorKeyframeConfig",
+    "description": "An instance of <a href=\"#director-track-keyframe\">a director track keyframe</a>.",
+    "type": "object",
+
+    "properties": {
+        "time": {
+            "type": "number",
+            "title": "Time",
+            "description": "The time to trigger the action.",
+            "example": 20
+        },
+
+        "data": {
+            "$ref": "director-track-keyframe-data"
+        }
+    }
+}

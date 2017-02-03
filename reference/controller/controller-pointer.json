@@ -1,0 +1,17 @@
+{
+    "id": "controller-pointer",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerPointerConfig",
+    "description": "An instance of <a href=\"#controller-pointer\">a controller pointer.</a>",
+    "type": "object",
+
+    "properties": {
+        "orientation":{
+            "$ref": "controller-options-orientation"
+        },
+
+        "zoom":{
+            "$ref": "controller-options-zoom"
+        }
+    }
+}

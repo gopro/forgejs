@@ -1,0 +1,29 @@
+{
+    "id": "action-property",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ActionPropertyConfig",
+    "description": "An instance of <a href=\"#action-property\">an action property.</a>",
+    "type": "object",
+
+    "properties": {
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the property.",
+            "example": "fov"
+        },
+
+        "value": {
+            "title": "Value",
+            "description": "The value you want to set to this property, can be of any valid JSON type.",
+            "example": 10
+        },
+
+        "operation": {
+            "type": "string",
+            "title": "Operation",
+            "description": "The kind of operation you want to apply to this property. Can be one of the following: <ul><li><i>set</i> - set the current value to the passed value</li><li><i>add</i> - add the passed value to the current value</li><li><i>substract</i> - substract the passed value to the current value</li><li><i>multiply</i> - multiply the current value by the passed value</li><li><i>divide</i> - divide the current value by the passed value</li><li><i>toggle</i> - toggle the current value to <i>false</i> if it was <i>true</i>, or the other way around (only work if the property is of <i>boolean</i> type)</li></ul>",
+            "example": "add"
+        }
+    }
+}

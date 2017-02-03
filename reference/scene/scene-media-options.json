@@ -1,0 +1,32 @@
+{
+    "id": "scene-media-options",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneMediaOptionsConfig",
+    "description": "The options of a media object. An instance of <a href=\"#scene-media-options\">a scene media options object.</a>",
+    "type": "object",
+
+    "properties": {
+        "autoPlay": {
+            "type": "boolean",
+            "title": "Autoplay",
+            "description": "Does the video need to be played automatically at start ?",
+            "default": false
+        },
+
+        "loop": {
+            "type": "boolean",
+            "title": "Loop",
+            "description": "Does the video need to be looped automatically at the end of playing ?",
+            "default": false
+        },
+
+        "volume": {
+            "type": "number",
+            "title": "Volume",
+            "description": "The volume of the media",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 1
+        }
+    }
+}

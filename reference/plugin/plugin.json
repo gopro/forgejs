@@ -1,0 +1,45 @@
+{
+    "id": "plugin",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "PluginsConfig",
+    "description": "An instance of <a href=\"#plugin\">the plugin object.</a>",
+    "type": "object",
+
+    "properties": {
+        "prefix": {
+            "type": "string",
+            "title": "Prefix",
+            "description": "The prefix to put before the path of each plugin. Can be override by the prefix properties in <a href=\"#plugin-engine\">the plugin engine declaration</a>.",
+            "example": "./plugins"
+        },
+
+        "engines": {
+            "type": "array",
+            "title": "Engines",
+            "description": "List of plugin engines. Each member is an instance of <a href=\"#plugin-engine\">a plugin engine</a>.",
+            "items": {
+                "$ref": "plugin-engine"
+            }
+        },
+
+        "instances": {
+            "type": "array",
+            "title": "Instances",
+            "description": "List of plugin instances. Each member is an instance of <a href=\"plugin-instance\">a plugin instance</a>.",
+            "items": {
+                "$ref": "plugin-instance"
+            }
+        },
+
+        "configurations": {
+            "type": "array",
+            "title": "Configurations",
+            "description": "List of plugin configurations. Each member is an instance of <a href=\"plugin-configuration\">a plugin configuration</a>.",
+            "items": {
+                "$ref": "plugin-configuration"
+            }
+        }
+    },
+
+    "required": [ "engines", "instances", "configurations" ]
+}

@@ -1,0 +1,55 @@
+<?js
+var data = obj;
+var self = this;
+?>
+
+<?js
+    var members = self.find({kind: 'member', memberof: data.longname});
+    var methods = self.find({kind: 'function', memberof: data.longname});
+?>
+
+<div id="quickNav">
+
+    <h4>
+        <?js if (data.ancestors && data.ancestors.length) { ?>
+            <span class="ancestors"><?js= data.ancestors.join('') ?></span>
+        <?js } ?>
+
+        <?js= data.name ?>
+    </h4>
+   
+    <?js if (members && members.length && members.forEach) { ?>
+        
+        <h5 class="subsection-title">Members</h5>
+
+        <ul>
+            <?js members.forEach(function(p) { ?>
+                <li class="<?js= (p.attribs.indexOf('private') != -1) ? "private" : "public" ?>">
+                    <a href="#<?js= p.name ?>"><?js= p.name ?></a>
+                </li>
+            <?js }); ?>
+        </ul>
+
+    <?js } ?>
+
+
+    <?js if (methods && methods.length && methods.forEach) { ?>
+        
+        <h5 class="subsection-title">Methods</h5>
+
+        <ul>
+            <?js methods.forEach(function(p) { ?>
+                <li class="<?js= (p.attribs.indexOf('private') != -1) ? "private" : "public" ?>">
+                    <a href="#<?js= p.name ?>"><?js= p.name ?></a>
+                </li>
+            <?js }); ?>
+        </ul>
+
+    <?js } ?>
+
+
+
+
+
+
+</div>

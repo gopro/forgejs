@@ -1,0 +1,48 @@
+{
+    "id": "playlist",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "AudioPlaylistsConfig",
+    "description": "An instance of <a href=\"#playlist\">the global playlist configuration.</a>",
+    "type": "object",
+
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Is it enabled ?",
+            "default": true
+        },
+
+        "volume": {
+            "$ref": "audio-volume"
+        },
+
+        "default": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "number" }
+            ],
+            "title": "Default List",
+            "description": "The default playlist UID",
+            "example": "playlist-0"
+        },
+
+        "lists": {
+            "type": "array",
+            "title": "Lists",
+            "description": "The list of playlists. Each member is an instance of <a href=\"#playlist-config\">a playlist.</a>",
+            "items": {
+                "$ref": "playlist-config"
+            }
+        },
+
+        "tracks": {
+            "type": "array",
+            "title": "Tracks",
+            "description": "The list of tracks. Each member is an instance of <a href=\"#playlist-track\">a track.</a>",
+            "items": {
+                "$ref": "playlist-track"
+            }
+        }
+    }
+}

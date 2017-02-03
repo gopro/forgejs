@@ -1,0 +1,73 @@
+{
+    "id": "story",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "StoryConfig",
+    "description": "An instance of <a href=\"#story\">the story configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the story.",
+            "example": "story-0"
+        },
+
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the story or its i18n key.",
+            "example": "My Story"
+        },
+
+        "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "The slug of the story or its i18n key.",
+            "example": "my-story"
+        },
+
+        "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "The description of the story or its i18n key.",
+            "example": "This is a super story about awesome things"
+        },
+
+        "default": {
+            "type": "string",
+            "title": "Default loading scene",
+            "description": "The UID of the default scene to load on start.",
+            "example": "scene-0"
+        },
+
+        "thumbnails": {
+            "type": "array",
+            "title": "Thumbnails",
+            "description": "The list of thumbnails in the story. Each member is an instance of <a href=\"#scene-thumbnail\">a thumbnail</a>.",
+            "items": {
+                "$ref": "scene-thumbnail"
+            }
+        },
+
+        "scenes": {
+            "type": "array",
+            "title": "Scenes",
+            "description": "The list of scenes in the story. Each member is an instance of <a href=\"#scene\">a scene.</a>",
+            "items": {
+                "$ref": "scene"
+            }
+        },
+
+        "groups": {
+            "type": "array",
+            "title": "Groups",
+            "description": "The list of groups in the story. Each member is an instance of <a href=\"#group\">a group.</a>",
+            "items": {
+                "$ref": "group"
+            }
+        }
+    },
+
+    "required": [ "uid", "name", "slug", "description", "default" ]
+}

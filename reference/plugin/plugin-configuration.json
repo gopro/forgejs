@@ -1,0 +1,45 @@
+{
+    "id": "plugin-configuration",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "PluginConfigurationConfig",
+    "description": "An instance of <a href=\"#plugin-configuration\">a plugin configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "data": {
+            "type": "object",
+            "title": "Data",
+            "description": "The eventual data associated to the plugin, specific to each plugin.",
+            "example": {}
+        },
+
+        "options": {
+            "type": "object",
+            "title": "Options",
+            "description": "The options of this instance, specific and different for each plugin.",
+            "example": {
+                "key": "overwritting-previous-key",
+                "missing-options": 42
+            }
+        },
+
+        "actions": {
+            "type": "array",
+            "title": "Actions",
+            "description": "A list of actions associated to this plugin.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "action-awesome-thing", "action-more-awesome" ]
+        },
+
+        "events": {
+            "type": "object",
+            "title": "Events",
+            "description": "Events to react to, specific to each plugin.",
+            "example": {
+                "onDrag": [ "action-more-awesome" ]
+            }
+        }
+    }
+}

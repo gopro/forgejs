@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en_US">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>{{page.title}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.min.css" media="screen,projection" charset="utf-8" />
+    <link type="text/css" rel="stylesheet" href="static/fonts/pfdintextpro/stylesheet.css">
+    <link type="text/css" rel="stylesheet" href="static/forge-iframe.css">
+    <script type="text/javascript">
+        function updateLink()
+        {
+            var url, slug, links = document.getElementsByTagName('a');
+
+            for (var i = 0, ii = links.length; i < ii; i++)
+            {
+                if (!links[i].classList.contains('out'))
+                {
+                    url = links[i].href.replace(/(.+\/)\w+\.html#([\w\-]+)/, function(match, p1, p2) {
+                        var subRefs = p2.split('-');
+
+                        if (subRefs.length > 1)
+                        {
+                            slug = subRefs[0] + '/' + p2;
+                            return p1 + subRefs[0] + '.html#' + p2;
+                        } else {
+                            slug = p2;
+                            return p1 + p2 + '.html'
+                        }
+                    });
+
+                    links[i].href = 'javascript:window.parent.goTo("' + url + '", "' + slug + '");';
+                }
+            }
+        }
+    </script>
+</head>
+<body data-spy="scroll" data-target="#navbar" onload="updateLink()">

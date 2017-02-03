@@ -1,0 +1,22 @@
+{
+    "id": "director",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "DirectorConfig",
+    "description": "An instance of <a href=\"#director\">a director configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "animation": {
+            "$ref": "director-animation"
+        },
+
+        "tracks": {
+            "type": "array",
+            "title": "Tracks",
+            "description": "A list of the tracks composing the director's cut. Each member is an instance of <a href=\"#director-track\">a director track</a>.",
+            "items": {
+                "$ref": "director-track"
+            }
+        }
+    }
+}

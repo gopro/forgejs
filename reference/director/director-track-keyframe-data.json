@@ -1,0 +1,37 @@
+{
+    "id": "director-track-keyframe-data",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "DirectorKeyframeConfigData",
+    "description": "An instance of <a href=\"#director-track-keyframe-data\">a director track keyframe data</a>.",
+    "type": "object",
+
+    "properties": {
+        "yaw": {
+            "type": "number",
+            "title": "Yaw",
+            "description": "The yaw of the camera.",
+            "example": 10
+        },
+
+        "pitch": {
+            "type": "number",
+            "title": "Pitch",
+            "description": "The pitch of the camera.",
+            "example": 20
+        },
+
+        "roll": {
+            "type": "number",
+            "title": "Roll",
+            "description": "The roll of the camera.",
+            "example": -50
+        },
+
+        "fov": {
+            "type": "number",
+            "title": "FOV",
+            "description": "The field of view of the camera.",
+            "example": 270
+        }
+    }
+}

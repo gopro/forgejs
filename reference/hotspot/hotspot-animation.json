@@ -1,0 +1,47 @@
+{
+    "id": "hotspot-animation",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotAnimationConfig",
+    "description": "An instance of <a href=\"#hotspot-animation\">a hotspot animation</a>.",
+    "type": "object",
+
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Is the animation enabled ?",
+            "example": true
+        },
+
+        "random": {
+            "type": "boolean",
+            "title": "Randomly",
+            "description": "Are the tracks played randomly ?",
+            "example": false
+        },
+
+        "loop": {
+            "type": "boolean",
+            "title": "Looping",
+            "description": "Does the animation loop ?",
+            "example": false
+        },
+
+        "autostart": {
+            "type": "boolean",
+            "title": "Autostart",
+            "description": "Does the animation autostart ?",
+            "example": false
+        },
+
+        "order": {
+            "type": "array",
+            "title": "Order",
+            "description": "The list of tracks UID ot execute. The tracks are executed in the order they are written in this array.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "track-0", "track-2" ]
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "id": "audio-volume",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "AudioVolumeConfig",
+    "description": "The configuration of <a href=\"#audio-volume\">the volume of the audio.</a>",
+    "type": "object",
+
+    "properties": {
+        "default": {
+            "type": "number",
+            "title": "Default",
+            "description": "The default value of the volume.",
+            "default": 1,
+            "minimum": 0,
+            "maximum": 1
+        },
+
+        "max": {
+            "type": "number",
+            "title": "Maximum",
+            "description": "The maximum value of the volume.",
+            "default": 1,
+            "minimum": 0,
+            "maximum": 1
+        }
+    }
+}

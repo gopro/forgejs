@@ -1,0 +1,35 @@
+{
+    "id": "sound",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SoundConfig",
+    "description": "An instance of <a href='#sound'>a sound.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the sound.",
+            "example": "sound-0"
+        },
+
+        "type": {
+            "type": "string",
+            "enum": [ "stereo", "ambisonic" ],
+            "title": "Type",
+            "description": "What is the type of the sound :<ul><li>stereo</li><li>3d</li><li>ambisonic</li></ul>",
+            "default": "stereo",
+            "example": "stereo"
+        },
+
+        "source": {
+            "$ref": "sound-source"
+        },
+
+        "options": {
+            "$ref": "sound-options"
+        }
+    },
+
+    "required": [ "uid" ]
+}

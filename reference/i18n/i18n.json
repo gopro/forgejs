@@ -1,0 +1,41 @@
+{
+    "id": "i18n",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "I18nConfig",
+    "description": "An instance of <a href=\"#i18n\">the i18n configuration.</a>",
+    "type": "object",
+
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Is the i18n support enabled for this project ?",
+            "default": true,
+            "example": false
+        },
+
+        "default": {
+            "type": "string",
+            "title": "Default",
+            "description": "The default locale UID to use.",
+            "example": "en-US"
+        },
+
+        "auto": {
+            "type": "boolean",
+            "title": "Auto",
+            "description": "Is the device default browser locale used if available ?",
+            "default": false,
+            "example": false
+        },
+
+        "locales": {
+            "type": "array",
+            "title": "Locales",
+            "description": "The list of each locale configuration. Each member is an instance of <a href=\"#i18n-locale\">an i18n locale.</a>",
+            "items": {
+                "$ref": "i18n-locale"
+            }
+        }
+    }
+}

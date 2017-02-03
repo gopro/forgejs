@@ -1,0 +1,16 @@
+<nav id="navbar" class="nav">
+    {{#each page.sections}}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a href="?q={{slug}}" class="text-muted reference-link">{{title}}</a>
+            </h3>
+        </div>
+        <dl>
+            {{#each schemas}}
+                <li class="nav-item"><a class="sub-reference-link" href="?q={{../slug}}&a={{id}}">{{id}}</a></li>
+            {{/each}}
+        </dl>
+    </div>
+    {{/each}}
+</nav>

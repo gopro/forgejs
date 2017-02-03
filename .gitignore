@@ -1,0 +1,23 @@
+#Binary files extensions
+*.sh
+*.zip
+*.mp4
+*.webm
+*.xls
+
+#Node packages
+**/node_modules
+
+# Files that changes at build time, no need to commit them
+build/
+
+#documentation
+doc/
+
+# Others
+.DS_Store
+**/.DS_Store
+.dropbox
+
+
+

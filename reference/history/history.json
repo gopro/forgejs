@@ -1,0 +1,17 @@
+{
+    "id": "history",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HistoryConfig",
+    "description": "An instance of <a href=\"#history\">the history global configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Is the history enabled ?",
+            "default": true,
+            "example": true
+        }
+    }
+}

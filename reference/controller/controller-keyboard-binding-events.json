@@ -1,0 +1,36 @@
+{
+    "id": "controller-keyboard-binding-events",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerKeyboardBindingEventsConfig",
+    "description": "Available events to bind actions to for the <a href=\"#controller-keyboard\">controller keyboard.</a>",
+    "type": "object",
+
+    "properties": {
+        "onDown":{
+            "anyOf":[
+                {"type": "string"},
+                {"type": "array", "items": "string"}
+            ],
+            "title": "onDown",
+            "description": "The action or array of actions uid to trigger on key down event"
+        },
+
+        "onHold":{
+            "anyOf":[
+                {"type": "string"},
+                {"type": "array", "items": "string"}
+            ],
+            "title": "onHold",
+            "description": "The action or array of actions uid to trigger on key hold event"
+        },
+
+        "onUp":{
+            "anyOf":[
+                {"type": "string"},
+                {"type": "array", "items": "string"}
+            ],
+            "title": "onUp",
+            "description": "The action or array of actions uid to trigger on key up event"
+        }
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "id": "scene-media-level",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneMediaLevelConfig",
+    "description": "The level of a media source object. An instance of <a href=\"#scene-media-level\">a scene source level.</a>",
+    "type": "object",
+
+    "properties": {
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "If set, specifies the <code>{z}</code> pattern for this level. If not, the value will be the index of the level in the levels array.",
+            "example": "4K"
+        },
+
+        "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "If set, overrides any computed URL by this one. If not, the URL will be computed from other values",
+            "example": "multi/video-2K.mp4"
+        },
+
+        "width": {
+            "type": "number",
+            "title": "Width",
+            "description": "The width of the source. It will be used with the height and tile to compute the value of the <code>{x}</code> and <code>{y}</code> patterns.",
+            "example": 2048
+        },
+
+        "height": {
+            "type": "number",
+            "title": "Height",
+            "description": "The height of the source. It will be used with the width and tile to compute the value of the <code>{x}</code> and <code>{y}</code> patterns.",
+            "example": 1024
+        },
+
+        "tile": {
+            "type": "number",
+            "title": "Tile",
+            "description": "The size of a tile, which corresponds to the width and the height of a tile. It will be used with the width and height to compute the value of the <code>{x}</code> and <code>{y}</code> patterns.",
+            "example": 512
+        }
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "id": "i18n-locale",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "I18nLocaleConfig",
+    "description": "An instance of <a href=\"#i18n-locale\">an i18n locale.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the locale, we recommend a code respecting the <a href=\"https://tools.ietf.org/html/rfc5646#appendix-A\" class=\"out\">RFC 5646</a> for better identification.",
+            "example": "en-US"
+        },
+
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the locale.",
+            "example": "English"
+        },
+
+        "files": {
+            "type": "array",
+            "title": "Files",
+            "description": "The list of files containing the locale. Each member is an instance of <a href=\"i18n-locale-files\">a i18n locale file</a>.",
+            "items": {
+                "$ref": "i18n-locale-files"
+            }
+        }
+    },
+
+    "required": [ "uid", "name", "files" ]
+}

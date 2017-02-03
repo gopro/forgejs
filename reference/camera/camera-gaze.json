@@ -1,0 +1,25 @@
+{
+    "id": "camera-gaze",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "CameraGazeConfig",
+    "description": "Camera gaze cursor configuration",
+    "type": "object",
+
+    "properties": {
+        "delay": {
+            "type": "number",
+            "title": "Delay",
+            "description": "The time needed to validate a gaze interaction.",
+            "minimum": 0,
+            "example": 2000
+        },
+
+        "cursor": {
+            "$ref": "camera-gaze-ring"
+        },
+
+        "progress": {
+            "$ref": "camera-gaze-ring"
+        }
+    }
+}

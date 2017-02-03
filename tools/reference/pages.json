@@ -1,0 +1,490 @@
+{
+    "destination": "doc/json-reference",
+    "pages": [
+    {
+        "file": "index.html",
+        "title": "JSON Reference",
+        "home": true,
+        "sections": [
+        {
+            "title": "Root",
+            "slug": "root",
+            "schemas": [
+                "root"
+            ]
+        },
+        {
+            "title": "Viewer",
+            "slug": "viewer",
+            "schemas": [
+                "viewer"
+            ]
+        },
+        {
+            "title": "History",
+            "slug": "history",
+            "schemas": [
+                "history"
+            ]
+        },
+        {
+            "title": "i18n",
+            "slug": "i18n",
+            "schemas": [
+                "i18n",
+                "i18n-locale",
+                "i18n-locale-files"
+            ]
+        },
+        {
+            "title": "View",
+            "slug": "view",
+            "schemas": [
+                "view"
+            ]
+        },
+        {
+            "title": "Camera",
+            "slug": "camera",
+            "schemas": [
+                "camera",
+                "camera-value",
+                "camera-gaze",
+                "camera-gaze-ring"
+            ]
+        },
+        {
+            "title": "Controllers",
+            "slug": "controller",
+            "schemas": [
+                "controller",
+                "controller-instance",
+                "controller-pointer",
+                "controller-options-orientation",
+                "controller-options-zoom",
+                "controller-keyboard",
+                "controller-keyboard-binding",
+                "controller-keyboard-binding-events"
+            ]
+        },
+        {
+            "title": "Audio",
+            "slug": "audio",
+            "schemas": [
+                "audio",
+                "audio-volume"
+            ]
+        },
+        {
+            "title": "Playlist",
+            "slug": "playlist",
+            "schemas": [
+                "playlist",
+                "playlist-config",
+                "playlist-track"
+            ]
+        },
+        {
+            "title": "Post Processing",
+            "slug": "postprocessing",
+            "schemas": [
+                "postprocessing",
+                "postprocessing-set",
+                "postprocessing-fx"
+            ]
+        },
+        {
+            "title": "Story",
+            "slug": "story",
+            "schemas": [
+                "story"
+            ]
+        },
+        {
+            "title": "Scene",
+            "slug": "scene",
+            "schemas": [
+                "scene",
+                "scene-thumbnail",
+                "scene-media",
+                "scene-media-source",
+                "scene-media-level",
+                "scene-media-options"
+            ]
+        },
+        {
+            "title": "Hotspot",
+            "slug": "hotspot",
+            "schemas": [
+                "hotspot",
+                "hotspot-transform",
+                "hotspot-transform-position",
+                "hotspot-transform-rotation",
+                "hotspot-transform-scale",
+                "hotspot-geometry",
+                "hotspot-animation",
+                "hotspot-material",
+                "hotspot-events",
+                "hotspot-anim",
+                "hotspot-track",
+                "hotspot-track-keyframe"
+            ]
+        },
+        {
+            "title": "Sound",
+            "slug": "sound",
+            "schemas": [
+                "sound",
+                "sound-source",
+                "sound-options",
+                "sound-volume"
+            ]
+        },
+        {
+            "title": "Group",
+            "slug": "group",
+            "schemas": [
+                "group"
+            ]
+        },
+        {
+            "title": "Director",
+            "slug": "director",
+            "schemas": [
+                "director",
+                "director-animation",
+                "director-track",
+                "director-track-keyframe",
+                "director-track-keyframe-data"
+            ]
+        },
+        {
+            "title": "Actions",
+            "slug": "actions",
+            "schemas": [
+                "action",
+                "action-target",
+                "action-method",
+                "action-property"
+            ]
+        },
+        {
+            "title": "Animation",
+            "slug": "animation",
+            "schemas": [
+                "animation-track-easing"
+            ]
+        },
+        {
+            "title": "Plugins",
+            "slug": "plugins",
+            "schemas": [
+                "plugin",
+                "plugin-engine",
+                "plugin-instance",
+                "plugin-configuration"
+            ]
+        }]
+    },
+    {
+        "file": "root.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Root",
+            "slug": "root",
+            "description": "This is the root of the story. It gathers all the objects describing the story.",
+            "schemas": [
+                "root"
+            ],
+            "noexample": true
+        }]
+    },
+    {
+        "file": "viewer.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Viewer",
+            "slug": "viewer",
+            "description": "All the global configuration of the viewer, such as the default background color to show when no media is loaded, is defined here.",
+            "schemas": [
+                "viewer"
+            ]
+        }]
+    },
+    {
+        "file": "history.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "History",
+            "slug": "history",
+            "description": "The history is to allow the user to navigate in the history of the story. It will append information about the current scene to the URL. When the history is enabled, the URL of the page will be appended with something like <code>#scene-1-slug&uid=scene-1</code>",
+            "schemas": [
+                "history"
+            ]
+        }]
+    },
+    {
+        "file": "i18n.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "i18n",
+            "slug": "i18n",
+            "description": "ForgeJS supports internationalization of everything, from text to media. This section allows to configure the internationalization, by specifying each available locale. It is recommended to follow a simple scheme to identify each locale, such as <b>en-US</b> or <b>fr-FR</b>.",
+            "schemas": [
+                "i18n",
+                "i18n-locale",
+                "i18n-locale-files"
+            ]
+        }]
+    },
+    {
+        "file": "view.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "View",
+            "slug": "view",
+            "description": "The type of view, either Rectilinear or GoPro, can be set globally at the root, but a scene can also have a specific view.",
+            "schemas": [
+                "view"
+            ]
+        }]
+    },
+    {
+        "file": "camera.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Camera",
+            "slug": "camera",
+            "description": "The camera can have its initial position set, and have limitations in its movement. This configuration can be set globally at the root, but a scene can also have a specific configuration for its camera.",
+            "schemas": [
+                "camera",
+                "camera-value",
+                "camera-gaze",
+                "camera-gaze-ring"
+            ]
+        }]
+    },
+    {
+        "file": "controller.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Controllers",
+            "slug": "controller",
+            "description": "Controllers can be bound to ForgeJS: by example, the keyboard and the mouse. By default, some bindings exists, like the arrow keys to move in the scene, and the mouse movement as well.",
+            "schemas": [
+                "controller",
+                "controller-instance",
+                "controller-pointer",
+                "controller-options-orientation",
+                "controller-options-zoom",
+                "controller-keyboard",
+                "controller-keyboard-binding",
+                "controller-keyboard-binding-events"
+            ]
+        }]
+    },
+    {
+        "file": "audio.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Audio",
+            "slug": "audio",
+            "description": "The global audio volume configuration, valid for either video and audio track. Volume can be changed for a video and an audio track, but take into account that this global audio config has still an effect on those others audio configuration.",
+            "schemas": [
+                "audio",
+                "audio-volume"
+            ]
+        }]
+    },
+    {
+        "file": "playlist.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Playlist",
+            "slug": "playlist",
+            "description": "Playlists are composed of audio tracks to play. Each track is independant of each playlist, and thus a track can be used for multiple playlists.",
+            "schemas": [
+                "playlist",
+                "playlist-config",
+                "playlist-track"
+            ]
+        }]
+    },
+    {
+        "file": "postprocessing.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Post Processing",
+            "slug": "postprocessing",
+            "description": "It is possible to apply special effects (FX) on a scene. Each object describing the configuration of a special effect is specific to the latter, as they don't have the same parameters. The special effect is then linked to the scene by specifying its UID to the scene.",
+            "schemas": [
+                "postprocessing",
+                "postprocessing-set",
+                "postprocessing-fx"
+            ]
+        }]
+    },
+    {
+        "file": "story.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Story",
+            "slug": "st$",
+            "description": "This is the main section of ForgeJS, describing each scene present in the story. It is essentially composed of <a href=\"#scene\">scenes</a> that can be put in <a href=\"#group\">groups</a>.",
+            "schemas": [
+                "story"
+            ]
+        }]
+    },
+    {
+        "file": "scene.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Scene",
+            "slug": "scene",
+            "description": "A scene is essentially composed of a 360&ordm; media to display, but also local configuration to itself. It can contain a specific view or camera configuration for example. This is also where <a href=\"#hotspot\">hotspots</a> are defined, along with the <a href=\"#director\">director's cut</a> and specific <a href=\"#plugins\">plugins</a> configuration.",
+            "schemas": [
+                "scene",
+                "scene-thumbnail",
+                "scene-media",
+                "scene-media-source",
+                "scene-media-level",
+                "scene-media-options"
+            ]
+        }]
+    },
+    {
+        "file": "hotspot.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Hotspot",
+            "slug": "hotspot",
+            "description": "A hotspot can only be a 3D hotspot for now. A 3D hotspot is a hotspot attached to the sphere containing the 360&ordm; media. It can have a visual representation, from an image showing the hotspot, but also a sound, that will be an ambisonic one. The hotspot can stay just like this, or it can be bind to an <a href=\"#actions\">action</a>, to give an interaction.",
+            "schemas": [
+                "hotspot",
+                "hotspot-transform",
+                "hotspot-transform-position",
+                "hotspot-transform-rotation",
+                "hotspot-transform-scale",
+                "hotspot-geometry",
+                "hotspot-animation",
+                "hotspot-material",
+                "hotspot-events"
+            ]
+        },
+        {
+            "title": "Hotspot Animation",
+            "slug": "hotspot-anim",
+            "description": "Each hotspot can be animated. The animation can begin at any time specified by the user, for example by a click or automatically after 10 seconds. This section is placed at the root of the JSON configuration.",
+            "schemas": [
+                "hotspot-anim",
+                "hotspot-track",
+                "hotspot-track-keyframe"
+            ]
+        }]
+    },
+    {
+        "file": "sound.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Sound",
+            "slug": "sound",
+            "description": "A sound can be really simple, just loaded on the scene, or more complex: only perceptible in a specific corner of the scene, ambisonic, etc...",
+            "schemas": [
+                "sound",
+                "sound-source",
+                "sound-options",
+                "sound-volume"
+            ]
+        }]
+    },
+    {
+        "file": "group.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Group",
+            "slug": "group",
+            "description": "A group is composed of multiple scenes, so scenes can be regrouped together if it is wanted.",
+            "schemas": [
+                "group"
+            ]
+        }]
+    },
+    {
+        "file": "director.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Director",
+            "slug": "director",
+            "description": "The director's cut allows to get an automatic navigation inside a 360&ordm; media, be it a video or an image. By specifying the different keyframes, the player will navigate through the media, doing interpolation between each keyframe, to display a smooth navigation.",
+            "schemas": [
+                "director",
+                "director-animation",
+                "director-track",
+                "director-track-keyframe",
+                "director-track-keyframe-data"
+            ]
+        }]
+    },
+    {
+        "file": "actions.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Actions",
+            "slug": "actions",
+            "description": "",
+            "schemas": [
+                "action",
+                "action-target",
+                "action-method",
+                "action-property"
+            ]
+        }]
+    },
+    {
+        "file": "animation.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Animation",
+            "slug": "animation",
+            "description": "Animation can be found in the <a href=\"#director\">director's cut</a> and in <a href=\"#hotspot\">hotspots</a>.",
+            "schemas": [
+                "animation-track-easing"
+            ]
+        }]
+    },
+    {
+        "file": "plugins.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Plugins",
+            "slug": "plugins",
+            "description": "A plugin can add elements and functionnalities that are not available through ForgeJS. It can be as simple as a button reacting to a click by going to the next scene, to a complex plugin of chromakey, detouring in real time something on top of a green screen.",
+            "schemas": [
+                "plugin",
+                "plugin-engine",
+                "plugin-instance",
+                "plugin-configuration"
+            ]
+        }]
+    }]
+}

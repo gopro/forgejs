@@ -1,0 +1,44 @@
+{
+    "id": "camera-gaze-ring",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "CameraGazeRingConfig",
+    "description": "An instance of a camera gaze ring geometry and material <a href=\"#camera-gaze-ring\">configuration.</a>",
+    "type": "object",
+
+    "properties": {
+        "innerRadius": {
+            "type": "number",
+            "title": "Inner radius",
+            "description": "The inner radius of the ring.",
+            "minimum": 0,
+            "default": 0.02
+        },
+
+        "outerRadius": {
+            "type": "number",
+            "title": "Outer radius",
+            "description": "The outer radius of the ring.",
+            "minimum": 0,
+            "default": 0.04
+        },
+
+        "color": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "number" }
+            ],
+            "title": "Color",
+            "description": "The hexadecimal color code of the ring.",
+            "example": "#ffffff"
+        },
+
+        "opacity": {
+            "type": "number",
+            "title": "Opacity",
+            "description": "The opacity of the ring.",
+            "minimum": 0,
+            "maximum": 1,
+            "example": 0.5
+        }
+    }
+}

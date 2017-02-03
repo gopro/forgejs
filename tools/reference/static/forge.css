@@ -1,0 +1,43 @@
+body {
+    font-family: 'pf_dintext_promedium', sans-serif;
+    color: #4D4E53;
+    font-size: 14px;
+}
+
+header {
+    background: black;
+}
+
+.scroll-section {
+    position: absolute;
+    height: calc(100% - 68px);
+    overflow: auto;
+}
+
+#object-nav {
+    left: 0px;
+    width: 250px;
+    padding-left: 20px;
+    background-color: #dddddd;
+}
+
+#object-definition {
+    right: 0px;
+    width: calc(100% - 250px);
+}
+
+#json-title {
+    display:inline;
+    vertical-align: middle;
+    float: right;
+    font-family: 'pf_dintext_probold', sans-serif;
+    margin: 0;
+    padding: 10px;
+    font-size: 30px;
+    color: #d8d8d8;
+}
+
+.text-muted, a, a:hover {
+    font-family: 'pf_dintext_promedium', sans-serif;
+    color: #4D4E53;
+}

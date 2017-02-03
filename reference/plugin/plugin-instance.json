@@ -1,0 +1,106 @@
+{
+    "id": "plugin-instance",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "PluginInstanceConfig",
+    "description": "An instance of <a href=\"#plugin-instance\">a plugin instance</a>.",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the instance.",
+            "example": "awesome-plugin-instance"
+        },
+
+        "engine": {
+            "type": "string",
+            "title": "Engine UID",
+            "description": "The UID of the engine the instance is of.",
+            "example": "com.awesome.plugin"
+        },
+
+        "tags": {
+            "type": "array",
+            "title": "Tags",
+            "description": "A list of tags.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "plugin", "beach", "awesome" ]
+        },
+
+        "scenes": {
+            "type": "array",
+            "title": "Scenes",
+            "description": "The list of UID of scenes associated to the instance.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "scene-0", "scene-2" ]
+        },
+
+        "options": {
+            "type": "object",
+            "title": "Options",
+            "description": "The options of this instance, specific and different for each plugin.",
+            "example": {
+                "awesomeness": 360,
+                "key": "i18n-awesome",
+                "another_options": {
+                    "target": "scene-1",
+                    "enabled": true
+                }
+            }
+        },
+
+        "data": {
+            "type": "object",
+            "title": "Data",
+            "description": "The eventual data associated to the plugin, specific to each plugin.",
+            "example": {}
+        },
+
+        "actions": {
+            "type": "array",
+            "title": "Actions",
+            "description": "A list actions associated to this plugin.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "action-awesome-thing", "action-more-awesome" ]
+        },
+
+        "events": {
+            "type": "object",
+            "title": "Events",
+            "description": "Events to react to, specific to each plugin.",
+            "example": {
+                "onClick": [ "action-awesome-thing" ]
+            }
+        },
+
+        "index": {
+            "type": "number",
+            "title": "Index",
+            "description": "The index of the plugin on the screen.",
+            "example": 10
+        },
+
+        "enabled": {
+            "type": "boolean",
+            "title": "Enable",
+            "description": "Is the instance enabled ?",
+            "example": true
+        },
+
+        "keep": {
+            "type": "boolean",
+            "title": "Keeping",
+            "description": "Do we need to keep the plugin ?",
+            "example": false
+        }
+    },
+
+    "required": [ "uid", "tags", "options", "actions", "events" ]
+}

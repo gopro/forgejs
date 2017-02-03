@@ -1,0 +1,64 @@
+{
+    "id": "playlist-config",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "AudioPlaylistConfig",
+    "description": "An instance of <a href=\"#playlist-config\">a playlist.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the playlist.",
+            "example": "playlist-0"
+        },
+
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the playlist.",
+            "example": "Killer Playlist"
+        },
+
+        "default": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "number" }
+            ],
+            "title": "Default Track",
+            "description": "The default track UID of the playlist.",
+            "example": "track-0"
+        },
+
+        "autoPlay": {
+            "type": "boolean",
+            "title": "AutoPlay",
+            "description": "This sets whether or not the playlist starts automatically.",
+            "default": true
+        },
+
+        "loop": {
+            "type": "boolean",
+            "title": "Loop",
+            "description": "This sets whether or not the playlist repeats after the play of the last track.",
+            "default": true
+        },
+
+        "volume": {
+            "$ref": "audio-volume"
+
+        },
+
+        "tracks": {
+            "type": "array",
+            "title": "Tracks",
+            "description": "The list of tracks UID associated to the playlist.",
+            "items": {
+                "type": "string"
+            },
+            "example": ["track-0", "track-1"]
+        }
+    },
+
+    "required": [ "uid", "tracks" ]
+}

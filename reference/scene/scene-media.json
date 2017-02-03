@@ -1,0 +1,39 @@
+{
+    "id": "scene-media",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneMediaConfig",
+    "description": "The media object associated to the scene. An instance of <a href=\"#scene-media\">a scene media.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the media.",
+            "example": "media-0"
+        },
+
+        "type": {
+            "type": "string",
+            "enum": [ "image", "video" ],
+            "title": "Type",
+            "description": "The type of the media. Can be :<ul><li>image</li><li>video</li></ul>",
+            "example": "image"
+        },
+
+        "source": {
+            "$ref": "scene-media-source"
+        },
+
+        "options": {
+            "$ref": "scene-media-options"
+        },
+
+        "fx": {
+            "type": "string",
+            "title": "FX",
+            "description": "The FX associated to the media.",
+            "example": "fx-0"
+        }
+    }
+}

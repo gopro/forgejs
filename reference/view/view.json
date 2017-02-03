@@ -1,0 +1,17 @@
+{
+    "id": "view",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ViewConfig",
+    "description": "An instance of <a href=\"#view\">the view configuration.</a>",
+    "type": "object",
+
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [ "Rectilinear", "GoPro" ],
+            "title": "The type of view",
+            "description": "Two views are available: <ul><li>Rectilinear</li><li>GoPro</li></ul>",
+            "default": "Rectilinear"
+        }
+    }
+}

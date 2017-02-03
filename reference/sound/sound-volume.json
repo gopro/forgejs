@@ -1,0 +1,29 @@
+{
+    "id": "sound-volume",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SoundVolumeConfig",
+    "description": "An instance of <a href='#sound-options'>sound volume.</a>",
+    "type": "object",
+
+    "properties": {
+        "min": {
+            "type": "number",
+            "title": "Min",
+            "description": "The minimum volume of the sound.",
+            "example": 0.2,
+            "default": 0,
+            "minimum": 0,
+            "maximum": 1
+        },
+
+        "max": {
+            "type": "number",
+            "title": "Max",
+            "description": "The maximum volume of the sound.",
+            "example": 0.8,
+            "default": 1,
+            "minimum": 0,
+            "maximum": 1
+        }
+    }
+}

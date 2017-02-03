@@ -1,0 +1,37 @@
+{
+    "id": "scene-thumbnail",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneThumbConfig",
+    "description": "The configuration of a thumbnail associated to a scene. An instance of <a href=\"#scene-thumbnail\">a scene thumbnail.</a>",
+    "type": "object",
+
+    "properties": {
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the thumbnail.",
+            "example": "thumb-0"
+        },
+
+        "width": {
+            "type": "number",
+            "title": "Width",
+            "description": "Width of the thumbnail.",
+            "example": 100
+        },
+
+        "height": {
+            "type": "number",
+            "title": "Height",
+            "description": "Height of the thumbnail.",
+            "example": 50
+        },
+
+        "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "URL of the thumbnail: the file can be local or on a distant server, but must be a valid image format.",
+            "example": "./images/scene-0-thumbnail.jpg"
+        }
+    }
+}

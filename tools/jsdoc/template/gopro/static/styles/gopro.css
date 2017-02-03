@@ -1,0 +1,486 @@
+
+html
+{
+    overflow: auto;
+    background-color: #fff;
+    font-size: 14px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body
+{
+    font-family: 'pf_dintext_prolight', sans-serif;
+    line-height: 1.5;
+    color: #4d4e53;
+    background-color: white;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+a, a:visited, a:active 
+{
+    font-family: 'pf_dintext_promedium', sans-serif;
+    color: #009FDF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+header
+{
+    display: block;
+    padding: 0px 4px;
+}
+
+div#header
+{
+    background-color: black;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    overflow: hidden;
+
+
+    -webkit-box-shadow: 0px 11px 45px 0px rgba(0,0,0,0.48);
+    -moz-box-shadow: 0px 11px 45px 0px rgba(0,0,0,0.48);
+    box-shadow: 0px 11px 45px 0px rgba(0,0,0,0.48);
+}
+
+div#header p
+{
+    font-family: 'pf_dintext_probold', sans-serif;
+    margin: 0;
+    padding: 10px;
+    float: left;
+    text-align: center;
+    font-size: 30px;
+    color: #d8d8d8;
+    
+}
+
+div#header p.title
+{
+   width: 100%;
+}
+
+div#header p.logo
+{
+   position: absolute;
+   top: 0px; 
+   left: 0px;
+}
+
+
+div#main 
+{
+    float: left;
+    width: calc(100% - 250px);
+    height: calc(100% - 140px);
+    overflow: hidden; 
+    margin-top: 65px;
+    box-sizing: border-box;
+}
+
+div#footer 
+{   
+    position: absolute;
+    bottom: 0px;
+
+    background-color: #353535;
+    font-style: italic;
+    font-size: 90%;
+    line-height: 50px;
+    text-align: center;
+    height: 50px;
+    width: 100%;
+    color: #d8d8d8;
+
+    -webkit-box-shadow: 0px -11px 45px 0px rgba(0,0,0,0.48);
+    -moz-box-shadow: 0px -11px 45px 0px rgba(0,0,0,0.48);
+    box-shadow: 0px -11px 45px 0px rgba(0,0,0,0.48);
+}
+
+div#quickNav
+{
+    float: left;
+    width: 280px;
+    height: 100%;
+    padding: 20px 0 0 20px;
+    box-sizing: border-box;
+    overflow-y: scroll; 
+
+}
+
+div#quickNav ul
+{
+    padding: 0 0 0 20px;
+}
+
+div#quickNav ul li
+{
+    list-style: none;
+}
+
+div#quickNav ul li a
+{
+    font-family: 'pf_dintext_promlight', sans-serif;
+    color: #4D4E53;
+}
+
+tt, code, kbd, samp {
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+}
+
+.class-description {
+    font-size: 130%;
+    line-height: 140%;
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
+.class-description:empty {
+    margin: 0;
+}
+
+
+
+article dl {
+    margin-bottom: 40px;
+}
+
+section
+{
+    display: block;
+    box-sizing: border-box;
+    float: left;
+    background-color: #fff;
+    padding: 12px 24px;
+    border-bottom: 1px solid #ccc;
+    width: calc(100% - 280px);
+    height: 100%;
+    overflow-y: scroll; 
+}
+
+.variation {
+    display: none;
+}
+
+.signature-attributes {
+    font-size: 60%;
+    color: #aaa;
+    font-style: italic;
+    font-weight: lighter;
+}
+
+nav
+{
+    display: block;
+    float: left;
+    margin-top: 65px;
+    width: 250px;
+
+    box-sizing: border-box;
+    border-left: 1px solid #ccc;
+    padding-left: 16px;
+    height: calc(100% - 140px);
+    overflow-y: scroll; 
+
+    background-color: #ddd;
+
+    padding-top: 20px;
+    padding-bottom: 20px; 
+}
+
+nav ul {
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif;
+    font-size: 100%;
+    line-height: 17px;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+nav ul a, nav ul a:visited, nav ul a:active {
+    font-family: 'pf_dintext_promedium', sans-serif;
+    line-height: 18px;
+    color: #4D4E53;
+}
+
+nav h3 {
+    margin-top: 12px;
+}
+
+nav li {
+    margin-top: 6px;
+}
+
+
+
+h1, h2, h3, h4 {
+    font-weight: 200;
+    margin: 0;
+}
+
+h1
+{
+    font-family: 'pf_dintext_probold', sans-serif;
+    font-size: 48px;
+    letter-spacing: -2px;
+    margin: 12px 24px 20px;
+}
+
+h2, h3
+{
+    font-family: 'pf_dintext_probold', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+}
+
+h4
+{
+    font-family: 'pf_dintext_probold', sans-serif;
+    font-size: 18px;
+    letter-spacing: -0.33px;
+    margin-bottom: 12px;
+    color: #4d4e53;
+}
+
+h5, .container-overview .subsection-title
+{
+    font-size: 120%;
+    font-weight: bold;
+    letter-spacing: -0.01em;
+    margin: 8px 0 3px 0;
+}
+
+h6
+{
+    font-size: 100%;
+    letter-spacing: -0.01em;
+    margin: 6px 0 3px 0;
+    font-style: italic;
+}
+
+.ancestors { color: #999; }
+.ancestors a
+{
+    color: #999 !important;
+    text-decoration: none;
+}
+
+.clear
+{
+    clear: both;
+}
+
+.important
+{
+    font-weight: bold;
+    color: #950B02;
+}
+
+.yes-def {
+    text-indent: -1000px;
+}
+
+.type-signature {
+    color: #aaa;
+}
+
+.name, .signature {
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+}
+
+.details { margin-top: 14px; border-left: 2px solid #DDD; }
+.details dt { width: 120px; float: left; padding-left: 10px;  padding-top: 6px; }
+.details dd { margin-left: 70px; }
+.details ul { margin: 0; }
+.details ul { list-style-type: none; }
+.details li { margin-left: 30px; padding-top: 6px; }
+.details pre.prettyprint { margin: 0 }
+.details .object-value { padding-top: 0; }
+
+.description {
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
+.code-caption
+{
+    font-style: italic;
+    font-size: 107%;
+    margin: 0;
+}
+
+.prettyprint
+{
+    border: 1px solid #ddd;
+    width: 80%;
+    overflow: auto;
+}
+
+.prettyprint.source {
+    width: inherit;
+}
+
+.prettyprint code
+{
+    font-size: 100%;
+    line-height: 18px;
+    display: block;
+    padding: 4px 12px;
+    margin: 0;
+    background-color: #fff;
+    color: #4D4E53;
+}
+
+.prettyprint code span.line
+{
+  display: inline-block;
+}
+
+.prettyprint.linenums
+{
+  padding-left: 70px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.prettyprint.linenums ol
+{
+  padding-left: 0;
+}
+
+.prettyprint.linenums li
+{
+  border-left: 3px #ddd solid;
+}
+
+.prettyprint.linenums li.selected,
+.prettyprint.linenums li.selected *
+{
+  background-color: lightyellow;
+}
+
+.prettyprint.linenums li *
+{
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+.params, .props
+{
+    border-spacing: 0;
+    border: 0;
+    border-collapse: collapse;
+}
+
+.params .name, .props .name, .name code {
+    color: #4D4E53;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 100%;
+}
+
+.params td, .params th, .props td, .props th
+{
+    border: 1px solid #ddd;
+    margin: 0px;
+    text-align: left;
+    vertical-align: top;
+    padding: 4px 6px;
+    display: table-cell;
+}
+
+.params thead tr, .props thead tr
+{
+    background-color: #ddd;
+    font-weight: bold;
+}
+
+.params .params thead tr, .props .props thead tr
+{
+    background-color: #fff;
+    font-weight: bold;
+}
+
+.params th, .props th { border-right: 1px solid #aaa; }
+.params thead .last, .props thead .last { border-right: 1px solid #ddd; }
+
+.params td.description > p:first-child,
+.props td.description > p:first-child
+{
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.params td.description > p:last-child,
+.props td.description > p:last-child
+{
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.disabled {
+    color: #454545;
+}
+
+
+/* on off switch */
+
+.onoffswitch {
+    position: relative; width: 40px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    height: 18px; padding: 0; line-height: 18px;
+    border: 0px solid #FFFFFF; border-radius: 26px;
+    background-color: #999999;
+}
+.onoffswitch-label:before {
+    content: "";
+    display: block; width: 26px; margin: -4px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 18px;
+    border-radius: 26px;
+    box-shadow: 0 6px 12px 0px #757575;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label {
+    background-color: #009FDF;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {
+   border-color: #009FDF;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label:before {
+    right: 0px; 
+    background-color: #0060af; 
+    box-shadow: 3px 6px 18px 0px rgba(0, 0, 0, 0.2);
+}
+
+
+div#showPrivate {
+    position: absolute; 
+    width: 40px;
+    right: 20px;
+    top: 23px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+
+}

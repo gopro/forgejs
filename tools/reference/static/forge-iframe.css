@@ -1,0 +1,24 @@
+h1, h2, h3, h4, h5 {
+    font-family: 'pf_dintext_promedium', sans-serif;
+    color: #4D4E53;
+}
+
+p, td {
+    font-family: 'pf_dintext_proregular', sans-serif;
+    color: #4D4E53;
+    font-size: 14px;
+}
+
+pre {
+    background: #f1f1f1;
+    padding: 10px;
+    border-left: #373a3c 5px solid;
+}
+
+ul {
+    margin-bottom: 0;
+}
+
+.param-anyof {
+    list-style: none;
+}
