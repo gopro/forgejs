@@ -9,10 +9,10 @@ It's not only a VR engine, it's a framework for authoring VR content. You can us
 ## Ressources
 
 Many documentation ressources are available online:
-- [API Documentation ](https://releases.forgejs.org/latest/doc/jsdoc) describing all public methods, interfaces, properties and events.
-- [JSON reference](https://releases.forgejs.org/latest/doc/json) explaining how to describe your project in the json configuration file.
-- [Samples](https://forgejs.org/samples) demonstrating how to build your experience in the config.json file.
-- [Tutorials series](https://forgejs.org/tutorials) explaining how to use some of the ForgeJS features in your project.
+- [API Documentation ](https://releases.forgejs.org/latest/doc/jsdoc) describes all public methods, interfaces, properties and events.
+- [JSON reference](https://releases.forgejs.org/latest/doc/json) explains how to describe your project in the json configuration file.
+- [Samples](https://forgejs.org/samples) demonstrates how to build your experience in the config.json file.
+- [Tutorials series](https://forgejs.org/tutorials) explains how to use some of the ForgeJS features in your project.
 - [Known issues and limitations](https://forgejs.org/known-issues-and-limitations).
 - [Frequently asked questions](https://forgejs.org/faq).
 
@@ -31,11 +31,11 @@ ForgeJS has the following dependencies:
 - [omnitone](http://googlechrome.github.io/omnitone/#home) 0.1.8 ([Apache 2.0 license](https://github.com/GoogleChrome/omnitone/blob/master/LICENSE))
 - [dash.js](https://github.com/Dash-Industry-Forum/dash.js) 2.3.0 ([BSD license](https://github.com/Dash-Industry-Forum/dash.js/blob/development/LICENSE.md))
 
-> NOTE: We made a custom build of three.js with some classes concatenated to it. These classes are included in the original three.js repository but not concatenated in the main build. We add EffectComposer, RenderPass, ClearPass, MaskPass, ShaderPass, TexturePass and CopyShader in our three.custom.min.js.
+> NOTE: We made a custom build of three.js with some classes concatenated to it. These classes are included in the original three.js repository but not concatenated in the main build. We added EffectComposer, RenderPass, ClearPass, MaskPass, ShaderPass, TexturePass and CopyShader in our three.custom.min.js.
 
 ## Quick Start for users
 
-The easiest way to learn how to build a project with ForgeJS is to learn with our [tutorials](https://forgejs.org/tutorials) and get inspired by our [samples](https://forgejs.org/samples) that are available online.
+The easiest way to learn how to build a project with ForgeJS is to practice with our [tutorials](https://forgejs.org/tutorials) and get inspiration from our [samples](https://forgejs.org/samples) that are available online.
 
 ## Quick Start for Developers
 
