@@ -115,7 +115,7 @@ FORGE.Device = (function(c)
         this.edge = this.ie === false && Boolean(window["StyleMedia"]) === true;
         this.firefox = typeof window["InstallTrigger"] !== "undefined";
         this.opera = Boolean(window["opr"]) === true || this.ua.indexOf(" OPR/") >= 0 || this.ua.indexOf("Opera") >= 0;
-        this.safari = Object.prototype.toString.call(window.HTMLElement).indexOf("Constructor") > 0;
+        this.safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         this.chrome = this.ie === false && this.edge === false && this.opera === false && (Boolean(window["chrome"]) === true || this.ua.indexOf("CriOS") >= 0);
 
         if (this.edge)
