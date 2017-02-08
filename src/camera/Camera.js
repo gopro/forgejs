@@ -562,7 +562,7 @@ FORGE.Camera.prototype._updateFromMatrix = function()
  */
 FORGE.Camera.prototype._updatePerspectiveCamera = function()
 {
-    if (this._main === null)
+    if (this._main === null || this._viewer.renderer.view === null)
     {
         return;
     }
@@ -580,18 +580,20 @@ FORGE.Camera.prototype._updatePerspectiveCamera = function()
     this._main.matrixWorld = mat;
     this._main.matrixWorldInverse.getInverse(mat);
 
-    this._main.fov = FORGE.Math.radToDeg(this._viewer.view.getProjectionFov());
+    this._main.fov = FORGE.Math.radToDeg(this._viewer.renderer.view.getProjectionFov());
     this._main.aspect = this._viewer.renderer.displayResolution.ratio;
     this._main.updateProjectionMatrix();
 };
 
 /**
- * Final method call to complete camera update.
+ * Final method call to complete camera update, ensure main camera is up to date.
  * @method FORGE.Camera#_updateComplete
  * @private
  */
 FORGE.Camera.prototype._updateComplete = function()
 {
+    this._updatePerspectiveCamera();
+
     if (this._onCameraChange !== null)
     {
         this._onCameraChange.dispatch(null, true);
@@ -813,13 +815,11 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
 
 /**
  * Update routine called by render manager before rendering a frame.
+ * All internals should be up to date.
  * @method FORGE.Camera#update
  */
 FORGE.Camera.prototype.update = function()
 {
-    // All internals should be up to date, just maintain perspective camera here
-    this._updatePerspectiveCamera();
-
     if (this._viewer.renderer.display.presentingVR === true)
     {
         this._gaze.update();
