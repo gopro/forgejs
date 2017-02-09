@@ -226,6 +226,21 @@ Object.defineProperty(FORGE.SceneParser.prototype, "tags",
 });
 
 /**
+ * Get the background of the scene.
+ * @name  FORGE.SceneParser#background
+ * @readonly
+ * @type {string}
+ */
+Object.defineProperty(FORGE.SceneParser.prototype, "background",
+{
+    /** @this {FORGE.SceneParser} */
+    get: function()
+    {
+        return (typeof this._config.background !== "undefined") ? this._config.background : this._viewer.config.background;
+    }
+});
+
+/**
  * Get the thumbnails Array.
  * @name  FORGE.SceneParser#thumbnails
  * @readonly

@@ -288,10 +288,7 @@ FORGE.RenderManager.prototype._onSceneLoadStart = function()
     this._sceneConfig = this._viewer.story.scene.config;
 
     // Apply background to renderer
-    if (typeof this._sceneConfig.background !== "undefined")
-    {
-        this._viewer.container.background = this._sceneConfig.background;
-    }
+    this._viewer.container.background = this._sceneConfig.background;
 
     // Create render scenes before initing the view to ensure pipeline is ready when
     // enabling the picking manager
