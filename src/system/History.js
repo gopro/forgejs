@@ -16,6 +16,14 @@ FORGE.History = function(viewer)
     this._viewer = viewer;
 
     /**
+     * History configuration
+     * @name FORGE.History#_config
+     * @type {HistoryConfig}
+     * @private
+     */
+    this._config;
+
+    /**
      * The history module enabled flag.
      * @name  FORGE.History#_enabled
      * @type {boolean}
@@ -48,9 +56,9 @@ FORGE.History.DEFAULT_CONFIG =
  */
 FORGE.History.prototype._parseConfig = function(config)
 {
-    config = /** @type {HistoryConfig} */ (FORGE.Utils.extendSimpleObject(FORGE.History.DEFAULT_CONFIG, config));
+    this._config = /** @type {HistoryConfig} */ (FORGE.Utils.extendSimpleObject(FORGE.History.DEFAULT_CONFIG, config));
 
-    this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
+    this._enabled = (typeof this._config.enabled === "boolean") ? this._config.enabled : true;
 
     if (this._enabled === true)
     {
