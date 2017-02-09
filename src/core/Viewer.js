@@ -483,7 +483,8 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
  */
 FORGE.Viewer.prototype._parseConfig = function(config)
 {
-    this._container.background = (typeof config !== "undefined" && typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
+    this._config.background = (typeof config !== "undefined" && typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
+    this._container.background = this._config.background;
 };
 
 /**
