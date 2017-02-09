@@ -29,13 +29,24 @@ FORGE.History = function(viewer)
      * @type {boolean}
      * @private
      */
-    this._enabled = true;
+    this._enabled = false;
 
     FORGE.BaseObject.call(this, "History");
 };
 
 FORGE.History.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.History.prototype.constructor = FORGE.History;
+
+/**
+ * Default configuration of the History
+ * @name FORGE.History.DEFAULT_CONFIG
+ * @type {HistoryConfig}
+ * @const
+ */
+FORGE.History.DEFAULT_CONFIG =
+{
+    enabled: true
+};
 
 /**
  * Boot sequence.
@@ -45,9 +56,9 @@ FORGE.History.prototype.constructor = FORGE.History;
  */
 FORGE.History.prototype._parseConfig = function(config)
 {
-    this._config = config;
+    this._config = /** @type {HistoryConfig} */ (FORGE.Utils.extendSimpleObject(FORGE.History.DEFAULT_CONFIG, config));
 
-    this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
+    this._enabled = (typeof this._config.enabled === "boolean") ? this._config.enabled : true;
 
     if (this._enabled === true)
     {
