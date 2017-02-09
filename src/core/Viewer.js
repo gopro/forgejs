@@ -427,10 +427,7 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
         this._i18n.addConfig(config.i18n); //force the parse of the main config
     }
 
-    if (typeof config.history !== "undefined")
-    {
-        this._history.addConfig(config.history);
-    }
+    this._history.addConfig(config.history);
 
     if (typeof config.audio !== "undefined")
     {
