@@ -694,7 +694,18 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
             if (typeof this._sceneConfig.media.source != "undefined") {
                 config.order = this._sceneConfig.media.source.order || "RLUDFB";
-                config.tile = this._sceneConfig.media.source.tile;
+
+                // Get the right tile
+                if (typeof this._sceneConfig.media.source.tile === "number")
+                {
+                    config.tile = this._sceneConfig.media.source.tile;
+                }
+                else if (Array.isArray(this._sceneConfig.media.source.levels) &&
+                    typeof this._sceneConfig.media.source.levels[0].tile === "number")
+                {
+                    config.tile = this._sceneConfig.media.source.levels[0].tile;
+                }
+
                 config.mediaFormat = this._sceneConfig.media.source.format;
             }
         }
