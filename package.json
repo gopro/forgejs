@@ -1,19 +1,12 @@
 {
   "name": "forgejs",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "ForgeJS JavaScript library",
   "author": "GoPro, Inc. | Kolor SAS",
   "license": "Apache 2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gopro/gopro-ken-src.git"
-  },
-  "private": true,
-  "scripts": {
-    "bootstrap:plugin": "node tools/bootstrap/plugin.js",
-    "bootstrap:project": "node tools/bootstrap/project.js",
-    "build": "grunt build",
-    "buildmin": "grunt min"
+    "url": "https://github.com/gopro/forgejs.git"
   },
   "devDependencies": {
     "google-closure-compiler": "^20170124.0.0",
