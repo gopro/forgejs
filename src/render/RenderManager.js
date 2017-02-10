@@ -670,7 +670,8 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
-        var cubeConfig = {
+        var cubeConfig =
+        {
             order: this._sceneConfig.media.source.order || "RLUDFB"
         };
 
