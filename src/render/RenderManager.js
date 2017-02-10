@@ -670,10 +670,20 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
-        var cubeConfig = {
-            order: this._sceneConfig.media.source.order || "RLUDFB",
-            tile: this._sceneConfig.media.source.tile
+        var cubeConfig =
+        {
+            order: this._sceneConfig.media.source.order || "RLUDFB"
         };
+
+        // Get the right tile
+        if (typeof this._sceneConfig.media.source.tile === "number")
+        {
+            cubeConfig.tile = this._sceneConfig.media.source.tile;
+        }
+        else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
+        {
+            cubeConfig.tile = this._sceneConfig.media.source.levels[0].tile;
+        }
 
         cubeConfig.mediaFormat = this._sceneConfig.media.source.format;
 
