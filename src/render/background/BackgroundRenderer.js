@@ -92,9 +92,10 @@ FORGE.BackgroundRenderer.prototype._boot = function()
  */
 FORGE.BackgroundRenderer.prototype._updateTexture = function()
 {
+    // doesn't refresh when there is no texture or texture container and when a video as WebGL texture is paused
     if (this._texture === null || this._textureCanvas === null ||
         this._textureContext === null || this._displayObject === null ||
-        this._displayObject.element === null)
+        this._displayObject.element === null || (FORGE.Utils.isTypeOf(this._displayObject, ["VideoHTML5", "VideoDash"]) === true && this._displayObject.playing === false))
     {
         return;
     }
