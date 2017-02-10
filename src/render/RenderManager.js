@@ -681,7 +681,9 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
-        var config = {};
+        var config = {
+            order: "RLUDFB"
+        };
 
         if (typeof this._sceneConfig.media != "undefined") {
             config.type = this._sceneConfig.media.type;
