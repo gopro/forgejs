@@ -273,8 +273,6 @@ FORGE.Viewer = function(parent, config, callbacks)
      */
     this._onResume = null;
 
-    //this._onConfigLoadComplete = null;
-
     /**
      * Callback function for the viewer.
      * @name FORGE.Viewer#_callbacks
