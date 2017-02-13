@@ -285,6 +285,8 @@ FORGE.Camera.prototype._boot = function()
 
     this._createMainCamera();
     this._createVRCameras();
+
+    this._viewer.container.onResize.add(this._containerResizeHandler, this);
 };
 
 /**
@@ -814,6 +816,15 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
 };
 
 /**
+ * Update routine called by camera when container size is updated.
+ * @method FORGE.Camera#_containerResizeHandler
+ */
+FORGE.Camera.prototype._containerResizeHandler = function()
+{
+    this._updatePerspectiveCamera();
+};
+
+/**
  * Update routine called by render manager before rendering a frame.
  * All internals should be up to date.
  * @method FORGE.Camera#update
@@ -841,6 +852,8 @@ FORGE.Camera.prototype.destroy = function()
 
     this._gaze.destroy();
     this._gaze = null;
+
+    this._viewer.container.onResize.remove(this._containerResizeHandler, this);
 
     if (this._onCameraChange !== null)
     {
