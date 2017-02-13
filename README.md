@@ -41,7 +41,7 @@ The easiest way to learn how to build a project with ForgeJS is to practice with
 
 ### Setup
 
-1. Clone the project from [GitHub](https://github.com/gopro/forgejs) (`git clone https://github.com/gopro/forgejs forgejs`).
+1. Clone the project from [GitHub](https://github.com/gopro/forgejs) (`git clone https://github.com/gopro/forgejs`).
 2. Install nodejs and npm on your machine (download [here](http://nodejs.org)).
 3. Install the grunt-cli npm package (`npm install -g grunt grunt-cli` will install grunt globally on your machine).
 4. Install the node dev dependencies of the project (`cd forgejs && npm install`).
