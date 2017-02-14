@@ -288,6 +288,21 @@ Object.defineProperty(FORGE.SceneParser.prototype, "fx",
 });
 
 /**
+ * Get the background color.
+ * @name  FORGE.SceneParser#background
+ * @readonly
+ * @type {string}
+ */
+Object.defineProperty(FORGE.SceneParser.prototype, "background",
+{
+    /** @this {FORGE.SceneParser} */
+    get: function()
+    {
+        return this._config.background;
+    }
+});
+
+/**
  * Get the playlists object.
  * @name  FORGE.SceneParser#playlists
  * @readonly
