@@ -42,6 +42,14 @@ FORGE.Media = function(viewer, config)
     this._displayObject = null;
 
     /**
+     * Ready flag
+     * @name FORGE.Media#_ready
+     * @type {boolean}
+     * @private
+     */
+    this._ready = false;
+
+    /**
      * On load complete event dispatcher.
      * @name  FORGE.Media#_onLoadComplete
      * @type {FORGE.EventDispatcher}
@@ -80,17 +88,20 @@ FORGE.Media.prototype._parseConfig = function(config)
     // media configuration
     var mediaConfig = config.media;
 
+    if (typeof mediaConfig === "undefined") {
+        return;
+    }
+
     // Warning : UID is not registered and applied to the FORGE.ImageScalable|FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
     this._uid = mediaConfig.uid;
 
     var source = mediaConfig.source;
 
-    if (!source)
+    if (mediaConfig.type === FORGE.MediaType.GRID)
     {
-        throw "No source specified !";
+        this._ready = true;
     }
-
-    if (mediaConfig.type === FORGE.MediaType.IMAGE)
+    else if (mediaConfig.type === FORGE.MediaType.IMAGE)
     {
         var imageConfig;
 
@@ -167,6 +178,7 @@ FORGE.Media.prototype._parseConfig = function(config)
  */
 FORGE.Media.prototype._onImageLoadComplete = function()
 {
+    this._ready = true;
     if (this._onLoadComplete !== null)
     {
         this._onLoadComplete.dispatch();
@@ -180,6 +192,7 @@ FORGE.Media.prototype._onImageLoadComplete = function()
  */
 FORGE.Media.prototype._onLoadedMetaDataHandler = function()
 {
+    this._ready = true;
     if (this._options !== null)
     {
         this._displayObject.volume = (typeof this._options.volume === "number") ? this._options.volume : 1;
@@ -235,6 +248,21 @@ Object.defineProperty(FORGE.Media.prototype, "displayObject",
     get: function()
     {
         return this._displayObject;
+    }
+});
+
+/**
+ * Get the ready flag
+ * @name FORGE.Media#ready
+ * @readonly
+ * @type boolean
+ */
+Object.defineProperty(FORGE.Media.prototype, "ready",
+{
+    /** @this {FORGE.RenderManager} */
+    get: function()
+    {
+        return this._ready;
     }
 });
 
