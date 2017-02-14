@@ -239,7 +239,7 @@ FORGE.RenderManager.prototype._onViewerReady = function()
         antialias: true,
         alpha: true,
         premultipliedAlpha: false,
-        stencil: true,
+        stencil: false,
         canvas: canvas
     };
 
@@ -410,9 +410,11 @@ FORGE.RenderManager.prototype._initCamera = function(sceneConfig)
 FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 {
     // Create media
-    if (typeof sceneConfig.media !== "undefined" && typeof sceneConfig.media.source !== "undefined")
+    if (typeof sceneConfig.media !== "undefined")
     {
-        if (sceneConfig.media.source.format === FORGE.MediaFormat.CUBE || this._renderDisplay.presentingVR === true)
+        if (sceneConfig.media.type === FORGE.MediaType.GRID ||
+            sceneConfig.media.source.format === FORGE.MediaFormat.CUBE ||
+            this._renderDisplay.presentingVR === true)
         {
             this._backgroundRendererType = FORGE.BackgroundType.MESH;
         }
@@ -423,8 +425,13 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 
         this._media = new FORGE.Media(this._viewer, sceneConfig);
 
+        if (this._media.ready === true) {
+            this._mediaLoadCompleteHandler();
+        }
+        else {
         // Listen to media load complete event once
         this._media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
+        }
 
         // If media is a video, listen to the quality change event
         if (FORGE.Utils.isTypeOf(this._media.displayObject, ["VideoHTML5", "VideoDash"]))
@@ -500,7 +507,9 @@ FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
 
     this._setBackgroundRenderer(this._backgroundRendererType);
 
+    if (typeof event !== "undefined") {
     this._backgroundRenderer.displayObject = event.emitter.displayObject;
+    }
 
     this._setupRenderPipeline();
 };
@@ -526,7 +535,8 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
 {
     var fxSet = null;
 
-    if (typeof this._sceneConfig.media.fx !== "undefined" && this._sceneConfig.media.fx !== null)
+    if (typeof this._sceneConfig.media !== "undefined" &&
+        typeof this._sceneConfig.media.fx !== "undefined" && this._sceneConfig.media.fx !== null)
     {
         fxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.media.fx);
     }
@@ -670,24 +680,35 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
-        var cubeConfig =
-        {
-            order: this._sceneConfig.media.source.order || "RLUDFB"
-        };
+        var config = {};
 
-        // Get the right tile
-        if (typeof this._sceneConfig.media.source.tile === "number")
-        {
-            cubeConfig.tile = this._sceneConfig.media.source.tile;
+        if (typeof this._sceneConfig.media != "undefined") {
+            config.type = this._sceneConfig.media.type;
+            
+            if (typeof this._sceneConfig.media.options != "undefined") {
+                if (typeof this._sceneConfig.media.options.color != "undefined") {
+                    config.color = this._sceneConfig.media.options.color;            
+                }
+            }
+
+            if (typeof this._sceneConfig.media.source != "undefined") {
+                config.order = this._sceneConfig.media.source.order || "RLUDFB";
+
+            // Get the right tile
+            if (typeof this._sceneConfig.media.source.tile === "number")
+            {
+                config.tile = this._sceneConfig.media.source.tile;
+            }
+            else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
+            {
+                config.tile = this._sceneConfig.media.source.levels[0].tile;
+            }
+
+                config.mediaFormat = this._sceneConfig.media.source.format;
+            }
         }
-        else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
-        {
-            cubeConfig.tile = this._sceneConfig.media.source.levels[0].tile;
-        }
 
-        cubeConfig.mediaFormat = this._sceneConfig.media.source.format;
-
-        this._backgroundRenderer = new FORGE.BackgroundMeshRenderer(this._viewer, renderTarget, cubeConfig);
+        this._backgroundRenderer = new FORGE.BackgroundMeshRenderer(this._viewer, renderTarget, config);
     }
     else
     {

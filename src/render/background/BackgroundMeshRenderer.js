@@ -39,6 +39,20 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
     this._textureContext = null;
 
     /**
+     * Media type
+     * @type {string}
+     * @private
+     */
+    this._mediaType = options.type || FORGE.MediaType.GRID;
+
+    /**
+     * Grid color
+     * @type {string}
+     * @private
+     */
+    this._gridColor = options.color || "#000000";
+
+    /**
      * The layout of the faces in the texture. There are six faces to specify:
      * Right (R), Left (L), Up (U), Down (D), Front (F), Back (B). The default
      * layout is the Facebook one, with RLUDFB.
@@ -96,6 +110,12 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
 
 FORGE.BackgroundMeshRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
 FORGE.BackgroundMeshRenderer.prototype.constructor = FORGE.BackgroundMeshRenderer;
+
+/**
+ * Default texture name
+ * @type {string}
+ */
+FORGE.BackgroundMeshRenderer.DEFAULT_TEXTURE_NAME = "Default Texture";
 
 /**
  * Init routine.
@@ -167,6 +187,8 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
     this._texture.generateMipmaps = false;
 
     this._texture.needsUpdate = true;
+
+    this._mesh.material.wireframe = false;
 
     if (this._texture.image !== null)
     {
@@ -370,13 +392,52 @@ FORGE.BackgroundMeshRenderer.prototype._clear = function()
 };
 
 /**
+ * Add barycentric coordinates as attribute to indices
+ * @method FORGE.BackgroundMeshRenderer#_addBarycentricAttribute
+ * @private
+ */
+FORGE.BackgroundMeshRenderer.prototype._addBarycentricAttribute = function( ) {
+    if (this._mesh === null || typeof this._mesh.geometry === "undefined") {
+        return;
+    }
+
+    var indices = this._mesh.geometry.getIndex().array;
+    var barycentric = new Uint8Array(indices.length * 3);
+
+    var it = barycentric.keys();
+    for (var i=0, ii=indices.length / 3; i<ii; i++)  {
+        barycentric[it.next().value] = 1;
+        barycentric[it.next().value] = 0;
+        barycentric[it.next().value] = 0;
+
+        barycentric[it.next().value] = 0;
+        barycentric[it.next().value] = 1;
+        barycentric[it.next().value] = 0;
+
+        barycentric[it.next().value] = 0;
+        barycentric[it.next().value] = 0;
+        barycentric[it.next().value] = 1;
+    }
+            
+    this._mesh.geometry.addAttribute("barycentric", new THREE.BufferAttribute(barycentric, 3));
+};
+
+/**
  * Update internals
  * @method FORGE.BackgroundMeshRenderer#_updateInternals
  * @private
  */
 FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 {
-    var shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).mapping;
+    var shader;
+    if (this._mediaType === FORGE.MediaType.GRID) {
+        shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).wireframe;
+        this._subdivision = 4;
+    }
+    else {
+        shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).mapping;
+    }
+
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
 
@@ -386,14 +447,21 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         vertexShader: vertexShader,
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
         name: "BackgroundMeshMaterial",
-        // wireframe: false,
+        transparent: true,
         side: THREE.BackSide
     });
     var geometry = null;
 
-    if (this._texture !== null)
-    {
+    if (this._texture !== null) {
         material.uniforms.tTexture.value = this._texture;
+    }
+
+    if (this._mediaType === FORGE.MediaType.GRID) {
+        material.uniforms.tColor.value = new THREE.Color(this._gridColor);
+        material.blending = THREE.CustomBlending;
+        material.blendEquationAlpha = THREE.AddEquation;
+        material.blendSrcAlpha = THREE.SrcAlphaFactor;
+        material.blendDstAlpha = THREE.OneMinusSrcAlphaFactor;
     }
 
     if (this._scene.children.length === 0)
@@ -410,6 +478,10 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         }
 
         this._mesh = new THREE.Mesh(geometry, material);
+
+        if (this._mediaType === FORGE.MediaType.GRID) {
+            this._addBarycentricAttribute();
+        }
 
         // Equirectangular mapping on a sphere needs a yaw shift of PI/2 to set front at center of the texture
         if (this._mediaFormat === FORGE.MediaFormat.EQUIRECTANGULAR)
