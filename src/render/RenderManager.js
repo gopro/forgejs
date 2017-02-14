@@ -697,7 +697,6 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
             if (typeof this._sceneConfig.media.source != "undefined") {
                 config.order = this._sceneConfig.media.source.order || "RLUDFB";
 
-                // Get the right tile
                 if (typeof this._sceneConfig.media.source.tile === "number")
                 {
                     config.tile = this._sceneConfig.media.source.tile;
