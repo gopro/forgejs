@@ -218,7 +218,7 @@ FORGE.BackgroundMeshRenderer.prototype._setUVMappingCube = function()
     var uvMap = new Float32Array((this._subdivision + 1) * (this._subdivision + 1) * 6 * 2);
 
     // iterator accross the uv coord
-    var it = uvMap.keys();
+    var it = FORGE.Utils.arrayKeys(uvMap);
 
     // layout of the texture
     var layout = this._layout.split("");
