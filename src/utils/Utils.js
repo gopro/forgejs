@@ -521,3 +521,30 @@ FORGE.Utils.endsWith = function(str, suffix)
 
     return str.endsWith(suffix);
 };
+
+/**
+ * Polyfill of Array.prototype.keys in ES5.
+ *
+ * @method FORGE.Utils.arrayKeys
+ * @param {(Array|TypedArray)} array - Array to iterate.
+ * @return {(IteratorIterable|Object)} Iterator
+ * @see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/keys
+ */
+FORGE.Utils.arrayKeys = function(array)
+{
+    if (!Array.prototype.keys)
+    {
+        var len, result = {}, nextIndex = 0;
+        len = array.length;
+        result.array = [];
+        result.length = array.length;
+        while (len > 0) result.array[--len] = len;
+        result.next = function()
+        {
+            return nextIndex < array.length ? {value: nextIndex++, done: false} : {done: true};
+        };
+        return result;
+    }
+
+    return array.keys();
+};
