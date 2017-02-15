@@ -392,34 +392,54 @@ FORGE.BackgroundMeshRenderer.prototype._clear = function()
 };
 
 /**
- * Add barycentric coordinates as attribute to indices
- * @method FORGE.BackgroundMeshRenderer#_addBarycentricAttribute
+ * Add quadrilateral coordinates as geometry attribute
+ * Used to draw wireframe
+ * @method FORGE.BackgroundMeshRenderer#_addQuadrilateralCoordsAttribute
  * @private
  */
-FORGE.BackgroundMeshRenderer.prototype._addBarycentricAttribute = function( ) {
+FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = function( ) {
     if (this._mesh === null || typeof this._mesh.geometry === "undefined") {
         return;
     }
 
-    var indices = this._mesh.geometry.getIndex().array;
-    var barycentric = new Uint8Array(indices.length * 3);
+    // Quadrilateral is a 2 components system, reduce vertices array size from 3:2
+    var size = this._mesh.geometry.attributes.position.array.length * 2 / 3;
+    var quadri = new Int8Array(size);
+    var it = quadri.keys();
 
-    var it = barycentric.keys();
-    for (var i=0, ii=indices.length / 3; i<ii; i++)  {
-        barycentric[it.next().value] = 1;
-        barycentric[it.next().value] = 0;
-        barycentric[it.next().value] = 0;
+    var qa = new THREE.Vector2( 1,  1);
+    var qb = new THREE.Vector2( 1, -1);
+    var qc = new THREE.Vector2(-1,  1);
+    var qd = new THREE.Vector2(-1, -1);
 
-        barycentric[it.next().value] = 0;
-        barycentric[it.next().value] = 1;
-        barycentric[it.next().value] = 0;
+    var ipd = this._subdivision + 1; // indices per dimension
+    for (var f=0; f<6; f++) {
+        for (var r=0; r < ipd; r++) {
+            var q0, q1;
+            if (r & 1) {
+                q0 = qa;
+                q1 = qb;
+            }
+            else {
+                q0 = qc;
+                q1 = qd;
+            }
 
-        barycentric[it.next().value] = 0;
-        barycentric[it.next().value] = 0;
-        barycentric[it.next().value] = 1;
+            for (var c=0; c < ipd; c++) {
+
+                if (c & 1) {
+                    quadri[it.next().value] = q1.x;
+                    quadri[it.next().value] = q1.y;
+                }
+                else {
+                    quadri[it.next().value] = q0.x;
+                    quadri[it.next().value] = q0.y;
+                }
+            }
+        }
     }
-            
-    this._mesh.geometry.addAttribute("barycentric", new THREE.BufferAttribute(barycentric, 3));
+
+    this._mesh.geometry.addAttribute("quadrilateralCoords", new THREE.BufferAttribute(quadri, 2));
 };
 
 /**
@@ -432,7 +452,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
     var shader;
     if (this._mediaType === FORGE.MediaType.GRID) {
         shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).wireframe;
-        this._subdivision = 4;
+        this._subdivision = 8;
     }
     else {
         shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).mapping;
@@ -480,7 +500,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         this._mesh = new THREE.Mesh(geometry, material);
 
         if (this._mediaType === FORGE.MediaType.GRID) {
-            this._addBarycentricAttribute();
+            this._addQuadrilateralCoordsAttribute();
         }
 
         // Equirectangular mapping on a sphere needs a yaw shift of PI/2 to set front at center of the texture

@@ -12,26 +12,25 @@
 
 uniform vec3 tColor;
 
-varying vec3 vBarycentricCoords;
 varying vec2 vUv;
+varying vec2 vQuadrilateralCoords;
+
 
 void main() {
     // Wireframe should be drawn when barycentric coords of
     // opposite corner is near zero. 
     // Compute quadratic sum of partial derivatives to get a fixed
     // width and a threshold giving a smooth profile.
-    // vec3 dfdx = dFdx(vBarycentricCoords);
-    // vec3 dfdy = dFdy(vBarycentricCoords);
-    // vec3 threshold = vec3(WIRE_THICKNESS * sqrt(dfdx * dfdx + dfdy * dfdy));
-    vec3 threshold = vec3(WIRE_THICKNESS * fwidth(vBarycentricCoords));
+    vec2 dfdx = dFdx(vQuadrilateralCoords);
+    vec2 dfdy = dFdy(vQuadrilateralCoords);
+    vec2 threshold = vec2(WIRE_THICKNESS * sqrt(dfdx * dfdx + dfdy * dfdy));
 
     // Compute amount at local point depending on threshold
     // and apply smoothstep for antialiasing
-    vec3 amount = smoothstep(vec3(0.0), threshold, vBarycentricCoords);
-    float a = min(amount.x, min(amount.y, amount.z));
+    vec2 amount = smoothstep(vec2(0.0), WIRE_THICKNESS * threshold, vec2(1.0) - abs(vQuadrilateralCoords));
 
     // Use amount to compute color and alpha and draw the texel
-    float alpha = 1.0 - a;
+    float alpha = 1.0 - amount.x * amount.y;
 
     gl_FragColor = vec4(tColor.rgb, alpha);
 }
