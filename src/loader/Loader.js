@@ -249,7 +249,6 @@ FORGE.Loader.prototype.sound = function(key, url, onCompleteCallback, onComplete
  */
 FORGE.Loader.prototype._soundLoadComplete = function(file, xhr)
 {
-
     if (this._viewer.audio.useWebAudio === true && typeof xhr !== "undefined")
     {
         file.data = xhr.response;
@@ -273,33 +272,36 @@ FORGE.Loader.prototype._soundLoadComplete = function(file, xhr)
  */
 FORGE.Loader.prototype._loadAudioTag = function(file, callback, context)
 {
-    // Populate Audio tag data
-    file.data = new Audio();
-
-    file.data.preload = "auto";
-    file.data.crossOrigin = "anonymous";
-    file.data.src = file.url;
+    // create an Audio element
+    var audioElement = new Audio();
 
     var canPlayEvent = "canplay";
+    var errorEvent = "error";
     var canPlayCallback = function()
     {
-        file.data.removeEventListener(canPlayEvent, canPlayCallback, false);
-        file.data.onerror = null;
+        this.removeEventListener(canPlayEvent, canPlayCallback);
+        this.removeEventListener(errorEvent, errorCallback);
 
         if (typeof callback === "function")
         {
+            file.data = this;
             callback.call(context, file);
         }
     };
-    file.data.onerror = function()
+    var errorCallback = function()
     {
-        file.data.removeEventListener(canPlayEvent, canPlayCallback, false);
-        file.data.onerror = null;
-        throw "FORGE.Loader._loadAudioTag : Could not load " + file.url;
+        this.removeEventListener(canPlayEvent, canPlayCallback);
+        this.removeEventListener(errorEvent, errorCallback);
+        throw "FORGE.Loader : Could not load HTMLMediaElement " + file.url;
     };
 
-    file.data.addEventListener(canPlayEvent, canPlayCallback, false);
-    file.data.load();
+    audioElement.addEventListener(canPlayEvent, canPlayCallback);
+    audioElement.addEventListener(errorEvent, errorCallback);
+
+    audioElement.preload = "auto";
+    audioElement.crossOrigin = "anonymous";
+    audioElement.src = file.url;
+    audioElement.load();
 };
 
 /**
