@@ -10,7 +10,7 @@
 uniform float tViewportResolutionRatio;
 
 varying vec2 vUv;
-varying vec3 vBarycentricCoords;
+varying vec2 vQuadrilateralCoords;
 
 void main() {
     vec4 camPt = modelViewMatrix * vec4( position, 1.0 );
@@ -18,5 +18,5 @@ void main() {
     gl_Position = projectionMatrix * camPt;
 
     vUv = uv;
-    vBarycentricCoords = barycentric;
+    vQuadrilateralCoords = quadrilateralCoords;
 }
