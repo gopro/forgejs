@@ -8,7 +8,8 @@
 
 #include <defines>
 
-#define WIRE_THICKNESS 1.0
+// Set thickness to 1.5. Seems like 1.0 adds aliasing to the grid.
+#define WIRE_THICKNESS 1.50
 
 uniform vec3 tColor;
 
