@@ -55,7 +55,7 @@ FORGE.ViewGoPro.prototype._boot = function()
  * @method FORGE.ViewGoPro#_updateViewParams
  * @private
  */
-FORGE.ViewGoPro.prototype._updateViewParams = function(uniforms)
+FORGE.ViewGoPro.prototype._updateViewParams = function()
 {
     var projFovLow = 90;
     var projFovHigh = 180;
