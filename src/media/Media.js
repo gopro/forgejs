@@ -259,7 +259,7 @@ Object.defineProperty(FORGE.Media.prototype, "displayObject",
  */
 Object.defineProperty(FORGE.Media.prototype, "ready",
 {
-    /** @this {FORGE.RenderManager} */
+    /** @this {FORGE.Media} */
     get: function()
     {
         return this._ready;
