@@ -289,7 +289,6 @@ FORGE.RenderManager.prototype._onSceneLoadStart = function()
 
     // Apply background to renderer
     this._viewer.container.background = this._sceneConfig.background;
-    this._webGLRenderer.setClearColor(new THREE.Color(this._sceneConfig.background));
 
     // Create render scenes before initing the view to ensure pipeline is ready when
     // enabling the picking manager
