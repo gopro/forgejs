@@ -397,8 +397,10 @@ FORGE.BackgroundMeshRenderer.prototype._clear = function()
  * @method FORGE.BackgroundMeshRenderer#_addQuadrilateralCoordsAttribute
  * @private
  */
-FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = function( ) {
-    if (this._mesh === null || typeof this._mesh.geometry === "undefined") {
+FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = function()
+{
+    if (this._mesh === null || typeof this._mesh.geometry === "undefined")
+    {
         return;
     }
 
@@ -407,31 +409,38 @@ FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = functi
     var quadri = new Int8Array(size);
     var it = FORGE.Utils.arrayKeys(quadri);
 
-    var qa = new THREE.Vector2( 1,  1);
-    var qb = new THREE.Vector2( 1, -1);
-    var qc = new THREE.Vector2(-1,  1);
+    var qa = new THREE.Vector2(1, 1);
+    var qb = new THREE.Vector2(1, -1);
+    var qc = new THREE.Vector2(-1, 1);
     var qd = new THREE.Vector2(-1, -1);
 
     var ipd = this._subdivision + 1; // indices per dimension
-    for (var f=0; f<6; f++) {
-        for (var r=0; r < ipd; r++) {
+    for (var f=0; f<6; f++)
+    {
+        for (var r=0; r < ipd; r++)
+        {
             var q0, q1;
-            if (r & 1) {
+
+            if (r & 1)
+            {
                 q0 = qa;
                 q1 = qb;
             }
-            else {
+            else
+            {
                 q0 = qc;
                 q1 = qd;
             }
 
-            for (var c=0; c < ipd; c++) {
-
-                if (c & 1) {
+            for (var c=0; c < ipd; c++)
+            {
+                if (c & 1)
+                {
                     quadri[it.next().value] = q1.x;
                     quadri[it.next().value] = q1.y;
                 }
-                else {
+                else
+                {
                     quadri[it.next().value] = q0.x;
                     quadri[it.next().value] = q0.y;
                 }
@@ -450,11 +459,13 @@ FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = functi
 FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 {
     var shader;
-    if (this._mediaType === FORGE.MediaType.GRID) {
+    if (this._mediaType === FORGE.MediaType.GRID)
+    {
         shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).wireframe;
         this._subdivision = 8;
     }
-    else {
+    else
+    {
         shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).mapping;
     }
 
@@ -472,11 +483,13 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
     });
     var geometry = null;
 
-    if (this._texture !== null) {
+    if (this._texture !== null)
+    {
         material.uniforms.tTexture.value = this._texture;
     }
 
-    if (this._mediaType === FORGE.MediaType.GRID) {
+    if (this._mediaType === FORGE.MediaType.GRID)
+    {
         material.uniforms.tColor.value = new THREE.Color(this._gridColor);
         material.blending = THREE.CustomBlending;
         material.blendEquationAlpha = THREE.AddEquation;
@@ -488,7 +501,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
     {
         if (this._mediaFormat === FORGE.MediaFormat.EQUIRECTANGULAR)
         {
-            // Sphere mapping of equirectangular texture becomes acceptable with subdivision greater or equal to 64 
+            // Sphere mapping of equirectangular texture becomes acceptable with subdivision greater or equal to 64
             this._subdivision = 64;
             geometry = new THREE.SphereBufferGeometry(this._size, this._subdivision, this._subdivision);
         }
@@ -499,7 +512,8 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 
         this._mesh = new THREE.Mesh(geometry, material);
 
-        if (this._mediaType === FORGE.MediaType.GRID) {
+        if (this._mediaType === FORGE.MediaType.GRID)
+        {
             this._addQuadrilateralCoordsAttribute();
         }
 

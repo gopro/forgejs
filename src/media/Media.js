@@ -88,7 +88,8 @@ FORGE.Media.prototype._parseConfig = function(config)
     // media configuration
     var mediaConfig = config.media;
 
-    if (typeof mediaConfig === "undefined") {
+    if (typeof mediaConfig === "undefined")
+    {
         return;
     }
 

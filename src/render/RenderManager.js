@@ -429,7 +429,8 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
         {
             this._mediaLoadCompleteHandler();
         }
-        else {
+        else
+        {
             // Listen to media load complete event once
             this._media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
         }
@@ -683,20 +684,25 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
-        var config = {
+        var config =
+        {
             order: "RLUDFB"
         };
 
-        if (typeof this._sceneConfig.media != "undefined") {
+        if (typeof this._sceneConfig.media != "undefined")
+        {
             config.type = this._sceneConfig.media.type;
 
-            if (typeof this._sceneConfig.media.options != "undefined") {
-                if (typeof this._sceneConfig.media.options.color != "undefined") {
+            if (typeof this._sceneConfig.media.options != "undefined")
+            {
+                if (typeof this._sceneConfig.media.options.color != "undefined")
+                {
                     config.color = this._sceneConfig.media.options.color;
                 }
             }
 
-            if (typeof this._sceneConfig.media.source != "undefined") {
+            if (typeof this._sceneConfig.media.source != "undefined")
+            {
                 config.order = this._sceneConfig.media.source.order || "RLUDFB";
 
                 if (typeof this._sceneConfig.media.source.tile === "number")
