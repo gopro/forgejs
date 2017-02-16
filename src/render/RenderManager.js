@@ -429,9 +429,10 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
         {
             this._mediaLoadCompleteHandler();
         }
-        else {
-        // Listen to media load complete event once
-        this._media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
+        else
+        {
+            // Listen to media load complete event once
+            this._media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
         }
 
         // If media is a video, listen to the quality change event
@@ -685,27 +686,31 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     {
         var config = {};
 
-        if (typeof this._sceneConfig.media != "undefined") {
+        if (typeof this._sceneConfig.media != "undefined")
+        {
             config.type = this._sceneConfig.media.type;
 
-            if (typeof this._sceneConfig.media.options != "undefined") {
-                if (typeof this._sceneConfig.media.options.color != "undefined") {
+            if (typeof this._sceneConfig.media.options != "undefined")
+            {
+                if (typeof this._sceneConfig.media.options.color != "undefined")
+                {
                     config.color = this._sceneConfig.media.options.color;
                 }
             }
 
-            if (typeof this._sceneConfig.media.source != "undefined") {
+            if (typeof this._sceneConfig.media.source != "undefined")
+            {
                 config.order = this._sceneConfig.media.source.order || "RLUDFB";
 
-            // Get the right tile
-            if (typeof this._sceneConfig.media.source.tile === "number")
-            {
-                config.tile = this._sceneConfig.media.source.tile;
-            }
-            else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
-            {
-                config.tile = this._sceneConfig.media.source.levels[0].tile;
-            }
+                // Get the right tile
+                if (typeof this._sceneConfig.media.source.tile === "number")
+                {
+                    config.tile = this._sceneConfig.media.source.tile;
+                }
+                else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
+                {
+                    config.tile = this._sceneConfig.media.source.levels[0].tile;
+                }
 
                 config.mediaFormat = this._sceneConfig.media.source.format;
             }
