@@ -425,7 +425,8 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 
         this._media = new FORGE.Media(this._viewer, sceneConfig);
 
-        if (this._media.ready === true) {
+        if (this._media.ready === true)
+        {
             this._mediaLoadCompleteHandler();
         }
         else {
@@ -499,6 +500,7 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
 /**
  * Handler of media load complete event
  * @method FORGE.RenderManager#_mediaLoadCompleteHandler
+ * @param {FORGE.Event=} event - Event object
  * @private
  */
 FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
@@ -507,8 +509,9 @@ FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
 
     this._setBackgroundRenderer(this._backgroundRendererType);
 
-    if (typeof event !== "undefined") {
-    this._backgroundRenderer.displayObject = event.emitter.displayObject;
+    if (typeof event !== "undefined")
+    {
+        this._backgroundRenderer.displayObject = event.emitter.displayObject;
     }
 
     this._setupRenderPipeline();
@@ -684,10 +687,10 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
         if (typeof this._sceneConfig.media != "undefined") {
             config.type = this._sceneConfig.media.type;
-            
+
             if (typeof this._sceneConfig.media.options != "undefined") {
                 if (typeof this._sceneConfig.media.options.color != "undefined") {
-                    config.color = this._sceneConfig.media.options.color;            
+                    config.color = this._sceneConfig.media.options.color;
                 }
             }
 
