@@ -150,13 +150,6 @@ THREE.WebGLRenderer.prototype.getSize = function() {};
 THREE.WebGLRenderer.prototype.render = function(arg1, arg2, arg3, arg4) {};
 
 /**
- * @param {THREE.Color} color
- * @param {?number=} alpha
- * @return {THREE.WebGLRenderer}
- */
-THREE.WebGLRenderer.prototype.setClearColor = function(color, alpha) {};
-
-/**
  * @param {number} arg1
  * @param {number} arg2
  * @param {boolean=} arg3
