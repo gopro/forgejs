@@ -405,7 +405,7 @@ FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = functi
     // Quadrilateral is a 2 components system, reduce vertices array size from 3:2
     var size = this._mesh.geometry.attributes.position.array.length * 2 / 3;
     var quadri = new Int8Array(size);
-    var it = quadri.keys();
+    var it = FORGE.Utils.arrayKeys(quadri);
 
     var qa = new THREE.Vector2( 1,  1);
     var qb = new THREE.Vector2( 1, -1);
