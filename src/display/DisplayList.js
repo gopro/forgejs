@@ -129,7 +129,6 @@ FORGE.DisplayList.prototype.unregister = function(object)
 {
     this._objects.splice(this._objects.indexOf(object), 1);
 
-
     var index = this._objectsToUpdate.indexOf(object);
 
     if(index !== -1)

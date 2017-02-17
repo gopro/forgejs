@@ -134,24 +134,26 @@ module.exports = function(grunt)
         "src/display/DisplayList.js",
         "src/display/DisplayObject.js",
         "src/display/DisplayObjectContainer.js",
-        "src/display/Image.js",
-        "src/display/ImageScalable.js",
-        "src/display/Sprite.js",
-        "src/display/Iframe.js",
-        "src/display/Icon.js",
-        "src/display/TextField.js",
-        "src/display/Button.js",
-        "src/display/ButtonSkin.js",
-        "src/display/Canvas.js",
+
+        "src/display/components/Iframe.js",
+        "src/display/components/TextField.js",
+        "src/display/components/Button.js",
+        "src/display/components/ButtonSkin.js",
+        "src/display/components/Canvas.js",
+
+        "src/display/image/Image.js",
+        "src/display/image/ImageScalable.js",
+
+        "src/display/sprite/Sprite.js",
+        "src/display/sprite/SpriteAnimationManager.js",
+        "src/display/sprite/SpriteAnimation.js",
+
         "src/display/video/VideoHTML5.js",
         "src/display/video/VideoDash.js",
         "src/display/video/VideoTimeRanges.js",
         "src/display/video/VideoQuality.js",
         "src/display/video/VideoQualityMode.js",
         "src/display/video/VideoFormat.js",
-
-        "src/animation/SpriteAnimationManager.js",
-        "src/animation/SpriteAnimation.js",
 
         "src/loader/Cache.js",
         "src/loader/File.js",

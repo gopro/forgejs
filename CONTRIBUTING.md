@@ -1,12 +1,12 @@
 # How to Contribute
 
-Want to contribute to ForgeJS ? Please take a moment to review this document in order to make your contribution and the process around it easier and more effective for everyone.
+Want to contribute to ForgeJS? Please take a moment to review this document in order to make your contribution and the process around it easier and more effective for everyone.
 
 ## Support
 
 Personal support issues **are not allowed** on the issue tracker, so please seek help on the [community forum](https://forum.forgejs.org/). Before asking for help in the forum, you can also do those things :
 
-+ read the [documentation](https://releases.forgejs.org/latest/doc/jsdoc/)
++ read the [documentation](https://forgejs.org/documentation)
 
 ## Issue tracker
 
