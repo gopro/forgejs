@@ -38,8 +38,8 @@ FORGE.ViewRectilinear.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
 
-    this._camera.fovMin = 10;
-    this._camera.fovMax = 170;
+    this._camera.fovMin = 40;
+    this._camera.fovMax = 140;
 };
 
 /**

@@ -76,6 +76,30 @@ THREE.ShaderLib.equirect;
 THREE.DoubleSide;
 
 /**
+ * @const
+ * @type {number}
+ */
+THREE.CustomBlending;
+
+/**
+ * @const
+ * @type {number}
+ */
+THREE.AddEquation;
+
+/**
+ * @const
+ * @type {number}
+ */
+THREE.SrcAlphaFactor;
+
+/**
+ * @const
+ * @type {number}
+ */
+THREE.OneMinusSrcAlphaFactor;
+
+/**
  * @constructor
  * @param {Object=} arg1
  * @return {!THREE.WebGLRenderer}
@@ -124,12 +148,6 @@ THREE.WebGLRenderer.prototype.getSize = function() {};
  * @param  {boolean=} arg4
  */
 THREE.WebGLRenderer.prototype.render = function(arg1, arg2, arg3, arg4) {};
-
-/**
- * @param {?(number|string)} arg1
- * @return {THREE.WebGLRenderer}
- */
-THREE.WebGLRenderer.prototype.setClearColor = function(arg1) {};
 
 /**
  * @param {number} arg1
@@ -1194,9 +1212,12 @@ THREE.WireframeGeometry = function(arg1) {};
 
 /**
  * @constructor
+ * @param  {TypedArray} array
+ * @param  {number} itemSize
+ * @param  {boolean=} normalized
  * @return {!THREE.BufferAttribute}
  */
-THREE.BufferAttribute = function() {};
+THREE.BufferAttribute = function(array, itemSize, normalized) {};
 
 /** @type {TypedArray} */
 THREE.BufferAttribute.prototype.array;
@@ -1276,6 +1297,12 @@ THREE.BoxBufferGeometry = function(arg1, arg2, arg3, arg4, arg5, arg6) {};
 
 /** @type {{position:(THREE.BufferAttribute|undefined), normal:(THREE.BufferAttribute|undefined), color:(THREE.BufferAttribute|undefined), index:(THREE.BufferAttribute|undefined), uv:(THREE.BufferAttribute|undefined)}} */
 THREE.BoxBufferGeometry.prototype.attributes;
+
+/**
+ * @param {string} name
+ * @param {THREE.BufferAttribute} attribute
+ */
+THREE.BoxBufferGeometry.prototype.addAttribute = function(name, attribute) {};
 
 /**
  * @constructor
