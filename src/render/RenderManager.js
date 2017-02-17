@@ -313,9 +313,9 @@ FORGE.RenderManager.prototype._onSceneLoadStart = function()
  */
 FORGE.RenderManager.prototype._onSceneUnloadStart = function()
 {
-    this._viewReady = false;
-    this._backgroundReady = false;
     this._hotspotsReady = false;
+
+    this._clearBackgroundRenderer();
 
     // Clear fx composer and hotspot renderer
     if (this._objectRenderer !== null)
@@ -372,6 +372,12 @@ FORGE.RenderManager.prototype._initView = function(sceneConfig)
     var extendedViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(storyViewConfig, sceneViewConfig));
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
+
+    if (this._view !== null && this._view.type === type) 
+    {
+        this.log("Render manager won't set view if it's already set");
+        return;
+    }
 
     switch (type)
     {
@@ -660,6 +666,7 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 {
     var displayObject = null;
     var renderTarget = null;
+
     if (this._backgroundRenderer !== null)
     {
         if (this._backgroundRenderer.displayObject !== null)
@@ -677,6 +684,7 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
     if (type === FORGE.BackgroundType.SHADER)
     {
+        this.log("Create background shader renderer");
         this._backgroundRenderer = new FORGE.BackgroundShaderRenderer(this._viewer, renderTarget);
 
         var size = this._webGLRenderer.getSize();
@@ -684,7 +692,12 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
-        var config = {};
+        this.log("Create background mesh renderer");
+
+        var config =
+        {
+            order: "RLUDFB"
+        };
 
         if (typeof this._sceneConfig.media != "undefined")
         {
@@ -898,14 +911,19 @@ FORGE.RenderManager.prototype.setView = function(type)
 {
     this.log("setView");
 
-    this._viewReady = false;
-
     if (this._view !== null)
     {
+        if (this._view.type === type)
+        {
+            return;
+        }
+
         this.log("Destroy previous view");
         this._view.destroy();
         this._view = null;
     }
+
+    this._viewReady = false;
 
     if (type === FORGE.ViewType.RECTILINEAR)
     {

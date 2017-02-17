@@ -135,8 +135,7 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
 
     this._subdivision = 32;
 
-    // Finalize now
-    this.updateAfterViewChange();
+    this._updateInternals();
 };
 
 /**
@@ -458,15 +457,23 @@ FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = functi
  */
 FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 {
+    if (this._viewer.renderer.view === null)
+    {
+        this.log("Background renderer cannot update internals without a defined view");
+        return;
+    }
+
     var shader;
     if (this._mediaType === FORGE.MediaType.GRID)
     {
         shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).wireframe;
+        this.log("Media " + this._mediaType + ", use wireframe shader");
         this._subdivision = 8;
     }
     else
     {
         shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).mapping;
+        this.log("Media " + this._mediaType + ", use mapping shader");
     }
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
@@ -504,10 +511,12 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
             // Sphere mapping of equirectangular texture becomes acceptable with subdivision greater or equal to 64
             this._subdivision = 64;
             geometry = new THREE.SphereBufferGeometry(this._size, this._subdivision, this._subdivision);
+            this.log("Create sphere geometry");
         }
         else
         {
             geometry = new THREE.BoxBufferGeometry(this._size, this._size, this._size, this._subdivision, this._subdivision, this._subdivision);
+            this.log("Create box geometry");
         }
 
         this._mesh = new THREE.Mesh(geometry, material);
@@ -571,6 +580,24 @@ FORGE.BackgroundMeshRenderer.prototype.destroy = function()
     this._displayObject = null;
     this._textureCanvas = null;
     this._textureContext = null;
+
+    if (this._mesh !== null)
+    {
+        this.log ("Destroy mesh (dispose geometry and material)");
+        if (this._mesh.geometry !== null)
+        {
+            this._mesh.geometry.dispose();
+            this._mesh.geometry = null;
+        }
+
+        if (this._mesh.material !== null)
+        {
+            this._mesh.material.dispose();
+            this._mesh.material = null;
+        }
+
+        this._mesh = null;
+    }
 
     if (this._texture !== null)
     {
