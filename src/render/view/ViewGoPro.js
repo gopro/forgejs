@@ -51,12 +51,11 @@ FORGE.ViewGoPro.prototype._boot = function()
 };
 
 /**
- * Update uniforms.
- *
- * @method FORGE.ViewGoPro#updateUniforms
- * @param {Object} uniforms
+ * Update view params.
+ * @method FORGE.ViewGoPro#_updateViewParams
+ * @private
  */
-FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
+FORGE.ViewGoPro.prototype._updateViewParams = function()
 {
     var projFovLow = 90;
     var projFovHigh = 180;
@@ -82,10 +81,21 @@ FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
     }
 
     this._projectionDistance = distance;
-    uniforms.tProjectionDistance.value = distance;
 
     var fovRad = 0.5 * FORGE.Math.degToRad(fov);
     this._projectionScale = (distance + 1) * Math.sin(fovRad) / (distance + Math.cos(fovRad));
+};
+
+/**
+ * Update uniforms.
+ *
+ * @method FORGE.ViewGoPro#updateUniforms
+ * @param {FORGEUniform} uniforms
+ */
+FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
+{
+    this._updateViewParams();
+    uniforms.tProjectionDistance.value = this._projectionDistance;
     uniforms.tProjectionScale.value = this._projectionScale;
 };
 
@@ -95,6 +105,8 @@ FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
  */
 FORGE.ViewGoPro.prototype.getProjectionFov = function()
 {
+    this._updateViewParams();
+
     var theta = 0.5 * FORGE.Math.degToRad(this._camera.fov);
 
     var radius = 1.0 - this._projectionDistance / 2.0;

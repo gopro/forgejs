@@ -64,7 +64,7 @@ FORGE.BackgroundShaderRenderer.prototype._boot = function()
     FORGE.BackgroundRenderer.prototype._boot.call(this);
 
     // Finalize now
-    this.updateAfterViewChange();
+    this._updateInternals();
 
     // Set orthographic camera
     this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);

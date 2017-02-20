@@ -239,7 +239,7 @@ FORGE.RenderManager.prototype._onViewerReady = function()
         antialias: true,
         alpha: true,
         premultipliedAlpha: false,
-        stencil: true,
+        stencil: false,
         canvas: canvas
     };
 
@@ -313,9 +313,9 @@ FORGE.RenderManager.prototype._onSceneLoadStart = function()
  */
 FORGE.RenderManager.prototype._onSceneUnloadStart = function()
 {
-    this._viewReady = false;
-    this._backgroundReady = false;
     this._hotspotsReady = false;
+
+    this._clearBackgroundRenderer();
 
     // Clear fx composer and hotspot renderer
     if (this._objectRenderer !== null)
@@ -373,6 +373,12 @@ FORGE.RenderManager.prototype._initView = function(sceneConfig)
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
 
+    if (this._view !== null && this._view.type === type) 
+    {
+        this.log("Render manager won't set view if it's already set");
+        return;
+    }
+
     switch (type)
     {
         case FORGE.ViewType.GOPRO:
@@ -410,9 +416,11 @@ FORGE.RenderManager.prototype._initCamera = function(sceneConfig)
 FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 {
     // Create media
-    if (typeof sceneConfig.media !== "undefined" && typeof sceneConfig.media.source !== "undefined")
+    if (typeof sceneConfig.media !== "undefined" && sceneConfig.media !== null)
     {
-        if (sceneConfig.media.source.format === FORGE.MediaFormat.CUBE || this._renderDisplay.presentingVR === true)
+        if (sceneConfig.media.type === FORGE.MediaType.GRID ||
+            (typeof sceneConfig.media.source !== "undefined" && sceneConfig.media.source !== null && sceneConfig.media.source.format === FORGE.MediaFormat.CUBE) ||
+            this._renderDisplay.presentingVR === true)
         {
             this._backgroundRendererType = FORGE.BackgroundType.MESH;
         }
@@ -423,8 +431,15 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 
         this._media = new FORGE.Media(this._viewer, sceneConfig);
 
-        // Listen to media load complete event once
-        this._media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
+        if (this._media.ready === true)
+        {
+            this._mediaLoadCompleteHandler();
+        }
+        else
+        {
+            // Listen to media load complete event once
+            this._media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
+        }
 
         // If media is a video, listen to the quality change event
         if (FORGE.Utils.isTypeOf(this._media.displayObject, ["VideoHTML5", "VideoDash"]))
@@ -470,7 +485,7 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
             // Warning : UID is not registered and applied to the FORGE.Sound object for registration
             this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC ? true : false));
 
-            if (typeof sceneConfig.sound.options !== "undefined")
+            if (typeof sceneConfig.sound.options !== "undefined" && sceneConfig.sound.options !== null)
             {
                 this._mediaSound.volume = volume;
                 this._mediaSound.loop = loop;
@@ -482,16 +497,14 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
                 }
             }
         }
-        // else if (typeof sceneConfig.sound.source.target !== "undefined" && sceneConfig.sound.source.target !== "")
-        // {
-        //
-        // }
+        // @todo Ability to use a target uid rather than a source url (ie. sceneConfig.sound.source.target)
     }
 };
 
 /**
  * Handler of media load complete event
  * @method FORGE.RenderManager#_mediaLoadCompleteHandler
+ * @param {FORGE.Event=} event - Event object
  * @private
  */
 FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
@@ -500,7 +513,10 @@ FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
 
     this._setBackgroundRenderer(this._backgroundRendererType);
 
-    this._backgroundRenderer.displayObject = event.emitter.displayObject;
+    if (typeof event !== "undefined" && event !== null)
+    {
+        this._backgroundRenderer.displayObject = event.emitter.displayObject;
+    }
 
     this._setupRenderPipeline();
 };
@@ -526,17 +542,15 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
 {
     var fxSet = null;
 
-    if (typeof this._sceneConfig.media.fx !== "undefined" && this._sceneConfig.media.fx !== null)
+    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null &&
+        typeof this._sceneConfig.media.fx !== "undefined" && this._sceneConfig.media.fx !== null)
     {
         fxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.media.fx);
     }
 
     this._renderPipeline.addBackground(this._backgroundRenderer.renderTarget.texture, fxSet);
 
-    // this._objectRenderer.createRenderScenes();
-    // this._renderPipeline.addRenderScenes(this._objectRenderer.renderScenes);
-
-    if (typeof this._sceneConfig.fx !== "undefined")
+    if (typeof this._sceneConfig.fx !== "undefined" && this._sceneConfig.fx !== null)
     {
         var globalFxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.fx);
         this._renderPipeline.addGlobalFx(globalFxSet);
@@ -646,6 +660,7 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 {
     var displayObject = null;
     var renderTarget = null;
+
     if (this._backgroundRenderer !== null)
     {
         if (this._backgroundRenderer.displayObject !== null)
@@ -663,6 +678,7 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
     if (type === FORGE.BackgroundType.SHADER)
     {
+        this.log("Create background shader renderer");
         this._backgroundRenderer = new FORGE.BackgroundShaderRenderer(this._viewer, renderTarget);
 
         var size = this._webGLRenderer.getSize();
@@ -670,24 +686,44 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
-        var cubeConfig =
+        this.log("Create background mesh renderer");
+
+        var config =
         {
-            order: this._sceneConfig.media.source.order || "RLUDFB"
+            order: "RLUDFB"
         };
 
-        // Get the right tile
-        if (typeof this._sceneConfig.media.source.tile === "number")
+        if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null)
         {
-            cubeConfig.tile = this._sceneConfig.media.source.tile;
-        }
-        else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
-        {
-            cubeConfig.tile = this._sceneConfig.media.source.levels[0].tile;
+            config.type = this._sceneConfig.media.type;
+
+            if (typeof this._sceneConfig.media.options !== "undefined" && this._sceneConfig.media.options !== null)
+            {
+                if (typeof this._sceneConfig.media.options.color !== "undefined")
+                {
+                    config.color = this._sceneConfig.media.options.color;
+                }
+            }
+
+            if (typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null)
+            {
+                config.order = this._sceneConfig.media.source.order || "RLUDFB";
+
+                // Get the right tile
+                if (typeof this._sceneConfig.media.source.tile === "number")
+                {
+                    config.tile = this._sceneConfig.media.source.tile;
+                }
+                else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
+                {
+                    config.tile = this._sceneConfig.media.source.levels[0].tile;
+                }
+
+                config.mediaFormat = this._sceneConfig.media.source.format;
+            }
         }
 
-        cubeConfig.mediaFormat = this._sceneConfig.media.source.format;
-
-        this._backgroundRenderer = new FORGE.BackgroundMeshRenderer(this._viewer, renderTarget, cubeConfig);
+        this._backgroundRenderer = new FORGE.BackgroundMeshRenderer(this._viewer, renderTarget, config);
     }
     else
     {
@@ -725,6 +761,15 @@ FORGE.RenderManager.prototype._clearBackgroundRenderer = function()
 };
 
 /**
+ * Update routine
+ * @method FORGE.RenderManager#update
+ */
+FORGE.RenderManager.prototype.update = function()
+{
+    this._camera.update();
+};
+
+/**
  * Render routine
  * @method FORGE.RenderManager#render
  */
@@ -738,7 +783,6 @@ FORGE.RenderManager.prototype.render = function()
     }
 
     this._backgroundRenderer.update();
-    this._camera.update();
 
     // Render
     if (this._backgroundReady === true)
@@ -831,11 +875,12 @@ FORGE.RenderManager.prototype.enableVR = function(status)
     else
     {
         this.setView(this._viewType);
+        this._camera.roll = 0;
     }
 
     // If we enter VR with a cubemap: do nothing. With an equi: toggle to mesh renderer
     // If we exit VR with a cubemap: do nothing. With an equi: toggle to shader renderer
-    if (this._sceneConfig.media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
+    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null && typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null && this._sceneConfig.media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
     {
         if (status === true)
         {
@@ -869,14 +914,19 @@ FORGE.RenderManager.prototype.setView = function(type)
 {
     this.log("setView");
 
-    this._viewReady = false;
-
     if (this._view !== null)
     {
+        if (this._view.type === type)
+        {
+            return;
+        }
+
         this.log("Destroy previous view");
         this._view.destroy();
         this._view = null;
     }
+
+    this._viewReady = false;
 
     if (type === FORGE.ViewType.RECTILINEAR)
     {

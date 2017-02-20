@@ -39,6 +39,20 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
     this._textureContext = null;
 
     /**
+     * Media type
+     * @type {string}
+     * @private
+     */
+    this._mediaType = options.type || FORGE.MediaType.GRID;
+
+    /**
+     * Grid color
+     * @type {string}
+     * @private
+     */
+    this._gridColor = options.color || "#000000";
+
+    /**
      * The layout of the faces in the texture. There are six faces to specify:
      * Right (R), Left (L), Up (U), Down (D), Front (F), Back (B). The default
      * layout is the Facebook one, with RLUDFB.
@@ -98,6 +112,12 @@ FORGE.BackgroundMeshRenderer.prototype = Object.create(FORGE.BackgroundRenderer.
 FORGE.BackgroundMeshRenderer.prototype.constructor = FORGE.BackgroundMeshRenderer;
 
 /**
+ * Default texture name
+ * @type {string}
+ */
+FORGE.BackgroundMeshRenderer.DEFAULT_TEXTURE_NAME = "Default Texture";
+
+/**
  * Init routine.
  * @method FORGE.BackgroundMeshRenderer#_boot
  * @private
@@ -115,8 +135,7 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
 
     this._subdivision = 32;
 
-    // Finalize now
-    this.updateAfterViewChange();
+    this._updateInternals();
 };
 
 /**
@@ -167,6 +186,8 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
     this._texture.generateMipmaps = false;
 
     this._texture.needsUpdate = true;
+
+    this._mesh.material.wireframe = false;
 
     if (this._texture.image !== null)
     {
@@ -370,13 +391,91 @@ FORGE.BackgroundMeshRenderer.prototype._clear = function()
 };
 
 /**
+ * Add quadrilateral coordinates as geometry attribute
+ * Used to draw wireframe
+ * @method FORGE.BackgroundMeshRenderer#_addQuadrilateralCoordsAttribute
+ * @private
+ */
+FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = function()
+{
+    if (this._mesh === null || typeof this._mesh.geometry === "undefined")
+    {
+        return;
+    }
+
+    // Quadrilateral is a 2 components system, reduce vertices array size from 3:2
+    var size = this._mesh.geometry.attributes.position.array.length * 2 / 3;
+    var quadri = new Int8Array(size);
+    var it = FORGE.Utils.arrayKeys(quadri);
+
+    var qa = new THREE.Vector2(1, 1);
+    var qb = new THREE.Vector2(1, -1);
+    var qc = new THREE.Vector2(-1, 1);
+    var qd = new THREE.Vector2(-1, -1);
+
+    var ipd = this._subdivision + 1; // indices per dimension
+    for (var f = 0; f < 6; f++)
+    {
+        for (var r=0; r < ipd; r++)
+        {
+            var q0, q1;
+
+            if (r & 1)
+            {
+                q0 = qa;
+                q1 = qb;
+            }
+            else
+            {
+                q0 = qc;
+                q1 = qd;
+            }
+
+            for (var c=0; c < ipd; c++)
+            {
+                if (c & 1)
+                {
+                    quadri[it.next().value] = q1.x;
+                    quadri[it.next().value] = q1.y;
+                }
+                else
+                {
+                    quadri[it.next().value] = q0.x;
+                    quadri[it.next().value] = q0.y;
+                }
+            }
+        }
+    }
+            
+    this._mesh.geometry.addAttribute("quadrilateralCoords", new THREE.BufferAttribute(quadri, 2));
+};
+
+/**
  * Update internals
  * @method FORGE.BackgroundMeshRenderer#_updateInternals
  * @private
  */
 FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 {
-    var shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).mapping;
+    if (this._viewer.renderer.view === null)
+    {
+        this.log("Background renderer cannot update internals without a defined view");
+        return;
+    }
+
+    var shader;
+    if (this._mediaType === FORGE.MediaType.GRID)
+    {
+        shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).wireframe;
+        this.log("Media " + this._mediaType + ", use wireframe shader");
+        this._subdivision = 8;
+    }
+    else
+    {
+        shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).mapping;
+        this.log("Media " + this._mediaType + ", use mapping shader");
+    }
+
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
 
@@ -386,7 +485,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         vertexShader: vertexShader,
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
         name: "BackgroundMeshMaterial",
-        // wireframe: false,
+        transparent: true,
         side: THREE.BackSide
     });
     var geometry = null;
@@ -396,20 +495,36 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         material.uniforms.tTexture.value = this._texture;
     }
 
+    if (this._mediaType === FORGE.MediaType.GRID)
+    {
+        material.uniforms.tColor.value = new THREE.Color(this._gridColor);
+        material.blending = THREE.CustomBlending;
+        material.blendEquationAlpha = THREE.AddEquation;
+        material.blendSrcAlpha = THREE.SrcAlphaFactor;
+        material.blendDstAlpha = THREE.OneMinusSrcAlphaFactor;
+    }
+
     if (this._scene.children.length === 0)
     {
         if (this._mediaFormat === FORGE.MediaFormat.EQUIRECTANGULAR)
         {
-            // Sphere mapping of equirectangular texture becomes acceptable with subdivision greater or equal to 64 
+            // Sphere mapping of equirectangular texture becomes acceptable with subdivision greater or equal to 64
             this._subdivision = 64;
             geometry = new THREE.SphereBufferGeometry(this._size, this._subdivision, this._subdivision);
+            this.log("Create sphere geometry");
         }
         else
         {
             geometry = new THREE.BoxBufferGeometry(this._size, this._size, this._size, this._subdivision, this._subdivision, this._subdivision);
+            this.log("Create box geometry");
         }
 
         this._mesh = new THREE.Mesh(geometry, material);
+
+        if (this._mediaType === FORGE.MediaType.GRID)
+        {
+            this._addQuadrilateralCoordsAttribute();
+        }
 
         // Equirectangular mapping on a sphere needs a yaw shift of PI/2 to set front at center of the texture
         if (this._mediaFormat === FORGE.MediaFormat.EQUIRECTANGULAR)
@@ -465,6 +580,24 @@ FORGE.BackgroundMeshRenderer.prototype.destroy = function()
     this._displayObject = null;
     this._textureCanvas = null;
     this._textureContext = null;
+
+    if (this._mesh !== null)
+    {
+        this.log ("Destroy mesh (dispose geometry and material)");
+        if (this._mesh.geometry !== null)
+        {
+            this._mesh.geometry.dispose();
+            this._mesh.geometry = null;
+        }
+
+        if (this._mesh.material !== null)
+        {
+            this._mesh.material.dispose();
+            this._mesh.material = null;
+        }
+
+        this._mesh = null;
+    }
 
     if (this._texture !== null)
     {

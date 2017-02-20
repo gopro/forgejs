@@ -17,3 +17,10 @@ FORGE.MediaType.IMAGE = "image";
  * @const
  */
 FORGE.MediaType.VIDEO = "video";
+
+/**
+ * @name FORGE.MediaType.GRID
+ * @type {string}
+ * @const
+ */
+FORGE.MediaType.GRID = "grid";

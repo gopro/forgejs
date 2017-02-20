@@ -62,6 +62,19 @@ FORGE.ShaderLib = {
                 fragmentShader: FORGE.ShaderChunk.wts_frag
             },
 
+            wireframe:
+            {
+                /** @type {FORGEUniform} */
+                uniforms:
+                {
+                    tColor: { type: "c", value: null },
+                    tProjectionScale: { type: "f", value: 1 },
+                    tModelViewMatrixInverse: { type: "m4", value: null }
+                },
+                vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear_wireframe,
+                fragmentShader: FORGE.ShaderChunk.wts_frag_wireframe
+            },
+
             equirectangular:
             {
                 /** @type {FORGEUniform} */
@@ -111,6 +124,20 @@ FORGE.ShaderLib = {
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_gopro,
                 fragmentShader: FORGE.ShaderChunk.wts_frag
+            },
+
+            wireframe:
+            {
+                /** @type {FORGEUniform} */
+                uniforms:
+                {
+                    tColor: { type: "c", value: null },
+                    tProjectionScale: { type: "f", value: 1 },
+                    tProjectionDistance: { type: "f", value: 1 },
+                    tModelViewMatrixInverse: { type: "m4", value: null }
+                },
+                vertexShader: FORGE.ShaderChunk.wts_vert_gopro_wireframe,
+                fragmentShader: FORGE.ShaderChunk.wts_frag_wireframe
             },
 
             equirectangular:

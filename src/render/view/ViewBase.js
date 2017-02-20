@@ -107,7 +107,7 @@ FORGE.ViewBase.prototype._fragmentToScreen = function(fragment)
  * Abstract method that should be implemented by subclass.
  *
  * @method FORGE.ViewBase#updateUniforms
- * @param {Object} uniforms
+ * @param {FORGEUniform} uniforms
  */
 FORGE.ViewBase.prototype.updateUniforms = function(uniforms)
 {
