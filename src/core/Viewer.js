@@ -547,6 +547,7 @@ FORGE.Viewer.prototype._updateLogic = function()
     this._tween.update();
     this._hotspots.update();
     this._controllers.update();
+    this._renderManager.update();
 
     if (this._callbacks !== null && typeof this._callbacks.update === "function")
     {
@@ -575,10 +576,7 @@ FORGE.Viewer.prototype._updateRendering = function()
     {
         this._callbacks.afterRender.call();
     }
-
 };
-
-
 
 /**
  * Update method called by the viewer main loop.

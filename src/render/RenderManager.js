@@ -553,9 +553,6 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
 
     this._renderPipeline.addBackground(this._backgroundRenderer.renderTarget.texture, fxSet);
 
-    // this._objectRenderer.createRenderScenes();
-    // this._renderPipeline.addRenderScenes(this._objectRenderer.renderScenes);
-
     if (typeof this._sceneConfig.fx !== "undefined")
     {
         var globalFxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.fx);
@@ -767,6 +764,15 @@ FORGE.RenderManager.prototype._clearBackgroundRenderer = function()
 };
 
 /**
+ * Update routine
+ * @method FORGE.RenderManager#update
+ */
+FORGE.RenderManager.prototype.update = function()
+{
+    this._camera.update();
+};
+
+/**
  * Render routine
  * @method FORGE.RenderManager#render
  */
@@ -780,7 +786,6 @@ FORGE.RenderManager.prototype.render = function()
     }
 
     this._backgroundRenderer.update();
-    this._camera.update();
 
     // Render
     if (this._backgroundReady === true)
@@ -873,6 +878,7 @@ FORGE.RenderManager.prototype.enableVR = function(status)
     else
     {
         this.setView(this._viewType);
+        this._camera.roll = 0;
     }
 
     // If we enter VR with a cubemap: do nothing. With an equi: toggle to mesh renderer
