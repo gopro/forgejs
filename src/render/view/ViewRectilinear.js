@@ -46,11 +46,10 @@ FORGE.ViewRectilinear.prototype._boot = function()
  * Update uniforms.
  *
  * @method FORGE.ViewRectilinear#updateUniforms
- * @param {Object} uniforms
+ * @param {FORGEUniform} uniforms
  */
 FORGE.ViewRectilinear.prototype.updateUniforms = function(uniforms)
 {
-    // this.log("ViewRectilinear _getUpdatedParamsScreenToWorld");
     var fov = FORGE.Math.clamp(this._camera.fov, this._camera.fovMin, this._camera.fovMax);
 
     this._projectionScale = Math.tan(FORGE.Math.degToRad(fov / 2));

@@ -90,7 +90,7 @@ FORGE.ViewGoPro.prototype._updateViewParams = function()
  * Update uniforms.
  *
  * @method FORGE.ViewGoPro#updateUniforms
- * @param {Object} uniforms
+ * @param {FORGEUniform} uniforms
  */
 FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
 {
