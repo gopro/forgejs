@@ -414,7 +414,7 @@ FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = functi
     var qd = new THREE.Vector2(-1, -1);
 
     var ipd = this._subdivision + 1; // indices per dimension
-    for (var f=0; f<6; f++)
+    for (var f = 0; f < 6; f++)
     {
         for (var r=0; r < ipd; r++)
         {
