@@ -796,8 +796,9 @@ FORGE.VideoHTML5.prototype._createVideoObjects = function(count)
 
             requestCount: 0,
             currentCount: 0,
-            abortCount: 0, //Number of times this video has been requested and aborted
-            leaveCount: 0, //Number of times this video has been leaved for bandwidth issues
+            abortCount: 0, //Number of times this video has been requested and aborted (accepted: 1 attemp)
+            leaveCount: 0, //Number of times this video has been leaved for bandwidth issues (accepted: 2 attemps)
+            downCount: 0, //Number of times this video has been requested for downgrade (need 3 attemps)
 
             lastTimeStamp: 0
         };
@@ -836,7 +837,6 @@ FORGE.VideoHTML5.prototype._createVideoAt = function(index)
     video.element = element;
     video.buffer = buffer;
     video.played = played;
-    video.lastTimeStamp = 0;
 
     return video;
 };
@@ -1019,7 +1019,7 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
     }
     else
     {
-        //Start a timer to estimate if it is a failure ...
+        // Start a timer to estimate if it is a failure ...
         this._requestTimer.add(this._timeoutTime, this._requestTimeOutHandler, this);
         this._requestTimer.start();
     }
@@ -1284,6 +1284,7 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
     // Resume playback if it was already playing
     if (this._playing === true)
     {
+        requestedVideo.element.currentTime = this.currentTime;
         requestedVideo.element.play();
     }
 
@@ -1320,7 +1321,7 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
         this._destroyVideo(videoToBeRemoved);
     }
 
-    //Clear the request timer
+    // Clear the request timer
     this._requestTimer.stop(true);
 
     if (this._onQualityChange !== null)
@@ -1341,8 +1342,6 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
  */
 FORGE.VideoHTML5.prototype._autoQualityTimerLoop = function()
 {
-    this.log("Auto quality timer loop");
-
     //If there is a pending request, return
     if (this._playing === false || this._requestIndex !== -1)
     {
@@ -1401,12 +1400,17 @@ FORGE.VideoHTML5.prototype._shouldAutoQualityDowngrade = function()
 
     if (time === currentVideo.lastTimeStamp)
     {
-        currentVideo.lastTimeStamp = 0;
-        return true;
+        currentVideo.downCount++;
+        if (currentVideo.downCount >= 3)
+        {
+            currentVideo.lastTimeStamp = 0;
+            return true;
+        }
     }
     else
     {
         currentVideo.lastTimeStamp = time;
+        currentVideo.downCount = 0;
     }
 
     return false;
@@ -1425,7 +1429,7 @@ FORGE.VideoHTML5.prototype._upgradeAutoQuality = function()
     {
         var nextIndex = this._currentIndex + 1;
 
-        if (this._videos[nextIndex].abortCount === 0 && this._videos[nextIndex].leaveCount === 0)
+        if (this._videos[nextIndex].abortCount === 0 && this._videos[nextIndex].leaveCount <= 1)
         {
             this.log("AutoQuality upgrade quality");
             this._setRequestIndex(nextIndex);
@@ -1445,13 +1449,12 @@ FORGE.VideoHTML5.prototype._upgradeAutoQuality = function()
  */
 FORGE.VideoHTML5.prototype._downgradeAutoQuality = function()
 {
-    this.log("AutoQuality downgrade quality");
-
     var currentVideo = this._getCurrentVideo();
     currentVideo.leaveCount++;
 
     if (this._currentIndex - 1 >= 0)
     {
+        this.log("AutoQuality downgrade quality");
         this._setRequestIndex(this._currentIndex - 1, true);
     }
     else
@@ -1541,12 +1544,11 @@ FORGE.VideoHTML5.prototype._abortRequest = function(count)
 FORGE.VideoHTML5.prototype._clearRequestedVideo = function()
 {
     var video = this._getRequestedVideo();
-    var element;
 
     if (video !== null)
     {
         //Remove all listeners used for the requested video
-        element = video.element;
+        var element = video.element;
         element.removeEventListener("loadstart", this._onRequestLoadStartBind, false);
         element.removeEventListener("loadedmetadata", this._onRequestLoadedMetaDataBind, false);
         element.removeEventListener("loadeddata", this._onRequestLoadedDataBind, false);
@@ -1787,7 +1789,7 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
 
         case "ended":
             this._playing = false;
-            this._dom.currentTime = 0;
+            this.currentTime = 0;
             this._endCount++;
 
             if (this._loop === true)
