@@ -110,13 +110,13 @@ FORGE.Hotspot3D.prototype._boot = function()
     this._animation = new FORGE.HotspotAnimation(this._viewer, this._transform);
     this._material = new FORGE.HotspotMaterial(this._viewer);
 
+    this._onBeforeRenderBound = this._onBeforeRender.bind(this);
+    this._onAfterRenderBound = this._onAfterRender.bind(this);
+
     if (typeof this._config !== "undefined" && this._config !== null)
     {
         this._parseConfig(this._config);
     }
-
-    this._onBeforeRenderBound = this._onBeforeRender.bind(this);
-    this._onAfterRenderBound = this._onAfterRender.bind(this);
 };
 
 /**
@@ -134,6 +134,8 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._type = config.type;
     this._name = config.name;
     this._visible = config.visible;
+
+    this._mesh.name = "mesh-" + this._uid;
 
     this._facingCenter = config.facingCenter || false;
 

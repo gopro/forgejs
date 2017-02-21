@@ -1016,6 +1016,9 @@ THREE.Mesh.prototype.geometry;
 /** @type {?THREE.Material} */
 THREE.Mesh.prototype.material;
 
+/** @type {?string} */
+THREE.Mesh.prototype.name;
+
 /**
  * @param {number} arg1
  * @return {THREE.Mesh}
