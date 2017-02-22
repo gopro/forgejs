@@ -497,6 +497,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 
     if (this._mediaType === FORGE.MediaType.GRID)
     {
+        material.extensions.derivatives = true;
         material.uniforms.tColor.value = new THREE.Color(this._gridColor);
         material.blending = THREE.CustomBlending;
         material.blendEquationAlpha = THREE.AddEquation;
