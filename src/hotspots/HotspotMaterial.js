@@ -42,6 +42,14 @@ FORGE.HotspotMaterial = function(viewer)
     this._texture = null;
 
     /**
+     * Texture frame.
+     * @name FORGE.HotspotMaterial#_textureFrame
+     * @type {FORGE.Rectangle}
+     * @private
+     */
+    this._textureFrame = null;
+
+    /**
      * THREE material.
      * @name  FORGE.HotspotMaterial#_material
      * @type {THREE.RawShaderMaterial}
@@ -246,14 +254,9 @@ FORGE.HotspotMaterial.prototype._createTextureFromImage = function(image)
 {
     this._displayObject = image;
 
-    this._texture = new THREE.Texture(image.element);
-    this._texture.image.crossOrigin = "anonymous";
-    this._texture.wrapS = THREE.ClampToEdgeWrapping;
-    this._texture.wrapT = THREE.ClampToEdgeWrapping;
-    this._texture.minFilter = THREE.LinearFilter;
-    this._texture.magFilter = THREE.LinearFilter;
+    this.setTextureFrame();
 
-    this._texture.needsUpdate = true;
+    this._texture.image.crossOrigin = "anonymous";
 
     this.log("Map new texture from image");
 
@@ -349,9 +352,6 @@ FORGE.HotspotMaterial.prototype._createTextureFromPlugin = function(plugin)
 
     this._texture = new THREE.Texture(this._displayObject.dom);
     this._texture.format = THREE.RGBAFormat;
-    this._texture.wrapS = THREE.ClampToEdgeWrapping;
-    this._texture.wrapT = THREE.ClampToEdgeWrapping;
-    this._texture.magFilter = THREE.LinearFilter;
     this._texture.minFilter = THREE.LinearFilter;
     this._texture.generateMipmaps = false;
     this._texture.needsUpdate = true;
@@ -475,6 +475,57 @@ FORGE.HotspotMaterial.prototype.update = function()
     }
 };
 
+
+/**
+ * Set texture source
+ * @method FORGE.HotspotMaterial#setTextureSource
+ * @param {FORGE.Image} image - texture source image
+ */
+FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
+{
+    if (this._displayObject !== null) {
+        this._displayObject.destroy();
+        this._displayObject = null;
+    }
+
+    this._displayObject = image;
+
+    this.setTextureFrame();
+};
+
+/**
+ * Set texture frame
+ * @method FORGE.HotspotMaterial#setTextureFrame
+ * @param {FORGE.Rectangle} frame - texture frame
+ */
+FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
+{
+    // Only support type IMAGE at the moment
+    if (this._displayObject === null ||
+        this._type !== FORGE.HotspotMaterial.types.IMAGE) {
+        return;
+    }
+
+    this._textureFrame = frame;
+
+    var rSrc = frame || new FORGE.Rectangle(0, 0, this._displayObject.width, this._displayObject.height);
+    var rDst = new FORGE.Rectangle(0, 0, rSrc.width, rSrc.height);
+
+    var canvas = document.createElement("canvas");
+    canvas.width = rSrc.width;
+    canvas.height = rSrc.height;
+
+    var context = canvas.getContext("2d");
+    context.drawImage(this._displayObject.element,
+        rSrc.x, rSrc.y, rSrc.width, rSrc.height,
+        rDst.x, rDst.y, rDst.width, rDst.height);
+
+    this._texture = new THREE.CanvasTexture(canvas);
+    this._texture.needsUpdate = true;
+
+    this.update();
+};
+
 /**
  * Destroy sequence.
  * @method FORGE.HotspotTransform#destroy
@@ -482,6 +533,8 @@ FORGE.HotspotMaterial.prototype.update = function()
 FORGE.HotspotMaterial.prototype.destroy = function()
 {
     this._viewer.renderer.onViewReady.remove(this._onViewReady, this);
+
+    this._textureFrame = null;
 
     if (this._texture !== null)
     {
