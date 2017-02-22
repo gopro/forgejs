@@ -187,7 +187,7 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
      * @private
      */
     this._defaultChannelMap = [0, 1, 2, 3]; //AMBIX
-    // this._defaultChannelMap = [0, 3, 1, 2]; //FUMA
+    //this._defaultChannelMap = [0, 3, 1, 2]; //FUMA
 
     /**
      * Does the video have received its metaData?
@@ -851,12 +851,20 @@ FORGE.VideoHTML5.prototype._createVideoAt = function(index)
  */
 FORGE.VideoHTML5.prototype._createSourceTags = function(video, quality)
 {
-    var source = document.createElement("source");
-    source.addEventListener("error", this._onRequestErrorBind, false);
-    source.src = quality.url;
-    source.type = quality.mimeType;
+    if (FORGE.Device.edge === true)
+    {
+        // EDGE is not able to restore the currentTime with source tag
+        video.element.src = quality.url;
+    }
+    else
+    {
+        var source = document.createElement("source");
+        source.addEventListener("error", this._onRequestErrorBind, false);
+        source.src = quality.url;
+        source.type = quality.mimeType;
 
-    video.element.appendChild(source);
+        video.element.appendChild(source);
+    }
 
     return video;
 };
@@ -898,15 +906,18 @@ FORGE.VideoHTML5.prototype._destroyVideoAt = function(index)
             element.pause();
             element.src = "";
 
-            var source;
-            for (var i = 0, ii = element.children.length; i < ii; i++)
+            if (FORGE.Device.edge !== true)
             {
-                source = element.children[i];
-                source.removeEventListener("error", this._onRequestErrorBind, false);
-                source.src = "";
+                var source;
+                for (var i = 0, ii = element.children.length; i < ii; i++)
+                {
+                    source = element.children[i];
+                    source.removeEventListener("error", this._onRequestErrorBind, false);
+                    source.src = "";
 
-                element.removeChild(source);
-                source = null;
+                    element.removeChild(source);
+                    source = null;
+                }
             }
 
             element.load();
@@ -991,17 +1002,17 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
 
     if (this._isAmbisonic() === true)
     {
-        // get the global audio context
+        //get the global audio context
         this._context = this._viewer.audio.context;
 
-        // FOA decoder and binaural renderer
+        //FOA decoder and binaural renderer
         this._decoder = Omnitone.createFOADecoder(this._context, requestedVideo.element, {
             channelMap: this._defaultChannelMap
-            // HRTFSetUrl: 'YOUR_HRTF_SET_URL', //Base URL for the cube HRTF sets.
-            // postGainDB: 0, //Post-decoding gain compensation in dB.
+            //HRTFSetUrl: 'YOUR_HRTF_SET_URL', //Base URL for the cube HRTF sets.
+            //postGainDB: 0, //Post-decoding gain compensation in dB.
         });
 
-        // Initialize the decoder
+        //Initialize the decoder
         this._decoderInitializedErrorBind = this._decoderInitializedError.bind(this);
         this._decoder.initialize().then(this._decoderInitializedSuccessBind, this._decoderInitializedErrorBind);
     }
@@ -1019,7 +1030,7 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
     }
     else
     {
-        // Start a timer to estimate if it is a failure ...
+        //Start a timer to estimate if it is a failure ...
         this._requestTimer.add(this._timeoutTime, this._requestTimeOutHandler, this);
         this._requestTimer.start();
     }
@@ -1034,7 +1045,7 @@ FORGE.VideoHTML5.prototype._decoderInitializedSuccess = function()
 {
     if (this._requestIndex === -1)
     {
-        // get the current video if requested index is set
+        //get the current video if requested index is set
         this._getCurrentVideo().element.load();
     }
     else
@@ -1144,14 +1155,21 @@ FORGE.VideoHTML5.prototype._onRequestSeeked = function()
     this.log("_onRequestSeeked [readyState: " + element.readyState + "]");
     element.removeEventListener("seeked", this._onRequestSeekedBind, false);
 
-    if (element.readyState === 4)
+    if (element.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA)
     {
         element.removeEventListener("error", this._onRequestErrorBind, false);
         this._requestWaitSync();
     }
     else
     {
-        element.addEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+        if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+        {
+            element.addEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+        }
+        else
+        {
+            element.addEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+        }
     }
 };
 
@@ -1166,8 +1184,18 @@ FORGE.VideoHTML5.prototype._onRequestCanPlayAfterSeek = function()
 
     this.log("_onRequestCanPlayAfterSeek [readyState: " + element.readyState + "]");
 
+    //Force the current time of the requested video to the current video time value. Usefull for long duration chunks downloads.
+    element.currentTime = this.currentTime;
+
     //Clean events listeners on element
-    element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+    if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+    {
+        element.removeEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+    }
+    else
+    {
+        element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+    }
     element.removeEventListener("error", this._onRequestErrorBind, false);
 
     this._requestWaitSync();
@@ -1190,12 +1218,15 @@ FORGE.VideoHTML5.prototype._requestWaitSync = function()
     }
 
     //Clean error event listener on requested source
-    var element = this._getRequestedVideo().element;
-    var source;
-    for (var i = 0, ii = element.children.length; i < ii; i++)
+    if (FORGE.Device.edge !== true)
     {
-        source = element.children[i];
-        source.removeEventListener("error", this._onRequestErrorBind, false);
+        var element = this._getRequestedVideo().element;
+        var source;
+        for (var i = 0, ii = element.children.length; i < ii; i++)
+        {
+            source = element.children[i];
+            source.removeEventListener("error", this._onRequestErrorBind, false);
+        }
     }
 
     if (this._forceRequest === true)
@@ -1244,7 +1275,7 @@ FORGE.VideoHTML5.prototype._videoSyncTimerLoop = function()
  */
 FORGE.VideoHTML5.prototype._requestTimeOutHandler = function()
 {
-    this.log("_requestTimeOutHandler");
+    this.log("_requestTimeOutHandler "+this._requestIndex);
     this._abortRequest(true);
 };
 
@@ -1275,13 +1306,13 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
         return;
     }
 
-    // Remove all video tags from our container div
+    //Remove all video tags from our container div
     this._dom.innerHTML = "";
 
     //Get the requested video
     var requestedVideo = this._getRequestedVideo();
 
-    // Resume playback if it was already playing
+    //Resume playback if it was already playing
     if (this._playing === true)
     {
         requestedVideo.element.currentTime = this.currentTime;
@@ -1294,11 +1325,11 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
     //Get the current video and clean some events listener (seek while sync), and destroy video tag.
     var videoToBeRemoved = this._getCurrentVideo();
 
-    // Index switch
+    //Index switch
     this._requestIndex = -1;
     this._currentIndex = index;
 
-    // Update current video reference
+    //Update current video reference
     var currentVideo = this._getCurrentVideo();
     currentVideo.currentCount++;
 
@@ -1321,7 +1352,7 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
         this._destroyVideo(videoToBeRemoved);
     }
 
-    // Clear the request timer
+    //Clear the request timer
     this._requestTimer.stop(true);
 
     if (this._onQualityChange !== null)
@@ -1554,7 +1585,14 @@ FORGE.VideoHTML5.prototype._clearRequestedVideo = function()
         element.removeEventListener("loadeddata", this._onRequestLoadedDataBind, false);
         element.removeEventListener("play", this._onRequestCanPlayBeforeSeekBind, false);
         element.removeEventListener("seeked", this._onRequestSeekedBind, false);
-        element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+        if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+        {
+            element.removeEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+        }
+        else
+        {
+            element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+        }
         element.removeEventListener("error", this._onRequestErrorBind, false);
 
         //Destroy the requested video
@@ -1767,9 +1805,9 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             break;
 
         case "volumechange":
-            // I do not dispatch the volume change if readyState is 0. Because
-            // I set the volume at 0 when I create the video element, it is
-            // not usefull to dispatch this internal volume change ?
+            //I do not dispatch the volume change if readyState is 0. Because
+            //I set the volume at 0 when I create the video element, it is
+            //not usefull to dispatch this internal volume change ?
             if (this._onVolumeChange !== null && element.readyState !== 0)
             {
                 this._onVolumeChange.dispatch(event);
@@ -1862,7 +1900,7 @@ FORGE.VideoHTML5.prototype.update = function()
 {
     if(this._decoder !== null && this._playing === true)
     {
-        // Rotate the binaural renderer based on a Three.js camera object.
+        //Rotate the binaural renderer based on a Three.js camera object.
         var m4 = this._viewer.renderer.camera.modelViewInverse;
         this._decoder.setRotationMatrixFromCamera(m4);
     }
@@ -2176,7 +2214,7 @@ FORGE.VideoHTML5.prototype.destroy = function()
         this._destroyVideoAt(i);
     }
 
-    // Nullify event listeners binded to this!
+    //Nullify event listeners binded to this!
     this._decoderInitializedSuccessBind = null;
     this._decoderInitializedErrorBind = null;
 
@@ -2444,7 +2482,7 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "currentTime",
     /** @this {FORGE.VideoHTML5} */
     set: function(value)
     {
-        if (typeof value === "number") // && value < this.duration) //@todo see if we can put video currentTime in pending if no metadata received ?
+        if (typeof value === "number") //@todo see if we can put video currentTime in pending if no metadata received ? (typeof value === "number" && value < this.duration)
         {
             var currentVideo = this._getCurrentVideo();
 
