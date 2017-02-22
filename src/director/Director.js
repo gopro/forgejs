@@ -111,6 +111,9 @@ FORGE.Director.prototype._boot = function()
 
     // Add controllers after viewer is ready
     this._viewer.onReady.add(this._onViewerReady, this);
+
+    // Bind onVisibilityChange handler
+    this._onVisibilityChangeBind = this._onVisibilityChange.bind(this);
 };
 
 /**
@@ -409,7 +412,7 @@ FORGE.Director.prototype._idleTimerCompleteHandler = function()
  */
 FORGE.Director.prototype._onVisibilityChange = function()
 {
-    if (!document.hidden)
+    if (FORGE.Device.visibilityState !== "hidden")
     {
         this._viewer.renderer.media.displayObject.onCurrentTimeChange.dispatch(this._viewer.renderer.media.displayObject.currentTime);
     }
