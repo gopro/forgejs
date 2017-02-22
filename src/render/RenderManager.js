@@ -155,6 +155,14 @@ FORGE.RenderManager = function(viewer)
     this._viewReady = false;
 
     /**
+     * Render pipeline renderer ready flag
+     * @name FORGE.RenderManager#_renderPipelineReady
+     * @type boolean
+     * @private
+     */
+    this._renderPipelineReady = false;
+
+    /**
      * Hotspot renderer ready flag
      * @name FORGE.RenderManager#_hotspotsReady
      * @type boolean
@@ -314,6 +322,7 @@ FORGE.RenderManager.prototype._onSceneLoadStart = function()
 FORGE.RenderManager.prototype._onSceneUnloadStart = function()
 {
     this._hotspotsReady = false;
+    this._renderPipelineReady = false;
 
     this._clearBackgroundRenderer();
 
@@ -555,6 +564,8 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
         var globalFxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.fx);
         this._renderPipeline.addGlobalFx(globalFxSet);
     }
+
+    this._renderPipelineReady = true;
 };
 
 /**
@@ -778,6 +789,7 @@ FORGE.RenderManager.prototype.update = function()
 FORGE.RenderManager.prototype.render = function()
 {
     if (this._viewReady === false ||
+        this._renderPipelineReady === false ||
         this._renderPipeline === null)
     {
         return;
@@ -790,7 +802,6 @@ FORGE.RenderManager.prototype.render = function()
 
     var vr = this._renderDisplay.presentingVR;
     var renderParams = this._renderDisplay.getRenderParams();
-
 
     for (var i = 0, ii = renderParams.length; i < ii; i++)
     {
