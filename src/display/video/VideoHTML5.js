@@ -494,6 +494,14 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._onRequestSeekedWhileSyncBind = null;
 
     /**
+     * Event handler for the Page Visibility event binded to this.
+     * @name FORGE.VideoHTML5#_onVisibilityChangeBind
+     * @type {Function}
+     * @private
+     */
+    this._onVisibilityChangeBind = null;
+
+    /**
      * Event handler for all events fired by the HTMLVideoElement. See https://developer.mozilla.org/en/docs/Web/Guide/Events/Media_events for a list of available events.
      * @name FORGE.VideoHTML5#_onEventBind
      * @type {Function}
@@ -563,6 +571,10 @@ FORGE.VideoHTML5.prototype._boot = function()
 
     //Listen to the enabled state of the sound manager.
     this._viewer.audio.onDisable.add(this._disableSoundHandler, this);
+
+    // Listen to the PageVisibility event
+    this._onVisibilityChangeBind = this._onVisibilityChange.bind(this);
+    document.addEventListener(FORGE.Device.visibilityChange, this._onVisibilityChangeBind);
 
     //force the creation of "onQualitiesLoaded" event dispatcher and memorize it's data
     this._onQualitiesLoaded = new FORGE.EventDispatcher(this, true);
@@ -1644,6 +1656,11 @@ FORGE.VideoHTML5.prototype._disableSoundHandler = function()
     }
 };
 
+FORGE.VideoHTML5.prototype._onVisibilityChange = function(event)
+{
+    console.log("Visiblity changed to " + document[FORGE.Device.visibilityState]);
+};
+
 /**
  * Bind native events handler for the current video.
  * @method FORGE.VideoHTML5#_installEvents
@@ -2228,6 +2245,9 @@ FORGE.VideoHTML5.prototype.destroy = function()
     this._onRequestSeekedWhileSyncBind = null;
 
     this._onEventBind = null;
+
+    document.removeEventListener(FORGE.Device.visibilityChange, this._onVisibilityChangeBind);
+    this._onVisibilityChangeBind = null;
 
     //Unbind main volume event
     this._viewer.audio.onVolumeChange.remove(this._mainVolumeChangeHandler, this);

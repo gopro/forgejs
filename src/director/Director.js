@@ -412,7 +412,7 @@ FORGE.Director.prototype._idleTimerCompleteHandler = function()
  */
 FORGE.Director.prototype._onVisibilityChange = function()
 {
-    if (FORGE.Device.visibilityState !== "hidden")
+    if (document[FORGE.Device.visibilityState] !== "hidden")
     {
         this._viewer.renderer.media.displayObject.onCurrentTimeChange.dispatch(this._viewer.renderer.media.displayObject.currentTime);
     }
@@ -534,6 +534,8 @@ FORGE.Director.prototype._clearEvents = function()
         this._viewer.renderer.media.displayObject.onPlaying.remove(this._playingHandler, this);
         this._viewer.renderer.media.displayObject.onEnded.remove(this._endedHandler, this);
         this._viewer.renderer.media.displayObject.onCurrentTimeChange.remove(this._synchronizeWithVideo, this);
+
+        document.removeEventListener(FORGE.Device.visibilityChange, this._onVisibilityChangeBind);
     }
 };
 

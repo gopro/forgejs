@@ -587,7 +587,7 @@ FORGE.Device = (function(c)
             "mozVisibilityState" in document ? "mozVisibilityState" :
             null;
 
-        this.visibilityChange = visibilityState.slice(0, -5) + "change";
+        this.visibilityChange = this.visibilityState.slice(0, -5) + "change";
 
         //Screen orientation API
         var orientation =
