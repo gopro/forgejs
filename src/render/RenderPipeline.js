@@ -446,6 +446,25 @@ FORGE.RenderPipeline.prototype._updateRenderPipeline = function()
 };
 
 /**
+ * Setup default background texture pass.
+ * @method FORGE.RenderPipeline#_setupDefaultBackground.
+ * @private
+ */
+FORGE.RenderPipeline.prototype._setupDefaultBackground = function()
+{
+    var canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    var context = canvas.getContext("2d");
+    context.fillStyle = "rgb(0, 0, 0)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    var defaultTexture = new THREE.TextureLoader().load(canvas.toDataURL());
+    defaultTexture.name = "forge-default-texture";
+
+    this.addBackground(defaultTexture, null, 0);
+};
+
+/**
  * Set all render passes camera.
  * @method FORGE.RenderPipeline#_setAllRenderPassCamera.
  * @param {THREE.Camera} camera render pass camera.
@@ -505,8 +524,9 @@ FORGE.RenderPipeline.prototype.enablePicking = function(status, material, render
  * @method FORGE.RenderPipeline#addBackground
  * @param {THREE.Texture} texture texture object used as background.
  * @param {Array<FX>} fxSet image fx set to apply to background only.
+ * @param {number=} opacity texture pass opacity
  */
-FORGE.RenderPipeline.prototype.addBackground = function(texture, fxSet)
+FORGE.RenderPipeline.prototype.addBackground = function(texture, fxSet, opacity)
 {
     // Background addition will be an insertion of all passes at index 0
     // First we add all shaders passes in reverse order at index 0
@@ -525,7 +545,7 @@ FORGE.RenderPipeline.prototype.addBackground = function(texture, fxSet)
         this._addShaderPasses(this._renderComposer, shaderPasses, 0);
     }
 
-    var texturePass = new FORGE.TexturePass(texture);
+    var texturePass = new FORGE.TexturePass(texture, opacity);
     texturePass.position = FORGE.PassPosition.BACKGROUND;
 
     this._renderComposer.insertPass(texturePass, 0);
@@ -663,6 +683,12 @@ FORGE.RenderPipeline.prototype.render = function(camera)
     if (this._renderComposer === null)
     {
         return;
+    }
+
+    // Create default texture and use it if there is no texture in background
+    if (!(this._renderComposer.passes[0] instanceof FORGE.TexturePass))
+    {
+        this._setupDefaultBackground();
     }
 
     for (var i = 0, ii = this._renderComposer.passes.length; i < ii; i++)

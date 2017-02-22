@@ -4,7 +4,7 @@
  * Compute distance to the edge to find what should be displayed
  */
 
-#extension GL_OES_standard_derivatives : enable
+#extension GL_OES_standard_derivatives : enable 
 
 #include <defines>
 

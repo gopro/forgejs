@@ -155,6 +155,14 @@ FORGE.RenderManager = function(viewer)
     this._viewReady = false;
 
     /**
+     * Render pipeline renderer ready flag
+     * @name FORGE.RenderManager#_renderPipelineReady
+     * @type boolean
+     * @private
+     */
+    this._renderPipelineReady = false;
+
+    /**
      * Hotspot renderer ready flag
      * @name FORGE.RenderManager#_hotspotsReady
      * @type boolean
@@ -314,6 +322,7 @@ FORGE.RenderManager.prototype._onSceneLoadStart = function()
 FORGE.RenderManager.prototype._onSceneUnloadStart = function()
 {
     this._hotspotsReady = false;
+    this._renderPipelineReady = false;
 
     this._clearBackgroundRenderer();
 
@@ -548,13 +557,15 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
         fxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.media.fx);
     }
 
-    this._renderPipeline.addBackground(this._backgroundRenderer.renderTarget.texture, fxSet);
+    this._renderPipeline.addBackground(this._backgroundRenderer.renderTarget.texture, fxSet, 1.0);
 
     if (typeof this._sceneConfig.fx !== "undefined" && this._sceneConfig.fx !== null)
     {
         var globalFxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.fx);
         this._renderPipeline.addGlobalFx(globalFxSet);
     }
+
+    this._renderPipelineReady = true;
 };
 
 /**
@@ -567,10 +578,12 @@ FORGE.RenderManager.prototype._drawBackground = function(camera)
 {
     // this.log("_drawBackground");
 
-    if (this._backgroundRenderer !== null)
+    if (this._backgroundRenderer === null)
     {
-        this._backgroundRenderer.render(camera || null);
+        return;
     }
+
+    this._backgroundRenderer.render(camera || null);
 };
 
 /**
@@ -775,53 +788,51 @@ FORGE.RenderManager.prototype.update = function()
  */
 FORGE.RenderManager.prototype.render = function()
 {
-    if (this._backgroundReady === false ||
-        this._viewReady === false ||
+    if (this._viewReady === false ||
+        this._renderPipelineReady === false ||
         this._renderPipeline === null)
     {
         return;
     }
 
-    this._backgroundRenderer.update();
-
-    // Render
-    if (this._backgroundReady === true)
+    if (this._backgroundRenderer !== null)
     {
-        var vr = this._renderDisplay.presentingVR;
-        var renderParams = this._renderDisplay.getRenderParams();
+        this._backgroundRenderer.update();
+    }
 
+    var vr = this._renderDisplay.presentingVR;
+    var renderParams = this._renderDisplay.getRenderParams();
 
-        for (var i = 0, ii = renderParams.length; i < ii; i++)
+    for (var i = 0, ii = renderParams.length; i < ii; i++)
+    {
+        var params = renderParams[i];
+        var rect = params.rectangle;
+        var camera = params.camera;
+
+        this._webGLRenderer.setViewport(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+
+        this._drawBackground(vr ? camera : null);
+
+        this._renderPipeline.render(camera);
+
+        // Render perspective camera children (objects in camera local space)
+        this._webGLRenderer.clearDepth();
+
+        //this._camera.gaze.visible = !this._renderDisplay.presentingVR;
+
+        if (vr === true)
         {
-            var params = renderParams[i];
-            var rect = params.rectangle;
-            var camera = params.camera;
+            var scene = new THREE.Scene();
+            scene.add(camera);
+            //window.scene = scene;
 
-            this._webGLRenderer.setViewport(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
-
-            this._drawBackground(vr ? camera : null);
-
-            this._renderPipeline.render(camera);
-
-            // Render perspective camera children (objects in camera local space)
-            this._webGLRenderer.clearDepth();
-
-            //this._camera.gaze.visible = !this._renderDisplay.presentingVR;
-
-            if (vr === true)
-            {
-                var scene = new THREE.Scene();
-                scene.add(camera);
-                //window.scene = scene;
-
-                this._webGLRenderer.render(scene, camera);
-            }
+            this._webGLRenderer.render(scene, camera);
         }
+    }
 
-        if (this._renderDisplay.presentingVR === true)
-        {
-            this._renderDisplay.submitFrame();
-        }
+    if (this._renderDisplay.presentingVR === true)
+    {
+        this._renderDisplay.submitFrame();
     }
 
     // @todo implement event for render stats (fps, objects count...)

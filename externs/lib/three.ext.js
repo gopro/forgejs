@@ -216,9 +216,9 @@ THREE.TextureLoader = function() {};
 
 /**
  * @param  {string} arg1
- * @param  {function(THREE.Texture): undefined} arg2
- * @param  {function(XMLHttpRequest): undefined} arg3
- * @param  {function(XMLHttpRequest): undefined} arg4
+ * @param  {function(THREE.Texture): undefined=} arg2
+ * @param  {function(XMLHttpRequest): undefined=} arg3
+ * @param  {function(XMLHttpRequest): undefined=} arg4
  */
 THREE.TextureLoader.prototype.load = function(arg1, arg2, arg3, arg4) {};
 
@@ -856,6 +856,9 @@ THREE.Material = function() {};
 
 /** @type {THREE.WebGLProgram} */
 THREE.Material.prototype.program;
+
+/** @type {Object} */
+THREE.Material.prototype.extensions;
 
 /**
  */
