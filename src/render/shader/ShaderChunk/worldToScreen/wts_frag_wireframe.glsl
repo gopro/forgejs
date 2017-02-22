@@ -4,6 +4,8 @@
  * Compute distance to the edge to find what should be displayed
  */
 
+#extension GL_OES_standard_derivatives : enable 
+
 #include <defines>
 
 // Set thickness to 1.5. Seems like 1.0 adds aliasing to the grid.
