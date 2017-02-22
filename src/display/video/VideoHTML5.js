@@ -821,7 +821,8 @@ FORGE.VideoHTML5.prototype._createVideoAt = function(index)
 {
     //Create a video tag and get the quality
     var element = document.createElement("video");
-    element.setAttribute("webkit-playsinline", "webkit-playsinline");
+    element.setAttribute("webkit-playsinline", "true");
+    element.setAttribute("playsinline", "true");
     element.setAttribute("width", this.pixelWidth);
     element.setAttribute("height", this.pixelHeight);
     element.volume = 0;
