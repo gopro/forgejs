@@ -430,6 +430,22 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._endCount = 0;
 
     /**
+     * Does the video is automatically paused when the window is not in focus anymore ?
+     * @name FORGE.VideoHTML5#_autoPause
+     * @type {boolean}
+     * @private
+     */
+    this._autoPause = true;
+
+    /**
+     * Does the video is automatically resumed when the window is back in focus ?
+     * @name FORGE.VideoHTML5#_autoResume
+     * @type {boolean}
+     * @private
+     */
+    this._autoResume = false;
+
+    /**
      * Event handler for request error binded to this.
      * @name FORGE.VideoHTML5#_onRequestErrorBind
      * @type {Function}
@@ -1656,9 +1672,28 @@ FORGE.VideoHTML5.prototype._disableSoundHandler = function()
     }
 };
 
-FORGE.VideoHTML5.prototype._onVisibilityChange = function(event)
+/**
+ * Handles the change of the visibility of the page.
+ * @method FORGE.VideoHTML5#_onVisibilityChange
+ * @private
+ */
+FORGE.VideoHTML5.prototype._onVisibilityChange = function()
 {
-    console.log("Visiblity changed to " + document[FORGE.Device.visibilityState]);
+    var status = document[FORGE.Device.visibilityState];
+
+    // Pause if playing, leaving and authorized to pause
+    if (this._autoPause === true && status === "hidden" && this._playing === true)
+    {
+        this.pause();
+        return;
+    }
+
+    // Resume if paused, entering and authorized to resume
+    if (this._autoResume === true && status === "visible" && this._playing === false)
+    {
+        this.play();
+        return;
+    }
 };
 
 /**
@@ -2625,6 +2660,52 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "canPlay",
     get: function()
     {
         return this._canPlay;
+    }
+});
+
+/**
+ * Get/Set the autoPause parameter of the video.
+ * @name FORGE.VideoHTML5#autoPause
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoHTML5.prototype, "autoPause",
+{
+    /** @this {FORGE.VideoHTML5} */
+    get: function()
+    {
+        return this._autoPause;
+    },
+
+    /** @this {FORGE.VideoHTML5} */
+    set: function(value)
+    {
+        if (typeof value === "boolean")
+        {
+            this._autoPause = value;
+        }
+    }
+});
+
+/**
+ * Get/Set the autoResume parameter of the video.
+ * @name FORGE.VideoHTML5#autoResume
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoHTML5.prototype, "autoResume",
+{
+    /** @this {FORGE.VideoHTML5} */
+    get: function()
+    {
+        return this._autoResume;
+    },
+
+    /** @this {FORGE.VideoHTML5} */
+    set: function(value)
+    {
+        if (typeof value === "boolean")
+        {
+            this._autoResume = value;
+        }
     }
 });
 

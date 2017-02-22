@@ -249,6 +249,22 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
     this._endCount = 0;
 
     /**
+     * Does the video is automatically paused when the window is not in focus anymore ?
+     * @name FORGE.VideoDash#_autoPause
+     * @type {boolean}
+     * @private
+     */
+    this._autoPause = true;
+
+    /**
+     * Does the video is automatically resumed when the window is back in focus ?
+     * @name FORGE.VideoDash#_autoResume
+     * @type {boolean}
+     * @private
+     */
+    this._autoResume = false;
+
+    /**
      * On load start event dispatcher.
      * @name  FORGE.VideoDash#_onLoadStart
      * @type {?FORGE.EventDispatcher}
@@ -1674,10 +1690,30 @@ FORGE.VideoDash.prototype._updateVolume = function()
     }
 };
 
-FORGE.VideoDash.prototype._onVisibilityChange = function(event)
+/**
+ * Handles the change of the visibility of the page.
+ * @method FORGE.VideoDash#_onVisibilityChange
+ * @private
+ */
+FORGE.VideoDash.prototype._onVisibilityChange = function()
 {
-    console.log("Visiblity changed to " + document[FORGE.Device.visibilityState]);
+    var status = document[FORGE.Device.visibilityState];
+
+    // Pause if playing, leaving and authorized to pause
+    if (this._autoPause === true && status === "hidden" && this._playing === true)
+    {
+        this.pause();
+        return;
+    }
+
+    // Resume if paused, entering and authorized to resume
+    if (this._autoResume === true && status === "visible" && this._playing === false)
+    {
+        this.play();
+        return;
+    }
 };
+
 
 /**
  * Apply the requested quality index.
@@ -2471,6 +2507,52 @@ Object.defineProperty(FORGE.VideoDash.prototype, "canPlay",
     get: function()
     {
         return this._canPlay;
+    }
+});
+
+/**
+ * Get/Set the autoPause parameter of the video.
+ * @name FORGE.VideoDash#autoPause
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoDash.prototype, "autoPause",
+{
+    /** @this {FORGE.VideoDash} */
+    get: function()
+    {
+        return this._autoPause;
+    },
+
+    /** @this {FORGE.VideoDash} */
+    set: function(value)
+    {
+        if (typeof value === "boolean")
+        {
+            this._autoPause = value;
+        }
+    }
+});
+
+/**
+ * Get/Set the autoResume parameter of the video.
+ * @name FORGE.VideoDash#autoResume
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoDash.prototype, "autoResume",
+{
+    /** @this {FORGE.VideoDash} */
+    get: function()
+    {
+        return this._autoResume;
+    },
+
+    /** @this {FORGE.VideoDash} */
+    set: function(value)
+    {
+        if (typeof value === "boolean")
+        {
+            this._autoResume = value;
+        }
     }
 });
 

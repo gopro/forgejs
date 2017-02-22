@@ -209,6 +209,7 @@ FORGE.Media.prototype._onImageLoadComplete = function()
 FORGE.Media.prototype._onLoadedMetaDataHandler = function()
 {
     this._ready = true;
+
     if (this._options !== null)
     {
         this._displayObject.volume = (typeof this._options.volume === "number") ? this._options.volume : 1;
@@ -219,6 +220,9 @@ FORGE.Media.prototype._onLoadedMetaDataHandler = function()
         {
             this._displayObject.play();
         }
+
+        this._displayObject.autoPause = this._options.autoPause;
+        this._displayObject.autoResume = this._options.autoResume;
     }
 
     if (this._onLoadComplete !== null)
