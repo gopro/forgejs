@@ -1315,7 +1315,6 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
     //Resume playback if it was already playing
     if (this._playing === true)
     {
-        requestedVideo.element.currentTime = this.currentTime;
         requestedVideo.element.play();
     }
 
