@@ -1722,9 +1722,9 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             break;
 
         case "durationchange":
-            //@firefox - FF disptach durationchange twice on readystate 1 & 4
+            //@firefox - FF disptach durationchange twice on readystate HAVE_METADATA (1) & HAVE_ENOUGH_DATA (4)
             //I will not dispatch this event if readystate is 4 !
-            if (this._onDurationChange !== null && element.readyState === 1)
+            if (this._onDurationChange !== null && element.readyState === HTMLMediaElement.HAVE_METADATA)
             {
                 this._onDurationChange.dispatch(event);
             }
@@ -1804,10 +1804,10 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             break;
 
         case "volumechange":
-            //I do not dispatch the volume change if readyState is 0. Because
+            //I do not dispatch the volume change if readyState is HAVE_NOTHING (0). Because
             //I set the volume at 0 when I create the video element, it is
             //not usefull to dispatch this internal volume change ?
-            if (this._onVolumeChange !== null && element.readyState !== 0)
+            if (this._onVolumeChange !== null && element.readyState !== HTMLMediaElement.HAVE_NOTHING)
             {
                 this._onVolumeChange.dispatch(event);
             }
