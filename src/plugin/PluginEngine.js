@@ -331,7 +331,7 @@ FORGE.PluginEngine.prototype._parseManifest = function(manifest)
         return;
     }
 
-    if(this._deviceCheck(manifest.device) === false)
+    if(FORGE.Device.deviceCheck(manifest.device) === false)
     {
         this.warn("Device compatibility check for plugin "+manifest.uid+" failed!");
         this.warn(manifest.device);
@@ -422,36 +422,6 @@ FORGE.PluginEngine.prototype._versionCheck = function(config)
     if(viewerN < minN || viewerN > maxN)
     {
         return false;
-    }
-
-    return true;
-};
-
-/**
- * Check device requirement for this plugin engine.
- * @method FORGE.PluginEngine#_deviceCheck
- * @private
- * @param  {Object} config - The device requirement configuration object of the manifest.
- * @return {boolean} Returns true if the plugin is compatible with the device environment, false if not.
- */
-FORGE.PluginEngine.prototype._deviceCheck = function(config)
-{
-    //If configuration is undefined I guess that the plugin has no device limitations
-    if(typeof config === "undefined")
-    {
-        return true;
-    }
-
-    for(var i in config)
-    {
-        if(typeof FORGE.Device[i] === "undefined")
-        {
-            this.warn("Unable to check plugin device compatibility for: "+i);
-        }
-        else if(FORGE.Device[i] !== config[i])
-        {
-            return false;
-        }
     }
 
     return true;
