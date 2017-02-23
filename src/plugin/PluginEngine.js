@@ -331,7 +331,7 @@ FORGE.PluginEngine.prototype._parseManifest = function(manifest)
         return;
     }
 
-    if(FORGE.Device.deviceCheck(manifest.device) === false)
+    if(FORGE.Device.check(manifest.device) === false)
     {
         this.warn("Device compatibility check for plugin "+manifest.uid+" failed!");
         this.warn(manifest.device);

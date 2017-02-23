@@ -970,11 +970,11 @@ FORGE.Device = (function(c)
 
     /**
      * Check device requirement for an object from configuration/manifest.
-     * @method FORGE.Device#deviceCheck
+     * @method FORGE.Device#check
      * @param  {Object} config - The device requirement configuration of the configuration/manifest.
      * @return {boolean} Returns true if the object is compatible with the device environment, false if not.
      */
-    Tmp.prototype.deviceCheck = function(config)
+    Tmp.prototype.check = function(config)
     {
         //If configuration is undefined, the object has no device limitations
         if(typeof config === "undefined")

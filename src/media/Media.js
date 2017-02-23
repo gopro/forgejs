@@ -155,7 +155,7 @@ FORGE.Media.prototype._parseConfig = function(config)
             source.url = [];
             for (var i = 0, ii = source.levels.length; i < ii; i++)
             {
-                if(FORGE.Device.deviceCheck(source.levels[i].device) === false)
+                if(FORGE.Device.check(source.levels[i].device) === false)
                 {
                     continue;
                 }
