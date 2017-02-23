@@ -88,13 +88,20 @@ FORGE.Media.prototype._parseConfig = function(config)
     // media configuration
     var mediaConfig = config.media;
 
-    if (typeof mediaConfig === "undefined")
+    if (typeof mediaConfig === "undefined" || mediaConfig === null)
     {
         return;
     }
 
-    // Warning : UID is not registered and applied to the FORGE.ImageScalable|FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
+    // Warning : UID is not registered and will be applied to the FORGE.ImageScalable|FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
     this._uid = mediaConfig.uid;
+
+    this._options = (typeof mediaConfig.options !== "undefined") ? mediaConfig.options : null;
+
+    if (typeof mediaConfig.source === "undefined" || mediaConfig.source === null)
+    {
+        return;
+    }
 
     var source = mediaConfig.source;
 
@@ -148,8 +155,18 @@ FORGE.Media.prototype._parseConfig = function(config)
             source.url = [];
             for (var i = 0, ii = source.levels.length; i < ii; i++)
             {
+                if(FORGE.Device.deviceCheck(source.levels[i].device) === false)
+                {
+                    continue;
+                }
+
                 source.url.push(source.levels[i].url);
             }
+        }
+
+        if (typeof source.url !== "string" && source.url.length === 0)
+        {
+            return;
         }
 
         if (typeof source.streaming !== "undefined" && source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
@@ -168,8 +185,6 @@ FORGE.Media.prototype._parseConfig = function(config)
 
         this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
     }
-
-    this._options = (typeof mediaConfig.options !== "undefined") ? mediaConfig.options : null;
 };
 
 /**
