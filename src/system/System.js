@@ -33,7 +33,7 @@ FORGE.System = function(viewer)
     /**
      * Interval value for the wakelock.
      * @name  FORGE.System#_wakelockInterval
-     * @type {number}
+     * @type {?number}
      * @private
      */
     this._wakelockInterval = null;
@@ -81,8 +81,6 @@ FORGE.System = function(viewer)
      * @private
      */
     this._pointerLock = false;
-
-    this._boot();
 };
 
 FORGE.System.prototype.constructor = FORGE.System;
@@ -91,7 +89,7 @@ FORGE.System.prototype.constructor = FORGE.System;
  * Boot sequence.
  * @method FORGE.System#boot
  */
-FORGE.System.prototype._boot = function()
+FORGE.System.prototype.boot = function()
 {
     // bind visibility change event
     this._visibilityChangeBind = this._visibilityChangeHandler.bind(this);
@@ -240,17 +238,7 @@ FORGE.System.prototype._setPageVisibilityEvent = function()
     document.addEventListener(FORGE.Device.visibilityChange, this._visibilityChangeBind, false);
 
     //force current tab state
-    this._visibilityChangeHandler(null);
-};
-
-/**
- * Returns the visible state of the tab.
- * @method  FORGE.System#_pageVisibilityState
- * @private
- */
-FORGE.System.prototype._pageVisibilityState = function()
-{
-    return !document[FORGE.Device.visibleState];
+    this._visibilityChangeHandler();
 };
 
 /**
@@ -260,16 +248,15 @@ FORGE.System.prototype._pageVisibilityState = function()
  */
 FORGE.System.prototype._visibilityChangeHandler = function()
 {
-    if(typeof FORGE.Device.visibilityState === "string" && typeof FORGE.Device.visibilityChange === "string")
+    var state = document[FORGE.Device.visibilityState];
+
+    if (typeof state === "string" && state === "visible")
     {
-        if(this._pageVisibilityState())
-        {
-            this._onFocusHandler();
-        }
-        else
-        {
-            this._onBlurHandler();
-        }
+        this._onFocusHandler();
+    }
+    else
+    {
+        this._onBlurHandler();
     }
 };
 
@@ -304,7 +291,7 @@ FORGE.System.prototype._onBlurHandler = function()
  */
 FORGE.System.prototype._setLockScreenOrientationEvent = function()
 {
-    if(FORGE.Device.Android === true && (FORGE.Device.screenOrientation === true || typeof FORGE.Device.orientation === "string"))
+    if(FORGE.Device.isAndroidStockBrowser === true && (FORGE.Device.screenOrientation === true || typeof FORGE.Device.orientation === "string"))
     {
         //add lock screen activation/deactivation on fullscreen enter/exit
         this._viewer.container.onFullscreenEnter.add(this._activateLockScreenOrientation, this);
@@ -319,7 +306,7 @@ FORGE.System.prototype._setLockScreenOrientationEvent = function()
  */
 FORGE.System.prototype._lockScreenOrientation = function()
 {
-    if(FORGE.Device.Android === true && (FORGE.Device.screenOrientation === true || typeof FORGE.Device.orientation === "string"))
+    if(FORGE.Device.isAndroidStockBrowser === true && (FORGE.Device.screenOrientation === true || typeof FORGE.Device.orientation === "string"))
     {
         if(this._lockScreen === true)
         {
@@ -381,7 +368,7 @@ FORGE.System.prototype._deactivateLockScreenOrientation = function()
  */
 FORGE.System.prototype.destroy = function()
 {
-    if(FORGE.Device.Android === true && (FORGE.Device.screenOrientation === true || typeof FORGE.Device.orientation === "string"))
+    if(FORGE.Device.isAndroidStockBrowser === true && (FORGE.Device.screenOrientation === true || typeof FORGE.Device.orientation === "string"))
     {
         this._viewer.container.onFullscreenEnter.remove(this._activateLockScreenOrientation, this);
         this._viewer.container.onFullscreenExit.remove(this._deactivateLockScreenOrientation, this);

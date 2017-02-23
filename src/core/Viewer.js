@@ -320,6 +320,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._createContainers();
     this._createCanvas();
 
+    this._system = new FORGE.System(this);
     this._dependencies = new FORGE.DependencyManager(this);
     this._clock = new FORGE.Clock(this);
     this._audio = new FORGE.SoundManager(this);
@@ -341,6 +342,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._load = new FORGE.Loader(this);
     this._tween = new FORGE.TweenManager(this);
 
+    this._system.boot();
     this._audio.boot();
     this._raf.boot();
     this._story.boot();

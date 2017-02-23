@@ -632,14 +632,6 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
      */
     this._onMetricsChangedBind = null;
 
-    /**
-     * Event handler for the Page Visibility event binded to this.
-     * @name FORGE.VideoDash#_onVisibilityChangeBind
-     * @type {Function}
-     * @private
-     */
-    this._onVisibilityChangeBind = null;
-
     FORGE.DisplayObject.call(this, viewer, null, "VideoDash");
 };
 
@@ -717,8 +709,8 @@ FORGE.VideoDash.prototype._boot = function()
     this._viewer.audio.onDisable.add(this._disableSoundHandler, this);
 
     // Listen to the PageVisibility event
-    this._onVisibilityChangeBind = this._onVisibilityChange.bind(this);
-    document.addEventListener(FORGE.Device.visibilityChange, this._onVisibilityChangeBind);
+    this._viewer.onPause.add(this._onVisibilityChange, this);
+    this._viewer.onResume.add(this._onVisibilityChange, this);
 
     //force the creation of "onQualitiesLoaded" event dispatcher and memorize it's data
     this._onQualitiesLoaded = new FORGE.EventDispatcher(this, true);
@@ -2112,8 +2104,8 @@ FORGE.VideoDash.prototype.destroy = function()
     //this._onQualityAbortBind = null;
     this._onMetricsChangedBind = null;
 
-    document.removeEventListener(FORGE.Device.visibilityChange, this._onVisibilityChangeBind);
-    this._onVisibilityChangeBind = null;
+    this._viewer.onPause.remove(this._onVisibilityChange, this);
+    this._viewer.onResume.remove(this._onVisibilityChange, this);
 
     //Unbind main volume event
     this._viewer.audio.onVolumeChange.remove(this._mainVolumeChangeHandler, this);

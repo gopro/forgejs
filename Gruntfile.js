@@ -115,6 +115,7 @@ module.exports = function(grunt)
         "src/plugin/PluginObjectFactory.js",
 
         "src/system/Device.js",
+        "src/system/System.js",
         "src/system/RequestAnimationFrame.js",
         "src/system/History.js",
 
