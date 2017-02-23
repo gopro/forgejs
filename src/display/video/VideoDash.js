@@ -2768,7 +2768,7 @@ Object.defineProperty(FORGE.VideoDash.prototype, "onTimeUpdate",
  */
 Object.defineProperty(FORGE.VideoDash.prototype, "onCurrentTimeChange",
 {
-    /** @this {FORGE.VideoHTML5} */
+    /** @this {FORGE.VideoDash} */
     get: function()
     {
         if (this._onCurrentTimeChange === null)
