@@ -23,10 +23,17 @@
         "volume": {
             "type": "number",
             "title": "Volume",
-            "description": "The volume of the media",
+            "description": "The volume of the media.",
             "minimum": 0,
             "maximum": 1,
             "default": 1
+        },
+
+        "startTime": {
+            "type": "number",
+            "title": "Start Time",
+            "description": "Set the current position (in seconds) of the video playback.",
+            "default": 0
         }
     }
 }
