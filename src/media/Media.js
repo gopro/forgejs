@@ -121,7 +121,7 @@ FORGE.Media.prototype._parseConfig = function(config)
 
             this._displayObject = new FORGE.Image(this._viewer, imageConfig);
         }
-        else if (source.format === FORGE.MediaFormat.CUBE)
+        else if (source.format === FORGE.MediaFormat.CUBE || source.format === FORGE.MediaFormat.FLAT)
         {
             imageConfig = {
                 key: this._uid,
@@ -130,7 +130,7 @@ FORGE.Media.prototype._parseConfig = function(config)
 
             this._displayObject = new FORGE.Image(this._viewer, imageConfig);
         }
-        else if (source.format === FORGE.MediaFormat.FLAT)
+        else
         {
             throw "Flat media not supported yet !";
         }

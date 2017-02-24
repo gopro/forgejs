@@ -179,11 +179,54 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
 
     this._texture.format = THREE.RGBAFormat;
     this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
-    this._texture.magFilter = THREE.LinearFilter;
-    this._texture.minFilter = THREE.LinearFilter;
-    this._texture.wrapS = THREE.ClampToEdgeWrapping;
-    this._texture.wrapT = THREE.ClampToEdgeWrapping;
-    this._texture.generateMipmaps = false;
+    
+    if (this._mediaFormat === FORGE.MediaFormat.FLAT) {
+        // Enable mipmaps for flat rendering to avoid aliasing
+        this._texture.generateMipmaps = true;
+        this._texture.minFilter = THREE.LinearMipMapLinearFilter;
+        
+        // Replace geometry with a rectangle matching texture ratio
+        // First release previous default geometry
+        if (this._mesh.geometry != null) {
+            this._mesh.geometry.dispose();
+            this._mesh.geometry = null;
+        }
+
+        // Compute camera fov limits depending on geometry size and position and on display object size
+        var canvasHeight = this._viewer.container.height;
+        var canvasWidth = this._viewer.container.width;
+        var canvasRatio = canvasWidth / canvasHeight;
+
+        var texHeight = displayObject.height;
+        var texRatio = displayObject.width / displayObject.height;
+
+        var geomWidth = this._size;
+        var geomHeight = Math.round(geomWidth / texRatio);
+        var geomDepth = Math.abs(this._mesh.position.z);
+
+        var s = Math.min(geomWidth, geomHeight);
+        this._viewer.renderer.camera.flat.left = -s / 2 * canvasRatio;
+        this._viewer.renderer.camera.flat.right = s / 2 * canvasRatio;
+        this._viewer.renderer.camera.flat.top = s / 2;
+        this._viewer.renderer.camera.flat.bottom = -s / 2;
+
+        var geometry = new THREE.PlaneBufferGeometry(geomWidth, geomHeight);
+        this._mesh.geometry = geometry;
+
+        var fovMax = FORGE.Math.radToDeg(2 * Math.atan(0.5 * geomHeight / geomDepth));
+        var fovMin = FORGE.Math.radToDeg(2 * Math.atan((0.5 * geomHeight / geomDepth) * (canvasHeight / texHeight)));
+
+        this.log("Flat rendering boundaries [" + fovMin.toFixed() + ", " + fovMax.toFixed() + "]");
+        this._viewer.renderer.camera.fovMax = fovMax;
+        this._viewer.renderer.camera.fovMin = fovMin;
+
+        this.get
+
+    }
+    else {
+        this._texture.generateMipmaps = false;
+        this._texture.minFilter = THREE.LinearFilter;
+    }
 
     this._texture.needsUpdate = true;
 
@@ -513,6 +556,11 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
             geometry = new THREE.SphereBufferGeometry(this._size, this._subdivision, this._subdivision);
             this.log("Create sphere geometry");
         }
+        else if (this._mediaFormat === FORGE.MediaFormat.FLAT)
+        {
+            geometry = new THREE.PlaneBufferGeometry(this._size, this._size);
+            this.log("Create plane geometry");
+        }
         else
         {
             geometry = new THREE.BoxBufferGeometry(this._size, this._size, this._size, this._subdivision, this._subdivision, this._subdivision);
@@ -524,6 +572,10 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         if (this._mediaType === FORGE.MediaType.GRID)
         {
             this._addQuadrilateralCoordsAttribute();
+        }
+        else if (this._mediaFormat === FORGE.MediaFormat.FLAT) {
+            this._mesh.position.set(0, 0, -this._size * 0.5);
+            this._mesh.material.side = THREE.FrontSide;
         }
 
         // Equirectangular mapping on a sphere needs a yaw shift of PI/2 to set front at center of the texture
@@ -621,3 +673,4 @@ Object.defineProperty(FORGE.BackgroundMeshRenderer.prototype, "texture",
         return this._texture;
     }
 });
+

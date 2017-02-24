@@ -161,6 +161,14 @@ FORGE.Camera = function(viewer)
     this._main = null;
 
     /**
+     * Three Orthographic Camera object
+     * @name FORGE.Camera#_flat
+     * @type {THREE.OrthographicCamera}
+     * @private
+     */
+    this._flat = null;
+
+    /**
      * Left camera for VR rendering
      * @name  FORGE.Camera._left
      * @type {THREE.PerspectiveCamera}
@@ -284,6 +292,7 @@ FORGE.Camera.prototype._boot = function()
     this._gaze = new FORGE.CameraGaze(this._viewer, FORGE.Camera.DEFAULT_CONFIG.gaze);
 
     this._createMainCamera();
+    this._createFlatCamera();
     this._createVRCameras();
 };
 
@@ -341,6 +350,25 @@ FORGE.Camera.prototype._createMainCamera = function()
         this._main = new THREE.PerspectiveCamera(this._fov, aspect, FORGE.RenderManager.DEPTH_NEAR, 2 * FORGE.RenderManager.DEPTH_FAR);
         this._main.name = "CameraMain";
         this._main.matrixAutoUpdate = false;
+    }
+};
+
+/**
+ * Init the THREE OrthographicCamera.
+ * @method FORGE.Camera#_createFlatCamera
+ * @private
+ */
+FORGE.Camera.prototype._createFlatCamera = function()
+{
+    if (typeof this._viewer.renderer !== "undefined")
+    {
+        this._flat = new THREE.OrthographicCamera(
+            -FORGE.RenderManager.DEPTH_FAR, FORGE.RenderManager.DEPTH_FAR,
+            FORGE.RenderManager.DEPTH_FAR, -FORGE.RenderManager.DEPTH_FAR,
+            FORGE.RenderManager.DEPTH_NEAR,
+            FORGE.RenderManager.DEPTH_FAR);
+        this._flat.name = "CameraFlat";
+        this._flat.matrixAutoUpdate = false;
     }
 };
 
@@ -557,10 +585,10 @@ FORGE.Camera.prototype._updateFromMatrix = function()
 
 /**
  * THREE Perspective camera update internals after modelview matrix has been set.
- * @method FORGE.Camera#_updatePerspectiveCamera
+ * @method FORGE.Camera#_updateMainCamera
  * @private
  */
-FORGE.Camera.prototype._updatePerspectiveCamera = function()
+FORGE.Camera.prototype._updateMainCamera = function()
 {
     if (this._main === null || this._viewer.renderer.view === null)
     {
@@ -583,6 +611,33 @@ FORGE.Camera.prototype._updatePerspectiveCamera = function()
     this._main.fov = FORGE.Math.radToDeg(this._viewer.renderer.view.getProjectionFov());
     this._main.aspect = this._viewer.renderer.displayResolution.ratio;
     this._main.updateProjectionMatrix();
+    
+};
+
+/**
+ * THREE Orthographic camera update internals.
+ * @method FORGE.Camera#_updateFlatCamera
+ * @private
+ */
+FORGE.Camera.prototype._updateFlatCamera = function()
+{
+    if (this._flat === null)
+    {
+        return;
+    }
+
+    var camW = this._flat.right - this._flat.left;
+    var camH = this._flat.top - this._flat.bottom;
+
+    this._flat.left = this._flat.position.x - camW / 2;
+    this._flat.right = this._flat.position.x + camW / 2;
+
+    this._flat.top = this._flat.position.y + camH / 2;
+    this._flat.bottom = this._flat.position.y - camH / 2;
+
+    this._flat.zoom = this._fovMax / this._fov;
+
+    this._flat.updateProjectionMatrix();
 };
 
 /**
@@ -825,7 +880,8 @@ FORGE.Camera.prototype.update = function()
         this._cloneVRCamerasChildren();
     }
 
-    this._updatePerspectiveCamera();
+    this._updateMainCamera();
+    this._updateFlatCamera();
 };
 
 /**
@@ -838,6 +894,7 @@ FORGE.Camera.prototype.destroy = function()
     this._modelViewInverse = null;
     this._quaternion = null;
     this._main = null;
+    this._flat = null;
 
     this._gaze.destroy();
     this._gaze = null;
@@ -1132,6 +1189,26 @@ Object.defineProperty(FORGE.Camera.prototype, "main",
         }
 
         return this._main;
+    }
+});
+
+/**
+ * Get the flat THREE.OrthographicCamera of the camera.
+ * @name FORGE.Camera#flat
+ * @readonly
+ * @type {THREE.OrthographicCamera}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "flat",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        if (this._flat === null)
+        {
+            this._createFlatCamera();
+        }
+
+        return this._flat;
     }
 });
 

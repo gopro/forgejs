@@ -427,15 +427,13 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
     // Create media
     if (typeof sceneConfig.media !== "undefined" && sceneConfig.media !== null)
     {
-        if (sceneConfig.media.type === FORGE.MediaType.GRID ||
-            (typeof sceneConfig.media.source !== "undefined" && sceneConfig.media.source !== null && sceneConfig.media.source.format === FORGE.MediaFormat.CUBE) ||
-            this._renderDisplay.presentingVR === true)
-        {
-            this._backgroundRendererType = FORGE.BackgroundType.MESH;
+        if (sceneConfig.media.type === FORGE.MediaType.EQUIRECTANGULAR &&
+            this._renderDisplay.presentingVR === false) {
+            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
         }
         else
         {
-            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+            this._backgroundRendererType = FORGE.BackgroundType.MESH;
         }
 
         this._media = new FORGE.Media(this._viewer, sceneConfig);
@@ -811,9 +809,18 @@ FORGE.RenderManager.prototype.render = function()
 
         this._webGLRenderer.setViewport(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 
-        this._drawBackground(vr ? camera : null);
+        var cam = camera;
+        if (vr === false) {
+            if (this._sceneConfig.media.source.format === FORGE.MediaFormat.FLAT) {
+                cam = this._camera.flat;
+            }
+            else {
+                cam = null;
+            }
+        }
+        this._drawBackground(cam);
 
-        this._renderPipeline.render(camera);
+        this._renderPipeline.render(cam);
 
         // Render perspective camera children (objects in camera local space)
         this._webGLRenderer.clearDepth();
