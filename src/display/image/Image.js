@@ -830,6 +830,21 @@ Object.defineProperty(FORGE.Image.prototype, "element",
 });
 
 /**
+* Get the canvas element for canvas renderer mode.
+* @name FORGE.Image#canvas
+* @readonly
+* @type {Element|HTMLCanvasElement}
+*/
+Object.defineProperty(FORGE.Image.prototype, "canvas",
+{
+    /** @this {FORGE.Image} */
+    get: function()
+    {
+        return this._canvas;
+    }
+});
+
+/**
 * Get and set the current frame {x: 0, y: 0, w: 0, h: 0}.
 * @name FORGE.Image#frame
 * @type {Object}
