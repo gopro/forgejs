@@ -265,6 +265,14 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
     this._autoResume = false;
 
     /**
+     * The paused state of the video.
+     * @name FORGE.VideoDash#_paused
+     * @type {boolean}
+     * @private
+     */
+    this._paused = false;
+
+    /**
      * On load start event dispatcher.
      * @name  FORGE.VideoDash#_onLoadStart
      * @type {?FORGE.EventDispatcher}
@@ -1695,11 +1703,12 @@ FORGE.VideoDash.prototype._onVisibilityChange = function()
     if (this._autoPause === true && status === "hidden" && this._playing === true)
     {
         this.pause();
+        this._paused = false; // can safely be set at false, as the playing state is checked
         return;
     }
 
     // Resume if paused, entering and authorized to resume
-    if (this._autoResume === true && status === "visible" && this._playing === false)
+    if (this._autoResume === true && status === "visible" && this._playing === false && this._paused == false)
     {
         this.play();
         return;
@@ -1828,6 +1837,7 @@ FORGE.VideoDash.prototype.play = function(time, loop)
     {
         this._dashMediaPlayer.play();
         this._playing = true;
+        this._paused = false;
         this._playCount++;
     }
 };
@@ -1842,6 +1852,7 @@ FORGE.VideoDash.prototype.pause = function()
     {
         this._dashMediaPlayer.pause();
         this._playing = false;
+        this._paused = true;
     }
 };
 
@@ -2545,6 +2556,21 @@ Object.defineProperty(FORGE.VideoDash.prototype, "autoResume",
         {
             this._autoResume = value;
         }
+    }
+});
+
+/**
+ * Get the paused status of the video.
+ * @name FORGE.VideoDash#paused
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoDash.prototype, "paused",
+{
+    /** @this {FORGE.VideoDash} */
+    get: function()
+    {
+        return this._paused;
     }
 });
 

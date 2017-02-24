@@ -446,6 +446,14 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._autoResume = false;
 
     /**
+     * The paused state of the video.
+     * @name FORGE.VideoHTML5#_paused
+     * @type {boolean}
+     * @private
+     */
+    this._paused = false;
+
+    /**
      * Event handler for request error binded to this.
      * @name FORGE.VideoHTML5#_onRequestErrorBind
      * @type {Function}
@@ -1677,11 +1685,12 @@ FORGE.VideoHTML5.prototype._onVisibilityChange = function()
     if (this._autoPause === true && status === "hidden" && this._playing === true)
     {
         this.pause();
+        this._paused = false; // can safely be set at false, as the playing state is checked
         return;
     }
 
     // Resume if paused, entering and authorized to resume
-    if (this._autoResume === true && status === "visible" && this._playing === false)
+    if (this._autoResume === true && status === "visible" && this._playing === false && this._paused === false)
     {
         this.play();
         return;
@@ -1989,6 +1998,7 @@ FORGE.VideoHTML5.prototype.play = function(time, loop)
     {
         currentVideo.element.play();
         this._playing = true;
+        this._paused = false;
         this._playCount++;
     }
 };
@@ -2005,6 +2015,7 @@ FORGE.VideoHTML5.prototype.pause = function()
     {
         currentVideo.element.pause();
         this._playing = false;
+        this._paused = true;
     }
 };
 
@@ -2698,6 +2709,21 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "autoResume",
         {
             this._autoResume = value;
         }
+    }
+});
+
+/**
+ * Get the paused status of the video.
+ * @name FORGE.VideoHTML5#paused
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoHTML5.prototype, "paused",
+{
+    /** @this {FORGE.VideoHTML5} */
+    get: function()
+    {
+        return this._paused;
     }
 });
 
