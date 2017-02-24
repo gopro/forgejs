@@ -224,19 +224,6 @@ FORGE.Image.prototype._boot = function()
     //Images keeps ratio by default
     this._keepRatio = true;
 
-    if(this._renderMode === FORGE.Image.renderModes.CSS)
-    {
-        this._dom.style.backgroundRepeat = "no-repeat";
-    }
-    else if(this._renderMode === FORGE.Image.renderModes.CANVAS)
-    {
-        this._canvas = document.createElement("canvas");
-        this._canvas.style.position = "absolute";
-        this._canvas.style.top = "0px";
-        this._canvas.style.left = "0px";
-        this._dom.appendChild(this._canvas);
-    }
-
     if(this._config !== null)
     {
         this.load(this._config);
@@ -369,6 +356,32 @@ FORGE.Image.prototype._localeChangeComplete = function()
     {
         var url = this._i18nImageUrlLocaleString.value;
         this._loadImage(key, url);
+    }
+};
+
+/**
+ * Set the render mode of the image
+ * @method FORGE.Image#_setRenderMode
+ * @private
+ */
+FORGE.Image.prototype._setRenderMode = function(mode)
+{
+    if(mode === FORGE.Image.renderModes.CSS || mode === FORGE.Image.renderModes.CANVAS)
+    {
+        this._renderMode = mode;
+    }
+
+    if(this._renderMode === FORGE.Image.renderModes.CSS)
+    {
+        this._dom.style.backgroundRepeat = "no-repeat";
+    }
+    else if(this._renderMode === FORGE.Image.renderModes.CANVAS)
+    {
+        this._canvas = document.createElement("canvas");
+        this._canvas.style.position = "absolute";
+        this._canvas.style.top = "0px";
+        this._canvas.style.left = "0px";
+        this._dom.appendChild(this._canvas);
     }
 };
 
@@ -562,7 +575,6 @@ FORGE.Image.prototype._loadFramesComplete = function(file)
     if(typeof file.data.frames !== "undefined")
     {
         this._frames = file.data.frames;
-        //this._setFrame(this._frames[0].frame);
     }
     else
     {
@@ -634,6 +646,11 @@ FORGE.Image.prototype._parseConfig = function(config)
 {
     if(typeof config === "object" && config !== null)
     {
+        if(typeof config.renderMode === "string")
+        {
+            this._setRenderMode(config.renderMode);
+        }
+
         this._imageKey = config.key || "";
 
         this._i18n = config.i18n || false;
