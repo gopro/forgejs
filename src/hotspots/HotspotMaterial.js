@@ -89,7 +89,7 @@ FORGE.HotspotMaterial = function(viewer)
     /**
      * The display object used for the texture
      * @name  FORGE.HotspotMaterial#_displayObject
-     * @type {(FORGE.ImageScalable|FORGE.DisplayObject)}
+     * @type {(FORGE.Image|FORGE.DisplayObject)}
      * @private
      */
     this._displayObject = null;
@@ -101,6 +101,14 @@ FORGE.HotspotMaterial = function(viewer)
      * @private
      */
     this._update = false;
+
+    /**
+     * Ready flag
+     * @name FORGE.HotspotMaterial#_ready
+     * @type {boolean}
+     * @private
+     */
+    this._ready = false;
 
     /**
      * The onReady event dispatcher.
@@ -208,12 +216,6 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
     {
         this._setupWithGraphics();
     }
-
-    // Nothing is defined, don't know what to do
-    // else
-    // {
-    //     throw new Error("Unknown hotspot material texture input");
-    // }
 };
 
 /**
@@ -226,7 +228,17 @@ FORGE.HotspotMaterial.prototype._setupWithImage = function(config)
 {
     this._type = FORGE.HotspotMaterial.types.IMAGE;
 
-    this._displayObject = new FORGE.ImageScalable(this._viewer, config);
+    // If the config is a string, we assume that this is the image url.
+    // We convert the config into a image config object.
+    if(typeof config === "string")
+    {
+        config = { url: config };
+    }
+
+    //Force the render mode to canvas
+    config.renderMode = FORGE.Image.renderModes.CANVAS;
+
+    this._displayObject = new FORGE.Image(this._viewer, config);
     this._displayObject.onLoadComplete.addOnce(this._imageLoadCompleteHandler, this);
 };
 
@@ -254,7 +266,7 @@ FORGE.HotspotMaterial.prototype._createTextureFromImage = function(image)
 {
     this._displayObject = image;
 
-    this.setTextureFrame();
+    this.setTextureFrame(image.frame);
 
     this._texture.image.crossOrigin = "anonymous";
 
@@ -381,15 +393,20 @@ FORGE.HotspotMaterial.prototype._setupWithGraphics = function()
  */
 FORGE.HotspotMaterial.prototype._setupComplete = function()
 {
-    this._createMaterial();
+    if (this._viewer.renderer.viewReady === true)
+    {
+        this._createMaterial();
+    }
+
+    this._viewer.renderer.onViewReady.add(this._setupComplete, this);
 };
 
 /**
- * Callback triggered on view ready
- * @method FORGE.HotspotMaterial#_onViewReady
+ * Create the THREE.MeshBasicMaterial that will be used on a THREE.Mesh.<br>
+ * @method FORGE.HotspotMaterial#_createMaterial
  * @private
  */
-FORGE.HotspotMaterial.prototype._onViewReady = function()
+FORGE.HotspotMaterial.prototype._createMaterial = function()
 {
     if (this._material !== null)
     {
@@ -425,25 +442,12 @@ FORGE.HotspotMaterial.prototype._onViewReady = function()
         this._material.needsUpdate = true;
     }
 
+    this._ready = true;
+
     if (this._onReady !== null)
     {
         this._onReady.dispatch();
     }
-};
-
-/**
- * Create the THREE.MeshBasicMaterial that will be used on a THREE.Mesh.<br>
- * @method FORGE.HotspotMaterial#_createMaterial
- * @private
- */
-FORGE.HotspotMaterial.prototype._createMaterial = function()
-{
-    if (this._viewer.renderer.viewReady === true)
-    {
-        this._onViewReady();
-    }
-
-    this._viewer.renderer.onViewReady.add(this._onViewReady, this);
 };
 
 /**
@@ -454,6 +458,7 @@ FORGE.HotspotMaterial.prototype._createMaterial = function()
 FORGE.HotspotMaterial.prototype.load = function(config)
 {
     this._config = config;
+    this._ready = false;
     this._parseConfig(this._config);
 };
 
@@ -483,7 +488,8 @@ FORGE.HotspotMaterial.prototype.update = function()
  */
 FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
 {
-    if (this._displayObject !== null) {
+    if (this._displayObject !== null)
+    {
         this._displayObject.destroy();
         this._displayObject = null;
     }
@@ -501,26 +507,16 @@ FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
 FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 {
     // Only support type IMAGE at the moment
-    if (this._displayObject === null ||
-        this._type !== FORGE.HotspotMaterial.types.IMAGE) {
+    if (this._displayObject === null || this._type !== FORGE.HotspotMaterial.types.IMAGE)
+    {
         return;
     }
 
-    this._textureFrame = frame;
+    this._textureFrame = frame || new FORGE.Rectangle(0, 0, this._displayObject.element.naturalWidth, this._displayObject.element.naturalHeight);
 
-    var rSrc = frame || new FORGE.Rectangle(0, 0, this._displayObject.width, this._displayObject.height);
-    var rDst = new FORGE.Rectangle(0, 0, rSrc.width, rSrc.height);
+    this._displayObject.frame = this._textureFrame;
 
-    var canvas = document.createElement("canvas");
-    canvas.width = rSrc.width;
-    canvas.height = rSrc.height;
-
-    var context = canvas.getContext("2d");
-    context.drawImage(this._displayObject.element,
-        rSrc.x, rSrc.y, rSrc.width, rSrc.height,
-        rDst.x, rDst.y, rDst.width, rDst.height);
-
-    this._texture = new THREE.CanvasTexture(canvas);
+    this._texture = new THREE.CanvasTexture(this._displayObject.canvas);
     this._texture.needsUpdate = true;
 
     this.update();
@@ -528,7 +524,7 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 
 /**
  * Destroy sequence.
- * @method FORGE.HotspotTransform#destroy
+ * @method FORGE.HotspotMaterial#destroy
  */
 FORGE.HotspotMaterial.prototype.destroy = function()
 {
@@ -659,7 +655,7 @@ Object.defineProperty(FORGE.HotspotMaterial.prototype, "color",
  * Get the displayObject of this hotspot material.
  * @name FORGE.HotspotMaterial#displayObject
  * @readonly
- * @type {(FORGE.ImageScalable|FORGE.DisplayObject)}
+ * @type {(FORGE.Image|FORGE.DisplayObject)}
  */
 Object.defineProperty(FORGE.HotspotMaterial.prototype, "displayObject",
 {
@@ -667,6 +663,21 @@ Object.defineProperty(FORGE.HotspotMaterial.prototype, "displayObject",
     get: function()
     {
         return this._displayObject;
+    }
+});
+
+/**
+ * Get the ready flag of this hotspot material.
+ * @name FORGE.HotspotMaterial#ready
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.HotspotMaterial.prototype, "ready",
+{
+    /** @this {FORGE.HotspotMaterial} */
+    get: function()
+    {
+        return this._ready;
     }
 });
 
