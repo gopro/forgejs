@@ -93,7 +93,7 @@ FORGE.Media.prototype._parseConfig = function(config)
         return;
     }
 
-    // Warning : UID is not registered and applied to the FORGE.ImageScalable|FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
+    // Warning : UID is not registered and applied to the FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
     this._uid = mediaConfig.uid;
 
     var source = mediaConfig.source;
