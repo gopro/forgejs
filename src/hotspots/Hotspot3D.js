@@ -381,8 +381,6 @@ FORGE.Hotspot3D.prototype._checkReady = function()
  */
 FORGE.Hotspot3D.prototype.over = function()
 {
-    console.log("over "+this._checkReady());
-
     this._states.load("over");
 
     FORGE.Object3D.prototype.over.call(this);
@@ -394,8 +392,6 @@ FORGE.Hotspot3D.prototype.over = function()
  */
 FORGE.Hotspot3D.prototype.out = function()
 {
-    console.log("out "+this._checkReady());
-
     this._states.load("default");
 
     FORGE.Object3D.prototype.over.call(this);
