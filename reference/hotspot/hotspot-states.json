@@ -6,6 +6,21 @@
     "type": "object",
 
     "properties": {
+
+        "default": {
+            "type": "string",
+            "title": "Default",
+            "description": "The default state name to load",
+            "default": "default"
+        },
+
+        "auto": {
+            "type": "boolean",
+            "title": "Auto",
+            "description": "Does the hotspot auto switch to the appropriate state?",
+            "default": true
+        },
+
         "over": {
             "$ref": "hotspot-state"
         }

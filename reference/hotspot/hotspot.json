@@ -38,11 +38,19 @@
             "default": true
         },
 
-        "interactive":{
+        "interactive": {
             "type": "boolean",
             "title": "Interactive flag",
             "description": "Is this hotspot is interactive and eligible to raycast",
             "default": true
+        },
+
+        "cursor": {
+            "type": "string",
+            "title": "Pointer cursor",
+            "description": "The cursor to display when the pointer is over the hotspot.",
+            "example": "crosshair",
+            "default": "pointer"
         },
 
         "fx": {

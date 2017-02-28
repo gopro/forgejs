@@ -69,7 +69,7 @@ FORGE.Hotspot3D = function(viewer, config)
 
     /**
      * Hotspots states manager
-     * @name FORGE.HotspotStates
+     * @name FORGE.Hotspot3D#_states
      * @type {FORGE.HotspotStates}
      * @private
      */
@@ -78,10 +78,19 @@ FORGE.Hotspot3D = function(viewer, config)
     /**
      * Does the hotspot is facing the camera ? Useful for a flat hotspot we want
      * to always be facing to the camera.
+     * @name FORGE.Hotspot3D#_facingCenter
      * @type {boolean}
      * @private
      */
     this._facingCenter = false;
+
+    /**
+     * The pointer cursor when pointer is over the Object3D
+     * @name FORGE.Hotspot3D#_cursor
+     * @type {string}
+     * @private
+     */
+    this._cursor = "pointer";
 
     /**
      * Before render bound callback.
@@ -139,21 +148,21 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._tags = config.tags;
     this._register();
 
-    this._type = config.type;
-    this._name = config.name;
-    this._visible = config.visible;
+    // Set the mesh name
+    this._mesh.name = "mesh-" + this._uid;
+
+    this._name = (typeof config.name === "string") ? config.name : "";
+    this._visible = (typeof config.visible === "boolean") ? config.visible : true;
+    this._facingCenter = (typeof config.facingCenter === "boolean") ? config.facingCenter : false;
+    this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
+    this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
+
+    this._states = new FORGE.HotspotStates(this._viewer, this._uid);
 
     if (typeof config.states === "object")
     {
-        this._states = new FORGE.HotspotStates(this._viewer, this._uid);
         this._states.addConfig(config.states);
     }
-
-    this._mesh.name = "mesh-" + this._uid;
-
-    this._facingCenter = (typeof config.facingCenter === "boolean") ? config.facingCenter : false;
-
-    this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
 
     if (typeof config.transform === "object")
     {
@@ -165,8 +174,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         this._animation.load(config.animation);
         this._animation.onProgress.add(this._updatePosition, this);
     }
-
-    this._material.onReady.add(this._materialReadyHandler, this);
 
     /** @type {HotspotMaterialConfig} */
     var materialConfig;
@@ -185,7 +192,8 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         materialConfig = /** @type {HotspotMaterialConfig} */ (FORGE.Utils.extendMultipleObjects(materialConfig, FORGE.HotspotMaterial.presets.DEBUG));
     }
 
-    this._material.load(materialConfig);
+    this._material.onReady.add(this._materialReadyHandler, this);
+    // !! The loading of the material is now handled by the states manager !!
 
     if (typeof config.sound === "object")
     {
@@ -202,6 +210,8 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     {
         this._createEvents(config.events);
     }
+
+    this._states.load();
 };
 
 /**
@@ -252,7 +262,9 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
  * @private
  */
 FORGE.Hotspot3D.prototype._onAfterRender = function()
-{};
+{
+
+};
 
 /**
  * Event handler for material ready. Triggers the creation of the hotspot3D.
@@ -383,7 +395,12 @@ FORGE.Hotspot3D.prototype._checkReady = function()
  */
 FORGE.Hotspot3D.prototype.over = function()
 {
-    this._states.load("over");
+    if(this._states.auto === true)
+    {
+        this._states.load("over");
+    }
+
+    this._viewer.canvas.pointer.cursor = this._cursor;
 
     FORGE.Object3D.prototype.over.call(this);
 };
@@ -394,7 +411,12 @@ FORGE.Hotspot3D.prototype.over = function()
  */
 FORGE.Hotspot3D.prototype.out = function()
 {
-    this._states.load("default");
+    if(this._states.auto === true)
+    {
+        this._states.load();
+    }
+
+    this._viewer.canvas.pointer.cursor = "default";
 
     FORGE.Object3D.prototype.over.call(this);
 };
@@ -466,21 +488,6 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "config",
     get: function()
     {
         return this._config;
-    }
-});
-
-/**
- * Hotspot type accessor
- * @name FORGE.Hotspot3D#type
- * @readonly
- * @type {string}
- */
-Object.defineProperty(FORGE.Hotspot3D.prototype, "type",
-{
-    /** @this {FORGE.Hotspot3D} */
-    get: function()
-    {
-        return this._type;
     }
 });
 
