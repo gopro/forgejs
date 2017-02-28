@@ -88,11 +88,7 @@ FORGE.HotspotStates.prototype._updateMaterial = function(config)
     var hotspot = FORGE.UID.get(this._hotspotUid);
     var materialConfig = hotspot.config.material;
 
-    if(typeof materialConfig.image === "object" && typeof config.image === "object")
-    {
-        // hotspot.material.setTextureFrame(config.image.frame);
-        hotspot.material.load(config);
-    }
+    hotspot.material.load(config);
 };
 
 /**
