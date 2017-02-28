@@ -151,7 +151,9 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
 
     this._mesh.name = "mesh-" + this._uid;
 
-    this._facingCenter = config.facingCenter || false;
+    this._facingCenter = (typeof config.facingCenter === "boolean") ? config.facingCenter : false;
+
+    this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
 
     if (typeof config.transform === "object")
     {
