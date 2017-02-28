@@ -106,7 +106,7 @@ FORGE.HotspotStates.prototype._boot = function()
 /**
  * Parse the states configuration
  * @method FORGE.HotspotStates#_parseConfig
- * @param {HotspotStatesConfig} config - The configuration to parse
+ * @param {?HotspotStatesConfig} config - The configuration to parse
  * @private
  */
 FORGE.HotspotStates.prototype._parseConfig = function(config)
@@ -120,11 +120,18 @@ FORGE.HotspotStates.prototype._parseConfig = function(config)
 /**
  * Get the state names (states config keys without reserved keys that are not states)
  * @method FORGE.HotspotStates#_getStatesNames
+ * @return {Array<string>} Returns the names of the available states.
  * @private
  */
 FORGE.HotspotStates.prototype._getStatesNames = function()
 {
-    var keys = Object.keys(this._config);
+    if(this._config === null)
+    {
+        return [];
+    }
+
+    var config = /** @type {!Object} */ (this._config);
+    var keys = Object.keys(config);
 
     for(var i = 0, ii = FORGE.HotspotStates._RESERVED.length; i < ii; i++)
     {
@@ -166,7 +173,7 @@ FORGE.HotspotStates.prototype.addConfig = function(config)
 /**
  * Load a state.
  * @method FORGE.HotspotStates#load
- * @param  {string} name - the name of the state to load.
+ * @param  {string=} name - the name of the state to load.
  */
 FORGE.HotspotStates.prototype.load = function(name)
 {
@@ -197,7 +204,7 @@ FORGE.HotspotStates.prototype.load = function(name)
 /**
  * Toggle from a state to another.
  * @method FORGE.HotspotStates#load
- * @param  {string} names - the name of the states to toggle to.
+ * @param  {Array<string>} names - the names of the states to loop through.
  */
 FORGE.HotspotStates.prototype.toggle = function(names)
 {
@@ -207,13 +214,9 @@ FORGE.HotspotStates.prototype.toggle = function(names)
     }
 
     var current = names.indexOf(this._state);
-    var next
+    var next = 0;
 
-    if(current === -1 || current === names.length - 1)
-    {
-        next = 0;
-    }
-    else
+    if(current < names.length - 1)
     {
         next = current + 1;
     }
