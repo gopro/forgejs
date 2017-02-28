@@ -36,7 +36,7 @@ FORGE.HotspotMaterial = function(viewer)
     /**
      * THREE texture.
      * @name  FORGE.HotspotMaterial#_texture
-     * @type {THREE.Texture}
+     * @type {THREE.Texture|THREE.CanvasTexture}
      * @private
      */
     this._texture = null;
@@ -502,7 +502,7 @@ FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
 /**
  * Set texture frame
  * @method FORGE.HotspotMaterial#setTextureFrame
- * @param {FORGE.Rectangle} frame - texture frame
+ * @param {FORGE.Rectangle=} frame - texture frame
  */
 FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 {
@@ -517,7 +517,7 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
     this._displayObject.frame = this._textureFrame;
 
     this._texture = new THREE.CanvasTexture(this._displayObject.canvas);
-    this._texture.needsUpdate = true;
+    this._texture.needsUpdate = this._update;
 
     this.update();
 };
@@ -528,7 +528,7 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
  */
 FORGE.HotspotMaterial.prototype.destroy = function()
 {
-    this._viewer.renderer.onViewReady.remove(this._onViewReady, this);
+    this._viewer.renderer.onViewReady.remove(this._setupComplete, this);
 
     this._textureFrame = null;
 

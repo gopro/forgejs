@@ -235,6 +235,13 @@ THREE.Clock.prototype.getDelta = function() {};
 
 /**
  * @constructor
+ * @param {HTMLCanvasElement} arg1
+ * @return {!THREE.CanvasTexture}
+ */
+THREE.CanvasTexture = function(arg1) {};
+
+/**
+ * @constructor
  * @return {!THREE.Pass}
  */
 THREE.Pass = function() {};

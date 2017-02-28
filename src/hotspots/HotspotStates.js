@@ -35,7 +35,7 @@ FORGE.HotspotStates = function(viewer, hotspotUid)
     /**
      * The current state name
      * @name FORGE.HotspotStates#_state
-     * @type {String}
+     * @type {string}
      * @private
      */
     this._state = "default";
@@ -61,7 +61,7 @@ FORGE.HotspotStates.prototype.constructor = FORGE.HotspotStates;
  * @method FORGE.HotspotStates#_boot
  * @private
  */
-FORGE.HotspotStates.prototype._boot = function(config)
+FORGE.HotspotStates.prototype._boot = function()
 {
     var hotspot = FORGE.UID.get(this._hotspotUid);
 

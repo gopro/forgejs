@@ -212,7 +212,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
 FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, geometry, material, group)
 {
     //Logs these value for jscs check (if not warn parameter is not used)
-    // this.log(group);
+    this.log(group);
 
     var gl = this._viewer.renderer.webGLRenderer.getContext();
 
@@ -374,7 +374,7 @@ FORGE.Hotspot3D.prototype._updatePosition = function()
  */
 FORGE.Hotspot3D.prototype._checkReady = function()
 {
-    return (this._mesh.geometry.index !== null && this._material.ready === true)
+    return (this._mesh.geometry.index !== null && this._material.ready === true);
 };
 
 /**

@@ -38,6 +38,13 @@
             "default": true
         },
 
+        "interactive":{
+            "type": "boolean",
+            "title": "Interactive flag",
+            "description": "Is this hotspot is interactive and eligible to raycast",
+            "default": true
+        },
+
         "fx": {
             "type": "string",
             "title": "FX to apply",
@@ -74,6 +81,10 @@
 
         "events": {
             "$ref": "hotspot-events"
+        },
+
+        "states": {
+            "$ref": "hotspot-states"
         }
     },
 

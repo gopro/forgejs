@@ -1,0 +1,16 @@
+{
+    "id": "hotspot-state",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotStateConfig",
+    "description": "A hotspot state configuration",
+    "type": "object",
+
+    "properties": {
+
+        "material": {
+            "$ref": "hotspot-material"
+        }
+    },
+
+    "required": []
+}
