@@ -79,7 +79,7 @@ FORGE.HotspotStates.prototype.constructor = FORGE.HotspotStates;
  * @const
  * @private
  */
-FORGE.HotspotStates._RESERVED = ["default", "auto"];
+FORGE.HotspotStates._RESERVED = ["options"];
 
 /**
  * Boot method.
@@ -96,9 +96,11 @@ FORGE.HotspotStates.prototype._boot = function()
         throw("No hotspot match with uid: "+this._hotspotUid);
     }
 
-    // Set the default config as the base hotspot config
+    // Set the default config
     this._config =
     {
+        options: {},
+
         default: hotspot.config
     };
 };
@@ -111,8 +113,8 @@ FORGE.HotspotStates.prototype._boot = function()
  */
 FORGE.HotspotStates.prototype._parseConfig = function(config)
 {
-    this._default = (typeof config.default === "string") ? config.default : "default";
-    this._auto = (typeof config.auto === "boolean") ? config.auto : true;
+    this._default = (typeof config.options.default === "string") ? config.options.default : "default";
+    this._auto = (typeof config.options.auto === "boolean") ? config.options.auto : true;
 
     this._config.default = FORGE.Utils.extendSimpleObject(this._config.default, config[this._default]);
 };
@@ -133,9 +135,21 @@ FORGE.HotspotStates.prototype._getStatesNames = function()
     var config = /** @type {!Object} */ (this._config);
     var keys = Object.keys(config);
 
+    // Remove the reserved keywords from state names
     for(var i = 0, ii = FORGE.HotspotStates._RESERVED.length; i < ii; i++)
     {
         var index = keys.indexOf(FORGE.HotspotStates._RESERVED[i]);
+
+        if(index !== -1)
+        {
+            keys.splice(index, 1);
+        }
+    }
+
+    // Remove the state named "default" if there is a default state in the options
+    if(this._default !== "default" && typeof this._config[this._default] !== "undefined")
+    {
+        index = keys.indexOf("default");
 
         if(index !== -1)
         {
@@ -178,6 +192,8 @@ FORGE.HotspotStates.prototype.addConfig = function(config)
 FORGE.HotspotStates.prototype.load = function(name)
 {
     name = (typeof name === "string") ? name : this._default;
+
+    this.log("Hotspot load state: "+name);
 
     var hotspot = FORGE.UID.get(this._hotspotUid);
 
@@ -252,6 +268,21 @@ Object.defineProperty(FORGE.HotspotStates.prototype, "state",
     set: function(value)
     {
         this.load(value);
+    }
+});
+
+/**
+ * Get the states names.
+ * @name FORGE.HotspotStates#names
+ * @type {Array<string>}
+ * @readonly
+ */
+Object.defineProperty(FORGE.HotspotStates.prototype, "names",
+{
+    /** @this {FORGE.HotspotStates} */
+    get: function()
+    {
+        return this._getStatesNames();
     }
 });
 
