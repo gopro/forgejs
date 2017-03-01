@@ -38,7 +38,7 @@ FORGE.HotspotStates = function(viewer, hotspotUid)
      * @type {string}
      * @private
      */
-    this._state = "default";
+    this._state = "";
 
     /**
      * Default state
@@ -181,8 +181,8 @@ FORGE.HotspotStates.prototype.load = function(name)
 
     var hotspot = FORGE.UID.get(this._hotspotUid);
 
-    // If no match, return
-    if(typeof hotspot === "undefined" || typeof this._config[name] !== "object")
+    // If no hotspot match OR no state name match OR already on this state THEN return
+    if(typeof hotspot === "undefined" || typeof this._config[name] !== "object" || name === this._state)
     {
         return;
     }
