@@ -320,11 +320,3 @@ Object.defineProperty(FORGE.HotspotStates.prototype, "onLoadComplete",
         return this._onLoadComplete;
     }
 });
-
-
-
-
-
-
-
-
