@@ -968,6 +968,35 @@ FORGE.Device = (function(c)
             });
     };
 
+    /**
+     * Check device requirement for an object from configuration/manifest.
+     * @method FORGE.Device#check
+     * @param  {Object} config - The device requirement configuration of the configuration/manifest.
+     * @return {boolean} Returns true if the object is compatible with the device environment, false if not.
+     */
+    Tmp.prototype.check = function(config)
+    {
+        //If configuration is undefined, the object has no device limitations
+        if(typeof config === "undefined")
+        {
+            return true;
+        }
+
+        for(var i in config)
+        {
+            if(typeof this[i] === "undefined")
+            {
+                this.warn("Unable to check plugin device compatibility for: "+i);
+            }
+            else if(this[i] !== config[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     return new Tmp();
 
 })(function()

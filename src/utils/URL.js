@@ -152,11 +152,11 @@ FORGE.URL.exists = function(url, success, fail, context)
     var xhr = new XMLHttpRequest();
     var exists = false;
     var timeout = null;
-    
+
     /** @this {XMLHttpRequest} */
-    xhr.onreadystatechange = function() 
+    xhr.onreadystatechange = function()
     {
-        if(this.readyState === 4)
+        if(this.readyState === XMLHttpRequest.DONE)
         {
             if(this.status === 200)
             {
@@ -165,10 +165,10 @@ FORGE.URL.exists = function(url, success, fail, context)
 
                 if(typeof success === "function")
                 {
-                    success.call(context); 
+                    success.call(context);
                 }
-                
-            }  
+
+            }
         }
     };
 
@@ -184,16 +184,16 @@ FORGE.URL.exists = function(url, success, fail, context)
     {
         if(typeof fail === "function")
         {
-            fail.call(context); 
+            fail.call(context);
         }
-        
+
     };
 
     timeout = window.setTimeout(timeoutCallback, 500);
 };
 
 /**
- * Check if a URL is valid. 
+ * Check if a URL is valid.
  * Works only for absolute URLs.
  * @method  FORGE.URL.isValid
  * @param  {string} url - The URL to test.
@@ -202,8 +202,8 @@ FORGE.URL.exists = function(url, success, fail, context)
 FORGE.URL.isValid = function(url)
 {
     var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)/;
-      
-    if(!urlRegEx.test(url)) 
+
+    if(!urlRegEx.test(url))
     {
         return false;
     }
@@ -217,7 +217,7 @@ FORGE.URL.isValid = function(url)
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "url", 
+Object.defineProperty(FORGE.URL.prototype, "url",
 {
     /** @this {FORGE.URL} */
     get: function()
@@ -232,7 +232,7 @@ Object.defineProperty(FORGE.URL.prototype, "url",
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "protocol", 
+Object.defineProperty(FORGE.URL.prototype, "protocol",
 {
     /** @this {FORGE.URL} */
     get: function()
@@ -247,7 +247,7 @@ Object.defineProperty(FORGE.URL.prototype, "protocol",
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "host", 
+Object.defineProperty(FORGE.URL.prototype, "host",
 {
     /** @this {FORGE.URL} */
     get: function()
@@ -262,7 +262,7 @@ Object.defineProperty(FORGE.URL.prototype, "host",
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "port", 
+Object.defineProperty(FORGE.URL.prototype, "port",
 {
     /** @this {FORGE.URL} */
     get: function()
@@ -277,7 +277,7 @@ Object.defineProperty(FORGE.URL.prototype, "port",
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "path", 
+Object.defineProperty(FORGE.URL.prototype, "path",
 {
     /** @this {FORGE.URL} */
     get: function()
@@ -292,7 +292,7 @@ Object.defineProperty(FORGE.URL.prototype, "path",
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "query", 
+Object.defineProperty(FORGE.URL.prototype, "query",
 {
     /** @this {FORGE.URL} */
     get: function()
@@ -307,7 +307,7 @@ Object.defineProperty(FORGE.URL.prototype, "query",
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "hash", 
+Object.defineProperty(FORGE.URL.prototype, "hash",
 {
     /** @this {FORGE.URL} */
     get: function()
@@ -322,7 +322,7 @@ Object.defineProperty(FORGE.URL.prototype, "hash",
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "hashParameters", 
+Object.defineProperty(FORGE.URL.prototype, "hashParameters",
 {
     /** @this {FORGE.URL} */
     get: function()
@@ -337,7 +337,7 @@ Object.defineProperty(FORGE.URL.prototype, "hashParameters",
  * @readonly
  * @type {string}
  */
-Object.defineProperty(FORGE.URL.prototype, "extension", 
+Object.defineProperty(FORGE.URL.prototype, "extension",
 {
     /** @this {FORGE.URL} */
     get: function()

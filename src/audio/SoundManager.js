@@ -474,11 +474,11 @@ FORGE.SoundManager.prototype._indexOfSound = function (sound)
 
 /**
  * Suspend audio context if no sound are playing.
- * @method FORGE.SoundManager#autoSuspend
+ * @method FORGE.SoundManager#suspend
  */
-FORGE.SoundManager.prototype.autoSuspend = function()
+FORGE.SoundManager.prototype.suspend = function()
 {
-    if(this._context !== null && typeof this._context.suspend !== "undefined" && this._useWebAudio === true)
+    if(this._context !== null && typeof this._context.suspend !== "undefined" && this._useWebAudio === true && FORGE.Device.safari === false)
     {
         if(this._contextState === "running")
         {
@@ -503,11 +503,11 @@ FORGE.SoundManager.prototype.autoSuspend = function()
 
 /**
  * Resume the audio context if at least one sound is playing.
- * @method FORGE.SoundManager#autoResume
+ * @method FORGE.SoundManager#resume
  */
-FORGE.SoundManager.prototype.autoResume = function()
+FORGE.SoundManager.prototype.resume = function()
 {
-    if(this._context !== null && typeof this._context.resume !== "undefined" && this._useWebAudio === true)
+    if(this._context !== null && typeof this._context.resume !== "undefined" && this._useWebAudio === true && FORGE.Device.safari === false)
     {
         if(this._contextState === "suspended")
         {

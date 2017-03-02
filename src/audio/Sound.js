@@ -906,7 +906,7 @@ FORGE.Sound.prototype.play = function(position, loop, forceRestart)
         }
     }
 
-    this._viewer.audio.autoResume();
+    this._viewer.audio.resume();
 };
 
 /**
@@ -931,7 +931,7 @@ FORGE.Sound.prototype.stop = function(internal)
             this._onStop.dispatch();
         }
 
-        this._viewer.audio.autoSuspend();
+        this._viewer.audio.suspend();
     }
     else if (this._ready === false || this._decoded !== true)
     {
@@ -1005,7 +1005,7 @@ FORGE.Sound.prototype.pause = function()
             this._onPause.dispatch();
         }
 
-        this._viewer.audio.autoSuspend();
+        this._viewer.audio.suspend();
     }
     else if (this._ready === false || this._decoded !== true)
     {
@@ -1078,7 +1078,7 @@ FORGE.Sound.prototype.resume = function()
             this._onResume.dispatch();
         }
 
-        this._viewer.audio.autoResume();
+        this._viewer.audio.resume();
     }
     else if (this._ready === false || this._decoded === false)
     {
