@@ -48,7 +48,7 @@
         "cursor": {
             "type": "string",
             "title": "Pointer cursor",
-            "description": "The cursor to display when the pointer is over the hotspot.",
+            "description": "The cursor to display when the pointer is over the hotspot. Any valid css cursor value can be set.",
             "example": "crosshair",
             "default": "pointer"
         },
