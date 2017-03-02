@@ -159,17 +159,17 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
 
     this._states = new FORGE.HotspotStates(this._viewer, this._uid);
 
-    if (typeof config.states === "object")
+    if (typeof config.states === "object" && config.states !== null)
     {
         this._states.addConfig(config.states);
     }
 
-    if (typeof config.transform === "object")
+    if (typeof config.transform === "object" && config.transform !== null)
     {
         this._transform.load(config.transform);
     }
 
-    if (typeof config.animation === "object")
+    if (typeof config.animation === "object" && config.animation !== null)
     {
         this._animation.load(config.animation);
         this._animation.onProgress.add(this._updatePosition, this);
@@ -178,7 +178,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     /** @type {HotspotMaterialConfig} */
     var materialConfig;
 
-    if (typeof config.material === "object")
+    if (typeof config.material === "object" && config.material !== null)
     {
         materialConfig = config.material;
     }
@@ -195,18 +195,18 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._material.onReady.add(this._materialReadyHandler, this);
     // !! The loading of the material is now handled by the states manager !!
 
-    if (typeof config.sound === "object")
+    if (typeof config.sound === "object" && config.sound !== null)
     {
         this._sound = new FORGE.HotspotSound(this._viewer);
         this._sound.load(config.sound, config.transform);
     }
 
-    if (typeof config.fx === "string")
+    if (typeof config.fx === "string" && config.fx !== "")
     {
         this._fx = config.fx;
     }
 
-    if (typeof config.events === "object")
+    if (typeof config.events === "object" && config.events !== null)
     {
         this._createEvents(config.events);
     }
