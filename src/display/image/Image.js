@@ -151,7 +151,7 @@ FORGE.Image = function(viewer, config, className)
      * @type {string}
      * @private
      */
-    this._renderMode = FORGE.Image.renderMode;
+    this._renderMode = "";
 
     /**
      * If the renderMode is CANVAS, you'll need a canvas element, so this is the canvas reference.
@@ -646,10 +646,8 @@ FORGE.Image.prototype._parseConfig = function(config)
 {
     if(typeof config === "object" && config !== null)
     {
-        if(typeof config.renderMode === "string")
-        {
-            this._setRenderMode(config.renderMode);
-        }
+        var renderMode = (typeof config.renderMode === "string") ? config.renderMode : FORGE.Image.renderMode;
+        this._setRenderMode(renderMode);
 
         this._imageKey = config.key || "";
 
@@ -685,6 +683,8 @@ FORGE.Image.prototype._parseConfig = function(config)
     }
     else
     {
+        this._setRenderMode(FORGE.Image.renderMode);
+
         this._imageKey = "";
         this._imageUrl = "";
         this._i18n = false;
