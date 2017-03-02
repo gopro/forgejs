@@ -98,18 +98,20 @@ FORGE.Media.prototype._parseConfig = function(config)
 
     this._options = (typeof mediaConfig.options !== "undefined") ? mediaConfig.options : null;
 
-    if (typeof mediaConfig.source === "undefined" || mediaConfig.source === null)
-    {
-        return;
-    }
-
     var source = mediaConfig.source;
 
     if (mediaConfig.type === FORGE.MediaType.GRID)
     {
         this._ready = true;
+        return;
     }
-    else if (mediaConfig.type === FORGE.MediaType.IMAGE)
+
+    if (typeof mediaConfig.source === "undefined" || mediaConfig.source === null)
+    {
+        return;
+    }
+
+    if (mediaConfig.type === FORGE.MediaType.IMAGE)
     {
         var imageConfig;
 
@@ -143,8 +145,10 @@ FORGE.Media.prototype._parseConfig = function(config)
         }
 
         this._displayObject.onLoadComplete.addOnce(this._onImageLoadComplete, this);
+        return;
     }
-    else if (mediaConfig.type === FORGE.MediaType.VIDEO)
+
+    if (mediaConfig.type === FORGE.MediaType.VIDEO)
     {
         // If the levels property is present, we get all urls from it and put it
         // inside source.url: it means that there is multi-quality. It is way
@@ -184,6 +188,7 @@ FORGE.Media.prototype._parseConfig = function(config)
         this._displayObject.load(source.url);
 
         this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
+        return;
     }
 };
 
