@@ -105,7 +105,7 @@ FORGE.Sprite.prototype.destroy = function()
 
     this._animations.destroy();
     this._animations = null;
-    
+
     FORGE.Image.prototype.destroy.call(this);
 };
 

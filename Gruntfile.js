@@ -82,6 +82,7 @@ module.exports = function(grunt)
         "src/hotspots/HotspotTransform.js",
         "src/hotspots/HotspotAnimation.js",
         "src/hotspots/HotspotAnimationTrack.js",
+        "src/hotspots/HotspotStates.js",
         "src/hotspots/HotspotType.js",
 
         "src/camera/Camera.js",
@@ -142,7 +143,6 @@ module.exports = function(grunt)
         "src/display/components/Canvas.js",
 
         "src/display/image/Image.js",
-        "src/display/image/ImageScalable.js",
 
         "src/display/sprite/Sprite.js",
         "src/display/sprite/SpriteAnimationManager.js",

@@ -312,7 +312,9 @@ FORGE.Raycaster.prototype._intersect = function(objects, ndc, camera)
         else
         {
             var color = this._getObjectColorFromUVCoords(object, uv);
-            if (color !== null && color.alpha > 10)
+
+            // If color is null we consider that we are hitting the object but its texture is not ready
+            if (color === null || (color != null && color.alpha > 10))
             {
                 result = object;
             }

@@ -50,7 +50,7 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
      * @type {string}
      * @private
      */
-    this._gridColor = options.color || "#000000";
+    this._gridColor = options.color || "#ffffff";
 
     /**
      * The layout of the faces in the texture. There are six faces to specify:
@@ -446,7 +446,7 @@ FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = functi
             }
         }
     }
-            
+
     this._mesh.geometry.addAttribute("quadrilateralCoords", new THREE.BufferAttribute(quadri, 2));
 };
 
