@@ -1081,6 +1081,7 @@ Object.defineProperty(FORGE.Camera.prototype, "parallax",
     set: function(value)
     {
         this._parallax = FORGE.Math.clamp(value, 0, 1);
+        this._radius = this._parallax * FORGE.Camera.RADIUS;
         this._updateComplete();
     }
 });
