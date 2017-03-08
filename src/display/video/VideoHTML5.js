@@ -10,7 +10,7 @@
  * @param {?(string|FORGE.VideoQuality|Array<(string|FORGE.VideoQuality)>)=} config - Either a {@link FORGE.VideoQuality} or a String URL, or an array of strings or {@link FORGE.VideoQuality} if multiquality.
  * @param {?string=} qualityMode - The default quality mode.
  * @param {?boolean=} ambisonic - Is the video sound ambisonic?
- * @extends {FORGE.DisplayObject}
+ * @extends {FORGE.VideoBase}
  *
  * @todo  Define a config object for videos, maybe a class like VideoConfig to describe this porperly.
  * @todo  Make it work with several sources if the user wants to pass a mp4 + webm + ogg for example.
@@ -19,14 +19,6 @@
  */
 FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
 {
-    /**
-     * The viewer reference.
-     * @name FORGE.VideoHTML5#_viewer
-     * @type {FORGE.Viewer}
-     * @private
-     */
-    this._viewer = viewer;
-
     /**
      * The video identifier.
      * @name FORGE.VideoHTML5#_key
@@ -398,62 +390,6 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._onQualityModeChange = null;
 
     /**
-     * Playing status of the video.
-     * @name  FORGE.VideoHTML5#_playing
-     * @type {boolean}
-     * @private
-     */
-    this._playing = false;
-
-    /**
-     * Boolean flag to know if can play is already received.
-     * @name FORGE.VideoHTML5#_canPlay
-     * @type {boolean}
-     * @private
-     */
-    this._canPlay = false;
-
-    /**
-     * Number of play action on this video.
-     * @name  FORGE.VideoHTML5#_playCount
-     * @type {number}
-     * @private
-     */
-    this._playCount = 0;
-
-    /**
-     * Number of the video ended.
-     * @name  FORGE.VideoHTML5#_endCount
-     * @type {number}
-     * @private
-     */
-    this._endCount = 0;
-
-    /**
-     * Does the video is automatically paused when the window is not in focus anymore ?
-     * @name FORGE.VideoHTML5#_autoPause
-     * @type {boolean}
-     * @private
-     */
-    this._autoPause = true;
-
-    /**
-     * Does the video is automatically resumed when the window is back in focus ?
-     * @name FORGE.VideoHTML5#_autoResume
-     * @type {boolean}
-     * @private
-     */
-    this._autoResume = false;
-
-    /**
-     * The paused state of the video.
-     * @name FORGE.VideoHTML5#_paused
-     * @type {boolean}
-     * @private
-     */
-    this._paused = false;
-
-    /**
      * Event handler for request error binded to this.
      * @name FORGE.VideoHTML5#_onRequestErrorBind
      * @type {Function}
@@ -541,10 +477,10 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
      */
     this._decoderInitializedErrorBind = null;
 
-    FORGE.DisplayObject.call(this, viewer, null, "VideoHTML5");
+    FORGE.VideoBase.call(this, viewer, "VideoHTML5");
 };
 
-FORGE.VideoHTML5.prototype = Object.create(FORGE.DisplayObject.prototype);
+FORGE.VideoHTML5.prototype = Object.create(FORGE.VideoBase.prototype);
 FORGE.VideoHTML5.prototype.constructor = FORGE.VideoHTML5;
 
 /**
@@ -554,7 +490,7 @@ FORGE.VideoHTML5.prototype.constructor = FORGE.VideoHTML5;
  */
 FORGE.VideoHTML5.prototype._boot = function()
 {
-    FORGE.DisplayObject.prototype._boot.call(this);
+    FORGE.VideoBase.prototype._boot.call(this);
 
     if (this._ambisonic === true && this._isAmbisonic() === false)
     {
@@ -587,10 +523,6 @@ FORGE.VideoHTML5.prototype._boot = function()
 
     //Listen to the enabled state of the sound manager.
     this._viewer.audio.onDisable.add(this._disableSoundHandler, this);
-
-    // Listen to the PageVisibility event
-    this._viewer.onPause.add(this._onVisibilityChange, this);
-    this._viewer.onResume.add(this._onVisibilityChange, this);
 
     //force the creation of "onQualitiesLoaded" event dispatcher and memorize it's data
     this._onQualitiesLoaded = new FORGE.EventDispatcher(this, true);
@@ -1673,31 +1605,6 @@ FORGE.VideoHTML5.prototype._disableSoundHandler = function()
 };
 
 /**
- * Handles the change of the visibility of the page.
- * @method FORGE.VideoHTML5#_onVisibilityChange
- * @private
- */
-FORGE.VideoHTML5.prototype._onVisibilityChange = function()
-{
-    var status = document[FORGE.Device.visibilityState];
-
-    // Pause if playing, leaving and authorized to pause
-    if (this._autoPause === true && status === "hidden" && this._playing === true)
-    {
-        this.pause();
-        this._paused = false; // can safely be set at false, as the playing state is checked
-        return;
-    }
-
-    // Resume if paused, entering and authorized to resume
-    if (this._autoResume === true && status === "visible" && this._playing === false && this._paused === false)
-    {
-        this.play();
-        return;
-    }
-};
-
-/**
  * Bind native events handler for the current video.
  * @method FORGE.VideoHTML5#_installEvents
  * @private
@@ -1989,8 +1896,7 @@ FORGE.VideoHTML5.prototype.load = function(config)
  */
 FORGE.VideoHTML5.prototype.play = function(time, loop)
 {
-    this.currentTime = time;
-    this.loop = loop;
+    FORGE.VideoBase.prototype.play.call(this, time, loop);
 
     var currentVideo = this._getCurrentVideo();
 
@@ -2284,9 +2190,6 @@ FORGE.VideoHTML5.prototype.destroy = function()
 
     this._onEventBind = null;
 
-    this._viewer.onPause.remove(this._onVisibilityChange, this);
-    this._viewer.onResume.remove(this._onVisibilityChange, this);
-
     //Unbind main volume event
     this._viewer.audio.onVolumeChange.remove(this._mainVolumeChangeHandler, this);
 
@@ -2298,7 +2201,7 @@ FORGE.VideoHTML5.prototype.destroy = function()
 
     this._videos = null;
 
-    FORGE.DisplayObject.prototype.destroy.call(this);
+    FORGE.VideoBase.prototype.destroy.call(this);
 };
 
 
@@ -2663,52 +2566,6 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "canPlay",
     get: function()
     {
         return this._canPlay;
-    }
-});
-
-/**
- * Get/Set the autoPause parameter of the video.
- * @name FORGE.VideoHTML5#autoPause
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "autoPause",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._autoPause;
-    },
-
-    /** @this {FORGE.VideoHTML5} */
-    set: function(value)
-    {
-        if (typeof value === "boolean")
-        {
-            this._autoPause = value;
-        }
-    }
-});
-
-/**
- * Get/Set the autoResume parameter of the video.
- * @name FORGE.VideoHTML5#autoResume
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "autoResume",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._autoResume;
-    },
-
-    /** @this {FORGE.VideoHTML5} */
-    set: function(value)
-    {
-        if (typeof value === "boolean")
-        {
-            this._autoResume = value;
-        }
     }
 });
 
