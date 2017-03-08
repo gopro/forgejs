@@ -12,6 +12,20 @@
             "description": "The color of the background for the viewer, shown when there is no media displayed.",
             "default": "#000000",
             "example": "#ff645d"
+        },
+
+        "autoPause": {
+            "type": "boolean",
+            "title": "Autopause",
+            "description": "Does any sound and videoneed to be paused automatically when the page loses focus ?",
+            "default": false
+        },
+
+        "autoResume": {
+            "type": "boolean",
+            "title": "Autoresume",
+            "description": "Does any sound need to be resumed automatically when the page gains focus ?",
+            "default": false
         }
     }
 }

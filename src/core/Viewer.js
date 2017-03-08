@@ -294,7 +294,9 @@ FORGE.Viewer.prototype.constructor = FORGE.Viewer;
  * @const
  */
 FORGE.Viewer.DEFAULT_CONFIG = {
-    background: "#000"
+    background: "#000",
+    autoResume: false,
+    autoPause: false
 };
 
 /**
@@ -480,8 +482,13 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
  */
 FORGE.Viewer.prototype._parseConfig = function(config)
 {
-    this._config.background = (typeof config !== "undefined" && typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
-    this._container.background = this._config.background;
+    if (typeof config !== "undefined")
+    {
+        this._config.background = (typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
+        this._container.background = this._config.background;
+        this._config.autoPause = (typeof config.autoPause === "boolean") ? config.autoPause : false;
+        this._config.autoResume = (typeof config.autoResume === "boolean") ? config.autoResume : false;
+    }
 };
 
 /**
@@ -607,6 +614,12 @@ FORGE.Viewer.prototype.pause = function()
 {
     this._paused = true;
 
+    // Pause all media if autoPause is true
+    if (this._config.autoPause === true)
+    {
+        this._audio.pauseAll();
+    }
+
     if (this._onPause !== null)
     {
         this._onPause.dispatch();
@@ -620,6 +633,12 @@ FORGE.Viewer.prototype.pause = function()
 FORGE.Viewer.prototype.resume = function()
 {
     this._paused = false;
+
+    // Resume all media if autoResume is true
+    if (this._config.autoResume === true)
+    {
+        this._audio.resumeAll();
+    }
 
     if (this._onResume !== null)
     {
