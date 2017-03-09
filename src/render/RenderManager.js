@@ -382,7 +382,7 @@ FORGE.RenderManager.prototype._initView = function(sceneConfig)
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
 
-    if (this._view !== null && this._view.type === type) 
+    if (this._view !== null && this._view.type === type)
     {
         this.log("Render manager won't set view if it's already set");
         return;
@@ -486,7 +486,7 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
             volume = (typeof sceneConfig.sound.options.volume === "number") ? FORGE.Math.clamp(sceneConfig.sound.options.volume, 0, 1) : 1;
             loop = (typeof sceneConfig.sound.options.loop === "boolean") ? sceneConfig.sound.options.loop : false;
             startTime = (typeof sceneConfig.sound.options.startTime === "number") ? sceneConfig.sound.options.startTime : 0;
-            autoPlay = (typeof sceneConfig.sound.options.autoPlay === "boolean") ? sceneConfig.sound.options.autoPlay : false;
+            autoPlay = (typeof sceneConfig.sound.options.autoPlay === "boolean" && document[FORGE.Device.visibilityState] === "visible") ? sceneConfig.sound.options.autoPlay : false;
         }
 
         if (typeof sceneConfig.sound.source.url !== "undefined" && sceneConfig.sound.source.url !== "")

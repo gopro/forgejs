@@ -291,11 +291,12 @@ FORGE.Viewer.prototype.constructor = FORGE.Viewer;
 /**
  * Viewer default configuration
  * @name  FORGE.Viewer.DEFAULT_CONFIG
+ * @type {MainConfig}
  * @const
  */
 FORGE.Viewer.DEFAULT_CONFIG = {
     background: "#000",
-    autoResume: false,
+    autoResume: true,
     autoPause: false
 };
 
@@ -482,13 +483,10 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
  */
 FORGE.Viewer.prototype._parseConfig = function(config)
 {
-    if (typeof config !== "undefined")
-    {
-        this._config.background = (typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
-        this._container.background = this._config.background;
-        this._config.autoPause = (typeof config.autoPause === "boolean") ? config.autoPause : false;
-        this._config.autoResume = (typeof config.autoResume === "boolean") ? config.autoResume : false;
-    }
+    this._config.background = (typeof config !== "undefined" && typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
+    this._container.background = this._config.background;
+    this._config.autoPause = (typeof config !== "undefined" && typeof config.autoPause === "boolean") ? config.autoPause : FORGE.Viewer.DEFAULT_CONFIG.autoPause;
+    this._config.autoResume = (typeof config !== "undefined" && typeof config.autoResume === "boolean") ? config.autoResume : FORGE.Viewer.DEFAULT_CONFIG.autoResume;
 };
 
 /**
@@ -773,6 +771,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "ready",
     get: function()
     {
         return this._ready;
+    }
+});
+
+/**
+ * Get the paused status.
+ * @name FORGE.Viewer#paused
+ * @type {boolean}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "paused",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._paused;
     }
 });
 

@@ -216,7 +216,7 @@ FORGE.Media.prototype._onLoadedMetaDataHandler = function()
         this._displayObject.loop = (typeof this._options.loop === "boolean") ? this._options.loop : true;
         this._displayObject.currentTime = (typeof this._options.startTime === "number") ? this._options.startTime : 0;
 
-        if (this._options.autoPlay === true)
+        if (this._options.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
         {
             this._displayObject.play();
         }
