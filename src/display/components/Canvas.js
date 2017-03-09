@@ -33,7 +33,7 @@ FORGE.Canvas.prototype._boot = function()
  * @type {CanvasRenderingContext2D}
  * @readonly
  */
-Object.defineProperty(FORGE.Canvas.prototype, "context2D", 
+Object.defineProperty(FORGE.Canvas.prototype, "context2D",
 {
     /** @this {FORGE.Canvas} */
     get: function()
@@ -48,7 +48,7 @@ Object.defineProperty(FORGE.Canvas.prototype, "context2D",
  * @type {WebGLRenderingContext}
  * @readonly
  */
-Object.defineProperty(FORGE.Canvas.prototype, "context3D", 
+Object.defineProperty(FORGE.Canvas.prototype, "context3D",
 {
     /** @this {FORGE.Canvas} */
     get: function()
@@ -63,7 +63,7 @@ Object.defineProperty(FORGE.Canvas.prototype, "context3D",
  * @type {HTMLCanvasElement}
  * @readonly
  */
-Object.defineProperty(FORGE.Canvas.prototype, "element", 
+Object.defineProperty(FORGE.Canvas.prototype, "element",
 {
     /** @this {FORGE.Canvas} */
     get: function()

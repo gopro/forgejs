@@ -116,6 +116,26 @@ Object.defineProperty(FORGE.Rectangle.prototype, "width",
 });
 
 /**
+ * Get and set width of the rectangle (w is a short for width).
+ * @name FORGE.Rectangle#w
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Rectangle.prototype, "w",
+{
+    /** @this {FORGE.Rectangle} */
+    get: function()
+    {
+        return this.width;
+    },
+
+    /** @this {FORGE.Rectangle} */
+    set: function(value)
+    {
+        this.width = value;
+    }
+});
+
+/**
  * Get and set height of the rectangle.
  * @name FORGE.Rectangle#height
  * @type {number}
@@ -135,6 +155,26 @@ Object.defineProperty(FORGE.Rectangle.prototype, "height",
         {
             this._height = value;
         }
+    }
+});
+
+/**
+ * Get and set height of the rectangle (h is a short for height).
+ * @name FORGE.Rectangle#h
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Rectangle.prototype, "h",
+{
+    /** @this {FORGE.Rectangle} */
+    get: function()
+    {
+        return this.height;
+    },
+
+    /** @this {FORGE.Rectangle} */
+    set: function(value)
+    {
+        this.height = value;
     }
 });
 
