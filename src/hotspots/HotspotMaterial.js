@@ -393,12 +393,7 @@ FORGE.HotspotMaterial.prototype._setupWithGraphics = function()
  */
 FORGE.HotspotMaterial.prototype._setupComplete = function()
 {
-    if (this._viewer.renderer.viewReady === true)
-    {
-        this._createMaterial();
-    }
-
-    this._viewer.renderer.onViewReady.add(this._setupComplete, this);
+    this._createMaterial();
 };
 
 /**
@@ -414,7 +409,7 @@ FORGE.HotspotMaterial.prototype._createMaterial = function()
         this._material = null;
     }
 
-    var shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS.mapping);
+    var shader = FORGE.Utils.clone(this._viewer.renderer.view.current.shaderWTS.mapping);
 
     if (this._type === FORGE.HotspotMaterial.types.GRAPHICS)
     {
@@ -517,7 +512,6 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
     this._displayObject.frame = this._textureFrame;
 
     this._texture = new THREE.CanvasTexture(this._displayObject.canvas);
-    this._texture.needsUpdate = this._update;
 
     this.update();
 };

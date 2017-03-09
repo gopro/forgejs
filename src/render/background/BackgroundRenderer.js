@@ -190,7 +190,7 @@ FORGE.BackgroundRenderer.prototype.update = function()
         this._mesh.material.uniforms.tModelViewMatrixInverse.value = this._viewer.renderer.camera.modelViewInverse;
     }
 
-    this._viewer.renderer.view.updateUniforms(this._mesh.material.uniforms);
+    this._viewer.renderer.view.current.updateUniforms(this._mesh.material.uniforms);
 };
 
 /**

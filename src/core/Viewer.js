@@ -1143,7 +1143,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "renderer",
 /**
  * Get the view.
  * @name FORGE.Viewer#view
- * @type {(FORGE.ViewRectilinear|FORGE.ViewGoPro)}
+ * @type {FORGE.ViewManager}
  * @readonly
  */
 Object.defineProperty(FORGE.Viewer.prototype, "view",

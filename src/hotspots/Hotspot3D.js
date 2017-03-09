@@ -150,6 +150,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
 
     // Set the mesh name
     this._mesh.name = "mesh-" + this._uid;
+    this._mesh.userData = config;
 
     this._name = (typeof config.name === "string") ? config.name : "";
     this._visible = (typeof config.visible === "boolean") ? config.visible : true;
@@ -174,6 +175,8 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         this._animation.load(config.animation);
         this._animation.onProgress.add(this._updatePosition, this);
     }
+
+    this._createGeometry(config.geometry);
 
     /** @type {HotspotMaterialConfig} */
     var materialConfig;
@@ -214,6 +217,41 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._states.load();
 };
 
+FORGE.Hotspot3D.prototype._createGeometry = function(config)
+{
+    if (typeof config !== "undefined" && typeof config.type === "string")
+    {
+        var options = config.options;
+
+        switch (config.type)
+        {
+            case FORGE.HotspotGeometryType.BOX:
+                this._mesh.geometry = FORGE.HotspotGeometry.BOX(options);
+                break;
+
+            case FORGE.HotspotGeometryType.SPHERE:
+                this._mesh.geometry = FORGE.HotspotGeometry.SPHERE(options);
+                break;
+
+            case FORGE.HotspotGeometryType.CYLINDER:
+                this._mesh.geometry = FORGE.HotspotGeometry.CYLINDER(options);
+                break;
+
+            case FORGE.HotspotGeometryType.PLANE:
+                this._mesh.geometry = FORGE.HotspotGeometry.PLANE(options);
+                break;
+
+            default:
+                this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
+                break;
+        }
+    }
+    else
+    {
+        this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
+    }
+};
+
 /**
  * Before render handler
  * @method FORGE.Hotspot3D#_onBeforeRender
@@ -226,7 +264,7 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
 
     var gl = this._viewer.renderer.webGLRenderer.getContext();
 
-    this._viewer.renderer.view.updateUniforms(material.uniforms);
+    this._viewer.renderer.view.current.updateUniforms(material.uniforms);
 
     // Check what is the current render pass looking at the material: Hotspot or Picking Material
     if (material.name === "HotspotMaterial")
@@ -295,40 +333,10 @@ FORGE.Hotspot3D.prototype._materialReadyHandler = function()
  */
 FORGE.Hotspot3D.prototype._createHotspot3D = function()
 {
-    if (typeof this._config.geometry !== "undefined" && typeof this._config.geometry.type === "string")
-    {
-        var options = this._config.geometry.options;
-
-        switch (this._config.geometry.type)
-        {
-            case FORGE.HotspotGeometryType.BOX:
-                this._mesh.geometry = FORGE.HotspotGeometry.BOX(options);
-                break;
-            case FORGE.HotspotGeometryType.SPHERE:
-                this._mesh.geometry = FORGE.HotspotGeometry.SPHERE(options);
-                break;
-            case FORGE.HotspotGeometryType.CYLINDER:
-                this._mesh.geometry = FORGE.HotspotGeometry.CYLINDER(options);
-                break;
-            case FORGE.HotspotGeometryType.PLANE:
-                this._mesh.geometry = FORGE.HotspotGeometry.PLANE(options);
-                break;
-            default:
-                this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
-                break;
-        }
-    }
-    else
-    {
-        this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
-    }
-
     this._mesh.geometry.scale(this._transform.scale.x, this._transform.scale.y, this._transform.scale.z);
-    this._mesh.material = this._material.material;
-    this._mesh.userData = this._config;
 
     // Only enable frustum culling when view is rectilinear and frustum makes sense
-    this._mesh.frustumCulled = this._viewer.renderer.view instanceof FORGE.ViewRectilinear;
+    this._mesh.frustumCulled = this._viewer.renderer.view.current instanceof FORGE.ViewRectilinear;
 
     this._updatePosition();
 

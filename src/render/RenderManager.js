@@ -43,20 +43,27 @@ FORGE.RenderManager = function(viewer)
     this._renderDisplay = null;
 
     /**
-     * View reference.
-     * @name FORGE.RenderManager#_view
-     * @type {?FORGE.ViewBase}
+     * View manager reference
+     * @name FORGE.RenderManager#_viewManager
+     * @type {Forge.ViewManager}
      * @private
      */
-    this._view = null;
+    this._viewManager = null;
 
-    /**
-     * View type when not in VR.
-     * @name FORGE.RenderManager#_viewType
-     * @type {string}
-     * @private
-     */
-    this._viewType = FORGE.ViewType.UNDEFINED;
+    // /**
+    //  * View reference.
+    //  * @name FORGE.RenderManager#_view
+    //  * @type {?FORGE.ViewBase}
+    //  * @private
+    //  */
+    // this._view = null;
+
+    // *
+    //  * View type when not in VR.
+    //  * @name FORGE.RenderManager#_viewType
+    //  * @type {string}
+    //  * @private
+    // this._viewType = FORGE.ViewType.UNDEFINED;
 
     /**
      * The media reference.
@@ -243,7 +250,8 @@ FORGE.RenderManager.prototype._onViewerReady = function()
 {
     var canvas = this._viewer.canvas.dom;
 
-    var options = {
+    var options =
+    {
         antialias: true,
         alpha: true,
         premultipliedAlpha: false,
@@ -265,6 +273,9 @@ FORGE.RenderManager.prototype._onViewerReady = function()
     this._webGLRenderer.autoClear = false;
     this._webGLRenderer.autoClearDepth = true;
     this._webGLRenderer.autoClearColor = true;
+
+    this._viewManager = new FORGE.ViewManager(this._viewer);
+    this._viewManager.onChange.add(this._onViewChangeHandler, this);
 
     this._pickingManager = new FORGE.PickingManager(this._viewer);
     this._renderDisplay = new FORGE.RenderDisplay(this._viewer);
@@ -303,7 +314,7 @@ FORGE.RenderManager.prototype._onSceneLoadStart = function()
     this._objectRenderer.createRenderScenes();
     this._renderPipeline.addRenderScenes(this._objectRenderer.renderScenes);
 
-    this._initView(this._sceneConfig);
+    this._viewManager.load(this._sceneConfig.view);
 
     this._initCamera(this._sceneConfig);
 
@@ -507,6 +518,25 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
             }
         }
         // @todo Ability to use a target uid rather than a source url (ie. sceneConfig.sound.source.target)
+    }
+};
+
+FORGE.RenderManager.prototype._onViewChangeHandler = function()
+{
+    if (this._backgroundRenderer !== null)
+    {
+        this._backgroundRenderer.updateAfterViewChange();
+    }
+
+    this._pickingManager.updateForViewType(this._viewManager.type);
+
+    if (this._viewManager.type === FORGE.ViewType.RECTILINEAR)
+    {
+        this._renderPipeline.enablePicking(false);
+    }
+    else
+    {
+        this._renderPipeline.enablePicking(true, this._pickingManager.material, this._pickingManager.renderTarget);
     }
 };
 
@@ -749,6 +779,8 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
         this._backgroundRenderer.displayObject = displayObject;
     }
 
+    this._backgroundRenderer.updateAfterViewChange();
+
     this._backgroundReady = true;
 
     if (this._onBackgroundReady !== null)
@@ -788,7 +820,7 @@ FORGE.RenderManager.prototype.update = function()
  */
 FORGE.RenderManager.prototype.render = function()
 {
-    if (this._viewReady === false ||
+    if (this._viewManager === null ||
         this._renderPipelineReady === false ||
         this._renderPipeline === null)
     {
@@ -921,7 +953,7 @@ FORGE.RenderManager.prototype.toggleVR = function()
  * @method FORGE.RenderManager#setView
  * @param {string} type - type of view
  */
-FORGE.RenderManager.prototype.setView = function(type)
+/*FORGE.RenderManager.prototype.setView = function(type)
 {
     this.log("setView");
 
@@ -971,7 +1003,7 @@ FORGE.RenderManager.prototype.setView = function(type)
     }
 
     this.onViewReady.dispatch();
-};
+};*/
 
 /**
  * Renderer destroy sequence
@@ -1026,10 +1058,10 @@ FORGE.RenderManager.prototype.destroy = function()
         this._objectRenderer = null;
     }
 
-    if (this._view !== null)
+    if (this._viewManager !== null)
     {
-        this._view.destroy();
-        this._view = null;
+        this._viewManager.destroy();
+        this._viewManager = null;
     }
 
     if (this._backgroundRenderer !== null)
@@ -1169,36 +1201,16 @@ Object.defineProperty(FORGE.RenderManager.prototype, "pickingManager",
 });
 
 /**
- * Get and set the view.
+ * Get the view manager.
  * @name FORGE.RenderManager#view
- * @type {FORGE.ViewBase}
+ * @type {FORGE.ViewManager}
  */
 Object.defineProperty(FORGE.RenderManager.prototype, "view",
 {
     /** @this {FORGE.RenderManager} */
     get: function()
     {
-        return this._view;
-    },
-    /** @this {FORGE.RenderManager} */
-    set: function(value)
-    {
-        if (typeof value === "string" && value !== "")
-        {
-            switch (value)
-            {
-                case FORGE.ViewType.GOPRO:
-                    this.setView(FORGE.ViewType.GOPRO);
-                    break;
-
-                case FORGE.ViewType.RECTILINEAR:
-                    this.setView(FORGE.ViewType.RECTILINEAR);
-                    break;
-
-                default:
-                    throw "View type not supported: " + value;
-            }
-        }
+        return this._viewManager;
     }
 });
 
@@ -1318,14 +1330,15 @@ Object.defineProperty(FORGE.RenderManager.prototype, "onBackgroundReady",
  * @readonly
  * @type boolean
  */
-Object.defineProperty(FORGE.RenderManager.prototype, "viewReady",
-{
-    /** @this {FORGE.RenderManager} */
-    get: function()
-    {
-        return this._viewReady;
-    }
-});
+
+// Object.defineProperty(FORGE.RenderManager.prototype, "viewReady",
+// {
+//     * @this {FORGE.RenderManager} 
+//     get: function()
+//     {
+//         return this._viewReady;
+//     }
+// });
 
 /**
  * Get the onViewReady {@link FORGE.EventDispatcher}.
