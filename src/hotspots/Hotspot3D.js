@@ -282,7 +282,7 @@ FORGE.Hotspot3D.prototype._materialReadyHandler = function()
     this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
     this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);
 
-    if (this._animation.autoPlay === true)
+    if (this._animation.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
     {
         this._animation.play();
     }

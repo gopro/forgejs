@@ -382,7 +382,7 @@ FORGE.RenderManager.prototype._initView = function(sceneConfig)
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
 
-    if (this._view !== null && this._view.type === type) 
+    if (this._view !== null && this._view.type === type)
     {
         this.log("Render manager won't set view if it's already set");
         return;
@@ -492,7 +492,7 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
         if (typeof sceneConfig.sound.source.url !== "undefined" && sceneConfig.sound.source.url !== "")
         {
             // Warning : UID is not registered and applied to the FORGE.Sound object for registration
-            this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC ? true : false));
+            this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC));
 
             if (typeof sceneConfig.sound.options !== "undefined" && sceneConfig.sound.options !== null)
             {

@@ -525,6 +525,38 @@ FORGE.SoundManager.prototype.resume = function()
 };
 
 /**
+ * Pause all playing sounds.
+ * @method FORGE.SoundManager#pauseAll
+ */
+FORGE.SoundManager.prototype.pauseAll = function()
+{
+    for (var i = 0, ii = this._sounds.length; i < ii; i++)
+    {
+        if (this._sounds[i].playing === true)
+        {
+            this._sounds[i].pause();
+            this._sounds[i].resumed = true;
+        }
+    }
+};
+
+/**
+ * Play all sounds that have been paused with the pauseAll method.
+ * @method FORGE.SoundManager#resumeAll
+ */
+FORGE.SoundManager.prototype.resumeAll = function()
+{
+    for (var i = 0, ii = this._sounds.length; i < ii; i++)
+    {
+        if (this._sounds[i].resumed === true)
+        {
+            this._sounds[i].resume();
+            this._sounds[i].resumed = false;
+        }
+    }
+};
+
+/**
  * Mute method of the sounds.
  * @method FORGE.SoundManager#mute
  */

@@ -10,7 +10,7 @@
  * @param {?(string|FORGE.VideoQuality|Array<(string|FORGE.VideoQuality)>)=} config - Either a {@link FORGE.VideoQuality} or a String URL, or an array of strings or {@link FORGE.VideoQuality} if multiquality.
  * @param {?string=} qualityMode - The default quality mode.
  * @param {?boolean=} ambisonic - Is the video sound ambisonic?
- * @extends {FORGE.DisplayObject}
+ * @extends {FORGE.VideoBase}
  *
  * @todo  Define a config object for videos, maybe a class like VideoConfig to describe this porperly.
  * @todo  Make it work with several sources if the user wants to pass a mp4 + webm + ogg for example.
@@ -19,14 +19,6 @@
  */
 FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
 {
-    /**
-     * The viewer reference.
-     * @name FORGE.VideoHTML5#_viewer
-     * @type {FORGE.Viewer}
-     * @private
-     */
-    this._viewer = viewer;
-
     /**
      * The video identifier.
      * @name FORGE.VideoHTML5#_key
@@ -398,38 +390,6 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._onQualityModeChange = null;
 
     /**
-     * Playing status of the video.
-     * @name  FORGE.VideoHTML5#_playing
-     * @type {boolean}
-     * @private
-     */
-    this._playing = false;
-
-    /**
-     * Boolean flag to know if can play is already received.
-     * @name FORGE.VideoHTML5#_canPlay
-     * @type {boolean}
-     * @private
-     */
-    this._canPlay = false;
-
-    /**
-     * Number of play action on this video.
-     * @name  FORGE.VideoHTML5#_playCount
-     * @type {number}
-     * @private
-     */
-    this._playCount = 0;
-
-    /**
-     * Number of the video ended.
-     * @name  FORGE.VideoHTML5#_endCount
-     * @type {number}
-     * @private
-     */
-    this._endCount = 0;
-
-    /**
      * Event handler for request error binded to this.
      * @name FORGE.VideoHTML5#_onRequestErrorBind
      * @type {Function}
@@ -517,10 +477,10 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
      */
     this._decoderInitializedErrorBind = null;
 
-    FORGE.DisplayObject.call(this, viewer, null, "VideoHTML5");
+    FORGE.VideoBase.call(this, viewer, "VideoHTML5");
 };
 
-FORGE.VideoHTML5.prototype = Object.create(FORGE.DisplayObject.prototype);
+FORGE.VideoHTML5.prototype = Object.create(FORGE.VideoBase.prototype);
 FORGE.VideoHTML5.prototype.constructor = FORGE.VideoHTML5;
 
 /**
@@ -530,7 +490,7 @@ FORGE.VideoHTML5.prototype.constructor = FORGE.VideoHTML5;
  */
 FORGE.VideoHTML5.prototype._boot = function()
 {
-    FORGE.DisplayObject.prototype._boot.call(this);
+    FORGE.VideoBase.prototype._boot.call(this);
 
     if (this._ambisonic === true && this._isAmbisonic() === false)
     {
@@ -1936,8 +1896,7 @@ FORGE.VideoHTML5.prototype.load = function(config)
  */
 FORGE.VideoHTML5.prototype.play = function(time, loop)
 {
-    this.currentTime = time;
-    this.loop = loop;
+    FORGE.VideoBase.prototype.play.call(this, time, loop);
 
     var currentVideo = this._getCurrentVideo();
 
@@ -1945,6 +1904,7 @@ FORGE.VideoHTML5.prototype.play = function(time, loop)
     {
         currentVideo.element.play();
         this._playing = true;
+        this._paused = false;
         this._playCount++;
     }
 };
@@ -1961,6 +1921,7 @@ FORGE.VideoHTML5.prototype.pause = function()
     {
         currentVideo.element.pause();
         this._playing = false;
+        this._paused = true;
     }
 };
 
@@ -2240,7 +2201,7 @@ FORGE.VideoHTML5.prototype.destroy = function()
 
     this._videos = null;
 
-    FORGE.DisplayObject.prototype.destroy.call(this);
+    FORGE.VideoBase.prototype.destroy.call(this);
 };
 
 
@@ -2560,66 +2521,6 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "durationMS",
     get: function()
     {
         return Math.round(this.duration * 1000);
-    }
-});
-
-/**
- * Get the playing status of the video.
- * @name FORGE.VideoHTML5#playing
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "playing",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._playing;
-    }
-});
-
-/**
- * Get the number of play action of the video.
- * @name FORGE.VideoHTML5#playCount
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "playCount",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._playCount;
-    }
-});
-
-/**
- * Get the canPlay status of the video.
- * @name FORGE.VideoHTML5#canPlay
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "canPlay",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._canPlay;
-    }
-});
-
-/**
- * Get the number of the video ends.
- * @name FORGE.VideoHTML5#endCount
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "endCount",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._endCount;
     }
 });
 
