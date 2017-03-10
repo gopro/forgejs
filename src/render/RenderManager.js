@@ -381,7 +381,7 @@ FORGE.RenderManager.prototype._initView = function(sceneConfig)
     var extendedViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(storyViewConfig, sceneViewConfig));
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
-
+  
     if (this._view !== null && this._view.type === type) 
     {
         this.log("Render manager won't set view if it's already set");
@@ -391,10 +391,11 @@ FORGE.RenderManager.prototype._initView = function(sceneConfig)
     switch (type)
     {
         case FORGE.ViewType.GOPRO:
-            this.setView(FORGE.ViewType.GOPRO);
+        case FORGE.ViewType.RECTILINEAR:
+        case FORGE.ViewType.FLAT:
+            this.setView(type);
             break;
 
-        case FORGE.ViewType.RECTILINEAR:
         default:
             this.setView(FORGE.ViewType.RECTILINEAR);
             break;
@@ -425,17 +426,10 @@ FORGE.RenderManager.prototype._initCamera = function(sceneConfig)
 FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 {
     // Create media
-    if (typeof sceneConfig.media !== "undefined" && sceneConfig.media !== null)
+    if (sceneConfig.media !== null &&
+        typeof sceneConfig.media !== "undefined" &&
+        typeof sceneConfig.media.source !== "undefined")
     {
-        if (sceneConfig.media.type === FORGE.MediaType.EQUIRECTANGULAR &&
-            this._renderDisplay.presentingVR === false) {
-            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
-        }
-        else
-        {
-            this._backgroundRendererType = FORGE.BackgroundType.MESH;
-        }
-
         this._media = new FORGE.Media(this._viewer, sceneConfig);
 
         if (this._media.ready === true)
@@ -518,6 +512,7 @@ FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
 {
     this.log("Media load is complete");
 
+    this._setBackgroundRendererType(this._renderDisplay.presentingVR);
     this._setBackgroundRenderer(this._backgroundRendererType);
 
     if (typeof event !== "undefined" && event !== null)
@@ -729,9 +724,9 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
                 {
                     config.tile = this._sceneConfig.media.source.levels[0].tile;
                 }
-
-                config.mediaFormat = this._sceneConfig.media.source.format;
             }
+
+            config.mediaFormat = this._sceneConfig.media.source.format;
         }
 
         this._backgroundRenderer = new FORGE.BackgroundMeshRenderer(this._viewer, renderTarget, config);
@@ -754,6 +749,43 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
         this._onBackgroundReady.dispatch();
     }
 };
+
+/**
+ * Set the background renderer depending on current media format and view type.
+ * @method FORGE.RenderManager#_setBackgroundRendererType
+ * @param {boolean} vrEnabled - VR enabled flag
+ * @private
+ */
+FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
+{
+    if (vrEnabled === true) {
+        this.log("VR on - background type = MESH")
+        this._backgroundRendererType = FORGE.BackgroundType.MESH;
+        return;
+    }
+
+    if (this._sceneConfig.media.source.format === FORGE.MediaType.CUBE || 
+        this._sceneConfig.media.source.format === FORGE.MediaType.FLAT ||
+        typeof this._sceneConfig.media.source.format === "undefined") {
+
+        if (this._view.type === FORGE.ViewType.FLAT) {
+            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+        }
+
+        else {
+            this._backgroundRendererType = FORGE.BackgroundType.MESH;
+        }
+    }
+
+    else
+    {
+        this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+    }
+
+    this.log("VR off - media " + this._sceneConfig.media.source.format + ", view " + this._view.type +
+        ", background type = " + this._backgroundRendererType);
+};
+
 
 /**
  * Clear the background renderer.
@@ -896,18 +928,16 @@ FORGE.RenderManager.prototype.enableVR = function(status)
         this._camera.roll = 0;
     }
 
+
     // If we enter VR with a cubemap: do nothing. With an equi: toggle to mesh renderer
     // If we exit VR with a cubemap: do nothing. With an equi: toggle to shader renderer
-    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null && typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null && this._sceneConfig.media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
+    if (typeof this._sceneConfig.media !== "undefined" &&
+        this._sceneConfig.media !== null &&
+        typeof this._sceneConfig.media.source !== "undefined" &&
+        this._sceneConfig.media.source !== null &&
+        this._sceneConfig.media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
     {
-        if (status === true)
-        {
-            this._backgroundRendererType = FORGE.BackgroundType.MESH;
-        }
-        else
-        {
-            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
-        }
+        this._setBackgroundRendererType(status);
         this._setBackgroundRenderer(this._backgroundRendererType);
     }
 };
@@ -948,11 +978,15 @@ FORGE.RenderManager.prototype.setView = function(type)
 
     if (type === FORGE.ViewType.RECTILINEAR)
     {
-        this._view = new FORGE.ViewRectilinear(this._viewer, this._camera);
+        this._view = new FORGE.ViewRectilinear(this._viewer);
     }
     else if (type === FORGE.ViewType.GOPRO)
     {
-        this._view = new FORGE.ViewGoPro(this._viewer, this._camera);
+        this._view = new FORGE.ViewGoPro(this._viewer);
+    }
+    else if (type === FORGE.ViewType.FLAT)
+    {
+        this._view = new FORGE.ViewFlat(this._viewer);
     }
     else
     {
@@ -1195,11 +1229,9 @@ Object.defineProperty(FORGE.RenderManager.prototype, "view",
             switch (value)
             {
                 case FORGE.ViewType.GOPRO:
-                    this.setView(FORGE.ViewType.GOPRO);
-                    break;
-
                 case FORGE.ViewType.RECTILINEAR:
-                    this.setView(FORGE.ViewType.RECTILINEAR);
+                case FORGE.ViewType.FLAT:
+                    this.setView(value);
                     break;
 
                 default:
