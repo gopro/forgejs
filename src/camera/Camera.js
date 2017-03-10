@@ -37,7 +37,7 @@ FORGE.Camera = function(viewer)
      * @type {?number}
      * @private
      */
-    this._yawMin = 0;
+    this._yawMin = -Infinity;
 
     /**
      * The yaw maximum value in radians.
@@ -45,7 +45,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._yawMax = 0;
+    this._yawMax = Infinity;
 
     /**
      * The pitch value in radians.
@@ -61,7 +61,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._pitchMin = 0;
+    this._pitchMin = -Infinity;
 
     /**
      * The pitch maximum value  in radians.
@@ -69,7 +69,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._pitchMax = 0;
+    this._pitchMax = Infinity;
 
     /**
      * The roll value in radians.
@@ -85,7 +85,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._rollMin = 0;
+    this._rollMin = -Infinity;
 
     /**
      * The roll maximum value in radians.
@@ -93,7 +93,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._rollMax = 0;
+    this._rollMax = Infinity;
 
     /**
      * The fov value in radians.
@@ -117,7 +117,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._fovMax = 0;
+    this._fovMax = Infinity;
 
     /**
      * Parallax setting
@@ -246,9 +246,7 @@ FORGE.Camera.DEFAULT_CONFIG = {
     },
     pitch:
     {
-        default: 0,
-        min: -90,
-        max: 90
+        default: 0
     },
     roll:
     {
@@ -307,29 +305,65 @@ FORGE.Camera.prototype._parseConfig = function(config)
     this._parallax = config.parallax;
     this._radius = this._parallax * FORGE.Camera.RADIUS;
 
-    this._yawMin = FORGE.Math.degToRad(config.yaw.min);
-    this._yawMax = FORGE.Math.degToRad(config.yaw.max);
-    this._setYaw(config.yaw.default, FORGE.Math.DEGREES);
+    if (typeof config.yaw.min === "number")
+    {
+        this._yawMin = FORGE.Math.degToRad(config.yaw.min);
+    }
 
-    this._pitchMin = FORGE.Math.degToRad(config.pitch.min);
-    this._pitchMax = FORGE.Math.degToRad(config.pitch.max);
-    this._setPitch(config.pitch.default, FORGE.Math.DEGREES);
+    if (typeof config.yaw.max === "number")
+    {
+        this._yawMax = FORGE.Math.degToRad(config.yaw.max);
+    }
 
-    this._rollMin = FORGE.Math.degToRad(config.roll.min);
-    this._rollMax = FORGE.Math.degToRad(config.roll.max);
-    this._setRoll(config.roll.default, FORGE.Math.DEGREES);
+    if (typeof config.yaw.default === "number")
+    {
+        this._setYaw(config.yaw.default, FORGE.Math.DEGREES);
+    }
 
-    if (typeof config.fov.min !== "undefined")
+    if (typeof config.pitch.min === "number")
+    {
+        this._pitchMin = FORGE.Math.degToRad(config.pitch.min);
+    }
+
+    if (typeof config.pitch.max === "number")
+    {
+        this._pitchMax = FORGE.Math.degToRad(config.pitch.max);
+    }
+
+    if (typeof config.pitch.default === "number")
+    {
+        this._setPitch(config.pitch.default, FORGE.Math.DEGREES);
+    }
+
+    if (typeof config.roll.min === "number")
+    {
+        this._rollMin = FORGE.Math.degToRad(config.roll.min);
+    }
+
+    if (typeof config.roll.max === "number")
+    {
+        this._rollMax = FORGE.Math.degToRad(config.roll.max);
+    }
+
+    if (typeof config.roll.default === "number")
+    {
+        this._setRoll(config.roll.default, FORGE.Math.DEGREES);
+    }
+
+    if (typeof config.fov.min === "number")
     {
         this._fovMin = FORGE.Math.degToRad(config.fov.min);
     }
 
-    if (typeof config.fov.max !== "undefined")
+    if (typeof config.fov.max === "number")
     {
         this._fovMax = FORGE.Math.degToRad(config.fov.max);
     }
 
-    this._setFov(config.fov.default, FORGE.Math.DEGREES);
+    if (typeof config.fov.default === "number")
+    {
+        this._setFov(config.fov.default, FORGE.Math.DEGREES);
+    }
 
     this._updateFromEuler();
     this._updateComplete();
@@ -674,11 +708,36 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
     // Convert value in radians for clamp if unit is in degrees.
     value = (unit === FORGE.Math.DEGREES) ? FORGE.Math.degToRad(value) : value;
 
-    // Wrap the value between -PI and +PI
-    value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
+    // Wrap the value between -PI and +PI, except for FLAT view where we apply texture ratio
+    if (this._viewer.renderer.backgroundRenderer !== null &&
+        this._viewer.renderer.view.type === FORGE.ViewType.FLAT) {
+        var disp = this._viewer.renderer.backgroundRenderer.displayObject;
+        var ratio = disp.width / disp.height;
+        value = FORGE.Math.wrap(value, -Math.PI * ratio, Math.PI * ratio);
+    }
+    else {
+        value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
+    }
 
     // Clamp the value between min and max
-    var yaw = FORGE.Math.clamp(value, this._yawMin, this._yawMax);
+    var min = this._yawMin;
+    var max = this._yawMax;
+    var view = this._viewer.renderer.view;
+
+    if (typeof view !== "undefined")
+    {
+        if (view.yawMin !== null)
+        {
+            min = Math.max(view.yawMin, min);
+        }
+
+        if (view.yawMax !== null)
+        {
+            max = Math.min(view.yawMax, max);
+        }
+    }
+
+    var yaw = FORGE.Math.clamp(value, min, max);
 
     var changed = this._yaw !== yaw;
 
@@ -712,7 +771,24 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
     value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
 
     // Clamp the value between min and max
-    var pitch = FORGE.Math.clamp(value, this._pitchMin, this._pitchMax);
+    var min = this._pitchMin;
+    var max = this._pitchMax;
+    var view = this._viewer.renderer.view;
+
+    if (typeof view !== "undefined")
+    {
+        if (view.pitchMin !== null)
+        {
+            min = Math.max(view.pitchMin, min);
+        }
+
+        if (view.pitchMax !== null)
+        {
+            max = Math.min(view.pitchMax, max);
+        }
+    }
+    
+    var pitch = FORGE.Math.clamp(value, min, max);
 
     var changed = this._pitch !== pitch;
 
@@ -746,7 +822,24 @@ FORGE.Camera.prototype._setRoll = function(value, unit)
     value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
 
     // Clamp the value between min and max
-    var roll = FORGE.Math.clamp(value, this._rollMin, this._rollMax);
+    var min = this._rollMin;
+    var max = this._rollMax;
+    var view = this._viewer.renderer.view;
+
+    if (typeof view !== "undefined")
+    {
+        if (view.rollMin !== null)
+        {
+            min = Math.max(view.rollMin, min);
+        }
+
+        if (view.rollMax !== null)
+        {
+            max = Math.min(view.rollMax, max);
+        }
+    }
+    
+    var roll = FORGE.Math.clamp(value, min, max);
 
     var changed = this._roll !== roll;
 
@@ -776,9 +869,35 @@ FORGE.Camera.prototype._setFov = function(value, unit)
     // Convert value in radians for clamp if unit is in degrees.
     value = (unit === FORGE.Math.DEGREES) ? FORGE.Math.degToRad(value) : value;
 
-    var fov = FORGE.Math.clamp(value, this._fovMin, this._fovMax);
+    // Clamp the value between min and max
+    var min = this._fovMin;
+    var max = this._fovMax;
+    var view = this._viewer.renderer.view;
+
+    if (typeof view !== "undefined")
+    {
+        if (view.fovMin !== null)
+        {
+            min = Math.max(view.fovMin, min);
+        }
+
+        if (view.fovMax !== null)
+        {
+            max = Math.min(view.fovMax, max);
+        }
+    }
+    
+    var fov = FORGE.Math.clamp(value, min, max);
 
     var changed = this._fov !== fov;
+
+    // If fov has changed, ensure angles are inside camera and view boundaries
+    // by calling their setters with their current value
+    if (changed === true) {
+        this._setYaw(this._yaw);
+        this._setPitch(this._pitch);
+        this._setRoll(this._roll);
+    }
 
     this._fov = fov;
 
