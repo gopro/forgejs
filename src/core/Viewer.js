@@ -607,13 +607,14 @@ FORGE.Viewer.prototype.update = function(time)
 /**
  * Pause the refresh on the main loop.
  * @method FORGE.Viewer#pause
+ * @param {boolean} internal - Internal lib usage
  */
-FORGE.Viewer.prototype.pause = function()
+FORGE.Viewer.prototype.pause = function(internal)
 {
     this._paused = true;
 
     // Pause all media if autoPause is true
-    if (this._config.autoPause === true)
+    if (internal !== true || this._config.autoPause === true)
     {
         this._audio.pauseAll();
     }
@@ -627,13 +628,14 @@ FORGE.Viewer.prototype.pause = function()
 /**
  * Resume the refresh on the main loop.
  * @method FORGE.Viewer#resume
+ * @param {boolean} internal - Internal lib usage
  */
-FORGE.Viewer.prototype.resume = function()
+FORGE.Viewer.prototype.resume = function(internal)
 {
     this._paused = false;
 
     // Resume all media if autoResume is true
-    if (this._config.autoResume === true)
+    if (internal !== true || this._config.autoResume === true)
     {
         this._audio.resumeAll();
     }

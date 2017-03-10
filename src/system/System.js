@@ -70,11 +70,11 @@ FORGE.System.prototype._visibilityChangeHandler = function()
 
     if (typeof state === "string" && state === "visible")
     {
-        this._viewer.resume();
+        this._viewer.resume(true);
     }
     else
     {
-        this._viewer.pause();
+        this._viewer.pause(true);
     }
 };
 
