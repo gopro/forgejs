@@ -72,14 +72,16 @@ FORGE.VideoBase.prototype._boot = function()
 /**
  * Handles the change of the visibility of the page.
  * @method FORGE.VideoBase#_onVisibilityChange
+ * @param {FORGE.Event} event - the received event
  * @private
  */
-FORGE.VideoBase.prototype._onVisibilityChange = function()
+FORGE.VideoBase.prototype._onVisibilityChange = function(event)
 {
     var status = document[FORGE.Device.visibilityState];
+    var external = (event.data.internal === undefined);
 
     // Pause if playing, leaving and authorized to pause
-    if (this._viewer.config.autoPause === true && status === "hidden" && this._playing === true)
+    if (this._viewer.config.autoPause === true && (status === "hidden" || external === true) && this._playing === true)
     {
         this.pause();
         this._paused = false; // can safely be set at false, as the playing state is checked
@@ -87,7 +89,7 @@ FORGE.VideoBase.prototype._onVisibilityChange = function()
     }
 
     // Resume if paused, entering and authorized to resume
-    if (this._viewer.config.autoResume === true && status === "visible" && this._playing === false && this._paused === false)
+    if (this._viewer.config.autoResume === true && (status === "visible" || external === true) && this._playing === false && this._paused === false)
     {
         this.play();
         return;

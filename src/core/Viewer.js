@@ -621,7 +621,9 @@ FORGE.Viewer.prototype.pause = function(internal)
 
     if (this._onPause !== null)
     {
-        this._onPause.dispatch();
+        this._onPause.dispatch({
+            "internal": internal
+        });
     }
 };
 
@@ -642,7 +644,9 @@ FORGE.Viewer.prototype.resume = function(internal)
 
     if (this._onResume !== null)
     {
-        this._onResume.dispatch();
+        this._onResume.dispatch({
+            "internal": internal
+        });
     }
 };
 
