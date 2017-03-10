@@ -403,14 +403,14 @@ FORGE.Hotspot3D.prototype._checkReady = function()
  */
 FORGE.Hotspot3D.prototype.over = function()
 {
+    FORGE.Object3D.prototype.over.call(this);
+
     if(this._states.auto === true)
     {
         this._states.load("over");
     }
 
     this._viewer.canvas.pointer.cursor = this._cursor;
-
-    FORGE.Object3D.prototype.over.call(this);
 };
 
 /**
@@ -419,14 +419,14 @@ FORGE.Hotspot3D.prototype.over = function()
  */
 FORGE.Hotspot3D.prototype.out = function()
 {
+    FORGE.Object3D.prototype.out.call(this);
+
     if(this._states.auto === true)
     {
         this._states.load();
     }
 
     this._viewer.canvas.pointer.cursor = "default";
-
-    FORGE.Object3D.prototype.over.call(this);
 };
 
 /**
