@@ -98,6 +98,12 @@ FORGE.Media.prototype._parseConfig = function(config)
 
     var source = mediaConfig.source;
 
+    if (typeof mediaConfig.source !== "undefined" &&
+        typeof mediaConfig.source.format === "undefined")
+    {
+        mediaConfig.source.format = FORGE.MediaFormat.FLAT;
+    }
+
     if (mediaConfig.type === FORGE.MediaType.GRID)
     {
         this._ready = true;
@@ -121,7 +127,8 @@ FORGE.Media.prototype._parseConfig = function(config)
 
             this._displayObject = new FORGE.Image(this._viewer, imageConfig);
         }
-        else if (source.format === FORGE.MediaFormat.CUBE || source.format === FORGE.MediaFormat.FLAT)
+        else if (source.format === FORGE.MediaFormat.CUBE ||
+            source.format === FORGE.MediaFormat.FLAT)
         {
             imageConfig = {
                 key: this._uid,
@@ -130,9 +137,10 @@ FORGE.Media.prototype._parseConfig = function(config)
 
             this._displayObject = new FORGE.Image(this._viewer, imageConfig);
         }
+
         else
         {
-            throw "Flat media not supported yet !";
+            throw "Media format not supported";
         }
 
         this._displayObject.onLoadComplete.addOnce(this._onImageLoadComplete, this);
