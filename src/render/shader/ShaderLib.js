@@ -25,6 +25,26 @@ FORGE.ShaderLib = {
             fragmentShader: FORGE.ShaderChunk.stw_frag_proj_rectilinear
         },
 
+        flat:
+        {
+            /** @type {FORGEUniform} */
+            uniforms:
+            {
+                tTexture: { type: "t", value: null },
+                tTextureRatio: { type: "f", value: 1.0 },
+                tViewportResolution: { type: "v2", value: new THREE.Vector2() },
+                tViewportResolutionRatio: { type: "f", value: 1.0 },
+                tFov: { type: "f", value: 0.0 },
+                tYaw: { type: "f", value: 0.0 },
+                tPitch: { type: "f", value: 0.0 },
+                tRepeatX: { type: "i", value: 0 },
+                tRepeatY: { type: "i", value: 0 }
+            },
+
+            vertexShader: FORGE.ShaderChunk.stw_vert_proj,
+            fragmentShader: FORGE.ShaderChunk.stw_frag_proj_flat
+        },
+
         gopro:
         {
             /** @type {FORGEUniform} */
