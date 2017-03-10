@@ -77,7 +77,7 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
     {
         var hfov = vfov * this._viewer.renderer.displayResolution.ratio;
         var texRatio = this._viewer.renderer.backgroundRenderer.textureSize.ratio;
-        this._yawMax = Math.max(0, (Math.PI / texRatio) - hfov * 0.5);
+        this._yawMax = Math.max(0, (Math.PI * texRatio - hfov) * 0.5); // image
         this._yawMin = -this._yawMax;
     }
 
