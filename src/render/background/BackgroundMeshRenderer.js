@@ -182,14 +182,16 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
     
     this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
 
-    if (this._mediaFormat === FORGE.MediaFormat.FLAT) {
+    if (this._mediaFormat === FORGE.MediaFormat.FLAT)
+    {
         // Enable mipmaps for flat rendering to avoid aliasing
         this._texture.generateMipmaps = true;
         this._texture.minFilter = THREE.LinearMipMapLinearFilter;
         
         // Replace geometry with a rectangle matching texture ratio
         // First release previous default geometry
-        if (this._mesh.geometry != null) {
+        if (this._mesh.geometry != null)
+        {
             this._mesh.geometry.dispose();
             this._mesh.geometry = null;
         }
@@ -221,11 +223,9 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
         this.log("Flat rendering boundaries [" + fovMin.toFixed() + ", " + fovMax.toFixed() + "]");
         this._viewer.renderer.camera.fovMax = fovMax;
         this._viewer.renderer.camera.fovMin = fovMin;
-
-        this.get
-
     }
-    else {
+    else
+    {
         this._texture.generateMipmaps = false;
         this._texture.minFilter = THREE.LinearFilter;
     }
@@ -576,7 +576,8 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         {
             this._addQuadrilateralCoordsAttribute();
         }
-        else if (this._mediaFormat === FORGE.MediaFormat.FLAT) {
+        else if (this._mediaFormat === FORGE.MediaFormat.FLAT)
+        {
             this._mesh.position.set(0, 0, -this._size * 0.5);
             this._mesh.material.side = THREE.FrontSide;
         }

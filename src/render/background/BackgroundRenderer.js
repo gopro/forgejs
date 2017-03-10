@@ -237,7 +237,8 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "textureSize",
     /** @this {FORGE.BackgroundRenderer} */
     get: function()
     {
-        if (this._texture === null || typeof this._texture.image === "undefined") {
+        if (this._texture === null || typeof this._texture.image === "undefined")
+        {
             return null;
         }
 

@@ -758,21 +758,25 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
  */
 FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
 {
-    if (vrEnabled === true) {
-        this.log("VR on - background type = MESH")
+    if (vrEnabled === true)
+    {
+        this.log("VR on - background type = MESH");
         this._backgroundRendererType = FORGE.BackgroundType.MESH;
         return;
     }
 
     if (this._sceneConfig.media.source.format === FORGE.MediaType.CUBE || 
         this._sceneConfig.media.source.format === FORGE.MediaType.FLAT ||
-        typeof this._sceneConfig.media.source.format === "undefined") {
+        typeof this._sceneConfig.media.source.format === "undefined")
+    {
 
-        if (this._view.type === FORGE.ViewType.FLAT) {
+        if (this._view.type === FORGE.ViewType.FLAT)
+        {
             this._backgroundRendererType = FORGE.BackgroundType.SHADER;
         }
 
-        else {
+        else
+        {
             this._backgroundRendererType = FORGE.BackgroundType.MESH;
         }
     }
@@ -841,18 +845,13 @@ FORGE.RenderManager.prototype.render = function()
 
         this._webGLRenderer.setViewport(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 
-        var cam = camera;
-        if (vr === false) {
-            if (this._sceneConfig.media.source.format === FORGE.MediaFormat.FLAT) {
-                cam = this._camera.flat;
-            }
-            else {
-                cam = null;
-            }
+        if (vr === false)
+        {
+            camera = null;
         }
-        this._drawBackground(cam);
+        this._drawBackground(camera);
 
-        this._renderPipeline.render(cam);
+        this._renderPipeline.render(camera);
 
         // Render perspective camera children (objects in camera local space)
         this._webGLRenderer.clearDepth();

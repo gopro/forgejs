@@ -73,14 +73,16 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
     // When repeat is ON, set yaw and pitch min and max depending on
     // texture and screen ratios
 
-    if (this._repeatX === false) {
+    if (this._repeatX === false)
+    {
         var hfov = vfov * this._viewer.renderer.displayResolution.ratio;
         var texRatio = this._viewer.renderer.backgroundRenderer.textureSize.ratio;
         this._yawMax = Math.max(0, (Math.PI / texRatio) - hfov * 0.5);
         this._yawMin = -this._yawMax;
     }
 
-    if (this._repeatY === false) {
+    if (this._repeatY === false)
+    {
         this._pitchMax = 0.5 * Math.max(0, Math.PI - vfov);
         this._pitchMin = -this._pitchMax;
     }
@@ -108,11 +110,9 @@ FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
  * Convert a point from world space to screen space.
  *
  * @method FORGE.ViewFlat#worldToScreen
- * @param {THREE.Vector3} worldPt - 3D point in world space
- * @param {number} parallaxFactor - parallax factor [0..1]
  * @return {THREE.Vector2} point in screen coordinates
  */
-FORGE.ViewFlat.prototype.worldToScreen = function(worldPt, parallaxFactor)
+FORGE.ViewFlat.prototype.worldToScreen = function()
 {
     return new THREE.Vector2();
 };
@@ -121,10 +121,9 @@ FORGE.ViewFlat.prototype.worldToScreen = function(worldPt, parallaxFactor)
  * Convert a point from screen space to world space.
  *
  * @method FORGE.ViewFlat#screenToWorld
- * @param {THREE.Vector2} screenPt - 2D point in screen space [0..w, 0..h]
  * @return {THREE.Vector3} world point
  */
-FORGE.ViewFlat.prototype.screenToWorld = function(screenPt)
+FORGE.ViewFlat.prototype.screenToWorld = function()
 {
     return new THREE.Vector3();
 };

@@ -710,12 +710,14 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
 
     // Wrap the value between -PI and +PI, except for FLAT view where we apply texture ratio
     if (this._viewer.renderer.backgroundRenderer !== null &&
-        this._viewer.renderer.view.type === FORGE.ViewType.FLAT) {
+        this._viewer.renderer.view.type === FORGE.ViewType.FLAT)
+    {
         var disp = this._viewer.renderer.backgroundRenderer.displayObject;
         var ratio = disp.width / disp.height;
         value = FORGE.Math.wrap(value, -Math.PI * ratio, Math.PI * ratio);
     }
-    else {
+    else
+    {
         value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
     }
 
@@ -893,7 +895,8 @@ FORGE.Camera.prototype._setFov = function(value, unit)
 
     // If fov has changed, ensure angles are inside camera and view boundaries
     // by calling their setters with their current value
-    if (changed === true) {
+    if (changed === true)
+    {
         this._setYaw(this._yaw);
         this._setPitch(this._pitch);
         this._setRoll(this._roll);
