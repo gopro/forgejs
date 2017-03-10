@@ -3,12 +3,11 @@
  *
  * @constructor FORGE.ViewRectilinear
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.Camera} camera - {@link FORGE.Camera} reference
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewRectilinear = function(viewer, camera)
+FORGE.ViewRectilinear = function(viewer)
 {
-    FORGE.ViewBase.call(this, viewer, camera, "ViewRectilinear", FORGE.ViewType.RECTILINEAR);
+    FORGE.ViewBase.call(this, viewer, "ViewRectilinear", FORGE.ViewType.RECTILINEAR);
 
     this._boot();
 };
@@ -38,8 +37,8 @@ FORGE.ViewRectilinear.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
 
-    this._camera.fovMin = 40;
-    this._camera.fovMax = 140;
+    this._fovMin = FORGE.Math.degToRad(40);
+    this._fovMax = FORGE.Math.degToRad(140);
 };
 
 /**
@@ -50,7 +49,7 @@ FORGE.ViewRectilinear.prototype._boot = function()
  */
 FORGE.ViewRectilinear.prototype.updateUniforms = function(uniforms)
 {
-    var fov = FORGE.Math.clamp(this._camera.fov, this._camera.fovMin, this._camera.fovMax);
+    var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
 
     this._projectionScale = Math.tan(FORGE.Math.degToRad(fov / 2));
     uniforms.tProjectionScale.value = this._projectionScale;
@@ -72,7 +71,7 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
     var worldPt4 = new THREE.Vector4(worldPt.x, worldPt.y, worldPt.z, 1.0);
 
     // Apply reversed rotation
-    var camEuler = FORGE.Math.rotationMatrixToEuler(this._camera.modelView);
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
     var rotation = FORGE.Math.eulerToRotationMatrix(camEuler.yaw, camEuler.pitch, camEuler.roll, true);
     rotation = rotation.transpose();
     worldPt4.applyMatrix4(rotation);
@@ -108,7 +107,7 @@ FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
 
     var cameraPt = new THREE.Vector4(fragment.x, fragment.y, -1, 0);
 
-    var worldPt = cameraPt.applyMatrix4(this._camera.modelViewInverse).normalize();
+    var worldPt = cameraPt.applyMatrix4(this._viewer.camera.modelViewInverse).normalize();
 
     return new THREE.Vector3(worldPt.x, worldPt.y, worldPt.z);
 };

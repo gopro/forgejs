@@ -3,12 +3,11 @@
  *
  * @constructor FORGE.ViewBase
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.Camera} camera - {@link FORGE.Camera} reference.
  * @param {string} className - object className.
  * @param {string} type - object view type.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ViewBase = function(viewer, camera, className, type)
+FORGE.ViewBase = function(viewer, className, type)
 {
     /**
      * The Viewer reference.
@@ -17,14 +16,6 @@ FORGE.ViewBase = function(viewer, camera, className, type)
      * @private
      */
     this._viewer = viewer;
-
-    /**
-     * The Camera reference.
-     * @name FORGE.ViewBase#_camera
-     * @type {FORGE.Camera}
-     * @private
-     */
-    this._camera = camera;
 
     /**
      * Projection scale.
@@ -41,6 +32,48 @@ FORGE.ViewBase = function(viewer, camera, className, type)
      * @private
      */
     this._type = type;
+
+    /**
+     * Fov min angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._fovMin = null;
+
+    /**
+     * Fov max angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._fovMax = null;
+
+    /**
+     * Yaw min angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._yawMin = null;
+
+    /**
+     * Yaw max angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._yawMax = null;
+
+    /**
+     * Pitch min angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._pitchMin = null;
+
+    /**
+     * Pitch min angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._pitchMax = null;
 
     FORGE.BaseObject.call(this, className || "ViewBase");
 };
@@ -194,7 +227,7 @@ Object.defineProperty(FORGE.ViewBase.prototype, "fovMin",
     /** @this {FORGE.ViewBase} */
     get: function()
     {
-        return this._camera.fovMin;
+        return this._fovMin;
     }
 });
 
@@ -209,6 +242,63 @@ Object.defineProperty(FORGE.ViewBase.prototype, "fovMax",
     /** @this {FORGE.ViewBase} */
     get: function()
     {
-        return this._camera.fovMax;
+        return this._fovMax;
     }
 });
+
+/**
+ * Get the minimum yaw value in degree.
+ * @name FORGE.ViewBase#yawMin
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "yawMin",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._yawMin;
+    }
+});
+
+/**
+ * Get the maximum yaw value in degree.
+ * @name FORGE.ViewBase#yawMax
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "yawMax",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._yawMax;
+    }
+});
+
+/**
+ * Get the minimum pitch value in degree.
+ * @name FORGE.ViewBase#pitchMin
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "pitchMin",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._pitchMin;
+    }
+});
+
+/**
+ * Get the maximum pitch value in degree.
+ * @name FORGE.ViewBase#pitchMax
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "pitchMax",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._pitchMax;
+    }
+});
+
