@@ -765,8 +765,8 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         return;
     }
 
-    if (this._sceneConfig.media.source.format === FORGE.MediaType.CUBE || 
-        this._sceneConfig.media.source.format === FORGE.MediaType.FLAT ||
+    if (this._sceneConfig.media.source.format === FORGE.MediaFormat.CUBE || 
+        this._sceneConfig.media.source.format === FORGE.MediaFormat.FLAT ||
         typeof this._sceneConfig.media.source.format === "undefined")
     {
 

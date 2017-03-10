@@ -31,6 +31,12 @@ THREE.NearestFilter;
  * @const
  * @type {number}
  */
+THREE.LinearMipMapLinearFilter;
+
+/**
+ * @const
+ * @type {number}
+ */
 THREE.RGBFormat;
 
 /**
@@ -1104,6 +1110,11 @@ THREE.PerspectiveCamera.prototype.clone = function() {};
  * @return {!THREE.OrthographicCamera}
  */
 THREE.OrthographicCamera = function(arg1, arg2, arg3, arg4, arg5, arg6) {};
+
+/**
+ * @return {THREE.OrthographicCamera}
+ */
+THREE.OrthographicCamera.prototype.updateProjectionMatrix = function() {};
 
 /**
  * @constructor
