@@ -190,6 +190,7 @@ FORGE.BackgroundRenderer.prototype.update = function()
         this._mesh.material.uniforms.tModelViewMatrixInverse.value = this._viewer.renderer.camera.modelViewInverse;
     }
 
+
     this._viewer.renderer.view.updateUniforms(this._mesh.material.uniforms);
 };
 
@@ -225,6 +226,24 @@ FORGE.BackgroundRenderer.prototype.destroy = function()
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
+
+/**
+ * Get texture size.
+ * @name FORGE.BackgroundRenderer#textureSize
+ * @type {FORGE.Size}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "textureSize",
+{
+    /** @this {FORGE.BackgroundRenderer} */
+    get: function()
+    {
+        if (this._texture === null || typeof this._texture.image === "undefined") {
+            return null;
+        }
+
+        return new FORGE.Size(this._texture.image.width, this._texture.image.height);
+    }
+});
 
 /**
  * Get background render target.

@@ -180,6 +180,8 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
     this._texture.format = THREE.RGBAFormat;
     this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
     
+    this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+
     if (this._mediaFormat === FORGE.MediaFormat.FLAT) {
         // Enable mipmaps for flat rendering to avoid aliasing
         this._texture.generateMipmaps = true;
@@ -536,6 +538,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
     if (this._texture !== null)
     {
         material.uniforms.tTexture.value = this._texture;
+        material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
     }
 
     if (this._mediaType === FORGE.MediaType.GRID)

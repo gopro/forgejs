@@ -125,6 +125,10 @@ FORGE.BackgroundShaderRenderer.prototype._setDisplayObject = function(displayObj
     this._texture.needsUpdate = true;
 
     this._mesh.material.uniforms.tTexture.value = this._texture;
+
+    if (typeof this._mesh.material.uniforms.tTextureRatio !== "undefined") {
+        this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+    }
 };
 
 /**
