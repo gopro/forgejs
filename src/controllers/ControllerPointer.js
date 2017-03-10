@@ -347,15 +347,23 @@ FORGE.ControllerPointer.prototype.update = function()
 
     var invert = this._orientation.invert ? -1 : 1;
 
+    var dx = this._velocity.x + this._inertia.x;
+    var dy = this._velocity.y + this._inertia.y;
+    
+    if (dx === 0 && dy === 0)
+    {
+        return;
+    }
+
     //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
-    var yaw = invert * (this._velocity.x + this._inertia.x);
+    var yaw = invert * dx;
     if(Math.abs(yaw) > 0.05)
     {
         this._camera.yaw += yaw;
         this._camera.flat.position.x += 10 * yaw;
     }
 
-    var pitch = invert * (this._velocity.y + this._inertia.y);
+    var pitch = invert * dy;
     //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
     if(Math.abs(pitch) > 0.05)
     {
