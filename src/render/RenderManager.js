@@ -486,13 +486,13 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
             volume = (typeof sceneConfig.sound.options.volume === "number") ? FORGE.Math.clamp(sceneConfig.sound.options.volume, 0, 1) : 1;
             loop = (typeof sceneConfig.sound.options.loop === "boolean") ? sceneConfig.sound.options.loop : false;
             startTime = (typeof sceneConfig.sound.options.startTime === "number") ? sceneConfig.sound.options.startTime : 0;
-            autoPlay = (typeof sceneConfig.sound.options.autoPlay === "boolean" && document[FORGE.Device.visibilityState] === "visible") ? sceneConfig.sound.options.autoPlay : false;
+            autoPlay = (typeof sceneConfig.sound.options.autoPlay === "boolean") ? sceneConfig.sound.options.autoPlay : false;
         }
 
         if (typeof sceneConfig.sound.source.url !== "undefined" && sceneConfig.sound.source.url !== "")
         {
             // Warning : UID is not registered and applied to the FORGE.Sound object for registration
-            this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC ? true : false));
+            this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC));
 
             if (typeof sceneConfig.sound.options !== "undefined" && sceneConfig.sound.options !== null)
             {

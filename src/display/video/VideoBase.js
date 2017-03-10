@@ -123,3 +123,78 @@ FORGE.VideoBase.prototype.destroy = function()
 
     FORGE.DisplayObject.prototype.destroy.call(this);
 };
+
+/**
+ * Get the playing status of the video.
+ * @name FORGE.VideoBase#playing
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoBase.prototype, "playing",
+{
+    /** @this {FORGE.VideoBase} */
+    get: function()
+    {
+        return this._playing;
+    }
+});
+
+/**
+ * Get the number of play action of the video.
+ * @name FORGE.VideoBase#playCount
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoBase.prototype, "playCount",
+{
+    /** @this {FORGE.VideoBase} */
+    get: function()
+    {
+        return this._playCount;
+    }
+});
+
+/**
+ * Get the canPlay status of the video.
+ * @name FORGE.VideoBase#canPlay
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoBase.prototype, "canPlay",
+{
+    /** @this {FORGE.VideoBase} */
+    get: function()
+    {
+        return this._canPlay;
+    }
+});
+
+/**
+ * Get the paused status of the video.
+ * @name FORGE.VideoBase#paused
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoBase.prototype, "paused",
+{
+    /** @this {FORGE.VideoBase} */
+    get: function()
+    {
+        return this._paused;
+    }
+});
+
+/**
+ * Get the number of the video ends.
+ * @name FORGE.VideoBase#endCount
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.VideoBase.prototype, "endCount",
+{
+    /** @this {FORGE.VideoBase} */
+    get: function()
+    {
+        return this._endCount;
+    }
+});

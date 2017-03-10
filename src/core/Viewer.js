@@ -297,7 +297,7 @@ FORGE.Viewer.prototype.constructor = FORGE.Viewer;
 FORGE.Viewer.DEFAULT_CONFIG = {
     background: "#000",
     autoResume: true,
-    autoPause: false
+    autoPause: true
 };
 
 /**
@@ -771,21 +771,6 @@ Object.defineProperty(FORGE.Viewer.prototype, "ready",
     get: function()
     {
         return this._ready;
-    }
-});
-
-/**
- * Get the paused status.
- * @name FORGE.Viewer#paused
- * @type {boolean}
- * @readonly
- */
-Object.defineProperty(FORGE.Viewer.prototype, "paused",
-{
-    /** @this {FORGE.Viewer} */
-    get: function()
-    {
-        return this._paused;
     }
 });
 
