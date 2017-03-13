@@ -77,7 +77,7 @@ var ButtonSkinStateConfig;
 var TextFieldConfig;
 
 /**
- * @typedef {{key:(string|undefined), i18n:(boolean|undefined), url:(string|undefined), frames:(string|Array<ImageFrameConfig>|undefined), alpha:(number|undefined), keepRatio:(boolean|undefined), maximized:(boolean|undefined), width:(number|string|undefined), height:(number|string|undefined)}}
+ * @typedef {{key:(string|undefined), i18n:(boolean|undefined), url:(string|undefined), frames:(string|Array<ImageFrameConfig>|undefined), alpha:(number|undefined), keepRatio:(boolean|undefined), maximized:(boolean|undefined), width:(number|string|undefined), height:(number|string|undefined), renderMode:(string|undefined)}}
  * @name TextFieldConfig
  * @property {string=} key
  * @property {boolean=} i18n
@@ -88,6 +88,7 @@ var TextFieldConfig;
  * @property {boolean=} maximized
  * @property {(string|number)=} width
  * @property {(string|number)=} height
+ * @property {string=} renderMode
  */
 var ImageConfig;
 

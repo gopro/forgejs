@@ -13,7 +13,7 @@ FORGE.Image = function(viewer, config, className)
     /**
      * Image configuration
      * @name  FORGE.Image#_config
-     * @type {?Object|string}
+     * @type {?ImageConfig|string}
      * @property {string} key - The cache key associated to this image.
      * @property {string} url - The URL of the image if not i18n
      * @property {string} i18n - The i18n key to find the URL of an i18n image.
