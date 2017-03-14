@@ -582,29 +582,12 @@ FORGE.Device = (function(c)
     Tmp.prototype._checkBrowserApi = function()
     {
         //Page Visibility API
-        var visibilityChange =
-            [
-                "visibilitychange",
-                "mozvisibilitychange",
-                "webkitvisibilitychange",
-                "msvisibilitychange"
-            ];
-        var visibilityState =
-            [
-                "hidden",
-                "mozHidden",
-                "webkitHidden",
-                "msHidden"
-            ];
-        for (var m = 0, mm = visibilityState.length; m < mm; m++)
-        {
-            if (typeof document[visibilityState[m]] !== "undefined")
-            {
-                this.visibilityState = visibilityState[m];
-                this.visibilityChange = visibilityChange[m];
-                break;
-            }
-        }
+        this.visibilityState = "visibilityState" in document ? "visibilityState" :
+            "webkitVisibilityState" in document ? "webkitVisibilityState" :
+            "mozVisibilityState" in document ? "mozVisibilityState" :
+            null;
+
+        this.visibilityChange = this.visibilityState.slice(0, -5) + "change";
 
         //Screen orientation API
         var orientation =

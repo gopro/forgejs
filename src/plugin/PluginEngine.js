@@ -405,15 +405,15 @@ FORGE.PluginEngine.prototype._versionCheck = function(config)
     {
         if(typeof viewerVersion[i] !== "undefined")
         {
-            viewerN = parseInt(viewerVersion[i], 10);
+            viewerN += parseInt(viewerVersion[i], 10) * inc;
         }
         if(typeof minVersion[i] !== "undefined")
         {
-            minN = parseInt(minVersion[i], 10);
+            minN += parseInt(minVersion[i], 10) * inc;
         }
         if(typeof maxVersion[i] !== "undefined")
         {
-            maxN = parseInt(maxVersion[i], 10);
+            maxN += parseInt(maxVersion[i], 10) * inc;
         }
 
         inc *= 10;

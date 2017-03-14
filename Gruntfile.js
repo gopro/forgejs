@@ -117,6 +117,7 @@ module.exports = function(grunt)
         "src/plugin/PluginObjectFactory.js",
 
         "src/system/Device.js",
+        "src/system/System.js",
         "src/system/RequestAnimationFrame.js",
         "src/system/History.js",
 
@@ -149,6 +150,7 @@ module.exports = function(grunt)
         "src/display/sprite/SpriteAnimationManager.js",
         "src/display/sprite/SpriteAnimation.js",
 
+        "src/display/video/VideoBase.js",
         "src/display/video/VideoHTML5.js",
         "src/display/video/VideoDash.js",
         "src/display/video/VideoTimeRanges.js",

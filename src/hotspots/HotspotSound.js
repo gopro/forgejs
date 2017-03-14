@@ -197,9 +197,16 @@ FORGE.HotspotSound.prototype._setupSound = function()
     this._sound.loop = this._loop;
     this._sound.startTime = this._startTime;
 
-    if(this._autoPlay === true)
+    if (this._autoPlay === true)
     {
-        this._sound.play(this._startTime, this._loop, true);
+        if (document[FORGE.Device.visibilityState] === "visible")
+        {
+            this._sound.play(this._startTime, this._loop, true);
+        }
+        else
+        {
+            this._sound.resumed = true;
+        }
     }
 };
 
