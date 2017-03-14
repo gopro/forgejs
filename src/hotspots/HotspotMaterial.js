@@ -393,16 +393,30 @@ FORGE.HotspotMaterial.prototype._setupWithGraphics = function()
  */
 FORGE.HotspotMaterial.prototype._setupComplete = function()
 {
-    this._createMaterial();
+    this._createShaderMaterial();
+
+    this._ready = true;
+
+    if (this._onReady !== null)
+    {
+        this._onReady.dispatch();
+    }
 };
 
 /**
- * Create the THREE.MeshBasicMaterial that will be used on a THREE.Mesh.<br>
- * @method FORGE.HotspotMaterial#_createMaterial
+ * Create the THREE.MeshBasicMaterial that will be used on a THREE.Mesh
+ * @method FORGE.HotspotMaterial#_createShaderMaterial
  * @private
  */
-FORGE.HotspotMaterial.prototype._createMaterial = function()
+FORGE.HotspotMaterial.prototype._createShaderMaterial = function()
 {
+    this.log("create shader material");
+
+    if(this._viewer.renderer.view.current === null)
+    {
+        return;
+    }
+
     if (this._material !== null)
     {
         this._material.dispose();
@@ -414,18 +428,19 @@ FORGE.HotspotMaterial.prototype._createMaterial = function()
     if (this._type === FORGE.HotspotMaterial.types.GRAPHICS)
     {
         shader.fragmentShader = FORGE.ShaderChunk.wts_frag_color;
-        shader.uniforms.tColor = { type: "c", value: new THREE.Color( 0x202020 ) };
+        shader.uniforms.tColor = { type: "c", value: new THREE.Color(this._color) };
     }
+
     shader.uniforms.tOpacity = { type: "f", value: this._opacity };
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
 
-    this._material = new THREE.RawShaderMaterial({
+    this._material = new THREE.RawShaderMaterial(
+    {
         fragmentShader: fragmentShader,
         vertexShader: vertexShader,
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
-        // wireframe: true,
         side: THREE.DoubleSide,
         name: "HotspotMaterial"
     });
@@ -436,13 +451,11 @@ FORGE.HotspotMaterial.prototype._createMaterial = function()
         this._material.transparent = this._transparent;
         this._material.needsUpdate = true;
     }
+};
 
-    this._ready = true;
-
-    if (this._onReady !== null)
-    {
-        this._onReady.dispatch();
-    }
+FORGE.HotspotMaterial.prototype.updateShader = function()
+{
+    this._createShaderMaterial();
 };
 
 /**
@@ -474,7 +487,6 @@ FORGE.HotspotMaterial.prototype.update = function()
         this._texture.needsUpdate = true;
     }
 };
-
 
 /**
  * Set texture source
@@ -522,8 +534,6 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
  */
 FORGE.HotspotMaterial.prototype.destroy = function()
 {
-    this._viewer.renderer.onViewReady.remove(this._setupComplete, this);
-
     this._textureFrame = null;
 
     if (this._texture !== null)
