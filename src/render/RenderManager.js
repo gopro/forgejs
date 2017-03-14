@@ -807,72 +807,62 @@ FORGE.RenderManager.prototype.render = function()
 };
 
 /**
-
-/**
- * Enable / disable VR display
- *
+ * Enable VR display
  * @method FORGE.RenderManager#enableVR
- * @param {boolean} status new VR display status
  */
-FORGE.RenderManager.prototype.enableVR = function(status)
+FORGE.RenderManager.prototype.enableVR = function()
 {
-    if (this._renderDisplay.presentingVR === status || FORGE.Device.webVR !== true)
+    if (this._renderDisplay.presentingVR === true || FORGE.Device.webVR !== true)
     {
         return;
     }
 
-    this._renderDisplay.enableVR(status);
-
-    if (status)
-    {
-        this._viewType = this._view.type;
-        this.setView(FORGE.ViewType.RECTILINEAR);
-    }
-    else
-    {
-        this.setView(this._viewType);
-        this._camera.roll = 0;
-    }
+    this._renderDisplay.enableVR();
+    this._viewManager.enableVR();
 
     // If we enter VR with a cubemap: do nothing. With an equi: toggle to mesh renderer
-    // If we exit VR with a cubemap: do nothing. With an equi: toggle to shader renderer
     if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null && typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null && this._sceneConfig.media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
     {
-        if (status === true)
-        {
-            this._backgroundRendererType = FORGE.BackgroundType.MESH;
-        }
-        else
-        {
-            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
-        }
-        this._setBackgroundRenderer(this._backgroundRendererType);
+        this._setBackgroundRenderer(FORGE.BackgroundType.MESH);
     }
 };
 
 /**
+ * Disable VR display
+ * @method FORGE.RenderManager#disableVR
+ */
+FORGE.RenderManager.prototype.disableVR = function()
+{
+    if (this._renderDisplay.presentingVR === false || FORGE.Device.webVR !== true)
+    {
+        return;
+    }
+
+    this._renderDisplay.disableVR();
+    this._viewManager.disableVR();
+
+    // If we exit VR with a cubemap: do nothing. With an equi: toggle to shader renderer
+    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null && typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null && this._sceneConfig.media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
+    {
+        this._setBackgroundRenderer(FORGE.BackgroundType.SHADER);
+    }
+}
+
+/**
  * Toggle VR display
- *
  * @method FORGE.RenderManager#toggleVR
  */
 FORGE.RenderManager.prototype.toggleVR = function()
 {
-    this.enableVR(!this._renderDisplay.presentingVR);
-};
-
-{
+    if(this._renderDisplay.presentingVR === true)
     {
-    }
-
-
-    {
-    }
-
-    {
+        this.disableVR();
     }
     else
     {
+        this.enableVR();
     }
+};
 
 /**
  * Renderer destroy sequence

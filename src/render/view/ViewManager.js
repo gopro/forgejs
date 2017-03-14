@@ -126,6 +126,29 @@ FORGE.ViewManager.prototype.load = function(config)
 };
 
 /**
+ * Enable VR backup the view type then force to rectilinear
+ * @method FORGE.ViewManager#enableVR
+ */
+FORGE.ViewManager.prototype.enableVR = function()
+{
+    this._viewTypeBackup = this._view.type;
+    this._setView(FORGE.ViewType.RECTILINEAR);
+};
+
+/**
+ * Disable VR restore the view type.
+ * @method FORGE.ViewManager#disableVR
+ */
+FORGE.ViewManager.prototype.disableVR = function()
+{
+    if(this._viewTypeBackup !== "")
+    {
+        this._setView(this._viewTypeBackup); // Restore the view as before the VR mode
+        this._viewer.camera.roll = 0; // Reset the roll to 0
+    }
+};
+
+/**
  * Get the current view object.
  * @name  FORGE.ViewManager#current
  * @type {FORGE.ViewBase}
