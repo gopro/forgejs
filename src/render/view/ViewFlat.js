@@ -39,7 +39,7 @@ FORGE.ViewFlat.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.flat;
  * Background shader world to screen
  * @type {Object}
  */
-FORGE.ViewFlat.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.rectilinear;
+FORGE.ViewFlat.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.flat;
 
 /**
  * Boot sequence.
@@ -57,8 +57,8 @@ FORGE.ViewFlat.prototype._boot = function()
     this._pitchMin = FORGE.Math.degToRad(-180);
     this._pitchMax = FORGE.Math.degToRad(180);
 
-    this._fovMin = FORGE.Math.degToRad(20);
-    this._fovMax = FORGE.Math.degToRad(180);
+    this._fovMin = 20;
+    this._fovMax = 180;
 };
 
 /**
@@ -98,12 +98,30 @@ FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
 {
     this._updateViewParams();
 
-    uniforms.tRepeatX.value = this._repeatX ? 1 : 0;
-    uniforms.tRepeatY.value = this._repeatY ? 1 : 0;
+    if (uniforms.hasOwnProperty('tRepeatX'))
+    {
+        uniforms.tRepeatX.value = this._repeatX ? 1 : 0;
+    }
 
-    uniforms.tYaw.value = FORGE.Math.degToRad(this._viewer.camera.yaw);
-    uniforms.tPitch.value = FORGE.Math.degToRad(this._viewer.camera.pitch);
-    uniforms.tFov.value = FORGE.Math.degToRad(this._viewer.renderer.camera.fov);
+    if (uniforms.hasOwnProperty('tRepeatY'))
+    {
+        uniforms.tRepeatY.value = this._repeatY ? 1 : 0;
+    }
+
+    if (uniforms.hasOwnProperty('tYaw'))
+    {
+        uniforms.tYaw.value = FORGE.Math.degToRad(this._viewer.camera.yaw);
+    }
+
+    if (uniforms.hasOwnProperty('tPitch'))
+    {
+        uniforms.tPitch.value = FORGE.Math.degToRad(this._viewer.camera.pitch);
+    }
+
+    if (uniforms.hasOwnProperty('tFov'))
+    {
+        uniforms.tFov.value = FORGE.Math.degToRad(this._viewer.renderer.camera.fov);
+    }
 };
 
 /**
