@@ -122,8 +122,12 @@ FORGE.Hotspot3D.prototype._boot = function()
     this._onBeforeRenderBound = this._onBeforeRender.bind(this);
     this._onAfterRenderBound = this._onAfterRender.bind(this);
 
+    this._mesh.visible = false;
     this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
     this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);
+
+    this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
+
     if (typeof this._config !== "undefined" && this._config !== null)
     {
         this._parseConfig(this._config);
@@ -189,9 +193,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         materialConfig = /** @type {HotspotMaterialConfig} */ (FORGE.Utils.extendMultipleObjects(materialConfig, FORGE.HotspotMaterial.presets.DEBUG));
     }
 
-    this._material.onReady.add(this._materialReadyHandler, this);
-    // !! The loading of the material is now handled by the states manager !!
-
     if (typeof config.sound === "object" && config.sound !== null)
     {
         this._sound = new FORGE.HotspotSound(this._viewer);
@@ -209,11 +210,15 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     }
 
     this._updatePosition();
+
+    this._states.onLoadComplete.add(this._stateLoadComplete, this);
     this._states.load();
 };
 
 FORGE.Hotspot3D.prototype._createGeometry = function(config)
 {
+    this.log("create geometry");
+
     if (typeof config !== "undefined" && typeof config.type === "string")
     {
         var options = config.options;
@@ -289,38 +294,20 @@ FORGE.Hotspot3D.prototype._onAfterRender = function()
 
 /**
  * Event handler for material ready. Triggers the creation of the hotspot3D.
- * @method FORGE.Hotspot3D#_materialReadyHandler
+ * @method FORGE.Hotspot3D#_stateLoadComplete
  * @private
  */
-FORGE.Hotspot3D.prototype._materialReadyHandler = function()
+FORGE.Hotspot3D.prototype._stateLoadComplete = function()
 {
+    this.log("material ready handler");
+
     this._mesh.material = this._material.material;
-
-    this._createHotspot3D();
-
-
+    this._mesh.visible = true;
 
     if (this._animation.autoPlay === true)
     {
         this._animation.play();
     }
-};
-
-/**
- * Final init step once setup is done.
- * @method FORGE.Hotspot3D#_setupDoneCallback
- * @private
- */
-FORGE.Hotspot3D.prototype._createHotspot3D = function()
-{
-    this._mesh.geometry.scale(this._transform.scale.x, this._transform.scale.y, this._transform.scale.z);
-
-    // Only enable frustum culling when view is rectilinear and frustum makes sense
-    this._mesh.frustumCulled = this._viewer.renderer.view.current instanceof FORGE.ViewRectilinear;
-
-    this._updatePosition();
-
-    this._ready = this._checkReady();
 
     if (this._onReady !== null)
     {
@@ -335,6 +322,8 @@ FORGE.Hotspot3D.prototype._createHotspot3D = function()
  */
 FORGE.Hotspot3D.prototype._updatePosition = function()
 {
+    this.log("update position");
+
     this._mesh.position.x = this._transform.position.x;
     this._mesh.position.y = this._transform.position.y;
     this._mesh.position.z = this._transform.position.z;
@@ -374,7 +363,21 @@ FORGE.Hotspot3D.prototype._updatePosition = function()
  */
 FORGE.Hotspot3D.prototype._checkReady = function()
 {
-    return (this._mesh.geometry.index !== null && this._material.ready === true);
+    return (this._states.ready === true);
+};
+
+/**
+ * View change handler
+ * @method FORGE.Hotspot3D#_viewChangeHandler
+ * @private
+ */
+FORGE.Hotspot3D.prototype._viewChangeHandler = function()
+{
+    // Only enable frustum culling when view is rectilinear and frustum makes sense
+    this._mesh.frustumCulled = this._viewer.renderer.view.current instanceof FORGE.ViewRectilinear;
+
+    this._material.updateShader();
+    this._mesh.material = this._material.material;
 };
 
 /**
@@ -415,11 +418,6 @@ FORGE.Hotspot3D.prototype.out = function()
  */
 FORGE.Hotspot3D.prototype.update = function()
 {
-    if (this._material !== null)
-    {
-        this._material.update();
-    }
-
     if (this._sound !== null)
     {
         this._sound.update();
@@ -432,10 +430,14 @@ FORGE.Hotspot3D.prototype.update = function()
  */
 FORGE.Hotspot3D.prototype.destroy = function()
 {
-    this._material.onReady.remove(this._materialReadyHandler, this);
-
     this._onBeforeRenderBound = null;
     this._onAfterRenderBound = null;
+
+    if(this._states !== null)
+    {
+        this._states.destroy();
+        this._states = null;
+    }
 
     if (this._transform !== null)
     {
