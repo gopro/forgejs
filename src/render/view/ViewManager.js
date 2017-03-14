@@ -23,12 +23,17 @@ FORGE.ViewManager = function(viewer)
      */
     this._view = null;
 
+    /**
+     * Ready flag
+     * @name FORGE.ViewManager#_ready
+     * @type {boolean}
+     */
     this._ready = false;
 
     /**
      * The view type to restore when the user quit VR mode
      * @name  FORGE.ViewManager#_viewTypeBackup
-     * @type {String}
+     * @type {string}
      * @private
      */
     this._viewTypeBackup = "";
@@ -49,21 +54,21 @@ FORGE.ViewManager.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.ViewManager.prototype.constructor = FORGE.ViewManager;
 
 /**
- * Init view with info contained in configuration
- * @method FORGE.RenderManager#_initView
- * @param {FORGE.SceneParser} sceneConfig - scene configuration
+ * Set the view type
+ * @method FORGE.ViewManager#_setView
+ * @param {string} type - The type of the view to set
  * @private
  */
 FORGE.ViewManager.prototype._setView = function(type)
 {
-    this.log("set View");
-
     if (this._view !== null && this._view.type === type)
     {
         return;
     }
 
     this._clearView();
+
+    this.log("set view "+type);
 
     switch (type)
     {
@@ -85,19 +90,30 @@ FORGE.ViewManager.prototype._setView = function(type)
     }
 };
 
+/**
+ * Clear the view
+ * @method FORGE.ViewManager#_clearView
+ * @private
+ */
 FORGE.ViewManager.prototype._clearView = function()
 {
-    this.log("clear View");
-
     this._ready = false;
 
     if (this._view !== null)
     {
+        this.log("clear view");
+
         this._view.destroy();
         this._view = null;
     }
 };
 
+/**
+ * Load a view configuration
+ * @method FORGE.ViewManager#load
+ * @param  {ViewConfig} config - The configuration of the view to load
+ * @private
+ */
 FORGE.ViewManager.prototype.load = function(config)
 {
     var sceneViewConfig = /** @type {ViewConfig} */ (config);
