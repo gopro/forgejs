@@ -9,6 +9,7 @@ uniform sampler2D tTexture;
 uniform vec2 tViewportResolution;
 uniform float tViewportResolutionRatio;
 uniform float tTextureRatio;
+uniform vec2 tTextureSize;
 uniform float tFov;
 uniform float tYaw;
 uniform float tPitch;
