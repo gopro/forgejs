@@ -253,24 +253,11 @@ FORGE.Hotspot3D.prototype._createGeometry = function(config)
  */
 FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, geometry, material, group)
 {
-    //Logs these value for jscs check (if not warn parameter is not used)
-    this.log(group);
-
-    var gl = this._viewer.renderer.webGLRenderer.getContext();
-
     this._viewer.renderer.view.current.updateUniforms(material.uniforms);
 
     // Check what is the current render pass looking at the material: Hotspot or Picking Material
     if (material.name === "HotspotMaterial")
     {
-        if (this._material.type === FORGE.HotspotMaterial.types.GRAPHICS)
-        {
-            material.uniforms.tColor.value = new THREE.Color(this._material.color);
-        }
-        else
-        {
-            material.uniforms.tTexture.value = this._material._texture;
-        }
     }
     else if (material.name === "PickingMaterial")
     {
@@ -280,10 +267,10 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
         // Set also material uniform to avoid both settings will collide on first object
         if (material.program)
         {
-            var color = this._pickingColor;
+            var gl = this._viewer.renderer.webGLRenderer.getContext();
             gl.useProgram(material.program.program);
-            material.program.getUniforms().map.tColor.setValue(gl, color);
-            material.uniforms.tColor.value = color;
+            material.program.getUniforms().map.tColor.setValue(gl, this._pickingColor);
+            material.uniforms.tColor.value = this._pickingColor;
         }
     }
 };
