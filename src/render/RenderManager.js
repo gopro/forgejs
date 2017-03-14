@@ -846,7 +846,7 @@ FORGE.RenderManager.prototype.disableVR = function()
     {
         this._setBackgroundRenderer(FORGE.BackgroundType.SHADER);
     }
-}
+};
 
 /**
  * Toggle VR display

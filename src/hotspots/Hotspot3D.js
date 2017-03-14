@@ -259,6 +259,8 @@ FORGE.Hotspot3D.prototype._createGeometry = function(config)
  */
 FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, geometry, material, group)
 {
+    var g = group; // Just to avoid the jscs warning about group parameter not used.
+
     this._viewer.renderer.view.current.updateUniforms(material.uniforms);
 
     // Check what is the current render pass looking at the material: Hotspot or Picking Material
