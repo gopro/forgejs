@@ -122,6 +122,8 @@ FORGE.Hotspot3D.prototype._boot = function()
     this._onBeforeRenderBound = this._onBeforeRender.bind(this);
     this._onAfterRenderBound = this._onAfterRender.bind(this);
 
+    this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
+    this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);
     if (typeof this._config !== "undefined" && this._config !== null)
     {
         this._parseConfig(this._config);
@@ -308,8 +310,6 @@ FORGE.Hotspot3D.prototype._materialReadyHandler = function()
     this._createHotspot3D();
 
 
-    this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
-    this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);
 
     if (this._animation.autoPlay === true)
     {
