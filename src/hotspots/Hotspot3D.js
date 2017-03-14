@@ -44,14 +44,6 @@ FORGE.Hotspot3D = function(viewer, config)
     this._material = null;
 
     /**
-     * Color based on 3D Object id used for picking.
-     * @name FORGE.Hotspot3D#_pickingColor
-     * @type {THREE.Color}
-     * @private
-     */
-    this._pickingColor = null;
-
-    /**
      * Sound object for the 3D object.
      * @name  FORGE.Hotspot3D#_sound
      * @type {FORGE.HotspotSound}
@@ -315,7 +307,6 @@ FORGE.Hotspot3D.prototype._materialReadyHandler = function()
 
     this._createHotspot3D();
 
-    this._pickingColor = FORGE.PickingDrawPass.colorFrom3DObject(this._mesh);
 
     this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
     this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);

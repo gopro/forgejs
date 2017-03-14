@@ -65,6 +65,14 @@ FORGE.Object3D = function(viewer, className)
     this._hovered = false;
 
     /**
+     * Color based on 3D Object id used for picking.
+     * @name FORGE.Object3D#_pickingColor
+     * @type {THREE.Color}
+     * @private
+     */
+    this._pickingColor = null;
+
+    /**
      * Is ready?
      * @name  FORGE.Object3D#_ready
      * @type {boolean}
@@ -120,6 +128,7 @@ FORGE.Object3D.prototype._boot = function()
 {
     this._events = {};
     this._mesh = new THREE.Mesh();
+    this._pickingColor = FORGE.PickingDrawPass.colorFrom3DObject(this._mesh);
     this._viewer.renderer.objects.register(this);
 };
 
