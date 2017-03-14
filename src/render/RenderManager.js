@@ -45,25 +45,10 @@ FORGE.RenderManager = function(viewer)
     /**
      * View manager reference
      * @name FORGE.RenderManager#_viewManager
-     * @type {Forge.ViewManager}
+     * @type {FORGE.ViewManager}
      * @private
      */
     this._viewManager = null;
-
-    // /**
-    //  * View reference.
-    //  * @name FORGE.RenderManager#_view
-    //  * @type {?FORGE.ViewBase}
-    //  * @private
-    //  */
-    // this._view = null;
-
-    // *
-    //  * View type when not in VR.
-    //  * @name FORGE.RenderManager#_viewType
-    //  * @type {string}
-    //  * @private
-    // this._viewType = FORGE.ViewType.UNDEFINED;
 
     /**
      * The media reference.
@@ -154,14 +139,6 @@ FORGE.RenderManager = function(viewer)
     this._backgroundReady = false;
 
     /**
-     * View ready flag
-     * @name FORGE.RenderManager#_viewReady
-     * @type boolean
-     * @private
-     */
-    this._viewReady = false;
-
-    /**
      * Render pipeline renderer ready flag
      * @name FORGE.RenderManager#_renderPipelineReady
      * @type boolean
@@ -184,14 +161,6 @@ FORGE.RenderManager = function(viewer)
      * @private
      */
     this._onBackgroundReady = null;
-
-    /**
-     * Event dispatcher for view ready.
-     * @name FORGE.RenderManager#_onViewReady
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onViewReady = null;
 
     /**
      * Event dispatcher for media ready status.
@@ -376,39 +345,6 @@ FORGE.RenderManager.prototype._onSceneUnloadStart = function()
 
         this._media.destroy();
         this._media = null;
-    }
-};
-
-/**
- * Init view with info contained in configuration
- * @method FORGE.RenderManager#_initView
- * @param {FORGE.SceneParser} sceneConfig - scene configuration
- * @private
- */
-FORGE.RenderManager.prototype._initView = function(sceneConfig)
-{
-    var sceneViewConfig = /** @type {ViewConfig} */ (sceneConfig.view);
-    var storyViewConfig = /** @type {ViewConfig} */ (this._viewer.config.view);
-    var extendedViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(storyViewConfig, sceneViewConfig));
-
-    var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
-
-    if (this._view !== null && this._view.type === type) 
-    {
-        this.log("Render manager won't set view if it's already set");
-        return;
-    }
-
-    switch (type)
-    {
-        case FORGE.ViewType.GOPRO:
-            this.setView(FORGE.ViewType.GOPRO);
-            break;
-
-        case FORGE.ViewType.RECTILINEAR:
-        default:
-            this.setView(FORGE.ViewType.RECTILINEAR);
-            break;
     }
 };
 
@@ -871,29 +807,6 @@ FORGE.RenderManager.prototype.render = function()
 };
 
 /**
- * Screen to world conversion based on current view
- *
- * @method FORGE.RenderManager#screenToWorld
- * @param {THREE.Vector2} screenPt point in screen space
- * @return {THREE.Vector3} point in world space
- */
-FORGE.RenderManager.prototype.screenToWorld = function(screenPt)
-{
-    return this._view.screenToWorld(screenPt);
-};
-
-/**
- * World to screen conversion based on current view
- *
- * @method FORGE.RenderManager#worldToScreen
- * @param {THREE.Vector3} worldPt point in world space
- * @param {number=} parallax parallax factor [0..1]
- * @return {THREE.Vector2} screenPt point in screen space
- */
-FORGE.RenderManager.prototype.worldToScreen = function(worldPt, parallax)
-{
-    return this._view.worldToScreen(worldPt, parallax || 0);
-};
 
 /**
  * Enable / disable VR display
@@ -947,63 +860,19 @@ FORGE.RenderManager.prototype.toggleVR = function()
     this.enableVR(!this._renderDisplay.presentingVR);
 };
 
-/**
- * Renderer set view type
- *
- * @method FORGE.RenderManager#setView
- * @param {string} type - type of view
- */
-/*FORGE.RenderManager.prototype.setView = function(type)
 {
-    this.log("setView");
-
-    if (this._view !== null)
     {
-        if (this._view.type === type)
-        {
-            return;
-        }
-
-        this.log("Destroy previous view");
-        this._view.destroy();
-        this._view = null;
     }
 
-    this._viewReady = false;
 
-    if (type === FORGE.ViewType.RECTILINEAR)
     {
-        this._view = new FORGE.ViewRectilinear(this._viewer, this._camera);
     }
-    else if (type === FORGE.ViewType.GOPRO)
+
     {
-        this._view = new FORGE.ViewGoPro(this._viewer, this._camera);
     }
     else
     {
-        throw "View type not supported " + type;
     }
-
-    if (this._backgroundRenderer !== null)
-    {
-        this._backgroundRenderer.updateAfterViewChange();
-    }
-
-    this._viewReady = true;
-
-    this._pickingManager.updateForViewType(type);
-
-    if (type === FORGE.ViewType.RECTILINEAR)
-    {
-        this._renderPipeline.enablePicking(false);
-    }
-    else
-    {
-        this._renderPipeline.enablePicking(true, this._pickingManager.material, this._pickingManager.renderTarget);
-    }
-
-    this.onViewReady.dispatch();
-};*/
 
 /**
  * Renderer destroy sequence
@@ -1323,22 +1192,6 @@ Object.defineProperty(FORGE.RenderManager.prototype, "onBackgroundReady",
         return this._onBackgroundReady;
     }
 });
-
-/**
- * Get the viewReady flag
- * @name FORGE.RenderManager#viewReady
- * @readonly
- * @type boolean
- */
-
-// Object.defineProperty(FORGE.RenderManager.prototype, "viewReady",
-// {
-//     * @this {FORGE.RenderManager} 
-//     get: function()
-//     {
-//         return this._viewReady;
-//     }
-// });
 
 /**
  * Get the onViewReady {@link FORGE.EventDispatcher}.
