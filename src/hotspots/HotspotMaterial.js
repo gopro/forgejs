@@ -252,7 +252,7 @@ FORGE.HotspotMaterial.prototype._imageLoadCompleteHandler = function(event)
 {
     var image = /** @type {FORGE.Image} */ (event.emitter);
 
-    this.log("Texture load complete (Image) : " + image.element.src);
+    this.log("image load complete : " + image.element.src);
     this._createTextureFromImage(image);
 };
 
@@ -270,7 +270,7 @@ FORGE.HotspotMaterial.prototype._createTextureFromImage = function(image)
 
     this._texture.image.crossOrigin = "anonymous";
 
-    this.log("Map new texture from image");
+    this.log("create texture from image");
 
     this._setupComplete();
 };
@@ -368,7 +368,7 @@ FORGE.HotspotMaterial.prototype._createTextureFromPlugin = function(plugin)
     this._texture.generateMipmaps = false;
     this._texture.needsUpdate = true;
 
-    this.log("Map new texture from plugin");
+    this.log("create texture from plugin");
 
     this._setupComplete();
 };
