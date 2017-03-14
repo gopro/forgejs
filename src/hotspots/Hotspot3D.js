@@ -434,8 +434,6 @@ FORGE.Hotspot3D.prototype.destroy = function()
 {
     this._viewer.renderer.view.onChange.remove(this._viewChangeHandler, this);
 
-    this._mesh.onBeforeRender = null;
-    this._mesh.onAfterRender = null;
     this._onBeforeRenderBound = null;
     this._onAfterRenderBound = null;
 
