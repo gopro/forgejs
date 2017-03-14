@@ -344,6 +344,13 @@ FORGE.PlaylistManager.prototype._parseConfig = function(config)
  */
 FORGE.PlaylistManager.prototype._initPlaylist = function()
 {
+    // If the page is not visible at init, report it later
+    if (document[FORGE.Device.visibilityState] !== "visible")
+    {
+        this._viewer.onResume.addOnce(this._initPlaylist, this);
+        return;
+    }
+
     if(this._playlists.length <= 0)
     {
         return;

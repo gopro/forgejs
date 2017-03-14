@@ -226,32 +226,6 @@ FORGE.Playlist.prototype._parseTracks = function(config)
 };
 
 /**
- * Internal method to find a {@link FORGE.PlaylistTrack} index in the _tracks Array.
- * @method FORGE.Playlist#_indexOfTrack
- * @private
- * @param {FORGE.PlaylistTrack} value - The {@link FORGE.PlaylistTrack} you search for.
- * @return {number} Returns the index of the searched {@link FORGE.PlaylistTrack} if found, -1 if not.
- *
-FORGE.Playlist.prototype._indexOfTrack = function (track)
-{
-    if(this._tracks === null)
-        return -1;
-
-    var _track;
-
-    for (var i = 0, ii = this._tracks.length; i < ii; i++)
-    {
-        _track = this._tracks[i];
-
-        if(_track === track)
-            return i;
-    }
-
-    return -1;
-};
-*/
-
-/**
  * Event handler that triggers when the current track ends, set the next track to play.
  * @method FORGE.Playlist#_trackEndHandler
  * @private

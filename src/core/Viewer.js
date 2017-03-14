@@ -291,10 +291,13 @@ FORGE.Viewer.prototype.constructor = FORGE.Viewer;
 /**
  * Viewer default configuration
  * @name  FORGE.Viewer.DEFAULT_CONFIG
+ * @type {MainConfig}
  * @const
  */
 FORGE.Viewer.DEFAULT_CONFIG = {
-    background: "#000"
+    background: "#000",
+    autoResume: true,
+    autoPause: true
 };
 
 /**
@@ -320,6 +323,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._createContainers();
     this._createCanvas();
 
+    this._system = new FORGE.System(this);
     this._dependencies = new FORGE.DependencyManager(this);
     this._clock = new FORGE.Clock(this);
     this._audio = new FORGE.SoundManager(this);
@@ -341,6 +345,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._load = new FORGE.Loader(this);
     this._tween = new FORGE.TweenManager(this);
 
+    this._system.boot();
     this._audio.boot();
     this._raf.boot();
     this._story.boot();
@@ -480,6 +485,8 @@ FORGE.Viewer.prototype._parseConfig = function(config)
 {
     this._config.background = (typeof config !== "undefined" && typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
     this._container.background = this._config.background;
+    this._config.autoPause = (typeof config !== "undefined" && typeof config.autoPause === "boolean") ? config.autoPause : FORGE.Viewer.DEFAULT_CONFIG.autoPause;
+    this._config.autoResume = (typeof config !== "undefined" && typeof config.autoResume === "boolean") ? config.autoResume : FORGE.Viewer.DEFAULT_CONFIG.autoResume;
 };
 
 /**
@@ -600,28 +607,46 @@ FORGE.Viewer.prototype.update = function(time)
 /**
  * Pause the refresh on the main loop.
  * @method FORGE.Viewer#pause
+ * @param {boolean} internal - Internal lib usage
  */
-FORGE.Viewer.prototype.pause = function()
+FORGE.Viewer.prototype.pause = function(internal)
 {
     this._paused = true;
 
+    // Pause all media if autoPause is true
+    if (internal !== true || this._config.autoPause === true)
+    {
+        this._audio.pauseAll();
+    }
+
     if (this._onPause !== null)
     {
-        this._onPause.dispatch();
+        this._onPause.dispatch({
+            "internal": internal
+        });
     }
 };
 
 /**
  * Resume the refresh on the main loop.
  * @method FORGE.Viewer#resume
+ * @param {boolean} internal - Internal lib usage
  */
-FORGE.Viewer.prototype.resume = function()
+FORGE.Viewer.prototype.resume = function(internal)
 {
     this._paused = false;
 
+    // Resume all media if autoResume is true
+    if (internal !== true || this._config.autoResume === true)
+    {
+        this._audio.resumeAll();
+    }
+
     if (this._onResume !== null)
     {
-        this._onResume.dispatch();
+        this._onResume.dispatch({
+            "internal": internal
+        });
     }
 };
 

@@ -34,6 +34,20 @@
             "title": "Start Time",
             "description": "Set the current position (in seconds) of the video playback.",
             "default": 0
+        },
+
+        "autoPause": {
+            "type": "boolean",
+            "title": "Autopause",
+            "description": "Does the video need to be paused automatically when the page is not visible anymore ?",
+            "default": true
+        },
+
+        "autoResume": {
+            "type": "boolean",
+            "title": "Autoresume",
+            "description": "Does the video need to be resumed automatically when the page is visible again ?",
+            "default": false
         }
     }
 }
