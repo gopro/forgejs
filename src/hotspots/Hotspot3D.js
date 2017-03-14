@@ -259,6 +259,7 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
     // Check what is the current render pass looking at the material: Hotspot or Picking Material
     if (material.name === "HotspotMaterial")
     {
+        this._material.update();
     }
     else if (material.name === "PickingMaterial")
     {
