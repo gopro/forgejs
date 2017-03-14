@@ -208,6 +208,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         this._createEvents(config.events);
     }
 
+    this._updatePosition();
     this._states.load();
 };
 
