@@ -220,8 +220,6 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
         var fovMin = FORGE.Math.radToDeg(2 * Math.atan((0.5 * geomHeight / geomDepth) * (canvasHeight / texHeight)));
 
         this.log("Flat rendering boundaries [" + fovMin.toFixed() + ", " + fovMax.toFixed() + "]");
-        this._viewer.renderer.camera.fovMax = fovMax;
-        this._viewer.renderer.camera.fovMin = fovMin;
     }
     else
     {
