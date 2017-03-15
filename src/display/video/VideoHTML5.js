@@ -1938,6 +1938,7 @@ FORGE.VideoHTML5.prototype.stop = function()
         currentVideo.element.pause();
         currentVideo.element.currentTime = 0;
         this._playing = false;
+        this._paused = true;
     }
 };
 

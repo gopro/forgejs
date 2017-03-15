@@ -1773,6 +1773,7 @@ FORGE.VideoDash.prototype.stop = function()
         this._dashMediaPlayer.seek(0);
         this._video.element.currentTime = 0;
         this._playing = false;
+        this._paused = true;
     }
 };
 
