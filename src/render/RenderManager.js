@@ -682,10 +682,56 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
     this._clearBackgroundRenderer();
 
+    var config = {};
+    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null)
+    {
+        config.type = this._sceneConfig.media.type;
+
+        if (typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null)
+        {
+            config.mediaFormat = this._sceneConfig.media.source.format;
+            var ratio = this._media.displayObject.element.width / this._media.displayObject.element.height;
+
+            if (typeof this._sceneConfig.media.source.fov !== "undefined")
+            {
+                var vFov;
+                if (typeof this._sceneConfig.media.source.fov === "number")
+                {
+                    vFov = this._sceneConfig.media.source.fov.vertical;
+                }
+                else if (typeof this._sceneConfig.media.source.fov.vertical === "number")
+                {
+                    vFov = this._sceneConfig.media.source.fov.vertical;
+                }
+                else if (typeof this._sceneConfig.media.source.fov.horizontal === "number")
+                {
+                    vFov = this._sceneConfig.media.source.fov.horizontal / ratio;
+                }                
+                else if (typeof this._sceneConfig.media.source.fov.diagonal === "number")
+                {
+                    vFov = this._sceneConfig.media.source.fov.diagonal / Math.sqrt(1 + ratio * ratio);
+                }
+                else {
+                    vFov = 90;
+                }
+
+                config.verticalFov = FORGE.Math.degToRad(vFov);
+            }
+        }
+
+        if (typeof this._sceneConfig.media.options !== "undefined" && this._sceneConfig.media.options !== null)
+        {
+            if (typeof this._sceneConfig.media.options.color !== "undefined")
+            {
+                config.color = this._sceneConfig.media.options.color;
+            }
+        }
+    }
+
     if (type === FORGE.BackgroundType.SHADER)
     {
         this.log("Create background shader renderer");
-        this._backgroundRenderer = new FORGE.BackgroundShaderRenderer(this._viewer, renderTarget);
+        this._backgroundRenderer = new FORGE.BackgroundShaderRenderer(this._viewer, renderTarget, config);
 
         var size = this._webGLRenderer.getSize();
         this._setRendererSize(new FORGE.Size(size.width, size.height));
@@ -694,23 +740,8 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     {
         this.log("Create background mesh renderer");
 
-        var config =
-        {
-            order: "RLUDFB"
-        };
-
         if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null)
         {
-            config.type = this._sceneConfig.media.type;
-
-            if (typeof this._sceneConfig.media.options !== "undefined" && this._sceneConfig.media.options !== null)
-            {
-                if (typeof this._sceneConfig.media.options.color !== "undefined")
-                {
-                    config.color = this._sceneConfig.media.options.color;
-                }
-            }
-
             if (typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null)
             {
                 config.order = this._sceneConfig.media.source.order || "RLUDFB";
@@ -725,8 +756,6 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
                     config.tile = this._sceneConfig.media.source.levels[0].tile;
                 }
             }
-
-            config.mediaFormat = this._sceneConfig.media.source.format;
         }
 
         this._backgroundRenderer = new FORGE.BackgroundMeshRenderer(this._viewer, renderTarget, config);
@@ -767,15 +796,15 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
 
     if (this._sceneConfig.media.source.format === FORGE.MediaFormat.CUBE || 
         this._sceneConfig.media.source.format === FORGE.MediaFormat.FLAT ||
+        typeof this._sceneConfig.media.source === "undefined" ||
         typeof this._sceneConfig.media.source.format === "undefined")
     {
+        // if (this._view.type === FORGE.ViewType.FLAT)
+        // {
+        //     this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+        // }
 
-        if (this._view.type === FORGE.ViewType.FLAT)
-        {
-            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
-        }
-
-        else
+        // else
         {
             this._backgroundRendererType = FORGE.BackgroundType.MESH;
         }
