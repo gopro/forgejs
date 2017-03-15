@@ -6,6 +6,7 @@
  * @extends {FORGE.BackgroundRenderer}
  *
  * @param {FORGE.Viewer} viewer - viewer reference
+ * @param {THREE.WebGLRenderTarget} target - render target
  * @param {SceneMediaOptionsConfig} options - the options for the cubemap
  */
 FORGE.BackgroundMeshRenderer = function(viewer, target, options)
@@ -46,6 +47,13 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
     this._mediaType = options.type || FORGE.MediaType.GRID;
 
     /**
+     * Media vertical fov (radians)
+     * @type {number}
+     * @private
+     */
+    this._mediaVFov = options.verticalFov || 90;
+
+    /**
      * Grid color
      * @type {string}
      * @private
@@ -76,13 +84,6 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
     this._tile = options.tile || 512;
 
     /**
-     * Media format (cubemap, equi...)
-     * @type {string}
-     * @private
-     */
-    this._mediaFormat = options.mediaFormat || FORGE.MediaFormat.CUBE;
-
-    /**
      * The size of the cube.
      * @type {number}
      * @private
@@ -105,7 +106,7 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
      */
     this._videoReductionFactor = 1;
 
-    FORGE.BackgroundRenderer.call(this, viewer, target, "BackgroundMeshRenderer");
+    FORGE.BackgroundRenderer.call(this, viewer, target, options, "BackgroundMeshRenderer");
 };
 
 FORGE.BackgroundMeshRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
@@ -180,7 +181,10 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
     this._texture.format = THREE.RGBAFormat;
     this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
     
-    this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+    if (typeof this._mesh.material.uniforms.tTextureRatio !== "undefined")
+    {
+        this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+    }
 
     if (this._mediaFormat === FORGE.MediaFormat.FLAT)
     {
@@ -206,16 +210,11 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
 
         var geomWidth = this._size;
         var geomHeight = Math.round(geomWidth / texRatio);
-        var geomDepth = Math.abs(this._mesh.position.z);
-
-        var s = Math.min(geomWidth, geomHeight);
-        this._viewer.renderer.camera.flat.left = -s / 2 * canvasRatio;
-        this._viewer.renderer.camera.flat.right = s / 2 * canvasRatio;
-        this._viewer.renderer.camera.flat.top = s / 2;
-        this._viewer.renderer.camera.flat.bottom = -s / 2;
+        var geomDepth = geomHeight / (2 * Math.tan(0.5 * this._mediaVFov));
 
         var geometry = new THREE.PlaneBufferGeometry(geomWidth, geomHeight);
         this._mesh.geometry = geometry;
+        this._mesh.position.set(0, 0, -geomDepth);
 
         var fovMax = FORGE.Math.radToDeg(2 * Math.atan(0.5 * geomHeight / geomDepth));
         var fovMin = FORGE.Math.radToDeg(2 * Math.atan((0.5 * geomHeight / geomDepth) * (canvasHeight / texHeight)));
@@ -576,7 +575,8 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         {
             this._addQuadrilateralCoordsAttribute();
         }
-        else if (this._mediaFormat === FORGE.MediaFormat.FLAT)
+        
+        if (this._mediaFormat === FORGE.MediaFormat.FLAT)
         {
             this._mesh.position.set(0, 0, -this._size * 0.5);
             this._mesh.material.side = THREE.FrontSide;
