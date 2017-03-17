@@ -411,6 +411,8 @@ FORGE.DisplayObject.prototype._boot = function()
         return;
     }
 
+    this._register();
+
     this._createDom();
 
     this._pending = [];
