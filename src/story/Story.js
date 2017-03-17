@@ -450,13 +450,20 @@ FORGE.Story.prototype.loadScene = function(value)
         this._viewer.renderer.pickingManager.stop();
 
         // Readd it when the background is ready again
-        this._viewer.renderer.onBackgroundReady.addOnce(function()
-        {
-            this._viewer.renderer.pickingManager.start();
-        }, this);
+        this._viewer.renderer.onBackgroundReady.addOnce(this._onBackgroundReadyHandler, this);
 
         this._loadUid(uid);
     }
+};
+
+/**
+ * Handler for the onBackgroundReady event of the FORGE.Scene that is being loaded.
+ * @method FORGE.Story#_onBackgroundReadyHandler
+ * @private
+ */
+FORGE.Story.prototype._onBackgroundReadyHandler = function()
+{
+    this._viewer.renderer.pickingManager.start();
 };
 
 /**
