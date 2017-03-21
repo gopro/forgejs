@@ -457,6 +457,11 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
     }
 };
 
+/**
+ * View change handler
+ * @method FORGE.RenderManager#_onViewChangeHandler
+ * @private
+ */
 FORGE.RenderManager.prototype._onViewChangeHandler = function()
 {
     if (this._backgroundRenderer !== null)
@@ -615,7 +620,6 @@ FORGE.RenderManager.prototype._canvasResizeHandler = function()
 FORGE.RenderManager.prototype._renderDisplayChangeHandler = function()
 {
     this._setRendererSize(this._renderDisplay.rendererSize);
-
 
     if (this._renderDisplay.presentingVR === true)
     {
@@ -784,7 +788,6 @@ FORGE.RenderManager.prototype.render = function()
 
         // Render perspective camera children (objects in camera local space)
         this._webGLRenderer.clearDepth();
-
 
         if (vr === true)
         {
