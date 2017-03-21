@@ -29,6 +29,10 @@
             "example": "./images/scene-0.jpg"
         },
 
+        "fov": {
+            "$ref": "scene-media-fov"
+        },
+
         "pattern": {
             "type": "string",
             "title": "Pattern",

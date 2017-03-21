@@ -46,7 +46,7 @@ FORGE.ViewRectilinear.prototype._boot = function()
  * @method FORGE.ViewRectilinear#_updateViewParams
  * @private
  */
-FORGE.ViewGoPro.prototype._updateViewParams = function()
+FORGE.ViewRectilinear.prototype._updateViewParams = function()
 {
     var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
 
