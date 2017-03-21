@@ -107,6 +107,11 @@ FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
 {
     this._updateViewParams();
 
+    if (typeof uniforms === "undefined")
+    {
+        return;
+    }
+    
     if (uniforms.hasOwnProperty('tRepeatX'))
     {
         uniforms.tRepeatX.value = this._repeatX ? 1 : 0;

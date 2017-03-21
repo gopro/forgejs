@@ -42,6 +42,18 @@ FORGE.ViewRectilinear.prototype._boot = function()
 };
 
 /**
+ * Update view params.
+ * @method FORGE.ViewRectilinear#_updateViewParams
+ * @private
+ */
+FORGE.ViewGoPro.prototype._updateViewParams = function()
+{
+    var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
+
+    this._projectionScale = Math.tan(FORGE.Math.degToRad(fov / 2));
+};
+
+/**
  * Update uniforms.
  *
  * @method FORGE.ViewRectilinear#updateUniforms
@@ -49,10 +61,17 @@ FORGE.ViewRectilinear.prototype._boot = function()
  */
 FORGE.ViewRectilinear.prototype.updateUniforms = function(uniforms)
 {
-    var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
+    this._updateViewParams();
 
-    this._projectionScale = Math.tan(FORGE.Math.degToRad(fov / 2));
-    uniforms.tProjectionScale.value = this._projectionScale;
+    if (typeof uniforms === "undefined")
+    {
+        return;
+    }    
+
+    if (uniforms.hasOwnProperty('tProjectionScale'))
+    {
+        uniforms.tProjectionScale.value = this._projectionScale;
+    }
 };
 
 /**

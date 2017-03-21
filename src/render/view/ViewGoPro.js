@@ -94,8 +94,21 @@ FORGE.ViewGoPro.prototype._updateViewParams = function()
 FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
 {
     this._updateViewParams();
-    uniforms.tProjectionDistance.value = this._projectionDistance;
-    uniforms.tProjectionScale.value = this._projectionScale;
+
+    if (typeof uniforms === "undefined")
+    {
+        return;
+    }    
+
+    if (uniforms.hasOwnProperty('tProjectionDistance'))
+    {
+        uniforms.tProjectionDistance.value = this._projectionDistance;
+    }
+
+    if (uniforms.hasOwnProperty('tProjectionScale'))
+    {
+        uniforms.tProjectionScale.value = this._projectionScale;
+    }
 };
 
 /**
