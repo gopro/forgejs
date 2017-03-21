@@ -57,6 +57,14 @@ FORGE.HotspotStates = function(viewer, hotspotUid)
     this._auto = true;
 
     /**
+     * Ready flag
+     * @name FORGE.HotspotStates#_ready
+     * @type {boolean}
+     * @private
+     */
+    this._ready = false;
+
+    /**
      * Load complete event dispatcher for state change.
      * @name  FORGE.HotspotStates#_onLoadComplete
      * @type {FORGE.EventDispatcher}
@@ -163,14 +171,30 @@ FORGE.HotspotStates.prototype._getStatesNames = function()
 /**
  * Update the material for the current state
  * @method FORGE.HotspotStates#_updateMaterial
+ * @param  {HotspotMaterialConfig} config - The hotspot material configuration object.
  * @private
  */
 FORGE.HotspotStates.prototype._updateMaterial = function(config)
 {
     var hotspot = FORGE.UID.get(this._hotspotUid);
-    var materialConfig = hotspot.config.material;
 
+    hotspot.material.onReady.addOnce(this._materialReadyHandler, this);
     hotspot.material.load(config);
+};
+
+/**
+ * Material ready event handler
+ * @method FORGE.HotspotStates#_materialReadyHandler
+ * @private
+ */
+FORGE.HotspotStates.prototype._materialReadyHandler = function()
+{
+    this._ready = true;
+
+    if(this._onLoadComplete !== null)
+    {
+        this._onLoadComplete.dispatch();
+    }
 };
 
 /**
@@ -203,23 +227,21 @@ FORGE.HotspotStates.prototype.load = function(name)
         return;
     }
 
+    this._ready = false;
+
     // Set the state name
     this._state = name;
 
     if(typeof this._config[name].material === "object")
     {
-        this._updateMaterial(FORGE.Utils.extendSimpleObject(hotspot.config.material, this._config[name].material));
-    }
-
-    if(this._onLoadComplete !== null)
-    {
-        this._onLoadComplete.dispatch();
+        var materialConfig = /** @type {!HotspotMaterialConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.material, this._config[name].material));
+        this._updateMaterial(materialConfig);
     }
 };
 
 /**
  * Toggle from a state to another.
- * @method FORGE.HotspotStates#load
+ * @method FORGE.HotspotStates#toggle
  * @param  {Array<string>} names - the names of the states to loop through.
  */
 FORGE.HotspotStates.prototype.toggle = function(names)
@@ -247,6 +269,12 @@ FORGE.HotspotStates.prototype.toggle = function(names)
 FORGE.HotspotStates.prototype.destroy = function()
 {
     this._viewer = null;
+
+    if(this._onLoadComplete !== null)
+    {
+        this._onLoadComplete.destroy();
+        this._onLoadComplete = null;
+    }
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
@@ -283,6 +311,21 @@ Object.defineProperty(FORGE.HotspotStates.prototype, "names",
     get: function()
     {
         return this._getStatesNames();
+    }
+});
+
+/**
+ * Get the ready flag.
+ * @name FORGE.HotspotStates#ready
+ * @type {boolean}
+ * @readonly
+ */
+Object.defineProperty(FORGE.HotspotStates.prototype, "ready",
+{
+    /** @this {FORGE.HotspotStates} */
+    get: function()
+    {
+        return this._ready;
     }
 });
 

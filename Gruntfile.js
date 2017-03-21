@@ -56,6 +56,7 @@ module.exports = function(grunt)
         "build/tmp/forge.glsl.js",
         "src/render/shader/ShaderLib.js",
 
+        "src/render/view/ViewManager.js",
         "src/render/view/ViewType.js",
         "src/render/view/ViewBase.js",
         "src/render/view/ViewGoPro.js",

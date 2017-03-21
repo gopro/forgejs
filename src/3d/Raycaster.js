@@ -190,6 +190,12 @@ FORGE.Raycaster.prototype._cameraChangeHandler = function()
  */
 FORGE.Raycaster.prototype._raycast = function(event, screenPoint)
 {
+    // If there is an hovered object but not ready (maybe the texture is updating), ignore the raycast
+    if(this._hoveredObject !== null && this._hoveredObject.ready === false)
+    {
+        return;
+    }
+
     var resolution = this._viewer.renderer.canvasResolution;
 
     screenPoint = screenPoint ||

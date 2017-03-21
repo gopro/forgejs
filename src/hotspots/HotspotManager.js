@@ -254,6 +254,6 @@ Object.defineProperty(FORGE.HotspotManager.prototype, "count",
     /** @this {FORGE.HotspotManager} */
     get: function()
     {
-        return this._hotspots;
+        return this._hotspots.length;
     }
 });
