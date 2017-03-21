@@ -112,7 +112,9 @@ FORGE.VideoBase.prototype.play = function(time, loop)
  * Pauses the video.
  * @method  FORGE.VideoBase#pause
  */
-FORGE.VideoBase.prototype.pause = function() {};
+FORGE.VideoBase.prototype.pause = function()
+{
+};
 
 /**
  * Destroy sequence.

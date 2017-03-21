@@ -1683,7 +1683,7 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             break;
 
         case "durationchange":
-            //@firefox - FF disptach durationchange twice on readystate HAVE_METADATA (1) & HAVE_ENOUGH_DATA (4)
+            //@firefox - FF dispatch durationchange twice on readystate HAVE_METADATA (1) & HAVE_ENOUGH_DATA (4)
             //I will not dispatch this event if readystate is 4 !
             if (this._onDurationChange !== null && element.readyState === HTMLMediaElement.HAVE_METADATA)
             {
@@ -1902,10 +1902,26 @@ FORGE.VideoHTML5.prototype.play = function(time, loop)
 
     if (currentVideo !== null && currentVideo.element !== null)
     {
-        currentVideo.element.play();
-        this._playing = true;
-        this._paused = false;
-        this._playCount++;
+        var p = currentVideo.element.play();
+        if (typeof p !== "undefined" && typeof Promise !== "undefined" && p instanceof Promise)
+        {
+            p.then(function()
+                {
+                    this._playing = true;
+                    this._paused = false;
+                    this._playCount++;
+                }.bind(this))
+             .catch(function(error)
+                {
+                    this.log("error while playing the video : " + error);
+                }.bind(this));
+        }
+        else
+        {
+            this._playing = true;
+            this._paused = true;
+            this._playCount++;
+        }
     }
 };
 
@@ -1938,6 +1954,7 @@ FORGE.VideoHTML5.prototype.stop = function()
         currentVideo.element.pause();
         currentVideo.element.currentTime = 0;
         this._playing = false;
+        this._paused = true;
     }
 };
 
