@@ -616,7 +616,6 @@ FORGE.RenderManager.prototype._renderDisplayChangeHandler = function()
 {
     this._setRendererSize(this._renderDisplay.rendererSize);
 
-    //this._camera.gaze.visible = this._renderDisplay.presentingVR;
 
     if (this._renderDisplay.presentingVR === true)
     {
@@ -786,7 +785,6 @@ FORGE.RenderManager.prototype.render = function()
         // Render perspective camera children (objects in camera local space)
         this._webGLRenderer.clearDepth();
 
-        //this._camera.gaze.visible = !this._renderDisplay.presentingVR;
 
         if (vr === true)
         {
