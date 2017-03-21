@@ -73,7 +73,8 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
     // When repeat is ON, set yaw and pitch min and max depending on
     // texture and screen ratios
 
-    if (this._viewer.renderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer) {
+    if (this._viewer.renderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer)
+    {
         if (this._repeatX === false)
         {
             var hfov = vfov * this._viewer.renderer.displayResolution.ratio;
@@ -90,7 +91,8 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
     }
 
     // Mesh rendering in flat view is limited around -+ 20 degrees
-    else {
+    else
+    {
         this._yawMax = this._pitchMax = FORGE.Math.degToRad(20);
         this._yawMin = -this._yawMax;
         this._pitchMin = -this._pitchMax;
@@ -112,27 +114,27 @@ FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
         return;
     }
     
-    if (uniforms.hasOwnProperty('tRepeatX'))
+    if (uniforms.hasOwnProperty("tRepeatX"))
     {
         uniforms.tRepeatX.value = this._repeatX ? 1 : 0;
     }
 
-    if (uniforms.hasOwnProperty('tRepeatY'))
+    if (uniforms.hasOwnProperty("tRepeatY"))
     {
         uniforms.tRepeatY.value = this._repeatY ? 1 : 0;
     }
 
-    if (uniforms.hasOwnProperty('tYaw'))
+    if (uniforms.hasOwnProperty("tYaw"))
     {
         uniforms.tYaw.value = FORGE.Math.degToRad(this._viewer.camera.yaw);
     }
 
-    if (uniforms.hasOwnProperty('tPitch'))
+    if (uniforms.hasOwnProperty("tPitch"))
     {
         uniforms.tPitch.value = FORGE.Math.degToRad(this._viewer.camera.pitch);
     }
 
-    if (uniforms.hasOwnProperty('tFov'))
+    if (uniforms.hasOwnProperty("tFov"))
     {
         uniforms.tFov.value = FORGE.Math.degToRad(this._viewer.renderer.camera.fov);
     }

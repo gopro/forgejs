@@ -138,14 +138,14 @@ FORGE.BackgroundShaderRenderer.prototype._setDisplayObject = function(displayObj
 
     this._mesh.material.uniforms.tTexture.value = this._texture;
 
-    if (typeof this._mesh.material.uniforms.tTextureRatio !== "undefined")
+    if (this._mesh.material.uniforms.hasOwnProperty("tTextureRatio"))
     {
         this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
     }
 
-    if (typeof this._mesh.material.uniforms.tTextureSize !== "undefined")
+    if (this._mesh.material.uniforms.hasOwnProperty("tTextureSize"))
     {
-        this._mesh.material.uniforms.tTextureSize.value =  new THREE.Vector2(this._texture.image.width, this._texture.image.height);
+        this._mesh.material.uniforms.tTextureSize.value = new THREE.Vector2(this._texture.image.width, this._texture.image.height);
     }
 };
 

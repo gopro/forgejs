@@ -100,12 +100,12 @@ FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
         return;
     }    
 
-    if (uniforms.hasOwnProperty('tProjectionDistance'))
+    if (uniforms.hasOwnProperty("tProjectionDistance"))
     {
         uniforms.tProjectionDistance.value = this._projectionDistance;
     }
 
-    if (uniforms.hasOwnProperty('tProjectionScale'))
+    if (uniforms.hasOwnProperty("tProjectionScale"))
     {
         uniforms.tProjectionScale.value = this._projectionScale;
     }

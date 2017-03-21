@@ -68,7 +68,7 @@ FORGE.ViewRectilinear.prototype.updateUniforms = function(uniforms)
         return;
     }    
 
-    if (uniforms.hasOwnProperty('tProjectionScale'))
+    if (uniforms.hasOwnProperty("tProjectionScale"))
     {
         uniforms.tProjectionScale.value = this._projectionScale;
     }

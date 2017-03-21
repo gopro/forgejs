@@ -711,7 +711,8 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
                 {
                     vFov = this._sceneConfig.media.source.fov.diagonal / Math.sqrt(1 + ratio * ratio);
                 }
-                else {
+                else
+                {
                     vFov = 90;
                 }
 
