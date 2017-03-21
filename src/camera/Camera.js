@@ -397,10 +397,11 @@ FORGE.Camera.prototype._createFlatCamera = function()
     if (typeof this._viewer.renderer !== "undefined")
     {
         this._flat = new THREE.OrthographicCamera(
-            -FORGE.RenderManager.DEPTH_FAR, FORGE.RenderManager.DEPTH_FAR,
-            FORGE.RenderManager.DEPTH_FAR, -FORGE.RenderManager.DEPTH_FAR,
+            -1000, 1000,
+            1000, -1000,
             FORGE.RenderManager.DEPTH_NEAR,
             FORGE.RenderManager.DEPTH_FAR);
+        
         this._flat.name = "CameraFlat";
         this._flat.matrixAutoUpdate = false;
     }
@@ -669,7 +670,18 @@ FORGE.Camera.prototype._updateFlatCamera = function()
     this._flat.top = this._flat.position.y + camH / 2;
     this._flat.bottom = this._flat.position.y - camH / 2;
 
-    this._flat.zoom = this._fovMax / this._fov;
+    var max = this._fovMax;
+    var view = this._viewer.renderer.view;
+
+    if (view !== null && view.fovMax !== null)
+    {
+        max = Math.min(FORGE.Math.degToRad(view.fovMax), this._fovMax);
+        this._flat.zoom = max / this._fov;
+    }
+    else
+    {
+        this._flat.zoom = 1;
+    }
 
     this._flat.updateProjectionMatrix();
 };
@@ -880,12 +892,12 @@ FORGE.Camera.prototype._setFov = function(value, unit)
     {
         if (view.fovMin !== null)
         {
-            min = Math.max(view.fovMin, min);
+            min = Math.max(FORGE.Math.degToRad(view.fovMin), min);
         }
 
         if (view.fovMax !== null)
         {
-            max = Math.min(view.fovMax, max);
+            max = Math.min(FORGE.Math.degToRad(view.fovMax), max);
         }
     }
     
@@ -1178,6 +1190,7 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMin",
     set: function(value)
     {
         this._fovMin = FORGE.Math.degToRad(value);
+        this._setFov(this._fov, FORGE.Math.RADIANS); 
     }
 });
 
@@ -1198,6 +1211,7 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMax",
     set: function(value)
     {
         this._fovMax = FORGE.Math.degToRad(value);
+        this._setFov(this._fov, FORGE.Math.RADIANS); 
     }
 });
 

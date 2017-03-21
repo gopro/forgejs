@@ -360,7 +360,7 @@ FORGE.ControllerPointer.prototype.update = function()
     if(Math.abs(yaw) > 0.05)
     {
         this._camera.yaw += yaw;
-        this._camera.flat.position.x += 10 * yaw;
+        this._camera.flat.position.x += dx;
     }
 
     var pitch = invert * dy;
@@ -368,7 +368,7 @@ FORGE.ControllerPointer.prototype.update = function()
     if(Math.abs(pitch) > 0.05)
     {
         this._camera.pitch -= pitch;
-        this._camera.flat.position.y -= 10 * pitch;
+        this._camera.flat.position.y -= dy;
     }
 
     // Damping 1 -> stops instantly, 0 infinite rebounds
