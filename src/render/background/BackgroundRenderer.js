@@ -265,3 +265,17 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "displayObject",
         }
     }
 });
+
+/**
+ * Get background scene.
+ * @name FORGE.BackgroundRenderer#scene
+ * @type {THREE.Scene}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "scene",
+{
+    /** @this {FORGE.BackgroundRenderer} */
+    get: function()
+    {
+        return this._scene;
+    }
+});

@@ -175,7 +175,7 @@ FORGE.BaseObject.prototype._stdout = function(value, mode)
  */
 FORGE.BaseObject.prototype.log = function(value)
 {
-    if(FORGE.DEBUG === true || window["FORGE"][this._className]["DEBUG"] === true || this._debug === true)
+    if(window["FORGE"]["DEBUG"] === true || window["FORGE"][this._className]["DEBUG"] === true || this._debug === true)
     {
         this._stdout(value, "log");
 
@@ -195,7 +195,7 @@ FORGE.BaseObject.prototype.log = function(value)
  */
 FORGE.BaseObject.prototype.warn = function(value)
 {
-    if(FORGE.WARNING === true || window["FORGE"][this._className]["WARNING"] === true || this._warning === true)
+    if(window["FORGE"]["WARNING"] === true || window["FORGE"][this._className]["WARNING"] === true || this._warning === true)
     {
         this._stdout(value, "warn");
     }

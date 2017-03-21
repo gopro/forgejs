@@ -446,8 +446,24 @@ FORGE.Story.prototype.loadScene = function(value)
     //If uid is defined and if it's not the current scene
     if(typeof uid !== "undefined" && uid !== this._sceneUid)
     {
+        // Disable picking while the scene is loading
+        this._viewer.renderer.pickingManager.stop();
+
+        // Readd it when the background is ready again
+        this._viewer.renderer.onBackgroundReady.addOnce(this._onBackgroundReadyHandler, this);
+
         this._loadUid(uid);
     }
+};
+
+/**
+ * Handler for the onBackgroundReady event of the FORGE.Scene that is being loaded.
+ * @method FORGE.Story#_onBackgroundReadyHandler
+ * @private
+ */
+FORGE.Story.prototype._onBackgroundReadyHandler = function()
+{
+    this._viewer.renderer.pickingManager.start();
 };
 
 /**
