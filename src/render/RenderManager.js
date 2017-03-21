@@ -799,12 +799,12 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         typeof this._sceneConfig.media.source === "undefined" ||
         typeof this._sceneConfig.media.source.format === "undefined")
     {
-        // if (this._view.type === FORGE.ViewType.FLAT)
-        // {
-        //     this._backgroundRendererType = FORGE.BackgroundType.SHADER;
-        // }
+        if (this._view.type === FORGE.ViewType.FLAT)
+        {
+            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+        }
 
-        // else
+        else
         {
             this._backgroundRendererType = FORGE.BackgroundType.MESH;
         }
@@ -874,11 +874,7 @@ FORGE.RenderManager.prototype.render = function()
 
         this._webGLRenderer.setViewport(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 
-        if (vr === false)
-        {
-            camera = null;
-        }
-        this._drawBackground(camera);
+        this._drawBackground((vr === true) ? camera : null);
 
         this._renderPipeline.render(camera);
 
