@@ -445,7 +445,8 @@ FORGE.RenderDisplay.prototype.getRenderParams = function()
     else
     {
         var rectangle = new FORGE.Rectangle(0, 0, this._rendererSizeScreen.width, this._rendererSizeScreen.height);
-        renderParams.push(new FORGE.RenderParams(rectangle, camera.main));
+        var renderCamera = this._viewer.renderer.view.type === FORGE.ViewType.FLAT ? camera.flat : camera.main;
+        renderParams.push(new FORGE.RenderParams(rectangle, renderCamera));
     }
 
     return renderParams;
