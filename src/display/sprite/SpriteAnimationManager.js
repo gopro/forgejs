@@ -25,11 +25,11 @@ FORGE.SpriteAnimationManager = function(sprite)
 
     /**
      * Reference to the curretn animation sequence.
-     * @name  FORGE.SpriteAnimationManager#_currentAnimation
+     * @name  FORGE.SpriteAnimationManager#_animation
      * @type {FORGE.SpriteAnimation}
      * @private
      */
-    this._currentAnimation = null;
+    this._animation = null;
 
     /**
      * List of pending actions.<br>
@@ -128,7 +128,7 @@ FORGE.SpriteAnimationManager.prototype.add = function(name, start, end, frameRat
 
     this._anims[name] = new FORGE.SpriteAnimation(this._sprite, name, selectedFrames, frameRate);
 
-    this._currentAnimation = this._anims[name];
+    this._animation = this._anims[name];
 };
 
 /**
@@ -151,7 +151,7 @@ FORGE.SpriteAnimationManager.prototype.play = function(animation, loop, index)
         return;
     }
 
-    var anim = this._currentAnimation;
+    var anim = this._animation;
 
     if(typeof animation === "string" && animation !== null)
     {
@@ -173,7 +173,7 @@ FORGE.SpriteAnimationManager.prototype.play = function(animation, loop, index)
  */
 FORGE.SpriteAnimationManager.prototype.pause = function(index)
 {
-    var anim = this._currentAnimation;
+    var anim = this._animation;
 
     if(anim !== null)
     {
@@ -188,7 +188,7 @@ FORGE.SpriteAnimationManager.prototype.pause = function(index)
  */
 FORGE.SpriteAnimationManager.prototype.resume = function(index)
 {
-    var anim = this._currentAnimation;
+    var anim = this._animation;
 
     if(anim !== null)
     {
@@ -202,7 +202,7 @@ FORGE.SpriteAnimationManager.prototype.resume = function(index)
  */
 FORGE.SpriteAnimationManager.prototype.stop = function()
 {
-    var anim = this._currentAnimation;
+    var anim = this._animation;
 
     if(anim !== null)
     {
@@ -234,9 +234,9 @@ FORGE.SpriteAnimationManager.prototype.get = function(name)
  */
 FORGE.SpriteAnimationManager.prototype.update = function()
 {
-    if(this._currentAnimation !== null)
+    if(this._animation !== null)
     {
-        this._currentAnimation.update();
+        this._animation.update();
     }
 };
 
@@ -254,7 +254,7 @@ FORGE.SpriteAnimationManager.prototype.destroy = function()
 
     this._sprite = null;
     this._anims = null;
-    this._currentAnimation = null;
+    this._animation = null;
     this._pending = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
@@ -262,15 +262,15 @@ FORGE.SpriteAnimationManager.prototype.destroy = function()
 
 /**
  * Get and set the current animation.
- * @name FORGE.SpriteAnimationManager#currentAnimation
+ * @name FORGE.SpriteAnimationManager#current
  * @type {FORGE.SpriteAnimation}
  */
-Object.defineProperty(FORGE.SpriteAnimationManager.prototype, "currentAnimation",
+Object.defineProperty(FORGE.SpriteAnimationManager.prototype, "current",
 {
     /** @this {FORGE.SpriteAnimationManager} */
     get: function()
     {
-        return this._currentAnimation;
+        return this._animation;
     },
 
     /** @this {FORGE.SpriteAnimationManager} */
@@ -278,7 +278,7 @@ Object.defineProperty(FORGE.SpriteAnimationManager.prototype, "currentAnimation"
     {
         if(FORGE.Utils.isTypeOf(animation, "SpriteAnimation") === true)
         {
-            this._currentAnimation = animation;
+            this._animation = animation;
         }
     }
 });

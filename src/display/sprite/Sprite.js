@@ -135,6 +135,6 @@ Object.defineProperty(FORGE.Sprite.prototype, "animation",
     /** @this {FORGE.Sprite} */
     get: function()
     {
-        return this._animations.currentAnimation;
+        return this._animations.current;
     }
 });
