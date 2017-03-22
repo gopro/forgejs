@@ -140,6 +140,13 @@ FORGE.HotspotMaterial.types = {};
 FORGE.HotspotMaterial.types.IMAGE = "image";
 
 /**
+ * @name FORGE.HotspotMaterial.types.SPRITE
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotMaterial.types.SPRITE = "sprite";
+
+/**
  * @name FORGE.HotspotMaterial.types.PLUGIN
  * @type {string}
  * @const
@@ -203,6 +210,12 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
     if (typeof config.image !== "undefined" && config.image !== null)
     {
         this._setupWithImage(config.image);
+    }
+
+    // Hotspot with animated sprite as background
+    else if (typeof config.sprite !== "undefined" && config.sprite !== null)
+    {
+        this._setupWithSprite(config.sprite);
     }
 
     // Hotspot with plugin that provide a texture as background
@@ -271,6 +284,54 @@ FORGE.HotspotMaterial.prototype._createTextureFromImage = function(image)
     this._texture.image.crossOrigin = "anonymous";
 
     this.log("create texture from image");
+
+    this._setupComplete();
+};
+
+/**
+ * Setup hotspot material with a sprite as texture.
+ * @method FORGE.HotspotMaterial#_setupWithSprite
+ * @param {(string|ImageConfig)} config - The sprite configuration you want to load and use as a texture.
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._setupWithSprite = function(config)
+{
+    this._type = FORGE.HotspotMaterial.types.SPRITE;
+    this._update = true;
+
+    this._displayObject = new FORGE.Sprite(this._viewer, config);
+    this._displayObject.animations.add();
+    this._displayObject.play(null, true);
+    this._displayObject.onLoadComplete.addOnce(this._spriteLoadCompleteHandler, this);
+};
+
+/**
+ * Sprite loaded event handler for the sprite setup.
+ * @method FORGE.HotspotMaterial#_spriteLoadCompleteHandler
+ * @param {FORGE.Event} event - load event
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._spriteLoadCompleteHandler = function(event)
+{
+    var sprite = /** @type {FORGE.Image} */ (event.emitter);
+
+    this.log("sprite load complete");
+    this._createTextureFromSprite(sprite);
+};
+
+/**
+ * Create a THREE.Texture from the loaded FORGE.Sprite
+ * @method  FORGE.HotspotMaterial#_createTextureFromSprite
+ * @param  {FORGE.Sprite} sprite - The FORGE.Sprite used to create the texture.
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._createTextureFromSprite = function(sprite)
+{
+    this._displayObject = sprite;
+
+    this.setTextureFrame(sprite.frame);
+
+    this.log("create texture from sprite");
 
     this._setupComplete();
 };
@@ -514,7 +575,7 @@ FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
 FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 {
     // Only support type IMAGE at the moment
-    if (this._displayObject === null || this._type !== FORGE.HotspotMaterial.types.IMAGE)
+    if (this._displayObject === null || (this._type !== FORGE.HotspotMaterial.types.IMAGE && this._type !== FORGE.HotspotMaterial.types.SPRITE))
     {
         return;
     }
