@@ -210,7 +210,7 @@ FORGE.Image.renderModes.CANVAS = "canvas";
  * @name FORGE.Image.renderModes
  * @type {string}
  */
-FORGE.Image.renderMode = FORGE.Image.renderModes.CSS;
+FORGE.Image.renderMode = FORGE.Image.renderModes.CANVAS;
 
 /**
  * Boot sequence.
