@@ -25,13 +25,13 @@ FORGE.ViewGoPro.prototype.constructor = FORGE.ViewGoPro;
 
 /**
  * Background shader screen to world
- * @type {Object}
+ * @type {ScreenToWorldProgram}
  */
 FORGE.ViewGoPro.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.gopro;
 
 /**
  * Background shader world to screen
- * @type {Object}
+ * @type {WorldToScreenProgram}
  */
 FORGE.ViewGoPro.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.gopro;
 

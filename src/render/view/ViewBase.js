@@ -83,13 +83,13 @@ FORGE.ViewBase.prototype.constructor = FORGE.ViewBase;
 
 /**
  * Background shader screen to world
- * @type {Object}
+ * @type {ScreenToWorldProgram}
  */
 FORGE.ViewBase.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.rectilinear;
 
 /**
  * Background shader world to screen
- * @type {Object}
+ * @type {WorldToScreenProgram}
  */
 FORGE.ViewBase.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.rectilinear;
 

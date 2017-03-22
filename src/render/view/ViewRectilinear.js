@@ -17,13 +17,13 @@ FORGE.ViewRectilinear.prototype.constructor = FORGE.ViewRectilinear;
 
 /**
  * Background shader screen to world
- * @type {Object}
+ * @type {ScreenToWorldProgram}
  */
 FORGE.ViewRectilinear.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.rectilinear;
 
 /**
  * Background shader world to screen
- * @type {Object}
+ * @type {WorldToScreenProgram}
  */
 FORGE.ViewRectilinear.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.rectilinear;
 

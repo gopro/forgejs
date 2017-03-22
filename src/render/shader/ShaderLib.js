@@ -125,8 +125,6 @@ FORGE.ShaderLib = {
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
                 fragmentShader: FORGE.ShaderChunk.wts_frag
             },
-
-
         },
 
         littlePlanet:

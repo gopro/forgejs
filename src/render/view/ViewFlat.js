@@ -31,13 +31,13 @@ FORGE.ViewFlat.prototype.constructor = FORGE.ViewFlat;
 
 /**
  * Background shader screen to world
- * @type {Object}
+ * @type {ScreenToWorldProgram}
  */
 FORGE.ViewFlat.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.flat;
 
 /**
  * Background shader world to screen
- * @type {Object}
+ * @type {WorldToScreenProgram}
  */
 FORGE.ViewFlat.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.flat;
 
