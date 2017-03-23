@@ -791,7 +791,7 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         typeof mediaConfig.source === "undefined" ||
         typeof mediaConfig.source.format === "undefined")
     {
-        if (this._view.type === FORGE.ViewType.FLAT)
+        if (this._viewManager.current.type === FORGE.ViewType.FLAT)
         {
             this._backgroundRendererType = FORGE.BackgroundType.SHADER;
         }
@@ -809,11 +809,11 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
 
     if (typeof mediaConfig.source === "undefined" ||  typeof mediaConfig.source.format === "undefined")
     {
-        this.log("VR off - view " + this._view.type + ", background type = " + this._backgroundRendererType);
+        this.log("VR off - view " + this._viewManager.current.type + ", background type = " + this._backgroundRendererType);
     }
     else
     {
-        this.log("VR off - media " + mediaConfig.source.format + ", view " + this._view.type +
+        this.log("VR off - media " + mediaConfig.source.format + ", view " + this._viewManager.current.type +
             ", background type = " + this._backgroundRendererType);
     }
 };

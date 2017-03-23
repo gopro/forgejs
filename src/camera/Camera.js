@@ -671,7 +671,7 @@ FORGE.Camera.prototype._updateFlatCamera = function()
     this._flat.bottom = this._flat.position.y - camH / 2;
 
     var max = this._fovMax;
-    var view = this._viewer.renderer.view;
+    var view = this._viewer.renderer.view.current;
 
     if (view !== null && view.fovMax !== null)
     {
@@ -736,7 +736,7 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
     // Clamp the value between min and max
     var min = this._yawMin;
     var max = this._yawMax;
-    var view = this._viewer.renderer.view;
+    var view = this._viewer.renderer.view.current;
 
     if (typeof view !== "undefined")
     {
@@ -787,7 +787,7 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
     // Clamp the value between min and max
     var min = this._pitchMin;
     var max = this._pitchMax;
-    var view = this._viewer.renderer.view;
+    var view = this._viewer.renderer.view.current;
 
     if (typeof view !== "undefined")
     {
@@ -838,7 +838,7 @@ FORGE.Camera.prototype._setRoll = function(value, unit)
     // Clamp the value between min and max
     var min = this._rollMin;
     var max = this._rollMax;
-    var view = this._viewer.renderer.view;
+    var view = this._viewer.renderer.view.current;
 
     if (typeof view !== "undefined")
     {
@@ -886,7 +886,7 @@ FORGE.Camera.prototype._setFov = function(value, unit)
     // Clamp the value between min and max
     var min = this._fovMin;
     var max = this._fovMax;
-    var view = this._viewer.renderer.view;
+    var view = this._viewer.renderer.view.current;
 
     if (typeof view !== "undefined")
     {
