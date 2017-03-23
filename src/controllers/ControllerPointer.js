@@ -3,6 +3,7 @@
  *
  * @constructor FORGE.ControllerPointer
  * @param {FORGE.Viewer} viewer - viewer reference.
+ * @param {ControllerInstanceConfig} config - the configuration of the controller
  * @extends {FORGE.ControllerBase}
  */
 FORGE.ControllerPointer = function(viewer, config)
@@ -10,7 +11,7 @@ FORGE.ControllerPointer = function(viewer, config)
     /**
      * Configuration
      * @name FORGE.ControllerPointer#_config
-     * @type {ControllerPointerConfig}
+     * @type {ControllerInstanceConfig}
      * @private
      */
     this._config = config;
@@ -126,7 +127,7 @@ FORGE.ControllerPointer.prototype._boot = function()
 /**
  * Parse the configuration.
  * @method FORGE.ControllerPointer#_parseConfig
- * @param {ControllerPointerConfig} config - configuration object to parse
+ * @param {ControllerInstanceConfig} config - configuration object to parse
  */
 FORGE.ControllerPointer.prototype._parseConfig = function(config)
 {

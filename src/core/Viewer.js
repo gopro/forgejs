@@ -186,6 +186,14 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._keyboard = null;
 
     /**
+     * Gyroscope interface.
+     * @name FORGE.Viewer#_gyroscope
+     * @type {FORGE.Gyroscope}
+     * @private
+     */
+    this._gyroscope = null;
+
+    /**
      * Plugins interface reference.
      * @name FORGE.Viewer#_plugins
      * @type {FORGE.PluginManager}
@@ -341,6 +349,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._postProcessing = new FORGE.PostProcessing(this);
 
     this._keyboard = new FORGE.Keyboard(this);
+    this._gyroscope = new FORGE.Gyroscope(this);
     this._cache = new FORGE.Cache(this);
     this._load = new FORGE.Loader(this);
     this._tween = new FORGE.TweenManager(this);
@@ -685,6 +694,9 @@ FORGE.Viewer.prototype.destroy = function()
 
     this._keyboard.destroy();
     this._keyboard = null;
+
+    this._gyroscope.destroy();
+    this._gyroscope = null;
 
     this._hotspots.destroy();
     this._hotspots = null;
@@ -1237,6 +1249,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "keyboard",
     get: function()
     {
         return this._keyboard;
+    }
+});
+
+/**
+ * Get the viewer gyroscope interface.
+ * @name FORGE.Viewer#gyroscope
+ * @type {FORGE.Gyroscope}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "gyroscope",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._gyroscope;
     }
 });
 

@@ -36,5 +36,5 @@
         }
     },
 
-    "required": [ "uid", "type", "enabled", "options" ]
+    "required": [ "uid", "type", "enabled" ]
 }

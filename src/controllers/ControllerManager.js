@@ -73,6 +73,12 @@ FORGE.ControllerManager.DEFAULT_CONFIG =
             uid: "controller-keyboard-0",
             type: FORGE.ControllerType.KEYBOARD,
             enabled: true
+        },
+
+        {
+            uid: "controller-gyroscope-0",
+            type: FORGE.ControllerType.GYROSCOPE,
+            enabled: true
         }
     ]
 };
@@ -104,6 +110,10 @@ FORGE.ControllerManager.prototype._parseConfig = function(config)
 
                 case FORGE.ControllerType.KEYBOARD:
                     controller = new FORGE.ControllerKeyboard(this._viewer, controllerConfig);
+                    break;
+
+                case FORGE.ControllerType.GYROSCOPE:
+                    controller = new FORGE.ControllerGyroscope(this._viewer, controllerConfig);
                     break;
 
                 default:

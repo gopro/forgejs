@@ -96,6 +96,7 @@ module.exports = function(grunt)
         "src/controllers/ControllerBase.js",
         "src/controllers/ControllerPointer.js",
         "src/controllers/ControllerKeyboard.js",
+        "src/controllers/ControllerGyroscope.js",
 
         "src/audio/SoundManager.js",
         "src/audio/SoundType.js",
@@ -134,6 +135,7 @@ module.exports = function(grunt)
         "src/input/KeyBinding.js",
         "src/input/Drag.js",
         "src/input/Pointer.js",
+        "src/input/Gyroscope.js",
 
         "src/display/DisplayList.js",
         "src/display/DisplayObject.js",
