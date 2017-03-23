@@ -474,11 +474,11 @@ FORGE.SoundManager.prototype._indexOfSound = function (sound)
 
 /**
  * Suspend audio context if no sound are playing.
- * @method FORGE.SoundManager#autoSuspend
+ * @method FORGE.SoundManager#suspend
  */
-FORGE.SoundManager.prototype.autoSuspend = function()
+FORGE.SoundManager.prototype.suspend = function()
 {
-    if(this._context !== null && typeof this._context.suspend !== "undefined" && this._useWebAudio === true)
+    if(this._context !== null && typeof this._context.suspend !== "undefined" && this._useWebAudio === true && FORGE.Device.safari === false)
     {
         if(this._contextState === "running")
         {
@@ -503,11 +503,11 @@ FORGE.SoundManager.prototype.autoSuspend = function()
 
 /**
  * Resume the audio context if at least one sound is playing.
- * @method FORGE.SoundManager#autoResume
+ * @method FORGE.SoundManager#resume
  */
-FORGE.SoundManager.prototype.autoResume = function()
+FORGE.SoundManager.prototype.resume = function()
 {
-    if(this._context !== null && typeof this._context.resume !== "undefined" && this._useWebAudio === true)
+    if(this._context !== null && typeof this._context.resume !== "undefined" && this._useWebAudio === true && FORGE.Device.safari === false)
     {
         if(this._contextState === "suspended")
         {
@@ -520,6 +520,38 @@ FORGE.SoundManager.prototype.autoResume = function()
                     break;
                 }
             }
+        }
+    }
+};
+
+/**
+ * Pause all playing sounds.
+ * @method FORGE.SoundManager#pauseAll
+ */
+FORGE.SoundManager.prototype.pauseAll = function()
+{
+    for (var i = 0, ii = this._sounds.length; i < ii; i++)
+    {
+        if (this._sounds[i].playing === true)
+        {
+            this._sounds[i].pause();
+            this._sounds[i].resumed = true;
+        }
+    }
+};
+
+/**
+ * Play all sounds that have been paused with the pauseAll method.
+ * @method FORGE.SoundManager#resumeAll
+ */
+FORGE.SoundManager.prototype.resumeAll = function()
+{
+    for (var i = 0, ii = this._sounds.length; i < ii; i++)
+    {
+        if (this._sounds[i].resumed === true)
+        {
+            this._sounds[i].resume();
+            this._sounds[i].resumed = false;
         }
     }
 };

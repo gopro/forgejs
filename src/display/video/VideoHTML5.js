@@ -10,7 +10,7 @@
  * @param {?(string|FORGE.VideoQuality|Array<(string|FORGE.VideoQuality)>)=} config - Either a {@link FORGE.VideoQuality} or a String URL, or an array of strings or {@link FORGE.VideoQuality} if multiquality.
  * @param {?string=} qualityMode - The default quality mode.
  * @param {?boolean=} ambisonic - Is the video sound ambisonic?
- * @extends {FORGE.DisplayObject}
+ * @extends {FORGE.VideoBase}
  *
  * @todo  Define a config object for videos, maybe a class like VideoConfig to describe this porperly.
  * @todo  Make it work with several sources if the user wants to pass a mp4 + webm + ogg for example.
@@ -19,14 +19,6 @@
  */
 FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
 {
-    /**
-     * The viewer reference.
-     * @name FORGE.VideoHTML5#_viewer
-     * @type {FORGE.Viewer}
-     * @private
-     */
-    this._viewer = viewer;
-
     /**
      * The video identifier.
      * @name FORGE.VideoHTML5#_key
@@ -187,7 +179,7 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
      * @private
      */
     this._defaultChannelMap = [0, 1, 2, 3]; //AMBIX
-    // this._defaultChannelMap = [0, 3, 1, 2]; //FUMA
+    //this._defaultChannelMap = [0, 3, 1, 2]; //FUMA
 
     /**
      * Does the video have received its metaData?
@@ -398,38 +390,6 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._onQualityModeChange = null;
 
     /**
-     * Playing status of the video.
-     * @name  FORGE.VideoHTML5#_playing
-     * @type {boolean}
-     * @private
-     */
-    this._playing = false;
-
-    /**
-     * Boolean flag to know if can play is already received.
-     * @name FORGE.VideoHTML5#_canPlay
-     * @type {boolean}
-     * @private
-     */
-    this._canPlay = false;
-
-    /**
-     * Number of play action on this video.
-     * @name  FORGE.VideoHTML5#_playCount
-     * @type {number}
-     * @private
-     */
-    this._playCount = 0;
-
-    /**
-     * Number of the video ended.
-     * @name  FORGE.VideoHTML5#_endCount
-     * @type {number}
-     * @private
-     */
-    this._endCount = 0;
-
-    /**
      * Event handler for request error binded to this.
      * @name FORGE.VideoHTML5#_onRequestErrorBind
      * @type {Function}
@@ -517,10 +477,10 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
      */
     this._decoderInitializedErrorBind = null;
 
-    FORGE.DisplayObject.call(this, viewer, null, "VideoHTML5");
+    FORGE.VideoBase.call(this, viewer, "VideoHTML5");
 };
 
-FORGE.VideoHTML5.prototype = Object.create(FORGE.DisplayObject.prototype);
+FORGE.VideoHTML5.prototype = Object.create(FORGE.VideoBase.prototype);
 FORGE.VideoHTML5.prototype.constructor = FORGE.VideoHTML5;
 
 /**
@@ -530,7 +490,7 @@ FORGE.VideoHTML5.prototype.constructor = FORGE.VideoHTML5;
  */
 FORGE.VideoHTML5.prototype._boot = function()
 {
-    FORGE.DisplayObject.prototype._boot.call(this);
+    FORGE.VideoBase.prototype._boot.call(this);
 
     if (this._ambisonic === true && this._isAmbisonic() === false)
     {
@@ -796,8 +756,9 @@ FORGE.VideoHTML5.prototype._createVideoObjects = function(count)
 
             requestCount: 0,
             currentCount: 0,
-            abortCount: 0, //Number of times this video has been requested and aborted
-            leaveCount: 0, //Number of times this video has been leaved for bandwidth issues
+            abortCount: 0, //Number of times this video has been requested and aborted (accepted: 1 attemp)
+            leaveCount: 0, //Number of times this video has been leaved for bandwidth issues (accepted: 2 attemps)
+            downCount: 0, //Number of times this video has been requested for downgrade (need 3 attemps)
 
             lastTimeStamp: 0
         };
@@ -837,7 +798,6 @@ FORGE.VideoHTML5.prototype._createVideoAt = function(index)
     video.element = element;
     video.buffer = buffer;
     video.played = played;
-    video.lastTimeStamp = 0;
 
     return video;
 };
@@ -852,12 +812,20 @@ FORGE.VideoHTML5.prototype._createVideoAt = function(index)
  */
 FORGE.VideoHTML5.prototype._createSourceTags = function(video, quality)
 {
-    var source = document.createElement("source");
-    source.addEventListener("error", this._onRequestErrorBind, false);
-    source.src = quality.url;
-    source.type = quality.mimeType;
+    if (FORGE.Device.edge === true)
+    {
+        // EDGE is not able to restore the currentTime with source tag
+        video.element.src = quality.url;
+    }
+    else
+    {
+        var source = document.createElement("source");
+        source.addEventListener("error", this._onRequestErrorBind, false);
+        source.src = quality.url;
+        source.type = quality.mimeType;
 
-    video.element.appendChild(source);
+        video.element.appendChild(source);
+    }
 
     return video;
 };
@@ -899,15 +867,18 @@ FORGE.VideoHTML5.prototype._destroyVideoAt = function(index)
             element.pause();
             element.src = "";
 
-            var source;
-            for (var i = 0, ii = element.children.length; i < ii; i++)
+            if (FORGE.Device.edge !== true)
             {
-                source = element.children[i];
-                source.removeEventListener("error", this._onRequestErrorBind, false);
-                source.src = "";
+                var source;
+                for (var i = 0, ii = element.children.length; i < ii; i++)
+                {
+                    source = element.children[i];
+                    source.removeEventListener("error", this._onRequestErrorBind, false);
+                    source.src = "";
 
-                element.removeChild(source);
-                source = null;
+                    element.removeChild(source);
+                    source = null;
+                }
             }
 
             element.load();
@@ -992,17 +963,17 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
 
     if (this._isAmbisonic() === true)
     {
-        // get the global audio context
+        //get the global audio context
         this._context = this._viewer.audio.context;
 
-        // FOA decoder and binaural renderer
+        //FOA decoder and binaural renderer
         this._decoder = Omnitone.createFOADecoder(this._context, requestedVideo.element, {
             channelMap: this._defaultChannelMap
-            // HRTFSetUrl: 'YOUR_HRTF_SET_URL', //Base URL for the cube HRTF sets.
-            // postGainDB: 0, //Post-decoding gain compensation in dB.
+            //HRTFSetUrl: 'YOUR_HRTF_SET_URL', //Base URL for the cube HRTF sets.
+            //postGainDB: 0, //Post-decoding gain compensation in dB.
         });
 
-        // Initialize the decoder
+        //Initialize the decoder
         this._decoderInitializedErrorBind = this._decoderInitializedError.bind(this);
         this._decoder.initialize().then(this._decoderInitializedSuccessBind, this._decoderInitializedErrorBind);
     }
@@ -1035,7 +1006,7 @@ FORGE.VideoHTML5.prototype._decoderInitializedSuccess = function()
 {
     if (this._requestIndex === -1)
     {
-        // get the current video if requested index is set
+        //get the current video if requested index is set
         this._getCurrentVideo().element.load();
     }
     else
@@ -1145,14 +1116,21 @@ FORGE.VideoHTML5.prototype._onRequestSeeked = function()
     this.log("_onRequestSeeked [readyState: " + element.readyState + "]");
     element.removeEventListener("seeked", this._onRequestSeekedBind, false);
 
-    if (element.readyState === 4)
+    if (element.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA)
     {
         element.removeEventListener("error", this._onRequestErrorBind, false);
         this._requestWaitSync();
     }
     else
     {
-        element.addEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+        if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+        {
+            element.addEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+        }
+        else
+        {
+            element.addEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+        }
     }
 };
 
@@ -1167,8 +1145,18 @@ FORGE.VideoHTML5.prototype._onRequestCanPlayAfterSeek = function()
 
     this.log("_onRequestCanPlayAfterSeek [readyState: " + element.readyState + "]");
 
+    //Force the current time of the requested video to the current video time value. Usefull for long duration chunks downloads.
+    element.currentTime = this.currentTime;
+
     //Clean events listeners on element
-    element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+    if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+    {
+        element.removeEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+    }
+    else
+    {
+        element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+    }
     element.removeEventListener("error", this._onRequestErrorBind, false);
 
     this._requestWaitSync();
@@ -1191,12 +1179,15 @@ FORGE.VideoHTML5.prototype._requestWaitSync = function()
     }
 
     //Clean error event listener on requested source
-    var element = this._getRequestedVideo().element;
-    var source;
-    for (var i = 0, ii = element.children.length; i < ii; i++)
+    if (FORGE.Device.edge !== true)
     {
-        source = element.children[i];
-        source.removeEventListener("error", this._onRequestErrorBind, false);
+        var element = this._getRequestedVideo().element;
+        var source;
+        for (var i = 0, ii = element.children.length; i < ii; i++)
+        {
+            source = element.children[i];
+            source.removeEventListener("error", this._onRequestErrorBind, false);
+        }
     }
 
     if (this._forceRequest === true)
@@ -1245,7 +1236,7 @@ FORGE.VideoHTML5.prototype._videoSyncTimerLoop = function()
  */
 FORGE.VideoHTML5.prototype._requestTimeOutHandler = function()
 {
-    this.log("_requestTimeOutHandler");
+    this.log("_requestTimeOutHandler "+this._requestIndex);
     this._abortRequest(true);
 };
 
@@ -1276,13 +1267,13 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
         return;
     }
 
-    // Remove all video tags from our container div
+    //Remove all video tags from our container div
     this._dom.innerHTML = "";
 
     //Get the requested video
     var requestedVideo = this._getRequestedVideo();
 
-    // Resume playback if it was already playing
+    //Resume playback if it was already playing
     if (this._playing === true)
     {
         requestedVideo.element.play();
@@ -1294,11 +1285,11 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
     //Get the current video and clean some events listener (seek while sync), and destroy video tag.
     var videoToBeRemoved = this._getCurrentVideo();
 
-    // Index switch
+    //Index switch
     this._requestIndex = -1;
     this._currentIndex = index;
 
-    // Update current video reference
+    //Update current video reference
     var currentVideo = this._getCurrentVideo();
     currentVideo.currentCount++;
 
@@ -1342,8 +1333,6 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
  */
 FORGE.VideoHTML5.prototype._autoQualityTimerLoop = function()
 {
-    this.log("Auto quality timer loop");
-
     //If there is a pending request, return
     if (this._playing === false || this._requestIndex !== -1)
     {
@@ -1402,12 +1391,17 @@ FORGE.VideoHTML5.prototype._shouldAutoQualityDowngrade = function()
 
     if (time === currentVideo.lastTimeStamp)
     {
-        currentVideo.lastTimeStamp = 0;
-        return true;
+        currentVideo.downCount++;
+        if (currentVideo.downCount >= 3)
+        {
+            currentVideo.lastTimeStamp = 0;
+            return true;
+        }
     }
     else
     {
         currentVideo.lastTimeStamp = time;
+        currentVideo.downCount = 0;
     }
 
     return false;
@@ -1426,7 +1420,7 @@ FORGE.VideoHTML5.prototype._upgradeAutoQuality = function()
     {
         var nextIndex = this._currentIndex + 1;
 
-        if (this._videos[nextIndex].abortCount === 0 && this._videos[nextIndex].leaveCount === 0)
+        if (this._videos[nextIndex].abortCount === 0 && this._videos[nextIndex].leaveCount <= 1)
         {
             this.log("AutoQuality upgrade quality");
             this._setRequestIndex(nextIndex);
@@ -1446,13 +1440,12 @@ FORGE.VideoHTML5.prototype._upgradeAutoQuality = function()
  */
 FORGE.VideoHTML5.prototype._downgradeAutoQuality = function()
 {
-    this.log("AutoQuality downgrade quality");
-
     var currentVideo = this._getCurrentVideo();
     currentVideo.leaveCount++;
 
     if (this._currentIndex - 1 >= 0)
     {
+        this.log("AutoQuality downgrade quality");
         this._setRequestIndex(this._currentIndex - 1, true);
     }
     else
@@ -1542,18 +1535,24 @@ FORGE.VideoHTML5.prototype._abortRequest = function(count)
 FORGE.VideoHTML5.prototype._clearRequestedVideo = function()
 {
     var video = this._getRequestedVideo();
-    var element;
 
     if (video !== null)
     {
         //Remove all listeners used for the requested video
-        element = video.element;
+        var element = video.element;
         element.removeEventListener("loadstart", this._onRequestLoadStartBind, false);
         element.removeEventListener("loadedmetadata", this._onRequestLoadedMetaDataBind, false);
         element.removeEventListener("loadeddata", this._onRequestLoadedDataBind, false);
         element.removeEventListener("play", this._onRequestCanPlayBeforeSeekBind, false);
         element.removeEventListener("seeked", this._onRequestSeekedBind, false);
-        element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+        if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+        {
+            element.removeEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+        }
+        else
+        {
+            element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+        }
         element.removeEventListener("error", this._onRequestErrorBind, false);
 
         //Destroy the requested video
@@ -1684,9 +1683,9 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             break;
 
         case "durationchange":
-            //@firefox - FF disptach durationchange twice on readystate 1 & 4
+            //@firefox - FF dispatch durationchange twice on readystate HAVE_METADATA (1) & HAVE_ENOUGH_DATA (4)
             //I will not dispatch this event if readystate is 4 !
-            if (this._onDurationChange !== null && element.readyState === 1)
+            if (this._onDurationChange !== null && element.readyState === HTMLMediaElement.HAVE_METADATA)
             {
                 this._onDurationChange.dispatch(event);
             }
@@ -1766,10 +1765,10 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             break;
 
         case "volumechange":
-            // I do not dispatch the volume change if readyState is 0. Because
-            // I set the volume at 0 when I create the video element, it is
-            // not usefull to dispatch this internal volume change ?
-            if (this._onVolumeChange !== null && element.readyState !== 0)
+            //I do not dispatch the volume change if readyState is HAVE_NOTHING (0). Because
+            //I set the volume at 0 when I create the video element, it is
+            //not usefull to dispatch this internal volume change ?
+            if (this._onVolumeChange !== null && element.readyState !== HTMLMediaElement.HAVE_NOTHING)
             {
                 this._onVolumeChange.dispatch(event);
             }
@@ -1788,7 +1787,7 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
 
         case "ended":
             this._playing = false;
-            this._dom.currentTime = 0;
+            this.currentTime = 0;
             this._endCount++;
 
             if (this._loop === true)
@@ -1861,7 +1860,7 @@ FORGE.VideoHTML5.prototype.update = function()
 {
     if(this._decoder !== null && this._playing === true)
     {
-        // Rotate the binaural renderer based on a Three.js camera object.
+        //Rotate the binaural renderer based on a Three.js camera object.
         var m4 = this._viewer.renderer.camera.modelViewInverse;
         this._decoder.setRotationMatrixFromCamera(m4);
     }
@@ -1897,16 +1896,32 @@ FORGE.VideoHTML5.prototype.load = function(config)
  */
 FORGE.VideoHTML5.prototype.play = function(time, loop)
 {
-    this.currentTime = time;
-    this.loop = loop;
+    FORGE.VideoBase.prototype.play.call(this, time, loop);
 
     var currentVideo = this._getCurrentVideo();
 
     if (currentVideo !== null && currentVideo.element !== null)
     {
-        currentVideo.element.play();
-        this._playing = true;
-        this._playCount++;
+        var p = currentVideo.element.play();
+        if (typeof p !== "undefined" && typeof Promise !== "undefined" && p instanceof Promise)
+        {
+            p.then(function()
+                {
+                    this._playing = true;
+                    this._paused = false;
+                    this._playCount++;
+                }.bind(this))
+             .catch(function(error)
+                {
+                    this.log("error while playing the video : " + error);
+                }.bind(this));
+        }
+        else
+        {
+            this._playing = true;
+            this._paused = true;
+            this._playCount++;
+        }
     }
 };
 
@@ -1922,6 +1937,7 @@ FORGE.VideoHTML5.prototype.pause = function()
     {
         currentVideo.element.pause();
         this._playing = false;
+        this._paused = true;
     }
 };
 
@@ -1938,6 +1954,7 @@ FORGE.VideoHTML5.prototype.stop = function()
         currentVideo.element.pause();
         currentVideo.element.currentTime = 0;
         this._playing = false;
+        this._paused = true;
     }
 };
 
@@ -2175,7 +2192,7 @@ FORGE.VideoHTML5.prototype.destroy = function()
         this._destroyVideoAt(i);
     }
 
-    // Nullify event listeners binded to this!
+    //Nullify event listeners binded to this!
     this._decoderInitializedSuccessBind = null;
     this._decoderInitializedErrorBind = null;
 
@@ -2201,7 +2218,7 @@ FORGE.VideoHTML5.prototype.destroy = function()
 
     this._videos = null;
 
-    FORGE.DisplayObject.prototype.destroy.call(this);
+    FORGE.VideoBase.prototype.destroy.call(this);
 };
 
 
@@ -2443,7 +2460,7 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "currentTime",
     /** @this {FORGE.VideoHTML5} */
     set: function(value)
     {
-        if (typeof value === "number") // && value < this.duration) //@todo see if we can put video currentTime in pending if no metadata received ?
+        if (typeof value === "number") //@todo see if we can put video currentTime in pending if no metadata received ? (typeof value === "number" && value < this.duration)
         {
             var currentVideo = this._getCurrentVideo();
 
@@ -2521,66 +2538,6 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "durationMS",
     get: function()
     {
         return Math.round(this.duration * 1000);
-    }
-});
-
-/**
- * Get the playing status of the video.
- * @name FORGE.VideoHTML5#playing
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "playing",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._playing;
-    }
-});
-
-/**
- * Get the number of play action of the video.
- * @name FORGE.VideoHTML5#playCount
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "playCount",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._playCount;
-    }
-});
-
-/**
- * Get the canPlay status of the video.
- * @name FORGE.VideoHTML5#canPlay
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "canPlay",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._canPlay;
-    }
-});
-
-/**
- * Get the number of the video ends.
- * @name FORGE.VideoHTML5#endCount
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoHTML5.prototype, "endCount",
-{
-    /** @this {FORGE.VideoHTML5} */
-    get: function()
-    {
-        return this._endCount;
     }
 });
 

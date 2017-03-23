@@ -152,6 +152,14 @@ FORGE.Sound = function(viewer, key, url, ambisonic)
     this._paused = false;
 
     /**
+     * The resumed state of the sound.
+     * @name FORGE.Sound#_resumed
+     * @type {boolean}
+     * @private
+     */
+    this._resumed = false;
+
+    /**
      * The sound file with augmented properties.
      * @property {AudioBuffer} data The sound file data contained into an AudioBuffer.
      * @name FORGE.Sound#_soundFile
@@ -906,7 +914,7 @@ FORGE.Sound.prototype.play = function(position, loop, forceRestart)
         }
     }
 
-    this._viewer.audio.autoResume();
+    this._viewer.audio.resume();
 };
 
 /**
@@ -931,7 +939,7 @@ FORGE.Sound.prototype.stop = function(internal)
             this._onStop.dispatch();
         }
 
-        this._viewer.audio.autoSuspend();
+        this._viewer.audio.suspend();
     }
     else if (this._ready === false || this._decoded !== true)
     {
@@ -1005,7 +1013,7 @@ FORGE.Sound.prototype.pause = function()
             this._onPause.dispatch();
         }
 
-        this._viewer.audio.autoSuspend();
+        this._viewer.audio.suspend();
     }
     else if (this._ready === false || this._decoded !== true)
     {
@@ -1078,7 +1086,7 @@ FORGE.Sound.prototype.resume = function()
             this._onResume.dispatch();
         }
 
-        this._viewer.audio.autoResume();
+        this._viewer.audio.resume();
     }
     else if (this._ready === false || this._decoded === false)
     {
@@ -1526,6 +1534,29 @@ Object.defineProperty(FORGE.Sound.prototype, "paused",
     get: function()
     {
         return this._paused;
+    }
+});
+
+/**
+ * Get/Set the resumed status of the sound.
+ * @name FORGE.Sound#resumed
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.Sound.prototype, "resumed",
+{
+    /** @this {FORGE.Sound} */
+    get: function()
+    {
+        return this._resumed;
+    },
+
+    /** @this {FORGE.Sound} */
+    set: function(value)
+    {
+        if (typeof value === "boolean")
+        {
+            this._resumed = value;
+        }
     }
 });
 

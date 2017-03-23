@@ -15,9 +15,9 @@
 
         "type": {
             "type": "string",
-            "enum": [ "image", "video" ],
+            "enum": [ "image", "video", "grid" ],
             "title": "Type",
-            "description": "The type of the media. Can be :<ul><li>image</li><li>video</li></ul>",
+            "description": "The type of the media. Can be :<ul><li>image</li><li>video</li><li>grid</li></ul>",
             "example": "image"
         },
 

@@ -625,7 +625,7 @@ FORGE.Camera.prototype._updateFromMatrix = function()
  */
 FORGE.Camera.prototype._updateMainCamera = function()
 {
-    if (this._main === null || this._viewer.renderer.view === null)
+    if (this._main === null || this._viewer.renderer.view.current === null)
     {
         return;
     }
@@ -643,7 +643,7 @@ FORGE.Camera.prototype._updateMainCamera = function()
     this._main.matrixWorld = mat;
     this._main.matrixWorldInverse.getInverse(mat);
 
-    this._main.fov = FORGE.Math.radToDeg(this._viewer.renderer.view.getProjectionFov());
+    this._main.fov = FORGE.Math.radToDeg(this._viewer.renderer.view.current.getProjectionFov());
     this._main.aspect = this._viewer.renderer.displayResolution.ratio;
     this._main.updateProjectionMatrix();
     
@@ -1274,6 +1274,7 @@ Object.defineProperty(FORGE.Camera.prototype, "parallax",
     set: function(value)
     {
         this._parallax = FORGE.Math.clamp(value, 0, 1);
+        this._radius = this._parallax * FORGE.Camera.RADIUS;
         this._updateComplete();
     }
 });

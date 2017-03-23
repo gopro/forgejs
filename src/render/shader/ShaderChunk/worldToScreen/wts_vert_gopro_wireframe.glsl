@@ -26,7 +26,7 @@ void main() {
     float offset = radius - 1.0;
     spherePt.xyz *= radius;
     spherePt.z += offset;
-        
+
     gl_Position = projectionMatrix * spherePt;
     vUv = uv;
     vQuadrilateralCoords = quadrilateralCoords;

@@ -446,8 +446,24 @@ FORGE.Story.prototype.loadScene = function(value)
     //If uid is defined and if it's not the current scene
     if(typeof uid !== "undefined" && uid !== this._sceneUid)
     {
+        // Disable picking while the scene is loading
+        this._viewer.renderer.pickingManager.stop();
+
+        // Readd it when the background is ready again
+        this._viewer.renderer.onBackgroundReady.addOnce(this._onBackgroundReadyHandler, this);
+
         this._loadUid(uid);
     }
+};
+
+/**
+ * Handler for the onBackgroundReady event of the FORGE.Scene that is being loaded.
+ * @method FORGE.Story#_onBackgroundReadyHandler
+ * @private
+ */
+FORGE.Story.prototype._onBackgroundReadyHandler = function()
+{
+    this._viewer.renderer.pickingManager.start();
 };
 
 /**
@@ -663,7 +679,7 @@ FORGE.Story.prototype.destroy = function()
 Object.defineProperty(FORGE.Story.prototype, "config",
 {
     /** @this {FORGE.Story} */
-    get: function ()
+    get: function()
     {
         return this._config;
     }
@@ -724,7 +740,7 @@ Object.defineProperty(FORGE.Story.prototype, "description",
 Object.defineProperty(FORGE.Story.prototype, "scenes",
 {
     /** @this {FORGE.Story} */
-    get: function ()
+    get: function()
     {
         return FORGE.UID.get(this._scenes);
     }
@@ -738,7 +754,7 @@ Object.defineProperty(FORGE.Story.prototype, "scenes",
 Object.defineProperty(FORGE.Story.prototype, "scene",
 {
     /** @this {FORGE.Story} */
-    get: function ()
+    get: function()
     {
         if(this._sceneUid === null || this._sceneUid === "")
         {
@@ -756,17 +772,37 @@ Object.defineProperty(FORGE.Story.prototype, "scene",
 });
 
 /**
+* Get all the sceneUids.
+* @name FORGE.Story#sceneUids
+* @readonly
+* @type {Array<string>}
+*/
+Object.defineProperty(FORGE.Story.prototype, "sceneUids",
+{
+    /** @this {FORGE.Story} */
+    get: function()
+    {
+        return this._scenes;
+    }
+});
+
+/**
 * Get the current sceneUid.
 * @name FORGE.Story#sceneUid
-* @readonly
 * @type {string}
 */
 Object.defineProperty(FORGE.Story.prototype, "sceneUid",
 {
     /** @this {FORGE.Story} */
-    get: function ()
+    get: function()
     {
         return this._sceneUid;
+    },
+
+    /** @this {FORGE.Story} */
+    set: function(value)
+    {
+        this.loadScene(value);
     }
 });
 
@@ -793,7 +829,7 @@ Object.defineProperty(FORGE.Story.prototype, "groups",
 Object.defineProperty(FORGE.Story.prototype, "group",
 {
     /** @this {FORGE.Story} */
-    get: function ()
+    get: function()
     {
         if(this._groupUid === null || this._groupUid === "")
         {
@@ -811,17 +847,37 @@ Object.defineProperty(FORGE.Story.prototype, "group",
 });
 
 /**
+* Get all the group Uids.
+* @name FORGE.Story#groupUids
+* @readonly
+* @type {Array<string>}
+*/
+Object.defineProperty(FORGE.Story.prototype, "groupUids",
+{
+    /** @this {FORGE.Story} */
+    get: function()
+    {
+        return this._groups;
+    }
+});
+
+/**
 * Get the current groupUid.
 * @name FORGE.Story#groupUid
-* @readonly
 * @type {string}
 */
 Object.defineProperty(FORGE.Story.prototype, "groupUid",
 {
     /** @this {FORGE.Story} */
-    get: function ()
+    get: function()
     {
         return this._groupUid;
+    },
+
+    /** @this {FORGE.Story} */
+    set: function(value)
+    {
+        this.loadGroup(value);
     }
 });
 

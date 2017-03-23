@@ -23,10 +23,31 @@
         "volume": {
             "type": "number",
             "title": "Volume",
-            "description": "The volume of the media",
+            "description": "The volume of the media.",
             "minimum": 0,
             "maximum": 1,
             "default": 1
+        },
+
+        "startTime": {
+            "type": "number",
+            "title": "Start Time",
+            "description": "Set the current position (in seconds) of the video playback.",
+            "default": 0
+        },
+
+        "autoPause": {
+            "type": "boolean",
+            "title": "Autopause",
+            "description": "Does the video need to be paused automatically when the page is not visible anymore ?",
+            "default": true
+        },
+
+        "autoResume": {
+            "type": "boolean",
+            "title": "Autoresume",
+            "description": "Does the video need to be resumed automatically when the page is visible again ?",
+            "default": false
         }
     }
 }

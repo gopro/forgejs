@@ -58,7 +58,7 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
      * @type {string}
      * @private
      */
-    this._gridColor = options.color || "#000000";
+    this._gridColor = options.color || "#ffffff";
 
     /**
      * The layout of the faces in the texture. There are six faces to specify:
@@ -129,8 +129,8 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
 
     // Set perspective camera
     this._camera = this._viewer.renderer.camera.main;
-    this._viewer.renderer.camera.fovMin = this._viewer.renderer.view.fovMin;
-    this._viewer.renderer.camera.fovMax = this._viewer.renderer.view.fovMax;
+    this._viewer.renderer.camera.fovMin = this._viewer.renderer.view.current.fovMin;
+    this._viewer.renderer.camera.fovMax = this._viewer.renderer.view.current.fovMax;
 
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
 
@@ -488,7 +488,7 @@ FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = functi
             }
         }
     }
-            
+
     this._mesh.geometry.addAttribute("quadrilateralCoords", new THREE.BufferAttribute(quadri, 2));
 };
 
@@ -499,7 +499,7 @@ FORGE.BackgroundMeshRenderer.prototype._addQuadrilateralCoordsAttribute = functi
  */
 FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 {
-    if (this._viewer.renderer.view === null)
+    if (this._viewer.renderer.view.current === null)
     {
         this.log("Background renderer cannot update internals without a defined view");
         return;
@@ -508,13 +508,13 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
     var shader;
     if (this._mediaType === FORGE.MediaType.GRID)
     {
-        shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).wireframe;
+        shader = FORGE.Utils.clone(this._viewer.renderer.view.current.shaderWTS).wireframe;
         this.log("Media " + this._mediaType + ", use wireframe shader");
         this._subdivision = 8;
     }
     else
     {
-        shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS).mapping;
+        shader = FORGE.Utils.clone(this._viewer.renderer.view.current.shaderWTS).mapping;
         this.log("Media " + this._mediaType + ", use mapping shader");
     }
 

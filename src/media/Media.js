@@ -88,13 +88,15 @@ FORGE.Media.prototype._parseConfig = function(config)
     // media configuration
     var mediaConfig = config.media;
 
-    if (typeof mediaConfig === "undefined")
+    if (typeof mediaConfig === "undefined" || mediaConfig === null)
     {
         return;
     }
 
-    // Warning : UID is not registered and applied to the FORGE.ImageScalable|FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
+    // Warning : UID is not registered and applied to the FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
     this._uid = mediaConfig.uid;
+
+    this._options = (typeof mediaConfig.options !== "undefined") ? mediaConfig.options : null;
 
     var source = mediaConfig.source;
 
@@ -107,8 +109,15 @@ FORGE.Media.prototype._parseConfig = function(config)
     if (mediaConfig.type === FORGE.MediaType.GRID)
     {
         this._ready = true;
+        return;
     }
-    else if (mediaConfig.type === FORGE.MediaType.IMAGE)
+
+    if (typeof mediaConfig.source === "undefined" || mediaConfig.source === null)
+    {
+        return;
+    }
+
+    if (mediaConfig.type === FORGE.MediaType.IMAGE)
     {
         var imageConfig;
 
@@ -144,8 +153,10 @@ FORGE.Media.prototype._parseConfig = function(config)
         }
 
         this._displayObject.onLoadComplete.addOnce(this._onImageLoadComplete, this);
+        return;
     }
-    else if (mediaConfig.type === FORGE.MediaType.VIDEO)
+
+    if (mediaConfig.type === FORGE.MediaType.VIDEO)
     {
         // If the levels property is present, we get all urls from it and put it
         // inside source.url: it means that there is multi-quality. It is way
@@ -156,8 +167,18 @@ FORGE.Media.prototype._parseConfig = function(config)
             source.url = [];
             for (var i = 0, ii = source.levels.length; i < ii; i++)
             {
+                if(FORGE.Device.check(source.levels[i].device) === false)
+                {
+                    continue;
+                }
+
                 source.url.push(source.levels[i].url);
             }
+        }
+
+        if (typeof source.url !== "string" && source.url.length === 0)
+        {
+            return;
         }
 
         if (typeof source.streaming !== "undefined" && source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
@@ -175,9 +196,8 @@ FORGE.Media.prototype._parseConfig = function(config)
         this._displayObject.load(source.url);
 
         this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
+        return;
     }
-
-    this._options = (typeof mediaConfig.options !== "undefined") ? mediaConfig.options : null;
 };
 
 /**
@@ -202,15 +222,20 @@ FORGE.Media.prototype._onImageLoadComplete = function()
 FORGE.Media.prototype._onLoadedMetaDataHandler = function()
 {
     this._ready = true;
+
     if (this._options !== null)
     {
         this._displayObject.volume = (typeof this._options.volume === "number") ? this._options.volume : 1;
         this._displayObject.loop = (typeof this._options.loop === "boolean") ? this._options.loop : true;
+        this._displayObject.currentTime = (typeof this._options.startTime === "number") ? this._options.startTime : 0;
 
-        if (this._options.autoPlay === true)
+        if (this._options.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
         {
             this._displayObject.play();
         }
+
+        this._displayObject.autoPause = this._options.autoPause;
+        this._displayObject.autoResume = this._options.autoResume;
     }
 
     if (this._onLoadComplete !== null)

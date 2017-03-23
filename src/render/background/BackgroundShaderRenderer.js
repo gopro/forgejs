@@ -170,11 +170,11 @@ FORGE.BackgroundShaderRenderer.prototype._mediaQualityChangeHandler = function(e
  */
 FORGE.BackgroundShaderRenderer.prototype._updateInternals = function()
 {
-    var shaderSTW = this._viewer.renderer.view.shaderSTW;
+    var shaderSTW = this._viewer.renderer.view.current.shaderSTW;
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shaderSTW.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shaderSTW.fragmentShader);
-    
+
     var material = new THREE.ShaderMaterial({
         uniforms: /** @type {FORGEUniform} */ (shaderSTW.uniforms),
         vertexShader: vertexShader,

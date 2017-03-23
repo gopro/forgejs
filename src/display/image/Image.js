@@ -13,7 +13,7 @@ FORGE.Image = function(viewer, config, className)
     /**
      * Image configuration
      * @name  FORGE.Image#_config
-     * @type {?Object|string}
+     * @type {?ImageConfig|string}
      * @property {string} key - The cache key associated to this image.
      * @property {string} url - The URL of the image if not i18n
      * @property {string} i18n - The i18n key to find the URL of an i18n image.
@@ -151,7 +151,7 @@ FORGE.Image = function(viewer, config, className)
      * @type {string}
      * @private
      */
-    this._renderMode = FORGE.Image.renderMode;
+    this._renderMode = "";
 
     /**
      * If the renderMode is CANVAS, you'll need a canvas element, so this is the canvas reference.
@@ -223,19 +223,6 @@ FORGE.Image.prototype._boot = function()
 
     //Images keeps ratio by default
     this._keepRatio = true;
-
-    if(this._renderMode === FORGE.Image.renderModes.CSS)
-    {
-        this._dom.style.backgroundRepeat = "no-repeat";
-    }
-    else if(this._renderMode === FORGE.Image.renderModes.CANVAS)
-    {
-        this._canvas = document.createElement("canvas");
-        this._canvas.style.position = "absolute";
-        this._canvas.style.top = "0px";
-        this._canvas.style.left = "0px";
-        this._dom.appendChild(this._canvas);
-    }
 
     if(this._config !== null)
     {
@@ -369,6 +356,32 @@ FORGE.Image.prototype._localeChangeComplete = function()
     {
         var url = this._i18nImageUrlLocaleString.value;
         this._loadImage(key, url);
+    }
+};
+
+/**
+ * Set the render mode of the image
+ * @method FORGE.Image#_setRenderMode
+ * @private
+ */
+FORGE.Image.prototype._setRenderMode = function(mode)
+{
+    if(mode === FORGE.Image.renderModes.CSS || mode === FORGE.Image.renderModes.CANVAS)
+    {
+        this._renderMode = mode;
+    }
+
+    if(this._renderMode === FORGE.Image.renderModes.CSS)
+    {
+        this._dom.style.backgroundRepeat = "no-repeat";
+    }
+    else if(this._renderMode === FORGE.Image.renderModes.CANVAS)
+    {
+        this._canvas = document.createElement("canvas");
+        this._canvas.style.position = "absolute";
+        this._canvas.style.top = "0px";
+        this._canvas.style.left = "0px";
+        this._dom.appendChild(this._canvas);
     }
 };
 
@@ -562,7 +575,6 @@ FORGE.Image.prototype._loadFramesComplete = function(file)
     if(typeof file.data.frames !== "undefined")
     {
         this._frames = file.data.frames;
-        //this._setFrame(this._frames[0].frame);
     }
     else
     {
@@ -634,6 +646,9 @@ FORGE.Image.prototype._parseConfig = function(config)
 {
     if(typeof config === "object" && config !== null)
     {
+        var renderMode = (typeof config.renderMode === "string") ? config.renderMode : FORGE.Image.renderMode;
+        this._setRenderMode(renderMode);
+
         this._imageKey = config.key || "";
 
         this._i18n = config.i18n || false;
@@ -668,6 +683,8 @@ FORGE.Image.prototype._parseConfig = function(config)
     }
     else
     {
+        this._setRenderMode(FORGE.Image.renderMode);
+
         this._imageKey = "";
         this._imageUrl = "";
         this._i18n = false;
@@ -826,6 +843,21 @@ Object.defineProperty(FORGE.Image.prototype, "element",
     get: function()
     {
         return this._img;
+    }
+});
+
+/**
+* Get the canvas element for canvas renderer mode.
+* @name FORGE.Image#canvas
+* @readonly
+* @type {Element|HTMLCanvasElement}
+*/
+Object.defineProperty(FORGE.Image.prototype, "canvas",
+{
+    /** @this {FORGE.Image} */
+    get: function()
+    {
+        return this._canvas;
     }
 });
 

@@ -2,7 +2,7 @@
     "id": "hotspot-events",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "HotspotEventConfig",
-    "description": "An instance of <a href='#hotspot-sound-events'>the hotspot events object.</a>",
+    "description": "An instance of <a href='#hotspot-events'>the hotspot events object.</a>",
     "type": "object",
 
     "properties": {

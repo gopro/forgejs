@@ -44,14 +44,6 @@ FORGE.Hotspot3D = function(viewer, config)
     this._material = null;
 
     /**
-     * Color based on 3D Object id used for picking.
-     * @name FORGE.Hotspot3D#_pickingColor
-     * @type {THREE.Color}
-     * @private
-     */
-    this._pickingColor = null;
-
-    /**
      * Sound object for the 3D object.
      * @name  FORGE.Hotspot3D#_sound
      * @type {FORGE.HotspotSound}
@@ -68,12 +60,29 @@ FORGE.Hotspot3D = function(viewer, config)
     this._animation = null;
 
     /**
+     * Hotspots states manager
+     * @name FORGE.Hotspot3D#_states
+     * @type {FORGE.HotspotStates}
+     * @private
+     */
+    this._states = null;
+
+    /**
      * Does the hotspot is facing the camera ? Useful for a flat hotspot we want
      * to always be facing to the camera.
+     * @name FORGE.Hotspot3D#_facingCenter
      * @type {boolean}
      * @private
      */
     this._facingCenter = false;
+
+    /**
+     * The pointer cursor when pointer is over the Object3D
+     * @name FORGE.Hotspot3D#_cursor
+     * @type {string}
+     * @private
+     */
+    this._cursor = "pointer";
 
     /**
      * Before render bound callback.
@@ -113,6 +122,12 @@ FORGE.Hotspot3D.prototype._boot = function()
     this._onBeforeRenderBound = this._onBeforeRender.bind(this);
     this._onAfterRenderBound = this._onAfterRender.bind(this);
 
+    this._mesh.visible = false;
+    this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
+    this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);
+
+    this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
+
     if (typeof this._config !== "undefined" && this._config !== null)
     {
         this._parseConfig(this._config);
@@ -131,31 +146,40 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._tags = config.tags;
     this._register();
 
-    this._type = config.type;
-    this._name = config.name;
-    this._visible = config.visible;
-
+    // Set the mesh name
     this._mesh.name = "mesh-" + this._uid;
+    this._mesh.userData = config;
 
-    this._facingCenter = config.facingCenter || false;
+    this._name = (typeof config.name === "string") ? config.name : "";
+    this._visible = (typeof config.visible === "boolean") ? config.visible : true;
+    this._facingCenter = (typeof config.facingCenter === "boolean") ? config.facingCenter : false;
+    this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
+    this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
 
-    if (typeof config.transform !== "undefined")
+    this._states = new FORGE.HotspotStates(this._viewer, this._uid);
+
+    if (typeof config.states === "object" && config.states !== null)
+    {
+        this._states.addConfig(config.states);
+    }
+
+    if (typeof config.transform === "object" && config.transform !== null)
     {
         this._transform.load(config.transform);
     }
 
-    if (typeof config.animation !== "undefined")
+    if (typeof config.animation === "object" && config.animation !== null)
     {
         this._animation.load(config.animation);
         this._animation.onProgress.add(this._updatePosition, this);
     }
 
-    this._material.onReady.add(this._materialReadyHandler, this);
+    this._createGeometry(config.geometry);
 
     /** @type {HotspotMaterialConfig} */
     var materialConfig;
 
-    if (typeof config.material !== "undefined")
+    if (typeof config.material === "object" && config.material !== null)
     {
         materialConfig = config.material;
     }
@@ -169,22 +193,62 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         materialConfig = /** @type {HotspotMaterialConfig} */ (FORGE.Utils.extendMultipleObjects(materialConfig, FORGE.HotspotMaterial.presets.DEBUG));
     }
 
-    this._material.load(materialConfig);
-
-    if (typeof config.sound !== "undefined")
+    if (typeof config.sound === "object" && config.sound !== null)
     {
         this._sound = new FORGE.HotspotSound(this._viewer);
         this._sound.load(config.sound, config.transform);
     }
 
-    if (typeof config.fx === "string")
+    if (typeof config.fx === "string" && config.fx !== "")
     {
         this._fx = config.fx;
     }
 
-    if (typeof config.events === "object")
+    if (typeof config.events === "object" && config.events !== null)
     {
         this._createEvents(config.events);
+    }
+
+    this._updatePosition();
+
+    this._states.onLoadComplete.add(this._stateLoadComplete, this);
+    this._states.load();
+};
+
+FORGE.Hotspot3D.prototype._createGeometry = function(config)
+{
+    this.log("create geometry");
+
+    if (typeof config !== "undefined" && typeof config.type === "string")
+    {
+        var options = config.options;
+
+        switch (config.type)
+        {
+            case FORGE.HotspotGeometryType.BOX:
+                this._mesh.geometry = FORGE.HotspotGeometry.BOX(options);
+                break;
+
+            case FORGE.HotspotGeometryType.SPHERE:
+                this._mesh.geometry = FORGE.HotspotGeometry.SPHERE(options);
+                break;
+
+            case FORGE.HotspotGeometryType.CYLINDER:
+                this._mesh.geometry = FORGE.HotspotGeometry.CYLINDER(options);
+                break;
+
+            case FORGE.HotspotGeometryType.PLANE:
+                this._mesh.geometry = FORGE.HotspotGeometry.PLANE(options);
+                break;
+
+            default:
+                this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
+                break;
+        }
+    }
+    else
+    {
+        this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
     }
 };
 
@@ -195,24 +259,14 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
  */
 FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, geometry, material, group)
 {
-    //Logs these value for jscs check (if not warn parameter is not used)
-    this.log(group);
+    var g = group; // Just to avoid the jscs warning about group parameter not used.
 
-    var gl = this._viewer.renderer.webGLRenderer.getContext();
-
-    this._viewer.renderer.view.updateUniforms(material.uniforms);
+    this._viewer.renderer.view.current.updateUniforms(material.uniforms);
 
     // Check what is the current render pass looking at the material: Hotspot or Picking Material
     if (material.name === "HotspotMaterial")
     {
-        if (this._material.type === FORGE.HotspotMaterial.types.GRAPHICS)
-        {
-            material.uniforms.tColor.value = new THREE.Color(this._material.color);
-        }
-        else
-        {
-            material.uniforms.tTexture.value = this._material._texture;
-        }
+        this._material.update();
     }
     else if (material.name === "PickingMaterial")
     {
@@ -222,10 +276,10 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
         // Set also material uniform to avoid both settings will collide on first object
         if (material.program)
         {
-            var color = this._pickingColor;
+            var gl = this._viewer.renderer.webGLRenderer.getContext();
             gl.useProgram(material.program.program);
-            material.program.getUniforms().map.tColor.setValue(gl, color);
-            material.uniforms.tColor.value = color;
+            material.program.getUniforms().map.tColor.setValue(gl, this._pickingColor);
+            material.uniforms.tColor.value = this._pickingColor;
         }
     }
 };
@@ -236,75 +290,26 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
  * @private
  */
 FORGE.Hotspot3D.prototype._onAfterRender = function()
-{};
-
-/**
- * Event handler for material ready. Triggers the creation of the hotspot3D.
- * @method FORGE.Hotspot3D#_materialReadyHandler
- * @private
- */
-FORGE.Hotspot3D.prototype._materialReadyHandler = function()
 {
-    this._mesh.material = this._material.material;
 
-    this._createHotspot3D();
-
-    this._pickingColor = FORGE.PickingDrawPass.colorFrom3DObject(this._mesh);
-
-    this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
-    this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);
-
-    if (this._animation.autoPlay === true)
-    {
-        this._animation.play();
-    }
 };
 
 /**
- * Final init step once setup is done.
- * @method FORGE.Hotspot3D#_setupDoneCallback
+ * Event handler for material ready. Triggers the creation of the hotspot3D.
+ * @method FORGE.Hotspot3D#_stateLoadComplete
  * @private
  */
-FORGE.Hotspot3D.prototype._createHotspot3D = function()
+FORGE.Hotspot3D.prototype._stateLoadComplete = function()
 {
-    if (typeof this._config.geometry !== "undefined" && typeof this._config.geometry.type === "string")
-    {
-        var options = this._config.geometry.options;
+    this.log("material ready handler");
 
-        switch (this._config.geometry.type)
-        {
-            case FORGE.HotspotGeometryType.BOX:
-                this._mesh.geometry = FORGE.HotspotGeometry.BOX(options);
-                break;
-            case FORGE.HotspotGeometryType.SPHERE:
-                this._mesh.geometry = FORGE.HotspotGeometry.SPHERE(options);
-                break;
-            case FORGE.HotspotGeometryType.CYLINDER:
-                this._mesh.geometry = FORGE.HotspotGeometry.CYLINDER(options);
-                break;
-            case FORGE.HotspotGeometryType.PLANE:
-                this._mesh.geometry = FORGE.HotspotGeometry.PLANE(options);
-                break;
-            default:
-                this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
-                break;
-        }
-    }
-    else
-    {
-        this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
-    }
-
-    this._mesh.geometry.scale(this._transform.scale.x, this._transform.scale.y, this._transform.scale.z);
     this._mesh.material = this._material.material;
-    this._mesh.userData = this._config;
+    this._mesh.visible = true;
 
-    // Only enable frustum culling when view is rectilinear and frustum makes sense
-    this._mesh.frustumCulled = this._viewer.renderer.view instanceof FORGE.ViewRectilinear;
-
-    this._updatePosition();
-
-    this._ready = true;
+    if (this._animation.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
+    {
+        this._animation.play();
+    }
 
     if (this._onReady !== null)
     {
@@ -319,6 +324,8 @@ FORGE.Hotspot3D.prototype._createHotspot3D = function()
  */
 FORGE.Hotspot3D.prototype._updatePosition = function()
 {
+    this.log("update position");
+
     this._mesh.position.x = this._transform.position.x;
     this._mesh.position.y = this._transform.position.y;
     this._mesh.position.z = this._transform.position.z;
@@ -351,16 +358,68 @@ FORGE.Hotspot3D.prototype._updatePosition = function()
 };
 
 /**
+ * Check the ready flag of hotspot
+ * @method FORGE.Hotspot3D#_checkReady
+ * @return {boolean}
+ * @private
+ */
+FORGE.Hotspot3D.prototype._checkReady = function()
+{
+    return (this._states.ready === true);
+};
+
+/**
+ * View change handler
+ * @method FORGE.Hotspot3D#_viewChangeHandler
+ * @private
+ */
+FORGE.Hotspot3D.prototype._viewChangeHandler = function()
+{
+    // Only enable frustum culling when view is rectilinear and frustum makes sense
+    this._mesh.frustumCulled = this._viewer.renderer.view.current instanceof FORGE.ViewRectilinear;
+
+    this._material.updateShader();
+    this._mesh.material = this._material.material;
+};
+
+/**
+ * Override of the over method to trigger the state change
+ * @method FORGE.Hotspot3D#over
+ */
+FORGE.Hotspot3D.prototype.over = function()
+{
+    FORGE.Object3D.prototype.over.call(this);
+
+    if(this._states.auto === true)
+    {
+        this._states.load("over");
+    }
+
+    this._viewer.canvas.pointer.cursor = this._cursor;
+};
+
+/**
+ * Override of the out method to trigger the state change
+ * @method FORGE.Hotspot3D#out
+ */
+FORGE.Hotspot3D.prototype.out = function()
+{
+    FORGE.Object3D.prototype.out.call(this);
+
+    if(this._states.auto === true)
+    {
+        this._states.load();
+    }
+
+    this._viewer.canvas.pointer.cursor = "default";
+};
+
+/**
  * Update hotspot content
  * @method FORGE.Hotspot3D#update
  */
 FORGE.Hotspot3D.prototype.update = function()
 {
-    if (this._material !== null)
-    {
-        this._material.update();
-    }
-
     if (this._sound !== null)
     {
         this._sound.update();
@@ -373,10 +432,16 @@ FORGE.Hotspot3D.prototype.update = function()
  */
 FORGE.Hotspot3D.prototype.destroy = function()
 {
-    this._material.onReady.remove(this._materialReadyHandler, this);
+    this._viewer.renderer.view.onChange.remove(this._viewChangeHandler, this);
 
     this._onBeforeRenderBound = null;
     this._onAfterRenderBound = null;
+
+    if(this._states !== null)
+    {
+        this._states.destroy();
+        this._states = null;
+    }
 
     if (this._transform !== null)
     {
@@ -406,17 +471,17 @@ FORGE.Hotspot3D.prototype.destroy = function()
 };
 
 /**
- * Hotspot type accessor
- * @name FORGE.Hotspot3D#visible
+ * Hotspot config accessor
+ * @name FORGE.Hotspot3D#config
  * @readonly
- * @type {string}
+ * @type {HotspotConfig}
  */
-Object.defineProperty(FORGE.Hotspot3D.prototype, "type",
+Object.defineProperty(FORGE.Hotspot3D.prototype, "config",
 {
     /** @this {FORGE.Hotspot3D} */
     get: function()
     {
-        return this._type;
+        return this._config;
     }
 });
 
@@ -447,5 +512,87 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "animation",
     get: function()
     {
         return this._animation;
+    }
+});
+
+/**
+ * Hotspot material accessor
+ * @name FORGE.Hotspot3D#material
+ * @readonly
+ * @type {FORGE.HotspotMaterial}
+ */
+Object.defineProperty(FORGE.Hotspot3D.prototype, "material",
+{
+    /** @this {FORGE.Hotspot3D} */
+    get: function()
+    {
+        return this._material;
+    }
+});
+
+/**
+ * Hotspot transform accessor
+ * @name FORGE.Hotspot3D#transform
+ * @readonly
+ * @type {FORGE.HotspotTransform}
+ */
+Object.defineProperty(FORGE.Hotspot3D.prototype, "transform",
+{
+    /** @this {FORGE.Hotspot3D} */
+    get: function()
+    {
+        return this._transform;
+    }
+});
+
+/**
+ * Hotspot3D ready flag
+ * @name FORGE.Hotspot3D#ready
+ * @readonly
+ * @type boolean
+  */
+Object.defineProperty(FORGE.Hotspot3D.prototype, "ready",
+{
+    /** @this {FORGE.Object3D} */
+    get: function()
+    {
+        this._ready = this._checkReady();
+        return this._ready;
+    }
+});
+
+/**
+ * Hotspot states accessor
+ * @name FORGE.Hotspot3D#states
+ * @readonly
+ * @type {FORGE.HotspotStates}
+ */
+Object.defineProperty(FORGE.Hotspot3D.prototype, "states",
+{
+    /** @this {FORGE.Hotspot3D} */
+    get: function()
+    {
+        return this._states;
+    }
+});
+
+/**
+ * Hotspot states accessor
+ * @name FORGE.Hotspot3D#states
+ * @readonly
+ * @type {FORGE.HotspotStates}
+ */
+Object.defineProperty(FORGE.Hotspot3D.prototype, "state",
+{
+    /** @this {FORGE.Hotspot3D} */
+    get: function()
+    {
+        return this._states.state;
+    },
+
+    /** @this {FORGE.Hotspot3D} */
+    set: function(value)
+    {
+        this._states.load(value);
     }
 });

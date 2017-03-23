@@ -20,6 +20,17 @@
             "example": "multi/video-2K.mp4"
         },
 
+        "device": {
+            "type": "object",
+            "title": "Device",
+            "description": "The device requirements.",
+            "example": {
+                "safari": false,
+                "webvr": true,
+                "os": "Windows"
+            }
+        },
+
         "width": {
             "type": "number",
             "title": "Width",

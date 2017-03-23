@@ -362,20 +362,21 @@ FORGE.RenderDisplay.prototype._exitPresent = function()
 };
 
 /**
- * Start or stop VR display
+ * Enable VR display
  * @method FORGE.RenderDisplay#enableVR
- * @param {boolean} status VR display status
  */
-FORGE.RenderDisplay.prototype.enableVR = function(status)
+FORGE.RenderDisplay.prototype.enableVR = function()
 {
-    if (status === true)
-    {
-        this._requestPresent();
-    }
-    else
-    {
-        this._exitPresent();
-    }
+    this._requestPresent();
+};
+
+/**
+ * Start or stop VR display
+ * @method FORGE.RenderDisplay#disableVR
+ */
+FORGE.RenderDisplay.prototype.disableVR = function()
+{
+    this._exitPresent();
 };
 
 /**

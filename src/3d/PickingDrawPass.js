@@ -68,7 +68,7 @@ FORGE.PickingDrawPass.prototype._boot = function()
 {
     // Create picking material reference
     // Replace fragment shader with picking shader only drawing objects with one flat colour
-    var shader = FORGE.Utils.clone(this._viewer.renderer.view.shaderWTS.mapping);
+    var shader = FORGE.Utils.clone(this._viewer.renderer.view.current.shaderWTS.mapping);
     shader.uniforms.tColor = { type: "c", value: new THREE.Color( 0x000000 ) };
 
     this._material = new THREE.RawShaderMaterial({

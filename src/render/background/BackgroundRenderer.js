@@ -199,8 +199,7 @@ FORGE.BackgroundRenderer.prototype.update = function()
         this._mesh.material.uniforms.tModelViewMatrixInverse.value = this._viewer.renderer.camera.modelViewInverse;
     }
 
-
-    this._viewer.renderer.view.updateUniforms(this._mesh.material.uniforms);
+    this._viewer.renderer.view.current.updateUniforms(this._mesh.material.uniforms);
 };
 
 /**
@@ -292,5 +291,19 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "displayObject",
         {
             this._setDisplayObject(value);
         }
+    }
+});
+
+/**
+ * Get background scene.
+ * @name FORGE.BackgroundRenderer#scene
+ * @type {THREE.Scene}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "scene",
+{
+    /** @this {FORGE.BackgroundRenderer} */
+    get: function()
+    {
+        return this._scene;
     }
 });

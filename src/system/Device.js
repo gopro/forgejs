@@ -582,29 +582,12 @@ FORGE.Device = (function(c)
     Tmp.prototype._checkBrowserApi = function()
     {
         //Page Visibility API
-        var visibilityChange =
-            [
-                "visibilitychange",
-                "mozvisibilitychange",
-                "webkitvisibilitychange",
-                "msvisibilitychange"
-            ];
-        var visibilityState =
-            [
-                "hidden",
-                "mozHidden",
-                "webkitHidden",
-                "msHidden"
-            ];
-        for (var m = 0, mm = visibilityState.length; m < mm; m++)
-        {
-            if (typeof document[visibilityState[m]] !== "undefined")
-            {
-                this.visibilityState = visibilityState[m];
-                this.visibilityChange = visibilityChange[m];
-                break;
-            }
-        }
+        this.visibilityState = "visibilityState" in document ? "visibilityState" :
+            "webkitVisibilityState" in document ? "webkitVisibilityState" :
+            "mozVisibilityState" in document ? "mozVisibilityState" :
+            null;
+
+        this.visibilityChange = this.visibilityState.slice(0, -5) + "change";
 
         //Screen orientation API
         var orientation =
@@ -966,6 +949,35 @@ FORGE.Device = (function(c)
             {
                 return false;
             });
+    };
+
+    /**
+     * Check device requirement for an object from configuration/manifest.
+     * @method FORGE.Device#check
+     * @param  {Object} config - The device requirement configuration of the configuration/manifest.
+     * @return {boolean} Returns true if the object is compatible with the device environment, false if not.
+     */
+    Tmp.prototype.check = function(config)
+    {
+        //If configuration is undefined, the object has no device limitations
+        if(typeof config === "undefined")
+        {
+            return true;
+        }
+
+        for(var i in config)
+        {
+            if(typeof this[i] === "undefined")
+            {
+                this.warn("Unable to check plugin device compatibility for: "+i);
+            }
+            else if(this[i] !== config[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
     };
 
     return new Tmp();

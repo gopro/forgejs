@@ -56,6 +56,7 @@ module.exports = function(grunt)
         "build/tmp/forge.glsl.js",
         "src/render/shader/ShaderLib.js",
 
+        "src/render/view/ViewManager.js",
         "src/render/view/ViewType.js",
         "src/render/view/ViewBase.js",
         "src/render/view/ViewFlat.js",
@@ -83,6 +84,7 @@ module.exports = function(grunt)
         "src/hotspots/HotspotTransform.js",
         "src/hotspots/HotspotAnimation.js",
         "src/hotspots/HotspotAnimationTrack.js",
+        "src/hotspots/HotspotStates.js",
         "src/hotspots/HotspotType.js",
 
         "src/camera/Camera.js",
@@ -116,6 +118,7 @@ module.exports = function(grunt)
         "src/plugin/PluginObjectFactory.js",
 
         "src/system/Device.js",
+        "src/system/System.js",
         "src/system/RequestAnimationFrame.js",
         "src/system/History.js",
 
@@ -143,12 +146,12 @@ module.exports = function(grunt)
         "src/display/components/Canvas.js",
 
         "src/display/image/Image.js",
-        "src/display/image/ImageScalable.js",
 
         "src/display/sprite/Sprite.js",
         "src/display/sprite/SpriteAnimationManager.js",
         "src/display/sprite/SpriteAnimation.js",
 
+        "src/display/video/VideoBase.js",
         "src/display/video/VideoHTML5.js",
         "src/display/video/VideoDash.js",
         "src/display/video/VideoTimeRanges.js",

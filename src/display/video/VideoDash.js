@@ -6,7 +6,7 @@
  * @param {string} key - The video file id reference.
  * @param {?(string|FORGE.VideoQuality|Array<(string|FORGE.VideoQuality)>)=} config - Either a {@link FORGE.VideoQuality} or a string URL.
  * @param {string=} qualityMode - The default quality mode.
- * @extends {FORGE.DisplayObject}
+ * @extends {FORGE.VideoBase}
  *
  * @todo  ability to call the QualityAbort event.
  * @todo  add protection controller and protection key controller to be able to manage external secured streams (DRM)
@@ -15,14 +15,6 @@
  */
 FORGE.VideoDash = function(viewer, key, config, qualityMode)
 {
-    /**
-     * The viewer reference.
-     * @name FORGE.VideoDash#_viewer
-     * @type {FORGE.Viewer}
-     * @private
-     */
-    this._viewer = viewer;
-
     /**
      * The video identifier.
      * @name FORGE.VideoDash#_key
@@ -215,38 +207,6 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
      * @private
      */
     this._monitoring = null;
-
-    /**
-     * Playing status of the video.
-     * @name  FORGE.VideoDash#_playing
-     * @type {boolean}
-     * @private
-     */
-    this._playing = false;
-
-    /**
-     * Boolean flag to know if can play is already received.
-     * @name FORGE.VideoDash#_canPlay
-     * @type {boolean}
-     * @private
-     */
-    this._canPlay = false;
-
-    /**
-     * Number of play action on this video.
-     * @name  FORGE.VideoDash#_playCount
-     * @type {number}
-     * @private
-     */
-    this._playCount = 0;
-
-    /**
-     * Number of the video ended.
-     * @name  FORGE.VideoDash#_endCount
-     * @type {number}
-     * @private
-     */
-    this._endCount = 0;
 
     /**
      * On load start event dispatcher.
@@ -616,10 +576,10 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
      */
     this._onMetricsChangedBind = null;
 
-    FORGE.DisplayObject.call(this, viewer, null, "VideoDash");
+    FORGE.VideoBase.call(this, viewer, "VideoDash");
 };
 
-FORGE.VideoDash.prototype = Object.create(FORGE.DisplayObject.prototype);
+FORGE.VideoDash.prototype = Object.create(FORGE.VideoBase.prototype);
 FORGE.VideoDash.prototype.constructor = FORGE.VideoDash;
 
 /**
@@ -651,7 +611,7 @@ FORGE.VideoDash.mediaType.AUDIO = "audio";
  */
 FORGE.VideoDash.prototype._boot = function()
 {
-    FORGE.DisplayObject.prototype._boot.call(this);
+    FORGE.VideoBase.prototype._boot.call(this);
 
     if (typeof dashjs === "undefined")
     {
@@ -1301,9 +1261,9 @@ FORGE.VideoDash.prototype._onDurationChangeHandler = function(event)
     var element = this._video.element;
     this.log("onDurationChange [readyState: " + element.readyState + "]");
 
-    //@firefox - FF disptach durationchange twice on readystate 1 & 4
-    //I will not dispatch this event if readystate is 4 !
-    if (this._onDurationChange !== null && element.readyState === 1)
+    //@firefox - FF disptach durationchange twice on readystate HAVE_METADATA (1) & HAVE_ENOUGH_DATA (4)
+    //I will not dispatch this event if readystate is HAVE_ENOUGH_DATA (4) !
+    if (this._onDurationChange !== null && element.readyState === HTMLMediaElement.HAVE_METADATA)
     {
         this._onDurationChange.dispatch(event);
     }
@@ -1464,9 +1424,9 @@ FORGE.VideoDash.prototype._onVolumeChangeHandler = function(event)
     var element = this._video.element;
     this.log("onVolumeChange [readyState: " + element.readyState + "]");
 
-    //I do not dispatch the volume change if readyState is 0.
+    //I do not dispatch the volume change if readyState is HAVE_NOTHING (0).
     //because I set the volume at 0 when I create the video element, it is not usefull to dispatch this internal volume change ?
-    if (this._onVolumeChange !== null && element.readyState !== 0)
+    if (this._onVolumeChange !== null && element.readyState !== HTMLMediaElement.HAVE_NOTHING)
     {
         this._onVolumeChange.dispatch(event);
     }
@@ -1776,13 +1736,13 @@ FORGE.VideoDash.prototype.load = function(config)
  */
 FORGE.VideoDash.prototype.play = function(time, loop)
 {
-    this.currentTime = time;
-    this.loop = loop;
+    FORGE.VideoBase.prototype.play.call(this, time, loop);
 
     if (this._dashMediaPlayer !== null && this._dashMediaPlayer.isReady() === true)
     {
         this._dashMediaPlayer.play();
         this._playing = true;
+        this._paused = false;
         this._playCount++;
     }
 };
@@ -1797,6 +1757,7 @@ FORGE.VideoDash.prototype.pause = function()
     {
         this._dashMediaPlayer.pause();
         this._playing = false;
+        this._paused = true;
     }
 };
 
@@ -1812,6 +1773,7 @@ FORGE.VideoDash.prototype.stop = function()
         this._dashMediaPlayer.seek(0);
         this._video.element.currentTime = 0;
         this._playing = false;
+        this._paused = true;
     }
 };
 
@@ -2078,7 +2040,7 @@ FORGE.VideoDash.prototype.destroy = function()
 
     this._video = null;
 
-    FORGE.DisplayObject.prototype.destroy.call(this);
+    FORGE.VideoBase.prototype.destroy.call(this);
 };
 
 /**
@@ -2410,66 +2372,6 @@ Object.defineProperty(FORGE.VideoDash.prototype, "durationMS",
 });
 
 /**
- * Get the playing status of the video.
- * @name FORGE.VideoDash#playing
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoDash.prototype, "playing",
-{
-    /** @this {FORGE.VideoDash} */
-    get: function()
-    {
-        return this._playing;
-    }
-});
-
-/**
- * Get the number of play action of the video.
- * @name FORGE.VideoDash#playCount
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoDash.prototype, "playCount",
-{
-    /** @this {FORGE.VideoDash} */
-    get: function()
-    {
-        return this._playCount;
-    }
-});
-
-/**
- * Get the canPlay status of the video.
- * @name FORGE.VideoDash#canPlay
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoDash.prototype, "canPlay",
-{
-    /** @this {FORGE.VideoDash} */
-    get: function()
-    {
-        return this._canPlay;
-    }
-});
-
-/**
- * Get the number of the video ends.
- * @name FORGE.VideoDash#endCount
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.VideoDash.prototype, "endCount",
-{
-    /** @this {FORGE.VideoDash} */
-    get: function()
-    {
-        return this._endCount;
-    }
-});
-
-/**
  * Get the metaDataLoaded status of the video.
  * @name FORGE.VideoDash#metaDataLoaded
  * @readonly
@@ -2768,7 +2670,7 @@ Object.defineProperty(FORGE.VideoDash.prototype, "onTimeUpdate",
  */
 Object.defineProperty(FORGE.VideoDash.prototype, "onCurrentTimeChange",
 {
-    /** @this {FORGE.VideoHTML5} */
+    /** @this {FORGE.VideoDash} */
     get: function()
     {
         if (this._onCurrentTimeChange === null)
