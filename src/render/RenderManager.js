@@ -427,11 +427,21 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 {
     var mediaConfig = /** @type {SceneMediaConfig} */ (sceneConfig.media);
 
-    // Create media from the SceneConfig
-    if (mediaConfig !== null &&
-        typeof mediaConfig !== "undefined" &&
-        typeof mediaConfig.source !== "undefined")
+    // Create media
+    if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
     {
+        if (mediaConfig.type === FORGE.MediaType.GRID ||
+            (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null &&
+                mediaConfig.source.format === FORGE.MediaFormat.CUBE) ||
+            this._renderDisplay.presentingVR === true)
+        {
+            this._backgroundRendererType = FORGE.BackgroundType.MESH;
+        }
+        else
+        {
+            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+        }
+
         this._media = new FORGE.Media(this._viewer, sceneConfig);
 
         if (this._media.ready === true)
@@ -803,7 +813,10 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
     }
 
     var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
-    if (mediaConfig.source.format === FORGE.MediaFormat.CUBE || 
+
+
+    if (typeof mediaConfig.source === "undefined" || 
+        mediaConfig.source.format === FORGE.MediaFormat.CUBE || 
         mediaConfig.source.format === FORGE.MediaFormat.FLAT ||
         typeof mediaConfig.source === "undefined" ||
         typeof mediaConfig.source.format === "undefined")
@@ -824,8 +837,15 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         this._backgroundRendererType = FORGE.BackgroundType.SHADER;
     }
 
-    this.log("VR off - media " + mediaConfig.source.format + ", view " + this._view.type +
-        ", background type = " + this._backgroundRendererType);
+    if (typeof mediaConfig.source === "undefined" ||  typeof mediaConfig.source.format === "undefined")
+    {
+        this.log("VR off - view " + this._view.type + ", background type = " + this._backgroundRendererType);
+    }
+    else
+    {
+        this.log("VR off - media " + mediaConfig.source.format + ", view " + this._view.type +
+            ", background type = " + this._backgroundRendererType);
+    }
 };
 
 
