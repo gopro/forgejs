@@ -45,8 +45,8 @@ FORGE.ViewGoPro.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
 
-    this._fovMin = FORGE.Math.degToRad(30);
-    this._fovMax = FORGE.Math.degToRad(330);
+    this._fovMin = 30;
+    this._fovMax = 330;
 };
 
 /**

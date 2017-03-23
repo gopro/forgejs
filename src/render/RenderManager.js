@@ -425,10 +425,12 @@ FORGE.RenderManager.prototype._initCamera = function(sceneConfig)
  */
 FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 {
+    var mediaConfig = /** @type {SceneMediaConfig} */ (sceneConfig.media);
+
     // Create media
-    if (sceneConfig.media !== null &&
-        typeof sceneConfig.media !== "undefined" &&
-        typeof sceneConfig.media.source !== "undefined")
+    if (mediaConfig !== null &&
+        typeof mediaConfig !== "undefined" &&
+        typeof mediaConfig.source !== "undefined")
     {
         this._media = new FORGE.Media(this._viewer, sceneConfig);
 
@@ -544,10 +546,12 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
 {
     var fxSet = null;
 
-    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null &&
-        typeof this._sceneConfig.media.fx !== "undefined" && this._sceneConfig.media.fx !== null)
+     var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+
+    if (typeof mediaConfig !== "undefined" && mediaConfig !== null &&
+        typeof mediaConfig.fx !== "undefined" && mediaConfig.fx !== null)
     {
-        fxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.media.fx);
+        fxSet = this._viewer.postProcessing.getFxSetByUID(mediaConfig.fx);
     }
 
     this._renderPipeline.addBackground(this._backgroundRenderer.renderTarget.texture, fxSet, 1.0);
@@ -683,33 +687,34 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     this._clearBackgroundRenderer();
 
     var config = {};
-    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null)
+    var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+    if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
     {
-        config.type = this._sceneConfig.media.type;
+        config.type = mediaConfig.type;
 
-        if (typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null)
+        if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
         {
-            config.mediaFormat = this._sceneConfig.media.source.format;
+            config.mediaFormat = mediaConfig.source.format;
             var ratio = this._media.displayObject.element.width / this._media.displayObject.element.height;
 
-            if (typeof this._sceneConfig.media.source.fov !== "undefined")
+            if (typeof mediaConfig.source.fov !== "undefined")
             {
                 var vFov;
-                if (typeof this._sceneConfig.media.source.fov === "number")
+                if (typeof mediaConfig.source.fov === "number")
                 {
-                    vFov = this._sceneConfig.media.source.fov.vertical;
+                    vFov = mediaConfig.source.fov.vertical;
                 }
-                else if (typeof this._sceneConfig.media.source.fov.vertical === "number")
+                else if (typeof mediaConfig.source.fov.vertical === "number")
                 {
-                    vFov = this._sceneConfig.media.source.fov.vertical;
+                    vFov = mediaConfig.source.fov.vertical;
                 }
-                else if (typeof this._sceneConfig.media.source.fov.horizontal === "number")
+                else if (typeof mediaConfig.source.fov.horizontal === "number")
                 {
-                    vFov = this._sceneConfig.media.source.fov.horizontal / ratio;
+                    vFov = mediaConfig.source.fov.horizontal / ratio;
                 }                
-                else if (typeof this._sceneConfig.media.source.fov.diagonal === "number")
+                else if (typeof mediaConfig.source.fov.diagonal === "number")
                 {
-                    vFov = this._sceneConfig.media.source.fov.diagonal / Math.sqrt(1 + ratio * ratio);
+                    vFov = mediaConfig.source.fov.diagonal / Math.sqrt(1 + ratio * ratio);
                 }
                 else
                 {
@@ -720,11 +725,11 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
             }
         }
 
-        if (typeof this._sceneConfig.media.options !== "undefined" && this._sceneConfig.media.options !== null)
+        if (typeof mediaConfig.options !== "undefined" && mediaConfig.options !== null)
         {
-            if (typeof this._sceneConfig.media.options.color !== "undefined")
+            if (typeof mediaConfig.options.color !== "undefined")
             {
-                config.color = this._sceneConfig.media.options.color;
+                config.color = mediaConfig.options.color;
             }
         }
     }
@@ -741,20 +746,20 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     {
         this.log("Create background mesh renderer");
 
-        if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null)
+        if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
         {
-            if (typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null)
+            if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
             {
-                config.order = this._sceneConfig.media.source.order || "RLUDFB";
+                config.order = mediaConfig.source.order || "RLUDFB";
 
                 // Get the right tile
-                if (typeof this._sceneConfig.media.source.tile === "number")
+                if (typeof mediaConfig.source.tile === "number")
                 {
-                    config.tile = this._sceneConfig.media.source.tile;
+                    config.tile = mediaConfig.source.tile;
                 }
-                else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
+                else if (Array.isArray(mediaConfig.source.levels) && typeof mediaConfig.source.levels[0].tile === "number")
                 {
-                    config.tile = this._sceneConfig.media.source.levels[0].tile;
+                    config.tile = mediaConfig.source.levels[0].tile;
                 }
             }
         }
@@ -795,10 +800,11 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         return;
     }
 
-    if (this._sceneConfig.media.source.format === FORGE.MediaFormat.CUBE || 
-        this._sceneConfig.media.source.format === FORGE.MediaFormat.FLAT ||
-        typeof this._sceneConfig.media.source === "undefined" ||
-        typeof this._sceneConfig.media.source.format === "undefined")
+    var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+    if (mediaConfig.source.format === FORGE.MediaFormat.CUBE || 
+        mediaConfig.source.format === FORGE.MediaFormat.FLAT ||
+        typeof mediaConfig.source === "undefined" ||
+        typeof mediaConfig.source.format === "undefined")
     {
         if (this._view.type === FORGE.ViewType.FLAT)
         {
@@ -816,7 +822,7 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         this._backgroundRendererType = FORGE.BackgroundType.SHADER;
     }
 
-    this.log("VR off - media " + this._sceneConfig.media.source.format + ", view " + this._view.type +
+    this.log("VR off - media " + mediaConfig.source.format + ", view " + this._view.type +
         ", background type = " + this._backgroundRendererType);
 };
 

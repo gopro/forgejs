@@ -37,8 +37,8 @@ FORGE.ViewRectilinear.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
 
-    this._fovMin = FORGE.Math.degToRad(40);
-    this._fovMax = FORGE.Math.degToRad(140);
+    this._fovMin = 40;
+    this._fovMax = 140;
 };
 
 /**

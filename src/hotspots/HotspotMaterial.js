@@ -496,7 +496,7 @@ FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
 /**
  * Set texture frame
  * @method FORGE.HotspotMaterial#setTextureFrame
- * @param {FORGE.Rectangle} frame - texture frame
+ * @param {FORGE.Rectangle=} frame - texture frame
  */
 FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 {
@@ -506,10 +506,10 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
         return;
     }
 
-    this._textureFrame = frame;
-
-    var rSrc = frame || new FORGE.Rectangle(0, 0, this._displayObject.width, this._displayObject.height);
+    var rSrc = frame || new FORGE.Rectangle(0, 0, this._displayObject.element.naturalWidth, this._displayObject.element.naturalHeight);
     var rDst = new FORGE.Rectangle(0, 0, rSrc.width, rSrc.height);
+
+    this._textureFrame = rSrc;
 
     var canvas = document.createElement("canvas");
     canvas.width = rSrc.width;
