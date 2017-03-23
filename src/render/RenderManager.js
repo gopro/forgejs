@@ -940,7 +940,7 @@ FORGE.RenderManager.prototype.disableVR = function()
         typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null &&
         mediaConfig.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
     {
-        this._setBackgroundRendererType(status);
+        this._setBackgroundRendererType(false);
         this._setBackgroundRenderer(this._backgroundRendererType);
     }
 };

@@ -515,58 +515,6 @@ FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
 FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 {
     // Only support type IMAGE at the moment
-    if (this._displayObject === null ||
-        this._type !== FORGE.HotspotMaterial.types.IMAGE)
-    {
-        return;
-    }
-
-    var rSrc = frame || new FORGE.Rectangle(0, 0, this._displayObject.element.naturalWidth, this._displayObject.element.naturalHeight);
-    var rDst = new FORGE.Rectangle(0, 0, rSrc.width, rSrc.height);
-
-    this._textureFrame = rSrc;
-
-    var canvas = document.createElement("canvas");
-    canvas.width = rSrc.width;
-    canvas.height = rSrc.height;
-
-    var context = canvas.getContext("2d");
-    context.drawImage(this._displayObject.element,
-        rSrc.x, rSrc.y, rSrc.width, rSrc.height,
-        rDst.x, rDst.y, rDst.width, rDst.height);
-
-    this._texture = new THREE.CanvasTexture(/** @type {HTMLCanvasElement} */ (canvas));
-    this._texture.needsUpdate = true;
-
-    this.update();
-};
-
-/**
- * Set texture source
- * @method FORGE.HotspotMaterial#setTextureSource
- * @param {FORGE.Image} image - texture source image
- */
-FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
-{
-    if (this._displayObject !== null)
-    {
-        this._displayObject.destroy();
-        this._displayObject = null;
-    }
-
-    this._displayObject = image;
-
-    this.setTextureFrame();
-};
-
-/**
- * Set texture frame
- * @method FORGE.HotspotMaterial#setTextureFrame
- * @param {FORGE.Rectangle=} frame - texture frame
- */
-FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
-{
-    // Only support type IMAGE at the moment
     if (this._displayObject === null || this._type !== FORGE.HotspotMaterial.types.IMAGE)
     {
         return;
