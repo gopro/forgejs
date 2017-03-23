@@ -483,7 +483,8 @@ FORGE.HotspotMaterial.prototype.update = function()
  */
 FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
 {
-    if (this._displayObject !== null) {
+    if (this._displayObject !== null)
+    {
         this._displayObject.destroy();
         this._displayObject = null;
     }
@@ -502,7 +503,8 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 {
     // Only support type IMAGE at the moment
     if (this._displayObject === null ||
-        this._type !== FORGE.HotspotMaterial.types.IMAGE) {
+        this._type !== FORGE.HotspotMaterial.types.IMAGE)
+    {
         return;
     }
 

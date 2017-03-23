@@ -546,7 +546,7 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
 {
     var fxSet = null;
 
-     var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+    var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
 
     if (typeof mediaConfig !== "undefined" && mediaConfig !== null &&
         typeof mediaConfig.fx !== "undefined" && mediaConfig.fx !== null)
