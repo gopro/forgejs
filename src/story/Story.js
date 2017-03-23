@@ -366,7 +366,7 @@ FORGE.Story.prototype._loadUid = function(uid)
  * Create {@link FORGE.Scene}s from scenes configuration object.
  * @method FORGE.Story#_createScenes
  * @private
- * @param  {Object} config - The object that describes the scenes, issued from the main configuration.
+ * @param  {Array<SceneConfig>} config - The object that describes the scenes, issued from the main configuration.
  */
 FORGE.Story.prototype._createScenes = function(config)
 {

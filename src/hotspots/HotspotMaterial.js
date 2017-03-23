@@ -522,7 +522,7 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
         rSrc.x, rSrc.y, rSrc.width, rSrc.height,
         rDst.x, rDst.y, rDst.width, rDst.height);
 
-    this._texture = new THREE.CanvasTexture(canvas);
+    this._texture = new THREE.CanvasTexture(/** @type {HTMLCanvasElement} */ (canvas));
     this._texture.needsUpdate = true;
 
     this.update();

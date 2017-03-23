@@ -276,7 +276,7 @@ Object.defineProperty(FORGE.SceneParser.prototype, "media",
  * Get the sound object.
  * @name  FORGE.SceneParser#sound
  * @readonly
- * @type {Object}
+ * @type {SoundConfig}
  */
 Object.defineProperty(FORGE.SceneParser.prototype, "sound",
 {

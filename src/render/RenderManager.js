@@ -381,8 +381,8 @@ FORGE.RenderManager.prototype._initView = function(sceneConfig)
     var extendedViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(storyViewConfig, sceneViewConfig));
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
-  
-    if (this._view !== null && this._view.type === type) 
+
+    if (this._view !== null && this._view.type === type)
     {
         this.log("Render manager won't set view if it's already set");
         return;
@@ -427,7 +427,7 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 {
     var mediaConfig = /** @type {SceneMediaConfig} */ (sceneConfig.media);
 
-    // Create media
+    // Create media from the SceneConfig
     if (mediaConfig !== null &&
         typeof mediaConfig !== "undefined" &&
         typeof mediaConfig.source !== "undefined")
@@ -470,25 +470,27 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
  */
 FORGE.RenderManager.prototype._initSound = function(sceneConfig)
 {
-    // Create sound
-    if (typeof sceneConfig.sound !== "undefined" && typeof sceneConfig.sound.source !== "undefined")
+    var soundConfig = /** @type {SoundConfig} */ (sceneConfig.sound);
+
+    // Create sound from the SceneConfig
+    if (typeof soundConfig !== "undefined" && typeof soundConfig.source !== "undefined")
     {
         var volume, loop, startTime, autoPlay;
 
-        if (typeof sceneConfig.sound.options !== "undefined")
+        if (typeof soundConfig.options !== "undefined")
         {
-            volume = (typeof sceneConfig.sound.options.volume === "number") ? FORGE.Math.clamp(sceneConfig.sound.options.volume, 0, 1) : 1;
-            loop = (typeof sceneConfig.sound.options.loop === "boolean") ? sceneConfig.sound.options.loop : false;
-            startTime = (typeof sceneConfig.sound.options.startTime === "number") ? sceneConfig.sound.options.startTime : 0;
-            autoPlay = (typeof sceneConfig.sound.options.autoPlay === "boolean") ? sceneConfig.sound.options.autoPlay : false;
+            volume = (typeof soundConfig.options.volume === "number") ? FORGE.Math.clamp(soundConfig.options.volume, 0, 1) : 1;
+            loop = (typeof soundConfig.options.loop === "boolean") ? soundConfig.options.loop : false;
+            startTime = (typeof soundConfig.options.startTime === "number") ? soundConfig.options.startTime : 0;
+            autoPlay = (typeof soundConfig.options.autoPlay === "boolean") ? soundConfig.options.autoPlay : false;
         }
 
-        if (typeof sceneConfig.sound.source.url !== "undefined" && sceneConfig.sound.source.url !== "")
+        if (typeof soundConfig.source.url !== "undefined" && soundConfig.source.url !== "")
         {
             // Warning : UID is not registered and applied to the FORGE.Sound object for registration
-            this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC ? true : false));
+            this._mediaSound = new FORGE.Sound(this._viewer, soundConfig.uid, soundConfig.source.url, (soundConfig.type === FORGE.SoundType.AMBISONIC ? true : false));
 
-            if (typeof sceneConfig.sound.options !== "undefined" && sceneConfig.sound.options !== null)
+            if (typeof soundConfig.options !== "undefined" && soundConfig.options !== null)
             {
                 this._mediaSound.volume = volume;
                 this._mediaSound.loop = loop;
@@ -500,7 +502,7 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
                 }
             }
         }
-        // @todo Ability to use a target uid rather than a source url (ie. sceneConfig.sound.source.target)
+        // @todo Ability to use a target uid rather than a source url (ie. soundConfig.source.target)
     }
 };
 
@@ -711,7 +713,7 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
                 else if (typeof mediaConfig.source.fov.horizontal === "number")
                 {
                     vFov = mediaConfig.source.fov.horizontal / ratio;
-                }                
+                }
                 else if (typeof mediaConfig.source.fov.diagonal === "number")
                 {
                     vFov = mediaConfig.source.fov.diagonal / Math.sqrt(1 + ratio * ratio);
@@ -959,14 +961,13 @@ FORGE.RenderManager.prototype.enableVR = function(status)
         this._camera.roll = 0;
     }
 
-
     // If we enter VR with a cubemap: do nothing. With an equi: toggle to mesh renderer
     // If we exit VR with a cubemap: do nothing. With an equi: toggle to shader renderer
-    if (typeof this._sceneConfig.media !== "undefined" &&
-        this._sceneConfig.media !== null &&
-        typeof this._sceneConfig.media.source !== "undefined" &&
-        this._sceneConfig.media.source !== null &&
-        this._sceneConfig.media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
+    var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+
+    if (typeof mediaConfig !== "undefined" && mediaConfig !== null &&
+        typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null &&
+        mediaConfig.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
     {
         this._setBackgroundRendererType(status);
         this._setBackgroundRenderer(this._backgroundRendererType);

@@ -235,17 +235,17 @@ THREE.TextureLoader.prototype.load = function(arg1, arg2, arg3, arg4) {};
 THREE.Clock = function() {};
 
 /**
+ * @return {number}
+ */
+THREE.Clock.prototype.getDelta = function() {};
+
+/**
  * @constructor
- * @param {Element} arg1
+ * @param {HTMLCanvasElement} arg1
  * @extends {THREE.Texture}
  * @return {!THREE.CanvasTexture}
  */
 THREE.CanvasTexture = function(arg1) {};
-
-/**
- * @return {number}
- */
-THREE.Clock.prototype.getDelta = function() {};
 
 /**
  * @constructor
