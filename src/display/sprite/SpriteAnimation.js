@@ -45,12 +45,12 @@ FORGE.SpriteAnimation = function(sprite, name, frames, frameRate)
     this._frameIndex = 0;
 
     /**
-     * Frame rate of this animation, this is the number of frames per second. (default = 60)
+     * Frame rate of this animation, this is the number of frames per second.
      * @name  FORGE.SpriteAnimation#_frameRate
      * @type {number}
      * @private
      */
-    this._frameRate = frameRate || 60;
+    this._frameRate = frameRate;
 
     /**
      * Does this animation loop?
@@ -241,7 +241,7 @@ FORGE.SpriteAnimation.prototype.play = function(loop, index)
 
     this._setFrameIndex(index); //Default will be 0 :)
 
-    this._sprite.animations.currentSpriteAnimation = this;
+    this._sprite.animations.current = this;
 
     if(this._onPlay !== null)
     {
