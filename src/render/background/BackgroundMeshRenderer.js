@@ -180,7 +180,7 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
 
     this._texture.format = THREE.RGBAFormat;
     this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
-    
+
     if (typeof this._mesh.material.uniforms.tTextureRatio !== "undefined")
     {
         this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
@@ -191,7 +191,7 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
         // Enable mipmaps for flat rendering to avoid aliasing
         this._texture.generateMipmaps = true;
         this._texture.minFilter = THREE.LinearMipMapLinearFilter;
-        
+
         // Replace geometry with a rectangle matching texture ratio
         // First release previous default geometry
         if (this._mesh.geometry != null)
@@ -581,7 +581,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         {
             this._addQuadrilateralCoordsAttribute();
         }
-        
+
         if (this._mediaFormat === FORGE.MediaFormat.FLAT)
         {
             this._mesh.position.set(0, 0, -this._size * 0.5);

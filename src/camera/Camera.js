@@ -401,7 +401,7 @@ FORGE.Camera.prototype._createFlatCamera = function()
             1000, -1000,
             FORGE.RenderManager.DEPTH_NEAR,
             FORGE.RenderManager.DEPTH_FAR);
-        
+
         this._flat.name = "CameraFlat";
         this._flat.matrixAutoUpdate = false;
     }
@@ -646,7 +646,6 @@ FORGE.Camera.prototype._updateMainCamera = function()
     this._main.fov = FORGE.Math.radToDeg(this._viewer.renderer.view.current.getProjectionFov());
     this._main.aspect = this._viewer.renderer.displayResolution.ratio;
     this._main.updateProjectionMatrix();
-    
 };
 
 /**
@@ -805,7 +804,7 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
             max = Math.min(view.pitchMax, max);
         }
     }
-    
+
     var pitch = FORGE.Math.clamp(value, min, max);
 
     var changed = this._pitch !== pitch;
@@ -856,7 +855,7 @@ FORGE.Camera.prototype._setRoll = function(value, unit)
             max = Math.min(view.rollMax, max);
         }
     }
-    
+
     var roll = FORGE.Math.clamp(value, min, max);
 
     var changed = this._roll !== roll;
@@ -904,7 +903,7 @@ FORGE.Camera.prototype._setFov = function(value, unit)
             max = Math.min(FORGE.Math.degToRad(view.fovMax), max);
         }
     }
-    
+
     var fov = FORGE.Math.clamp(value, min, max);
 
     var changed = this._fov !== fov;
@@ -1194,7 +1193,7 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMin",
     set: function(value)
     {
         this._fovMin = FORGE.Math.degToRad(value);
-        this._setFov(this._fov, FORGE.Math.RADIANS); 
+        this._setFov(this._fov, FORGE.Math.RADIANS);
     }
 });
 
@@ -1215,7 +1214,7 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMax",
     set: function(value)
     {
         this._fovMax = FORGE.Math.degToRad(value);
-        this._setFov(this._fov, FORGE.Math.RADIANS); 
+        this._setFov(this._fov, FORGE.Math.RADIANS);
     }
 });
 

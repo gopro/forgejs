@@ -22,7 +22,7 @@ FORGE.ViewFlat = function(viewer)
      * @private
      */
     this._repeatY = false;
-    
+
     this._boot();
 };
 
@@ -113,7 +113,7 @@ FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
     {
         return;
     }
-    
+
     if (uniforms.hasOwnProperty("tRepeatX"))
     {
         uniforms.tRepeatX.value = this._repeatX ? 1 : 0;
@@ -213,4 +213,3 @@ Object.defineProperty(FORGE.ViewFlat.prototype, "repeatY",
         this._updateViewParams();
     }
 });
-

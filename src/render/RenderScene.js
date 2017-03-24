@@ -97,7 +97,7 @@ FORGE.RenderScene.prototype._boot = function()
     // Create picking effect composer and add render pass
     this._pickingComposer = new FORGE.EffectComposer(FORGE.EffectComposerType.PICKING,
                                                    this._viewer.renderer.webGLRenderer);
-    
+
     var pickingPass = new FORGE.RenderPass(this._scene, this._camera);
     pickingPass.position = FORGE.PassPosition.RENDER;
     this._pickingComposer.addPass(pickingPass);

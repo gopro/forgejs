@@ -33,7 +33,7 @@ void main() {
 
     // Get texture coordinates
     vec2 uv = sTexel / sTexResolution;
-    
+
     if (isTrue(tRepeatX)) {
         uv.x = mod(uv.x, 1.0);
     }
