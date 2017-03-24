@@ -58,7 +58,7 @@ FORGE.ViewFlat.prototype._boot = function()
     this._pitchMax = FORGE.Math.degToRad(180);
 
     this._fovMin = 20;
-    this._fovMax = 170;
+    this._fovMax = 180;
 };
 
 /**
@@ -171,4 +171,46 @@ FORGE.ViewFlat.prototype.destroy = function()
 {
     FORGE.ViewBase.prototype.destroy.call(this);
 };
+
+/**
+ * Get and set the repeat X beahvior.
+ * @name  FORGE.ViewFlat#repeatX
+ * @type {string}
+ */
+Object.defineProperty(FORGE.ViewFlat.prototype, "repeatX",
+{
+    /** @this {FORGE.ViewFlat} */
+    get: function()
+    {
+        return this._repeatX;
+    },
+
+    /** @this {FORGE.ViewFlat} */
+    set: function(value)
+    {
+        this._repeatX = value;
+        this._updateViewParams();
+    }
+});
+
+/**
+ * Get and set the repeat Y beahvior.
+ * @name  FORGE.ViewFlat#repeatY
+ * @type {string}
+ */
+Object.defineProperty(FORGE.ViewFlat.prototype, "repeatY",
+{
+    /** @this {FORGE.ViewFlat} */
+    get: function()
+    {
+        return this._repeatY;
+    },
+
+    /** @this {FORGE.ViewFlat} */
+    set: function(value)
+    {
+        this._repeatY = value;
+        this._updateViewParams();
+    }
+});
 
