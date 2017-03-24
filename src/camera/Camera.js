@@ -725,7 +725,11 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
         this._viewer.renderer.view.type === FORGE.ViewType.FLAT)
     {
         var disp = this._viewer.renderer.backgroundRenderer.displayObject;
-        var ratio = disp.width / disp.height;
+        var ratio = disp.pixelWidth / disp.pixelHeight;
+        if (disp.element instanceof HTMLVideoElement)
+        {
+            ratio = disp.element.videoWidth / disp.element.videoHeight;
+        }
         value = FORGE.Math.wrap(value, -Math.PI * ratio, Math.PI * ratio);
     }
     else

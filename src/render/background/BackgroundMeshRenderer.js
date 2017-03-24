@@ -605,6 +605,11 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 FORGE.BackgroundMeshRenderer.prototype.updateAfterViewChange = function()
 {
     this._updateInternals();
+
+    if (typeof this._mesh.material.uniforms.tTextureRatio !== "undefined")
+    {
+        this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+    }
 };
 
 /**

@@ -238,6 +238,19 @@ FORGE.BackgroundShaderRenderer.prototype.render = function(camera)
 FORGE.BackgroundShaderRenderer.prototype.updateAfterViewChange = function()
 {
     this._updateInternals();
+
+    if (this._texture !== null && typeof this._texture.image !== "undefined")
+    {
+        if (this._mesh.material.uniforms.hasOwnProperty("tTextureRatio"))
+        {
+            this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+        }
+
+        if (this._mesh.material.uniforms.hasOwnProperty("tTextureSize"))
+        {
+            this._mesh.material.uniforms.tTextureSize.value = new THREE.Vector2(this._texture.image.width, this._texture.image.height);
+        }
+    }
 };
 
 /**
