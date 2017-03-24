@@ -146,7 +146,14 @@ FORGE.ControllerGyroscope.prototype._deviceOrientationChangeHandler = function(e
  */
 FORGE.ControllerGyroscope.prototype._screenOrientationChangeHandler = function()
 {
-    this._screenOrientation = FORGE.Math.degToRad(screen.orientation.angle);
+    if (typeof screen.orientation !== "undefined")
+    {
+        this._screenOrientation = FORGE.Math.degToRad(screen.orientation.angle);
+    }
+    else if (typeof window.orientation !== "undefined")
+    {
+        this._screenOrientation = FORGE.Math.degToRad(window.orientation);
+    }
 };
 
 /**
