@@ -534,8 +534,16 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 
     if (this._texture !== null)
     {
-        material.uniforms.tTexture.value = this._texture;
-        material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+        if (this._mesh.material.uniforms.hasOwnProperty("tTexture"))
+        {
+            material.uniforms.tTexture.value = this._texture;
+
+        }
+
+        if (this._mesh.material.uniforms.hasOwnProperty("tTextureRatio"))
+        {
+            material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+        }
     }
 
     if (this._mediaType === FORGE.MediaType.GRID)
