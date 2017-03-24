@@ -300,8 +300,6 @@ FORGE.HotspotMaterial.prototype._setupWithSprite = function(config)
     this._update = true;
 
     this._displayObject = new FORGE.Sprite(this._viewer, config);
-    this._displayObject.animations.add();
-    this._displayObject.play(null, true);
     this._displayObject.onLoadComplete.addOnce(this._spriteLoadCompleteHandler, this);
 };
 
