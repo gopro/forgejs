@@ -807,7 +807,7 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         this._backgroundRendererType = FORGE.BackgroundType.SHADER;
     }
 
-    if (typeof mediaConfig.source === "undefined" ||  typeof mediaConfig.source.format === "undefined")
+    if (typeof mediaConfig.source === "undefined" || typeof mediaConfig.source.format === "undefined")
     {
         this.log("VR off - view " + this._viewManager.current.type + ", background type = " + this._backgroundRendererType);
     }
