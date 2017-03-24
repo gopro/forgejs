@@ -25,11 +25,19 @@ FORGE.Gyroscope = function(viewer)
 
     /**
      * On orientation event dispatcher
-     * @name FORGE.Gyroscope#_onOrientationChange
+     * @name FORGE.Gyroscope#_onDeviceOrientationChange
      * @type {FORGE.EventDispatcher}
      * @private
      */
-    this._onOrientationChange = null;
+    this._onDeviceOrientationChange = null;
+
+    /**
+     * On orientation event dispatcher
+     * @name FORGE.Gyroscope#_onScreenOrientationChange
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onScreenOrientationChange = null;
 
     FORGE.BaseObject.call(this, "Gyroscope");
 
@@ -53,6 +61,7 @@ FORGE.Gyroscope.prototype._boot = function()
     }
 
     window.addEventListener("deviceorientation", this._deviceOrientationHandler.bind(this), false);
+    window.addEventListener("orientationchange", this._screenOrientationHandler.bind(this), false);
 };
 
 /**
@@ -64,9 +73,24 @@ FORGE.Gyroscope.prototype._boot = function()
 FORGE.Gyroscope.prototype._deviceOrientationHandler = function(event)
 {
     // Fire the event
-    if (this._onOrientationChange !== null && this._enabled === true)
+    if (this._onDeviceOrientationChange !== null && this._enabled === true)
     {
-        this._onOrientationChange.dispatch(event);
+        this._onDeviceOrientationChange.dispatch(event);
+    }
+};
+
+/**
+ * Screen orientation handler
+ * @method FORGE.Gyroscope#_screenOrientationHandler
+ * @param {ScreenOrientationEvent} event - the event associated to the screen orientation
+ * @private
+ */
+FORGE.Gyroscope.prototype._screenOrientationHandler = function(event)
+{
+    // Fire the event
+    if (this._onScreenOrientationChange !== null && this._enabled === true)
+    {
+        this._onScreenOrientationChange.dispatch(event);
     }
 };
 
@@ -80,6 +104,7 @@ FORGE.Gyroscope.prototype.destroy = function()
     this._viewer = null;
 
     window.removeEventListener("deviceorientation", this._deviceOrientationHandler.bind(this), false);
+    window.removeEventListener("orientationchange", this._screenOrientationHandler.bind(this), false);
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
@@ -105,20 +130,39 @@ Object.defineProperty(FORGE.Gyroscope.prototype, "enabled",
 });
 
 /**
- * Gets the onOrientationChange {@link FORGE.EventDispatcher}.
- * @name FORGE.Gyroscope#onOrientationChange
+ * Gets the onDeviceOrientationChange {@link FORGE.EventDispatcher}.
+ * @name FORGE.Gyroscope#onDeviceOrientationChange
  * @type {FORGE.EventDispatcher}
  */
-Object.defineProperty(FORGE.Gyroscope.prototype, "onOrientationChange",
+Object.defineProperty(FORGE.Gyroscope.prototype, "onDeviceOrientationChange",
 {
     /** @this {FORGE.Gyroscope} */
     get: function()
     {
-        if (this._onOrientationChange === null)
+        if (this._onDeviceOrientationChange === null)
         {
-            this._onOrientationChange = new FORGE.EventDispatcher(this);
+            this._onDeviceOrientationChange = new FORGE.EventDispatcher(this);
         }
 
-        return this._onOrientationChange;
+        return this._onDeviceOrientationChange;
+    }
+});
+
+/**
+ * Gets the onScreenOrientationChange {@link FORGE.EventDispatcher}.
+ * @name FORGE.Gyroscope#onScreenOrientationChange
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Gyroscope.prototype, "onScreenOrientationChange",
+{
+    /** @this {FORGE.Gyroscope} */
+    get: function()
+    {
+        if (this._onScreenOrientationChange === null)
+        {
+            this._onScreenOrientationChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onScreenOrientationChange;
     }
 });

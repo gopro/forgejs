@@ -18,27 +18,51 @@ FORGE.ControllerGyroscope = function(viewer, config)
 
     /**
      * Position euler.
-     * @name FORGE.ControllerGyroscope#_position
+     * @name FORGE.ControllerGyroscope#_posEuler
      * @type {THREE.Euler}
      * @private
      */
-    this._position = null;
+    this._posEuler = null;
 
     /**
-     * Order of the euler position depends on the device. By default the most common case is "XYZ"
-     * @name FORGE.ControllerGyroscope#_order
-     * @type {string}
-     * @private
-     */
-    this._order = "YXZ";
-
-    /**
-     * Quaternion result of the position.
-     * @name FORGE.ControllerGyroscope#_quaternion
+     * The intermediate quaternion where the position is computed.
+     * @name FORGE.ControllerGyroscope#_posQuatIndermediate
      * @type {THREE.Quaternion}
      * @private
      */
-    this._quaternion = null;
+    this._posQuatIndermediate = null;
+
+    /**
+     * The offset quaternion of the camera, given the touch and lookat of the camera
+     * @name FORGE.ControllerGyroscope#_posQuatOffset
+     * @type {THREE.Quaternion}
+     * @private
+     */
+    this._posQuatOffset = null;
+
+    /**
+     * The quaternion to add given the orientation of the screen
+     * @name FORGE.ControllerGyroscope#_posQuatScreenOrientation
+     * @type {THREE.Quaternion}
+     * @private
+     */
+    this._posQuatScreenOrientation = null;
+
+    /**
+     * Quaternion result of the position.
+     * @name FORGE.ControllerGyroscope#_posQuatFinal
+     * @type {THREE.Quaternion}
+     * @private
+     */
+    this._posQuatFinal = null;
+
+    /**
+     * Orientation of the screen (not the device !)
+     * @name FORGE.ControllerGyroscope#_screenOrientation
+     * @type {number}
+     * @private
+     */
+    this._screenOrientation = 0;
 
     FORGE.ControllerBase.call(this, viewer, "ControllerGyroscope");
 };
@@ -55,8 +79,11 @@ FORGE.ControllerGyroscope.prototype._boot = function()
 {
     FORGE.ControllerBase.prototype._boot.call(this);
 
-    this._position = new THREE.Euler();
-    this._quaternion = new THREE.Quaternion();
+    this._posEuler = new THREE.Euler();
+    this._posQuatIndermediate = new THREE.Quaternion();
+    this._posQuatOffset = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
+    this._posQuatScreenOrientation = new THREE.Quaternion();
+    this._posQuatFinal = new THREE.Quaternion();
 
     this._parseConfig(this._config);
 
@@ -81,11 +108,11 @@ FORGE.ControllerGyroscope.prototype._parseConfig = function(config)
 
 /**
  * Orientation change handler.
- * @method FORGE.ControllerGyroscope#_orientationChangeHandler
+ * @method FORGE.ControllerGyroscope#_deviceOrientationChangeHandler
  * @param {FORGE.Event} event - Event object
  * @private
  */
-FORGE.ControllerGyroscope.prototype._orientationChangeHandler = function(event)
+FORGE.ControllerGyroscope.prototype._deviceOrientationChangeHandler = function(event)
 {
     if (this._viewer.controllers.enabled === false)
     {
@@ -96,14 +123,30 @@ FORGE.ControllerGyroscope.prototype._orientationChangeHandler = function(event)
 
     if (typeof position.alpha === "number" && typeof position.beta === "number" && typeof position.gamma === "number")
     {
-        this._position.set(FORGE.Math.degToRad(position.beta), FORGE.Math.degToRad(position.alpha), -FORGE.Math.degToRad(position.gamma), "YXZ");
+        // Set the position in correct Euler coordinates
+        this._posEuler.set(FORGE.Math.degToRad(position.beta), FORGE.Math.degToRad(position.alpha), -FORGE.Math.degToRad(position.gamma), "YXZ");
+        this._posQuatIndermediate.setFromEuler(this._posEuler);
 
-        // Compute the quaternion
-        var quatPi2 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
-        this._quaternion.setFromEuler(this._position);
-        this._quaternion.multiply(quatPi2);
-        this._quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), 0));
+        // Add the offset provided by the camera or the touch
+        this._posQuatIndermediate.multiply(this._posQuatOffset);
+
+        // Adjust given the screen orientation
+        this._posQuatScreenOrientation.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -this._screenOrientation);
+        this._posQuatIndermediate.multiply(this._posQuatScreenOrientation);
+
+        // Final inversion, see FORGE.RenderDisplay#getQuaternionFromPose method
+        this._posQuatFinal.set(-this._posQuatIndermediate.y, -this._posQuatIndermediate.x, -this._posQuatIndermediate.z, this._posQuatIndermediate.w);
     }
+};
+
+/**
+ * Scren orientation change event.
+ * @method FORGE.ControllerGyroscope#_screenOrientationChangeHandler
+ * @private
+ */
+FORGE.ControllerGyroscope.prototype._screenOrientationChangeHandler = function()
+{
+    this._screenOrientation = FORGE.Math.degToRad(screen.orientation.angle);
 };
 
 /**
@@ -114,7 +157,10 @@ FORGE.ControllerGyroscope.prototype.enable = function()
 {
     FORGE.ControllerBase.prototype.enable.call(this);
 
-    this._viewer.gyroscope.onOrientationChange.add(this._orientationChangeHandler, this);
+    this._viewer.gyroscope.onDeviceOrientationChange.add(this._deviceOrientationChangeHandler, this);
+    this._viewer.gyroscope.onScreenOrientationChange.add(this._screenOrientationChangeHandler, this);
+
+    this._screenOrientationChangeHandler();
 };
 
 /**
@@ -125,7 +171,8 @@ FORGE.ControllerGyroscope.prototype.disable = function()
 {
     FORGE.ControllerBase.prototype.disable.call(this);
 
-    this._viewer.gyroscope.onOrientationChange.remove(this._orientationChangeHandler, this);
+    this._viewer.gyroscope.onDeviceOrientationChange.remove(this._deviceOrientationChangeHandler, this);
+    this._viewer.gyroscope.onScreenOrientationChange.remove(this._screenOrientationChangeHandler, this);
 };
 
 /**
@@ -134,7 +181,7 @@ FORGE.ControllerGyroscope.prototype.disable = function()
  */
 FORGE.ControllerGyroscope.prototype.update = function()
 {
-    this._viewer.camera.quaternion = this._quaternion;
+    this._viewer.camera.quaternion = this._posQuatFinal;
 };
 
 /**
@@ -144,5 +191,13 @@ FORGE.ControllerGyroscope.prototype.update = function()
  */
 FORGE.ControllerGyroscope.prototype.destroy = function()
 {
+    this.disable();
+
+    this._posEuler = null;
+    this._posQuatIndermediate = null;
+    this._posQuatOffset = null;
+    this._posQuatScreenOrientation = null;
+    this._posQuatFinal = null;
+
     FORGE.ControllerBase.prototype.destroy.call(this);
 };
