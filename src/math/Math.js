@@ -139,6 +139,16 @@ FORGE.Math.smoothStep = function(value, edge0, edge1)
 };
 
 /**
+ * Check if a value is a power of two
+ * @method FORGE.Math.isPowerOfTwo
+ * @param  {number} value - value to check
+ */
+FORGE.Math.isPowerOfTwo = function(value) 
+{
+    return ((value != 0) && !(value & (value - 1)));
+};
+
+/**
  * Get euler angles from rotation matrix
  *
  * @method FORGE.Math.rotationMatrixToEuler
@@ -199,4 +209,3 @@ FORGE.Math.eulerToRotationMatrix = function(yaw, pitch, roll, orderYPR)
      );
     //jscs:enable
 };
-

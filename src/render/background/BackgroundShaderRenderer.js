@@ -122,16 +122,15 @@ FORGE.BackgroundShaderRenderer.prototype._setDisplayObject = function(displayObj
     this._texture.wrapS = THREE.ClampToEdgeWrapping;
     this._texture.wrapT = THREE.ClampToEdgeWrapping;
 
-    if (this._mediaFormat === FORGE.MediaFormat.FLAT)
+    this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
+
+    if (this._mediaFormat === FORGE.MediaFormat.FLAT &&
+        FORGE.Math.isPowerOfTwo(displayObject.width) && FORGE.Math.isPowerOfTwo(displayObject.height))
     {
         // Enable mipmaps for flat rendering to avoid aliasing
         this._texture.generateMipmaps = true;
         this._texture.minFilter = THREE.LinearMipMapLinearFilter;
-    }
-    else
-    {
-        this._texture.generateMipmaps = false;
-        this._texture.minFilter = THREE.LinearFilter;
     }
 
     this._texture.needsUpdate = true;

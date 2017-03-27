@@ -186,12 +186,18 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
         this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
     }
 
+    this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
+
     if (this._mediaFormat === FORGE.MediaFormat.FLAT)
     {
-        // Enable mipmaps for flat rendering to avoid aliasing
-        this._texture.generateMipmaps = true;
-        this._texture.minFilter = THREE.LinearMipMapLinearFilter;
-
+        if (FORGE.Math.isPowerOfTwo(displayObject.width) && FORGE.Math.isPowerOfTwo(displayObject.height))
+        {
+            // Enable mipmaps for flat rendering to avoid aliasing
+            this._texture.generateMipmaps = true;
+            this._texture.minFilter = THREE.LinearMipMapLinearFilter;            
+        }
+        
         // Replace geometry with a rectangle matching texture ratio
         // First release previous default geometry
         if (this._mesh.geometry != null)
@@ -220,11 +226,6 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
         var fovMin = FORGE.Math.radToDeg(2 * Math.atan((0.5 * geomHeight / geomDepth) * (canvasHeight / texHeight)));
 
         this.log("Flat rendering boundaries [" + fovMin.toFixed() + ", " + fovMax.toFixed() + "]");
-    }
-    else
-    {
-        this._texture.generateMipmaps = false;
-        this._texture.minFilter = THREE.LinearFilter;
     }
 
     this._texture.needsUpdate = true;

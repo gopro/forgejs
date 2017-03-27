@@ -67,10 +67,12 @@ FORGE.ViewGoPro.prototype._updateViewParams = function()
     if (fov < projFovLow)
     {
         distance = 0;
+        fn = 0;
     }
     else if (fov > projFovHigh)
     {
         distance = 1;
+        fn = 1;
     }
     else
     {
