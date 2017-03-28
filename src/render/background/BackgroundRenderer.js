@@ -4,10 +4,12 @@
  *
  * @constructor FORGE.BackgroundRenderer
  * @param {FORGE.Viewer} viewer - viewer reference
+ * @param {THREE.WebGLRenderTarget} target - render target
+ * @param {SceneMediaOptionsConfig} options - the options for the cubemap
  * @param {string=} type - The type of the object as long as many other object inherits from this one.
  * @extends {FORGE.BaseObject}
  */
-FORGE.BackgroundRenderer = function(viewer, renderTarget, type)
+FORGE.BackgroundRenderer = function(viewer, target, options, type)
 {
     /**
      * @name FORGE.BackgroundRenderer#_viewer
@@ -45,11 +47,18 @@ FORGE.BackgroundRenderer = function(viewer, renderTarget, type)
     this._camera = null;
 
     /**
+     * Media format (cubemap, equi...)
+     * @type {string}
+     * @private
+     */
+    this._mediaFormat = options.mediaFormat || FORGE.MediaFormat.CUBE;
+
+    /**
      * @name FORGE.BackgroundRenderer#_renderTarget
      * @type {THREE.WebGLRenderTarget}
      * @private
      */
-    this._renderTarget = renderTarget || null;
+    this._renderTarget = target || null;
 
     FORGE.BaseObject.call(this, type || "BackgroundRenderer");
 
@@ -247,6 +256,25 @@ FORGE.BackgroundRenderer.prototype.destroy = function()
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
+
+/**
+ * Get texture size.
+ * @name FORGE.BackgroundRenderer#textureSize
+ * @type {FORGE.Size}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "textureSize",
+{
+    /** @this {FORGE.BackgroundRenderer} */
+    get: function()
+    {
+        if (this._texture === null || typeof this._texture.image === "undefined")
+        {
+            return null;
+        }
+
+        return new FORGE.Size(this._texture.image.width, this._texture.image.height);
+    }
+});
 
 /**
  * Get background render target.

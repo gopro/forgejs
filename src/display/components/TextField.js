@@ -234,7 +234,7 @@ FORGE.TextField = function(viewer, config)
     /**
      * The font-size CSS value. Can be "", "inherit", "medium", "xx-small", "x-small", "small", "large", "x-large", "xx-large", "smaller", "larger", % or length.
      * @name  FORGE.TextField#_fontSize
-     * @type {(number|string)}
+     * @type {string}
      * @private
      */
     this._fontSize = "";
@@ -250,7 +250,7 @@ FORGE.TextField = function(viewer, config)
     /**
      * The font-weight CSS value. Can be "", "inherit", "normal" (400), "bold" (700), "bolder", "lighter" or a value between 100 and 900.
      * @name  FORGE.TextField#_fontWeight
-     * @type {(string|number)}
+     * @type {string}
      * @private
      */
     this._fontWeight = "";
@@ -266,7 +266,7 @@ FORGE.TextField = function(viewer, config)
     /**
      * The line-height CSS value. Can be "", "inherit", "normal", % or length.
      * @name  FORGE.TextField#_lineHeight
-     * @type {(string|number)}
+     * @type {string}
      * @private
      */
     this._lineHeight = "";
@@ -1010,7 +1010,7 @@ Object.defineProperty(FORGE.TextField.prototype, "fontFamily",
 /**
 * Get and set the line-height CSS of the text.
 * @name FORGE.TextField#fontSize
-* @type {(number|string)}
+* @type {string}
 */
 Object.defineProperty(FORGE.TextField.prototype, "fontSize",
 {
@@ -1071,7 +1071,7 @@ Object.defineProperty(FORGE.TextField.prototype, "fontStyle",
 /**
 * Get and set the font-weight CSS of the text.
 * @name FORGE.TextField#fontWeight
-* @type {(string|number)}
+* @type {string}
 */
 Object.defineProperty(FORGE.TextField.prototype, "fontWeight",
 {
@@ -1084,12 +1084,12 @@ Object.defineProperty(FORGE.TextField.prototype, "fontWeight",
     /** @this {FORGE.TextField} */
     set: function(value)
     {
-        if(typeof value !== "string" || typeof value !== "number")
+        if(typeof value !== "string" && typeof value !== "number")
         {
             return;
         }
 
-        this._fontWeight = value;
+        this._fontWeight = value.toString();
         this._dom.style.fontWeight = this._fontWeight;
 
         //this._updateAutoSize();
@@ -1125,7 +1125,7 @@ Object.defineProperty(FORGE.TextField.prototype, "fontVariant",
 /**
 * Get and set the line-height CSS of the text.
 * @name FORGE.TextField#lineHeight
-* @type {(number|string)}
+* @type {string}
 */
 Object.defineProperty(FORGE.TextField.prototype, "lineHeight",
 {

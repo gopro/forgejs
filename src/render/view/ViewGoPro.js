@@ -3,10 +3,9 @@
  *
  * @constructor FORGE.ViewGoPro
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.Camera} camera - {@link FORGE.Camera} reference.
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewGoPro = function(viewer, camera)
+FORGE.ViewGoPro = function(viewer)
 {
     /**
      * Projection distance.
@@ -16,7 +15,7 @@ FORGE.ViewGoPro = function(viewer, camera)
      */
     this._projectionDistance = 0;
 
-    FORGE.ViewBase.call(this, viewer, camera, "ViewGoPro", FORGE.ViewType.GOPRO);
+    FORGE.ViewBase.call(this, viewer, "ViewGoPro", FORGE.ViewType.GOPRO);
 
     this._boot();
 };
@@ -26,13 +25,13 @@ FORGE.ViewGoPro.prototype.constructor = FORGE.ViewGoPro;
 
 /**
  * Background shader screen to world
- * @type {Object}
+ * @type {ScreenToWorldProgram}
  */
 FORGE.ViewGoPro.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.gopro;
 
 /**
  * Background shader world to screen
- * @type {Object}
+ * @type {WorldToScreenProgram}
  */
 FORGE.ViewGoPro.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.gopro;
 
@@ -46,8 +45,8 @@ FORGE.ViewGoPro.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
 
-    this._camera.fovMin = 30;
-    this._camera.fovMax = 330;
+    this._fovMin = 30;
+    this._fovMax = 330;
 };
 
 /**
@@ -61,17 +60,19 @@ FORGE.ViewGoPro.prototype._updateViewParams = function()
     var projFovHigh = 180;
     var distance = 0;
 
-    var fov = FORGE.Math.clamp(this._camera.fov, this._camera.fovMin, this._camera.fovMax);
+    var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
 
     var fn = 0;
 
     if (fov < projFovLow)
     {
         distance = 0;
+        fn = 0;
     }
     else if (fov > projFovHigh)
     {
         distance = 1;
+        fn = 1;
     }
     else
     {
@@ -95,8 +96,21 @@ FORGE.ViewGoPro.prototype._updateViewParams = function()
 FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
 {
     this._updateViewParams();
-    uniforms.tProjectionDistance.value = this._projectionDistance;
-    uniforms.tProjectionScale.value = this._projectionScale;
+
+    if (typeof uniforms === "undefined")
+    {
+        return;
+    }
+
+    if (uniforms.hasOwnProperty("tProjectionDistance"))
+    {
+        uniforms.tProjectionDistance.value = this._projectionDistance;
+    }
+
+    if (uniforms.hasOwnProperty("tProjectionScale"))
+    {
+        uniforms.tProjectionScale.value = this._projectionScale;
+    }
 };
 
 /**
@@ -107,7 +121,7 @@ FORGE.ViewGoPro.prototype.getProjectionFov = function()
 {
     this._updateViewParams();
 
-    var theta = 0.5 * FORGE.Math.degToRad(this._camera.fov);
+    var theta = 0.5 * FORGE.Math.degToRad(this._viewer.camera.fov);
 
     var radius = 1.0 - this._projectionDistance / 2.0;
     var offset = Math.abs(radius - 1);

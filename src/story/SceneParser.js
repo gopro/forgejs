@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.SceneParser
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
- * @param {Object} config input scene configuration from json
+ * @param {SceneConfig} config input scene configuration from json
  * @extends {FORGE.BaseObject}
  *
  */
@@ -20,7 +20,7 @@ FORGE.SceneParser = function(viewer, config)
     /**
      * Initial config
      * @name FORGE.SceneParser#_config
-     * @type {Object}
+     * @type {SceneConfig}
      * @private
      */
     this._config = config;
@@ -261,7 +261,7 @@ Object.defineProperty(FORGE.SceneParser.prototype, "thumbnails",
  * Get the media object.
  * @name  FORGE.SceneParser#media
  * @readonly
- * @type {Object}
+ * @type {SceneMediaConfig}
  */
 Object.defineProperty(FORGE.SceneParser.prototype, "media",
 {
@@ -276,7 +276,7 @@ Object.defineProperty(FORGE.SceneParser.prototype, "media",
  * Get the sound object.
  * @name  FORGE.SceneParser#sound
  * @readonly
- * @type {Object}
+ * @type {SoundConfig}
  */
 Object.defineProperty(FORGE.SceneParser.prototype, "sound",
 {

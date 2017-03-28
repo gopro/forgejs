@@ -4,9 +4,11 @@
  *
  * @constructor FORGE.BackgroundShaderRenderer
  * @param {FORGE.Viewer} viewer - viewer reference
+ * @param {THREE.WebGLRenderTarget} target - render target
+ * @param {SceneMediaOptionsConfig} options - the options for the cubemap
  * @extends {FORGE.BackgroundRenderer}
  */
-FORGE.BackgroundShaderRenderer = function(viewer, target)
+FORGE.BackgroundShaderRenderer = function(viewer, target, options)
 {
     /**
      * Display object (image, canvas or video)
@@ -48,7 +50,7 @@ FORGE.BackgroundShaderRenderer = function(viewer, target)
      */
     this._videoReductionFactor = 1;
 
-    FORGE.BackgroundRenderer.call(this, viewer, target, "BackgroundShaderRenderer");
+    FORGE.BackgroundRenderer.call(this, viewer, target, options, "BackgroundShaderRenderer");
 };
 
 FORGE.BackgroundShaderRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
@@ -117,14 +119,33 @@ FORGE.BackgroundShaderRenderer.prototype._setDisplayObject = function(displayObj
     this._texture.format = THREE.RGBFormat;
     this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
     this._texture.magFilter = THREE.LinearFilter;
-    this._texture.minFilter = THREE.LinearFilter;
     this._texture.wrapS = THREE.ClampToEdgeWrapping;
     this._texture.wrapT = THREE.ClampToEdgeWrapping;
+
     this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
+
+    if (this._mediaFormat === FORGE.MediaFormat.FLAT &&
+        FORGE.Math.isPowerOfTwo(displayObject.width) && FORGE.Math.isPowerOfTwo(displayObject.height))
+    {
+        // Enable mipmaps for flat rendering to avoid aliasing
+        this._texture.generateMipmaps = true;
+        this._texture.minFilter = THREE.LinearMipMapLinearFilter;
+    }
 
     this._texture.needsUpdate = true;
 
     this._mesh.material.uniforms.tTexture.value = this._texture;
+
+    if (this._mesh.material.uniforms.hasOwnProperty("tTextureRatio"))
+    {
+        this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+    }
+
+    if (this._mesh.material.uniforms.hasOwnProperty("tTextureSize"))
+    {
+        this._mesh.material.uniforms.tTextureSize.value = new THREE.Vector2(this._texture.image.width, this._texture.image.height);
+    }
 };
 
 /**
@@ -216,6 +237,19 @@ FORGE.BackgroundShaderRenderer.prototype.render = function(camera)
 FORGE.BackgroundShaderRenderer.prototype.updateAfterViewChange = function()
 {
     this._updateInternals();
+
+    if (this._texture !== null && typeof this._texture.image !== "undefined")
+    {
+        if (this._mesh.material.uniforms.hasOwnProperty("tTextureRatio"))
+        {
+            this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+        }
+
+        if (this._mesh.material.uniforms.hasOwnProperty("tTextureSize"))
+        {
+            this._mesh.material.uniforms.tTextureSize.value = new THREE.Vector2(this._texture.image.width, this._texture.image.height);
+        }
+    }
 };
 
 /**

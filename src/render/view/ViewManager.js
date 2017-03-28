@@ -73,12 +73,16 @@ FORGE.ViewManager.prototype._setView = function(type)
     switch (type)
     {
         case FORGE.ViewType.GOPRO:
-            this._view = new FORGE.ViewGoPro(this._viewer, this._viewer.camera);
+            this._view = new FORGE.ViewGoPro(this._viewer);
+            break;
+
+        case FORGE.ViewType.FLAT:
+            this._view = new FORGE.ViewFlat(this._viewer);
             break;
 
         case FORGE.ViewType.RECTILINEAR:
         default:
-            this._view = new FORGE.ViewRectilinear(this._viewer, this._viewer.camera);
+            this._view = new FORGE.ViewRectilinear(this._viewer);
             break;
     }
 

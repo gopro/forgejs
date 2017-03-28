@@ -33,7 +33,7 @@ FORGE.Collection.prototype.add = function(item)
  * @method FORGE.Collection.remove
  * @param {*} item - The item to remove.
  */
-FORGE.Collection.prototype.remove = function(item) 
+FORGE.Collection.prototype.remove = function(item)
 {
     for(var i = 0, ii = this._elements.length; i < ii; i++)
     {
@@ -71,7 +71,7 @@ FORGE.Collection.prototype.toArray = function()
  * @type {number}
  * @readonly
  */
-Object.defineProperty(FORGE.Collection.prototype, "size", 
+Object.defineProperty(FORGE.Collection.prototype, "size",
 {
     /** @this {FORGE.Collection} */
     get: function()

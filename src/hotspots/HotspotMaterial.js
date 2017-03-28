@@ -615,6 +615,7 @@ FORGE.HotspotMaterial.prototype.update = function()
     }
 };
 
+
 /**
  * Set texture frame
  * @method FORGE.HotspotMaterial#setTextureFrame
