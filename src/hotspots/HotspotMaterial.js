@@ -6,7 +6,7 @@
  * @param {FORGE.Viewer} viewer - The viewer reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.HotspotMaterial = function(viewer)
+FORGE.HotspotMaterial = function(viewer, hotspotUid)
 {
     /**
      * Viewer reference.
@@ -15,6 +15,14 @@ FORGE.HotspotMaterial = function(viewer)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * The hotspot uid
+     * @name FORGE.HotspotMaterial#_hotspotUid
+     * @type {string}
+     * @private
+     */
+    this._hotspotUid = hotspotUid;
 
     /**
      * Hotspot material config
