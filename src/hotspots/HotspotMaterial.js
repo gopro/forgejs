@@ -293,6 +293,8 @@ FORGE.HotspotMaterial.prototype._createTextureFromImage = function(image)
     this._displayObject = image;
 
     this._texture = new THREE.Texture();
+    this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
 
     this.setTextureFrame(image.frame);
 
@@ -339,6 +341,8 @@ FORGE.HotspotMaterial.prototype._spriteLoadCompleteHandler = function(event)
 FORGE.HotspotMaterial.prototype._createTextureFromSprite = function(sprite)
 {
     this._texture = new THREE.Texture();
+    this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
 
     this.setTextureFrame(sprite.frame);
 
@@ -390,9 +394,10 @@ FORGE.HotspotMaterial.prototype._createTextureFromVideo = function(video)
     this.log("create texture from video");
 
     this._texture = new THREE.Texture();
-    this._texture.image = video.element;
     this._texture.generateMipmaps = false;
     this._texture.minFilter = THREE.LinearFilter;
+
+    this._texture.image = video.element;
 
     this._setupComplete();
 };
