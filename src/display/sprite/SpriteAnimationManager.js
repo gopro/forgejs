@@ -114,11 +114,11 @@ FORGE.SpriteAnimationManager.prototype.addConfig = function(config)
 /**
  * Add an animation sequence to this sprite.
  * @method FORGE.SpriteAnimationManager#add
- * @param {string} name - The name of your animation sequence.
- * @param {number} start - The starting frame index of the full frames array.
- * @param {number} end - The end frame index of the full frame array.
- * @param {number} frameRate - The frame rate of this animation (default: 60)
- * @param {boolean} loop - Does the animation have to loop? (default: false)
+ * @param {string=} name - The name of your animation sequence.
+ * @param {number=} start - The starting frame index of the full frames array.
+ * @param {number=} end - The end frame index of the full frame array.
+ * @param {number=} frameRate - The frame rate of this animation (default: 60)
+ * @param {boolean=} loop - Does the animation have to loop? (default: false)
  */
 FORGE.SpriteAnimationManager.prototype.add = function(name, start, end, frameRate, loop)
 {
@@ -138,7 +138,7 @@ FORGE.SpriteAnimationManager.prototype.add = function(name, start, end, frameRat
     start = parseInt(start, 10);
     end = parseInt(end, 10);
     frameRate = (typeof frameRate === "number") ? frameRate : this._frameRate;
-    loop = (typeof loop === "boolean") ? loop : false;
+    loop = (typeof loop === "boolean") ? loop : true;
 
     var frames = this._sprite.frames;
 
@@ -154,7 +154,7 @@ FORGE.SpriteAnimationManager.prototype.add = function(name, start, end, frameRat
 
     var selectedFrames = frames.slice(start, end + 1);
 
-    this._anims[name] = new FORGE.SpriteAnimation(this._sprite, name, selectedFrames, frameRate);
+    this._anims[name] = new FORGE.SpriteAnimation(this._sprite, name, selectedFrames, frameRate, loop);
 };
 
 /**
@@ -305,7 +305,6 @@ FORGE.SpriteAnimationManager.prototype.destroy = function()
 
     this._sprite = null;
     this._anims = null;
-    this._animation = null;
     this._pending = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);

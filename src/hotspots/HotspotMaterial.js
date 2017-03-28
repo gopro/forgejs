@@ -304,7 +304,7 @@ FORGE.HotspotMaterial.prototype._createTextureFromImage = function(image)
 /**
  * Setup hotspot material with a sprite as texture.
  * @method FORGE.HotspotMaterial#_setupWithSprite
- * @param {(string|ImageConfig)} config - The sprite configuration you want to load and use as a texture.
+ * @param {(string|SpriteConfig)} config - The sprite configuration you want to load and use as a texture.
  * @private
  */
 FORGE.HotspotMaterial.prototype._setupWithSprite = function(config)
@@ -324,7 +324,7 @@ FORGE.HotspotMaterial.prototype._setupWithSprite = function(config)
  */
 FORGE.HotspotMaterial.prototype._spriteLoadCompleteHandler = function(event)
 {
-    var sprite = /** @type {FORGE.Image} */ (event.emitter);
+    var sprite = /** @type {FORGE.Sprite} */ (event.emitter);
 
     this.log("sprite load complete");
     this._createTextureFromSprite(sprite);
@@ -372,7 +372,7 @@ FORGE.HotspotMaterial.prototype._setupWithVideo = function(config)
  */
 FORGE.HotspotMaterial.prototype._videoLoadedMetaDataHandler = function(event)
 {
-    var video = /** @type {FORGE.Image} */ (event.emitter);
+    var video = /** @type {FORGE.VideoBase} */ (event.emitter);
     video.play();
 
     this.log("video load complete");
@@ -382,7 +382,7 @@ FORGE.HotspotMaterial.prototype._videoLoadedMetaDataHandler = function(event)
 /**
  * Create a THREE.Texture from the loaded FORGE.Video
  * @method FORGE.HotspotMaterial#_createTextureFromVideo
- * @param {FORGE.Video} video - The FORGE.Video used to create the texture.
+ * @param {FORGE.VideoBase} video - The FORGE.Video used to create the texture.
  * @private
  */
 FORGE.HotspotMaterial.prototype._createTextureFromVideo = function(video)
