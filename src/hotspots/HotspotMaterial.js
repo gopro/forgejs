@@ -611,31 +611,13 @@ FORGE.HotspotMaterial.prototype.update = function()
 };
 
 /**
- * Set texture source
- * @method FORGE.HotspotMaterial#setTextureSource
- * @param {FORGE.Image} image - texture source image
- */
-FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
-{
-    if (this._displayObject !== null)
-    {
-        this._displayObject.destroy();
-        this._displayObject = null;
-    }
-
-    this._displayObject = image;
-
-    this.setTextureFrame();
-};
-
-/**
  * Set texture frame
  * @method FORGE.HotspotMaterial#setTextureFrame
  * @param {FORGE.Rectangle=} frame - texture frame
  */
 FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 {
-    // Only support type IMAGE at the moment
+    // Only support type IMAGE and SPRITE
     if (this._displayObject === null || (this._type !== FORGE.HotspotMaterial.types.IMAGE && this._type !== FORGE.HotspotMaterial.types.SPRITE))
     {
         return;
