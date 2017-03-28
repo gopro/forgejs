@@ -147,6 +147,13 @@ FORGE.HotspotMaterial.types.IMAGE = "image";
 FORGE.HotspotMaterial.types.SPRITE = "sprite";
 
 /**
+ * @name FORGE.HotspotMaterial.types.VIDEO
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotMaterial.types.VIDEO = "video";
+
+/**
  * @name FORGE.HotspotMaterial.types.PLUGIN
  * @type {string}
  * @const
@@ -216,6 +223,12 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
     else if (typeof config.sprite !== "undefined" && config.sprite !== null)
     {
         this._setupWithSprite(config.sprite);
+    }
+
+    // Hotspot with video as background
+    else if (typeof config.video !== "undefined" && config.video !== null)
+    {
+        this._setupWithVideo(config.video);
     }
 
     // Hotspot with plugin that provide a texture as background
@@ -330,6 +343,56 @@ FORGE.HotspotMaterial.prototype._createTextureFromSprite = function(sprite)
     this.setTextureFrame(sprite.frame);
 
     this.log("create texture from sprite");
+
+    this._setupComplete();
+};
+
+/**
+ * Setup hotspot material with a video as texture.
+ * @method FORGE.HotspotMaterial#_setupWithVideo
+ * @param {(string|VideoConfig)} config - The video configuration you want to load and use as a texture.
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._setupWithVideo = function(config)
+{
+    this._type = FORGE.HotspotMaterial.types.VIDEO;
+    this._update = true;
+
+    this._displayObject = new FORGE.VideoHTML5(this._viewer, this._hotspotUid+"-material-video");
+    this._displayObject.currentTime = 100000;
+    this._displayObject.onLoadedMetaData.addOnce(this._videoLoadedMetaDataHandler, this);
+    this._displayObject.load(config.url);
+};
+
+/**
+ * Video meta data loaded event handler for the video setup.
+ * @method FORGE.HotspotMaterial#_videoLoadedMetaDataHandler
+ * @param {FORGE.Event} event - load event
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._videoLoadedMetaDataHandler = function(event)
+{
+    var video = /** @type {FORGE.Image} */ (event.emitter);
+    video.play();
+
+    this.log("video load complete");
+    this._createTextureFromVideo(video);
+};
+
+/**
+ * Create a THREE.Texture from the loaded FORGE.Video
+ * @method FORGE.HotspotMaterial#_createTextureFromVideo
+ * @param {FORGE.Video} video - The FORGE.Video used to create the texture.
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._createTextureFromVideo = function(video)
+{
+    this.log("create texture from video");
+
+    this._texture = new THREE.Texture();
+    this._texture.image = video.element;
+    this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
 
     this._setupComplete();
 };
