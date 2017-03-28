@@ -11,6 +11,13 @@ FORGE.ViewType = {};
 FORGE.ViewType.UNDEFINED = "undefined";
 
 /**
+ * @name FORGE.ViewType.FLAT
+ * @type {string}
+ * @const
+ */
+FORGE.ViewType.FLAT = "flat";
+
+/**
  * @name FORGE.ViewType.RECTILINEAR
  * @type {string}
  * @const

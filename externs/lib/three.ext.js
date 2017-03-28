@@ -31,6 +31,12 @@ THREE.NearestFilter;
  * @const
  * @type {number}
  */
+THREE.LinearMipMapLinearFilter;
+
+/**
+ * @const
+ * @type {number}
+ */
 THREE.RGBFormat;
 
 /**
@@ -236,6 +242,7 @@ THREE.Clock.prototype.getDelta = function() {};
 /**
  * @constructor
  * @param {HTMLCanvasElement} arg1
+ * @extends {THREE.Texture}
  * @return {!THREE.CanvasTexture}
  */
 THREE.CanvasTexture = function(arg1) {};
@@ -1111,6 +1118,11 @@ THREE.PerspectiveCamera.prototype.clone = function() {};
  * @return {!THREE.OrthographicCamera}
  */
 THREE.OrthographicCamera = function(arg1, arg2, arg3, arg4, arg5, arg6) {};
+
+/**
+ * @return {THREE.OrthographicCamera}
+ */
+THREE.OrthographicCamera.prototype.updateProjectionMatrix = function() {};
 
 /**
  * @constructor

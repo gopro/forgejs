@@ -8,7 +8,7 @@
     "properties": {
         "format": {
             "type": "string",
-            "enum": [ "equi", "cube" ],
+            "enum": [ "equi", "cube", "flat" ],
             "title": "Format",
             "description": "The format of the media: equi is for an equirectangular ressource (the most common one) and cube is for a cubemap ressource (less common but more efficient to display). Can be :<ul><li>equi</li><li>cube</li><li>flat</li><li>hotspot</li></ul>",
             "example": "equi"
@@ -27,6 +27,10 @@
             "title": "URL",
             "description": "This property is only set when the media is an image. The file can be local or on a distant server, but must be a valid image format.",
             "example": "./images/scene-0.jpg"
+        },
+
+        "fov": {
+            "$ref": "scene-media-fov"
         },
 
         "pattern": {

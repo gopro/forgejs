@@ -490,9 +490,17 @@ FORGE.ControllerKeyboard.prototype.update = function()
 
     // this.log("Current velocity: " + this._velocity.x + ", " + this._velocity.y);
 
+    var dx = this._velocity.x + this._inertia.x;
+    var dy = this._velocity.y + this._inertia.y;
+
+    if (dx === 0 && dy === 0)
+    {
+        return;
+    }
+    
     var invert = this._orientation.invert ? -1 : 1;
-    this._camera.yaw += invert * (this._velocity.x + this._inertia.x);
-    this._camera.pitch -= invert * (this._velocity.y + this._inertia.y);
+    this._camera.yaw += invert * dx;
+    this._camera.pitch -= invert * dy;
 
     // Damping 1 -> stops instantly, 0 infinite rebounds
     this._inertia.add(this._velocity).multiplyScalar(FORGE.Math.clamp(1 - this._orientation.damping, 0, 1));

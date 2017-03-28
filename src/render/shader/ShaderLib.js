@@ -25,6 +25,27 @@ FORGE.ShaderLib = {
             fragmentShader: FORGE.ShaderChunk.stw_frag_proj_rectilinear
         },
 
+        flat:
+        {
+            /** @type {FORGEUniform} */
+            uniforms:
+            {
+                tTexture: { type: "t", value: null },
+                tTextureSize: { type: "v2", value: new THREE.Vector2() },
+                tTextureRatio: { type: "f", value: 1.0 },
+                tViewportResolution: { type: "v2", value: new THREE.Vector2() },
+                tViewportResolutionRatio: { type: "f", value: 1.0 },
+                tFov: { type: "f", value: 0.0 },
+                tYaw: { type: "f", value: 0.0 },
+                tPitch: { type: "f", value: 0.0 },
+                tRepeatX: { type: "i", value: 0 },
+                tRepeatY: { type: "i", value: 0 }
+            },
+
+            vertexShader: FORGE.ShaderChunk.stw_vert_proj,
+            fragmentShader: FORGE.ShaderChunk.stw_frag_proj_flat
+        },
+
         gopro:
         {
             /** @type {FORGEUniform} */
@@ -55,7 +76,6 @@ FORGE.ShaderLib = {
                 {
                     tOpacity: { type: "f", value: 1.0 },
                     tTexture: { type: "t", value: null },
-                    tProjectionScale: { type: "f", value: 1 },
                     tModelViewMatrixInverse: { type: "m4", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
@@ -89,6 +109,22 @@ FORGE.ShaderLib = {
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear_equirectangular,
                 fragmentShader: FORGE.ShaderChunk.wts_frag_equirectangular
             }
+        },
+
+        flat:
+        {
+            mapping:
+            {
+                /** @type {FORGEUniform} */
+                uniforms:
+                {
+                    tOpacity: { type: "f", value: 1.0 },
+                    tTexture: { type: "t", value: null },
+                    tModelViewMatrixInverse: { type: "m4", value: null }
+                },
+                vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
+                fragmentShader: FORGE.ShaderChunk.wts_frag
+            },
         },
 
         littlePlanet:

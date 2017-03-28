@@ -371,11 +371,14 @@ FORGE.RenderManager.prototype._initCamera = function(sceneConfig)
  */
 FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
 {
+    var mediaConfig = /** @type {SceneMediaConfig} */ (sceneConfig.media);
+
     // Create media
-    if (typeof sceneConfig.media !== "undefined" && sceneConfig.media !== null)
+    if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
     {
-        if (sceneConfig.media.type === FORGE.MediaType.GRID ||
-            (typeof sceneConfig.media.source !== "undefined" && sceneConfig.media.source !== null && sceneConfig.media.source.format === FORGE.MediaFormat.CUBE) ||
+        if (mediaConfig.type === FORGE.MediaType.GRID ||
+            (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null &&
+                mediaConfig.source.format === FORGE.MediaFormat.CUBE) ||
             this._renderDisplay.presentingVR === true)
         {
             this._backgroundRendererType = FORGE.BackgroundType.MESH;
@@ -423,25 +426,27 @@ FORGE.RenderManager.prototype._initMedia = function(sceneConfig)
  */
 FORGE.RenderManager.prototype._initSound = function(sceneConfig)
 {
-    // Create sound
-    if (typeof sceneConfig.sound !== "undefined" && typeof sceneConfig.sound.source !== "undefined")
+    var soundConfig = /** @type {SoundConfig} */ (sceneConfig.sound);
+
+    // Create sound from the SceneConfig
+    if (typeof soundConfig !== "undefined" && typeof soundConfig.source !== "undefined")
     {
         var volume, loop, startTime, autoPlay;
 
-        if (typeof sceneConfig.sound.options !== "undefined")
+        if (typeof soundConfig.options !== "undefined")
         {
-            volume = (typeof sceneConfig.sound.options.volume === "number") ? FORGE.Math.clamp(sceneConfig.sound.options.volume, 0, 1) : 1;
-            loop = (typeof sceneConfig.sound.options.loop === "boolean") ? sceneConfig.sound.options.loop : false;
-            startTime = (typeof sceneConfig.sound.options.startTime === "number") ? sceneConfig.sound.options.startTime : 0;
-            autoPlay = (typeof sceneConfig.sound.options.autoPlay === "boolean") ? sceneConfig.sound.options.autoPlay : false;
+            volume = (typeof soundConfig.options.volume === "number") ? FORGE.Math.clamp(soundConfig.options.volume, 0, 1) : 1;
+            loop = (typeof soundConfig.options.loop === "boolean") ? soundConfig.options.loop : false;
+            startTime = (typeof soundConfig.options.startTime === "number") ? soundConfig.options.startTime : 0;
+            autoPlay = (typeof soundConfig.options.autoPlay === "boolean") ? soundConfig.options.autoPlay : false;
         }
 
-        if (typeof sceneConfig.sound.source.url !== "undefined" && sceneConfig.sound.source.url !== "")
+        if (typeof soundConfig.source.url !== "undefined" && soundConfig.source.url !== "")
         {
             // Warning : UID is not registered and applied to the FORGE.Sound object for registration
             this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC));
 
-            if (typeof sceneConfig.sound.options !== "undefined" && sceneConfig.sound.options !== null)
+            if (typeof soundConfig.options !== "undefined" && soundConfig.options !== null)
             {
                 this._mediaSound.volume = volume;
                 this._mediaSound.loop = loop;
@@ -453,7 +458,7 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
                 }
             }
         }
-        // @todo Ability to use a target uid rather than a source url (ie. sceneConfig.sound.source.target)
+        // @todo Ability to use a target uid rather than a source url (ie. soundConfig.source.target)
     }
 };
 
@@ -491,6 +496,7 @@ FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
 {
     this.log("Media load is complete");
 
+    this._setBackgroundRendererType(this._renderDisplay.presentingVR);
     this._setBackgroundRenderer(this._backgroundRendererType);
 
     if (typeof event !== "undefined" && event !== null)
@@ -522,10 +528,12 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
 {
     var fxSet = null;
 
-    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null &&
-        typeof this._sceneConfig.media.fx !== "undefined" && this._sceneConfig.media.fx !== null)
+    var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+
+    if (typeof mediaConfig !== "undefined" && mediaConfig !== null &&
+        typeof mediaConfig.fx !== "undefined" && mediaConfig.fx !== null)
     {
-        fxSet = this._viewer.postProcessing.getFxSetByUID(this._sceneConfig.media.fx);
+        fxSet = this._viewer.postProcessing.getFxSetByUID(mediaConfig.fx);
     }
 
     this._renderPipeline.addBackground(this._backgroundRenderer.renderTarget.texture, fxSet, 1.0);
@@ -658,10 +666,58 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
     this._clearBackgroundRenderer();
 
+    var config = {};
+    var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+    if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
+    {
+        config.type = mediaConfig.type;
+
+        if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
+        {
+            config.mediaFormat = mediaConfig.source.format;
+            var ratio = this._media.displayObject.element.width / this._media.displayObject.element.height;
+
+            if (typeof mediaConfig.source.fov !== "undefined")
+            {
+                var vFov;
+                if (typeof mediaConfig.source.fov === "number")
+                {
+                    vFov = mediaConfig.source.fov.vertical;
+                }
+                else if (typeof mediaConfig.source.fov.vertical === "number")
+                {
+                    vFov = mediaConfig.source.fov.vertical;
+                }
+                else if (typeof mediaConfig.source.fov.horizontal === "number")
+                {
+                    vFov = mediaConfig.source.fov.horizontal / ratio;
+                }
+                else if (typeof mediaConfig.source.fov.diagonal === "number")
+                {
+                    vFov = mediaConfig.source.fov.diagonal / Math.sqrt(1 + ratio * ratio);
+                }
+                else
+                {
+                    vFov = 90;
+                }
+
+                config.verticalFov = FORGE.Math.degToRad(vFov);
+            }
+        }
+
+        if (typeof mediaConfig.options !== "undefined" && mediaConfig.options !== null)
+        {
+            if (typeof mediaConfig.options.color !== "undefined")
+            {
+                config.color = mediaConfig.options.color;
+            }
+        }
+    }
+
     if (type === FORGE.BackgroundType.SHADER)
     {
         this.log("Create background shader renderer");
-        this._backgroundRenderer = new FORGE.BackgroundShaderRenderer(this._viewer, renderTarget);
+        this._backgroundRenderer = new FORGE.BackgroundShaderRenderer(this._viewer, renderTarget, config);
 
         var size = this._webGLRenderer.getSize();
         this._setRendererSize(new FORGE.Size(size.width, size.height));
@@ -670,38 +726,21 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     {
         this.log("Create background mesh renderer");
 
-        var config =
+        if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
         {
-            order: "RLUDFB"
-        };
-
-        if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null)
-        {
-            config.type = this._sceneConfig.media.type;
-
-            if (typeof this._sceneConfig.media.options !== "undefined" && this._sceneConfig.media.options !== null)
+            if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
             {
-                if (typeof this._sceneConfig.media.options.color !== "undefined")
-                {
-                    config.color = this._sceneConfig.media.options.color;
-                }
-            }
-
-            if (typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null)
-            {
-                config.order = this._sceneConfig.media.source.order || "RLUDFB";
+                config.order = mediaConfig.source.order || "RLUDFB";
 
                 // Get the right tile
-                if (typeof this._sceneConfig.media.source.tile === "number")
+                if (typeof mediaConfig.source.tile === "number")
                 {
-                    config.tile = this._sceneConfig.media.source.tile;
+                    config.tile = mediaConfig.source.tile;
                 }
-                else if (Array.isArray(this._sceneConfig.media.source.levels) && typeof this._sceneConfig.media.source.levels[0].tile === "number")
+                else if (Array.isArray(mediaConfig.source.levels) && typeof mediaConfig.source.levels[0].tile === "number")
                 {
-                    config.tile = this._sceneConfig.media.source.levels[0].tile;
+                    config.tile = mediaConfig.source.levels[0].tile;
                 }
-
-                config.mediaFormat = this._sceneConfig.media.source.format;
             }
         }
 
@@ -727,6 +766,55 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
         this._onBackgroundReady.dispatch();
     }
 };
+
+/**
+ * Set the background renderer depending on current media format and view type.
+ * @method FORGE.RenderManager#_setBackgroundRendererType
+ * @param {boolean} vrEnabled - VR enabled flag
+ * @private
+ */
+FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
+{
+    if (vrEnabled === true)
+    {
+        this.log("VR on - background type = MESH");
+        this._backgroundRendererType = FORGE.BackgroundType.MESH;
+        return;
+    }
+
+    var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+
+    if (typeof mediaConfig.source === "undefined" || 
+        mediaConfig.source.format === FORGE.MediaFormat.CUBE || 
+        mediaConfig.source.format === FORGE.MediaFormat.FLAT ||
+        typeof mediaConfig.source === "undefined" ||
+        typeof mediaConfig.source.format === "undefined")
+    {
+        if (this._viewManager.current.type === FORGE.ViewType.FLAT)
+        {
+            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+        }
+        else
+        {
+            this._backgroundRendererType = FORGE.BackgroundType.MESH;
+        }
+    }
+    else
+    {
+        this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+    }
+
+    if (typeof mediaConfig.source === "undefined" || typeof mediaConfig.source.format === "undefined")
+    {
+        this.log("VR off - view " + this._viewManager.current.type + ", background type = " + this._backgroundRendererType);
+    }
+    else
+    {
+        this.log("VR off - media " + mediaConfig.source.format + ", view " + this._viewManager.current.type +
+            ", background type = " + this._backgroundRendererType);
+    }
+};
+
 
 /**
  * Clear the background renderer.
@@ -782,7 +870,7 @@ FORGE.RenderManager.prototype.render = function()
 
         this._webGLRenderer.setViewport(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 
-        this._drawBackground(vr ? camera : null);
+        this._drawBackground((vr === true) ? camera : null);
 
         this._renderPipeline.render(camera);
 
@@ -843,9 +931,14 @@ FORGE.RenderManager.prototype.disableVR = function()
     this._viewManager.disableVR();
 
     // If we exit VR with a cubemap: do nothing. With an equi: toggle to shader renderer
-    if (typeof this._sceneConfig.media !== "undefined" && this._sceneConfig.media !== null && typeof this._sceneConfig.media.source !== "undefined" && this._sceneConfig.media.source !== null && this._sceneConfig.media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
+    var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
+
+    if (typeof mediaConfig !== "undefined" && mediaConfig !== null &&
+        typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null &&
+        mediaConfig.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
     {
-        this._setBackgroundRenderer(FORGE.BackgroundType.SHADER);
+        this._setBackgroundRendererType(false);
+        this._setBackgroundRenderer(this._backgroundRendererType);
     }
 };
 

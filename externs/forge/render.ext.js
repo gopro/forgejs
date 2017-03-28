@@ -1,15 +1,15 @@
 /**
- * @typedef {{screenToWorld:(ScreenWorldProgram|undefined), worldToScreen:(ScreenWorldProgram|undefined)}}
+ * @typedef {{screenToWorld:(ScreenToWorldProgram|undefined), worldToScreen:(ScreenToWorldProgram|undefined)}}
  */
 var FORGEProgram;
 
 /**
- * @typedef {{rectilinear:(ViewObjectProgram|WorldToScreenProgram|undefined), gopro:(ViewObjectProgram|WorldToScreenProgram|undefined), littlePlanet:(ViewObjectProgram|WorldToScreenProgram|undefined)}}
+ * @typedef {{rectilinear:(ViewObjectProgram|WorldToScreenProgram|undefined), gopro:(ViewObjectProgram|WorldToScreenProgram|undefined), flat:(ViewObjectProgram|WorldToScreenProgram|undefined), littlePlanet:(ViewObjectProgram|WorldToScreenProgram|undefined)}}
  */
-var ScreenWorldProgram;
+var ScreenToWorldProgram;
 
 /**
- * @typedef {{mapping:(ViewObjectProgram|undefined), equirectangular:(ViewObjectProgram|undefined)}}
+ * @typedef {{mapping:(ViewObjectProgram|undefined), equirectangular:(ViewObjectProgram|undefined), flat:(ViewObjectProgram|undefined)}}
  */
 var WorldToScreenProgram;
 
@@ -19,13 +19,20 @@ var WorldToScreenProgram;
 var ViewObjectProgram;
 
 /**
- * @typedef {{tTexture:(TUniform|undefined), resolution:(TUniform|undefined), tViewportResolution:(TUniform|undefined), tViewportResolutionMin:(TUniform|undefined), tViewportResolutionRatio:(TUniform|undefined), tModelViewMatrix:(TUniform|undefined), tModelViewMatrixInverse:(TUniform|undefined), tProjectionScale:(TUniform|undefined), tProjectionDistance:(TUniform|undefined), tScreenOffset:(TUniform|undefined), tTextureInfo:(TUniform|undefined), tAdd:(TUniform|undefined), tColor:(TUniform|undefined), tOpacity:(TUniform|undefined), time:(TUniform|undefined)}}
+ * @typedef {{tTexture:(TUniform|undefined), tTextureSize:(TUniform|undefined), tTextureRatio:(TUniform|undefined), resolution:(TUniform|undefined), tViewportResolution:(TUniform|undefined), tViewportResolutionMin:(TUniform|undefined), tViewportResolutionRatio:(TUniform|undefined), tFov:(TUniform|undefined), tYaw:(TUniform|undefined), tPitch:(TUniform|undefined), tRepeatX:(TUniform|undefined), tRepeatY:(TUniform|undefined), tModelViewMatrix:(TUniform|undefined), tModelViewMatrixInverse:(TUniform|undefined), tProjectionScale:(TUniform|undefined), tProjectionDistance:(TUniform|undefined), tScreenOffset:(TUniform|undefined), tTextureInfo:(TUniform|undefined), tAdd:(TUniform|undefined), tColor:(TUniform|undefined), tOpacity:(TUniform|undefined), time:(TUniform|undefined)}}
  * @name FORGEUniform
  * @property {TUniform=} tTexture
+ * @property {TUniform=} tTextureSize
+ * @property {TUniform=} tTextureRatio
  * @property {TUniform=} resolution
  * @property {TUniform=} tViewportResolution
  * @property {TUniform=} tViewportResolutionMin
  * @property {TUniform=} tViewportResolutionRatio
+ * @property {TUniform=} tFov
+ * @property {TUniform=} tYaw
+ * @property {TUniform=} tPitch
+ * @property {TUniform=} tRepeatX
+ * @property {TUniform=} tRepeatY
  * @property {TUniform=} tModelViewMatrix
  * @property {TUniform=} tModelViewMatrixInverse
  * @property {TUniform=} tProjectionScale

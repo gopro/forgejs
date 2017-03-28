@@ -488,6 +488,7 @@ FORGE.HotspotMaterial.prototype.update = function()
     }
 };
 
+
 /**
  * Set texture source
  * @method FORGE.HotspotMaterial#setTextureSource
@@ -534,6 +535,8 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
  */
 FORGE.HotspotMaterial.prototype.destroy = function()
 {
+    this._textureFrame = null;
+
     this._textureFrame = null;
 
     if (this._texture !== null)

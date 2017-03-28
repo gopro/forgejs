@@ -8,9 +8,9 @@
     "properties": {
         "type": {
             "type": "string",
-            "enum": [ "Rectilinear", "GoPro" ],
+            "enum": [ "Rectilinear", "GoPro", "Flat" ],
             "title": "The type of view",
-            "description": "Two views are available: <ul><li>Rectilinear</li><li>GoPro</li></ul>",
+            "description": "Two views are available: <ul><li>Rectilinear</li><li>GoPro</li><li>Flat</li></ul>",
             "default": "Rectilinear"
         }
     }

@@ -59,6 +59,7 @@ module.exports = function(grunt)
         "src/render/view/ViewManager.js",
         "src/render/view/ViewType.js",
         "src/render/view/ViewBase.js",
+        "src/render/view/ViewFlat.js",
         "src/render/view/ViewGoPro.js",
         "src/render/view/ViewRectilinear.js",
 

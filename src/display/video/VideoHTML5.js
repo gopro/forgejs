@@ -1906,15 +1906,15 @@ FORGE.VideoHTML5.prototype.play = function(time, loop)
         if (typeof p !== "undefined" && typeof Promise !== "undefined" && p instanceof Promise)
         {
             p.then(function()
-                {
-                    this._playing = true;
-                    this._paused = false;
-                    this._playCount++;
-                }.bind(this))
-             .catch(function(error)
-                {
-                    this.log("error while playing the video : " + error);
-                }.bind(this));
+            {
+                this._playing = true;
+                this._paused = false;
+                this._playCount++;
+            }.bind(this))
+            .catch(function(error)
+            {
+                this.log("error while playing the video : " + error);
+            }.bind(this));
         }
         else
         {
