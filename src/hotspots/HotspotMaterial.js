@@ -292,9 +292,9 @@ FORGE.HotspotMaterial.prototype._createTextureFromImage = function(image)
 {
     this._displayObject = image;
 
-    this.setTextureFrame(image.frame);
+    this._texture = new THREE.Texture();
 
-    this._texture.image.crossOrigin = "anonymous";
+    this.setTextureFrame(image.frame);
 
     this.log("create texture from image");
 
@@ -338,7 +338,7 @@ FORGE.HotspotMaterial.prototype._spriteLoadCompleteHandler = function(event)
  */
 FORGE.HotspotMaterial.prototype._createTextureFromSprite = function(sprite)
 {
-    this._displayObject = sprite;
+    this._texture = new THREE.Texture();
 
     this.setTextureFrame(sprite.frame);
 
@@ -645,7 +645,9 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 
     this._displayObject.frame = textureFrame;
 
-    this._texture = new THREE.CanvasTexture(this._displayObject.canvas);
+    this._texture.image = this._displayObject.canvas;
+    this._texture.image.crossOrigin = "anonymous";
+    this._texture.needsUpdate = true;
 
     this.update();
 };
