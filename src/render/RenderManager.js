@@ -784,7 +784,6 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
 
     var mediaConfig = /** @type {SceneMediaConfig} */ (this._sceneConfig.media);
 
-
     if (typeof mediaConfig.source === "undefined" || 
         mediaConfig.source.format === FORGE.MediaFormat.CUBE || 
         mediaConfig.source.format === FORGE.MediaFormat.FLAT ||
@@ -795,13 +794,11 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         {
             this._backgroundRendererType = FORGE.BackgroundType.SHADER;
         }
-
         else
         {
             this._backgroundRendererType = FORGE.BackgroundType.MESH;
         }
     }
-
     else
     {
         this._backgroundRendererType = FORGE.BackgroundType.SHADER;
