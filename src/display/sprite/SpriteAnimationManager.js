@@ -105,7 +105,7 @@ FORGE.SpriteAnimationManager.prototype.addConfig = function(config)
 
         for(var i = 0, ii = config.length; i < ii; i++)
         {
-            anim =  config[i];
+            anim = config[i];
             this.add(anim.name, anim.start, anim.end, anim.frameRate, anim.loop);
         }
     }
@@ -169,7 +169,8 @@ FORGE.SpriteAnimationManager.prototype.play = function(animation, loop, index)
 {
     if(this._sprite.loaded === false)
     {
-        this._pending.push({
+        this._pending.push(
+        {
             method: "play",
             args: [animation, loop, index]
         });
