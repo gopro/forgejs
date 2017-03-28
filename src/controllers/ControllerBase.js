@@ -104,7 +104,7 @@ FORGE.ControllerBase.prototype.disable = function()
         return;
     }
 
-    this._enabled = true;
+    this._enabled = false;
 };
 
 /**

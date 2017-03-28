@@ -344,6 +344,16 @@ FORGE.RenderDisplay.prototype._vrControlsReset = function()
  */
 FORGE.RenderDisplay.prototype._requestPresent = function()
 {
+    var controllers = this._viewer.controllers.all;
+
+    for (var i = 0, ii = controllers.length; i < ii; i++)
+    {
+        if (controllers[i].className === "ControllerGyroscope")
+        {
+            controllers[i].disable();
+        }
+    }
+
     this._viewer.raf.stop();
     this._viewer.raf.start(this._vrDisplay);
     return this._setFullScreen(true);
@@ -356,6 +366,16 @@ FORGE.RenderDisplay.prototype._requestPresent = function()
  */
 FORGE.RenderDisplay.prototype._exitPresent = function()
 {
+    var controllers = this._viewer.controllers.all;
+
+    for (var i = 0, ii = controllers.length; i < ii; i++)
+    {
+        if (controllers[i].className === "ControllerGyroscope")
+        {
+            controllers[i].enable();
+        }
+    }
+
     this._viewer.raf.stop();
     this._viewer.raf.start(window);
     return this._setFullScreen(false);

@@ -162,12 +162,18 @@ FORGE.ControllerGyroscope.prototype._screenOrientationChangeHandler = function()
  */
 FORGE.ControllerGyroscope.prototype.enable = function()
 {
+    if (this._viewer.controllers.enabled === false || this._config.enabled === false)
+    {
+        return;
+    }
+
     FORGE.ControllerBase.prototype.enable.call(this);
 
     this._viewer.gyroscope.onDeviceOrientationChange.add(this._deviceOrientationChangeHandler, this);
     this._viewer.gyroscope.onScreenOrientationChange.add(this._screenOrientationChangeHandler, this);
 
     this._screenOrientationChangeHandler();
+    this._deviceOrientationChangeHandler();
 };
 
 /**
@@ -176,6 +182,11 @@ FORGE.ControllerGyroscope.prototype.enable = function()
  */
 FORGE.ControllerGyroscope.prototype.disable = function()
 {
+    if (this._viewer.controllers.enabled === false || this._config.enabled === false)
+    {
+        return;
+    }
+
     FORGE.ControllerBase.prototype.disable.call(this);
 
     this._viewer.gyroscope.onDeviceOrientationChange.remove(this._deviceOrientationChangeHandler, this);
@@ -188,7 +199,10 @@ FORGE.ControllerGyroscope.prototype.disable = function()
  */
 FORGE.ControllerGyroscope.prototype.update = function()
 {
-    this._viewer.camera.quaternion = this._posQuatFinal;
+    if (this._enabled === true)
+    {
+        this._viewer.camera.quaternion = this._posQuatFinal;
+    }
 };
 
 /**
