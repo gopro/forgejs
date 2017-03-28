@@ -1,0 +1,49 @@
+{
+    "id": "sprite-animation",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SpriteAnimationConfig",
+    "description": "A configuration of the sprite animation.</a>",
+    "type": "object",
+
+    "properties": {
+
+        "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the animation.",
+            "example": "animation-0"
+        },
+
+        "start": {
+            "type": "number",
+            "title": "Start",
+            "description": "The index of the starting frame.",
+            "example": 0
+        },
+
+        "end": {
+            "type": "number",
+            "title": "End",
+            "description": "The index of the ending frame.",
+            "example": 24
+        },
+
+        "loop": {
+            "type": "boolean",
+            "title": "Loop",
+            "description": "If loop is set to true, the sprite animation will loop",
+            "example": false,
+            "default": true
+        },
+
+        "frameRate": {
+            "type": "number",
+            "title": "Frame rate",
+            "description": "The number of frame per second to use for this animation. That modifies the speed of the animation.",
+            "example": 24,
+            "default": 30
+        }
+    },
+
+    "required": [ "name" ]
+}

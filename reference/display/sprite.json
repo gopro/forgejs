@@ -1,0 +1,74 @@
+{
+    "id": "sprite",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SpriteConfig",
+    "description": "A configuration of the sprite display object.</a>",
+    "type": "object",
+
+    "properties": {
+
+        "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "The url of the sprite map image file.",
+            "example": "./sprites/sprite-map.png"
+        },
+
+        "frames": {
+            "type": "string",
+            "title": "Frames",
+            "description": "The url of the sprite frames json file.",
+            "example": "./sprites/sprite-map.json"
+        },
+
+        "frameRate": {
+            "type": "number",
+            "title": "Frame rate",
+            "description": "The default number of frame per second to use for all animations. That modifies the speed of the animation.",
+            "example": 24,
+            "default": 30
+        },
+
+        "frame": {
+            "type": "number",
+            "title": "Frame",
+            "description": "The starting frame index",
+            "example": 5,
+            "default": 0
+        },
+
+        "paused": {
+            "type": "boolean",
+            "title": "Paused",
+            "description": "If paused is set to true, the sprite will be paused at start.",
+            "example": true,
+            "default": false
+        },
+
+        "loop": {
+            "type": "boolean",
+            "title": "Loop",
+            "description": "If loop is set to true, the sprite animations will loop by default.",
+            "example": false,
+            "default": true
+        },
+
+        "animation": {
+            "type": "string",
+            "title": "Animation",
+            "description": "The name of the default animation.",
+            "example": "animation-0"
+        },
+
+        "animations": {
+            "type": "array",
+            "title": "Animations",
+            "description": "Array of animations configurations.",
+            "items": {
+                "$ref": "sprite-animation"
+            }
+        }
+    },
+
+    "required": [ "url", "frames" ]
+}

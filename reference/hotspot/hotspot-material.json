@@ -38,6 +38,18 @@
             "example": "images/scene-0-hotspot.jpg"
         },
 
+        "sprite": {
+            "$ref": "sprite",
+            "title": "Sprite configuration",
+            "description": "The Sprite configuration that will be used for the texture."
+        },
+
+        "video": {
+            "$ref": "video",
+            "title": "Video configuration",
+            "description": "The Video configuration that will be used for the texture."
+        },
+
         "plugin": {
             "type": "string",
             "title": "Plugin",
