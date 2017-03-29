@@ -208,8 +208,6 @@ FORGE.SpriteAnimationManager.prototype.pause = function(index)
         return;
     }
 
-    //index = (typeof index === "number" && isNaN(index) === false) ? index : 0;
-
     if(this.current !== null)
     {
         this.current.pause(index);
