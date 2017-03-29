@@ -15,7 +15,8 @@ FORGE.HotspotGeometry.SHAPE = function(options)
     options = options || {};
 
     var points = [];
-    for (var i = 0, ii = options.points.length; i < ii; i++) {
+    for (var i = 0, ii = options.points.length; i < ii; i++)
+    {
         var point = options.points[i];
         points.push(new THREE.Vector3(point[0], point[1], point[2]));
     }
