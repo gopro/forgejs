@@ -24,12 +24,20 @@ FORGE.SpriteAnimationManager = function(sprite)
     this._anims = {};
 
     /**
-     * Reference to the curretn animation sequence.
-     * @name  FORGE.SpriteAnimationManager#_currentAnimation
-     * @type {FORGE.SpriteAnimation}
+     * Reference to the current animation name.
+     * @name  FORGE.SpriteAnimationManager#_animation
+     * @type {string}
      * @private
      */
-    this._currentAnimation = null;
+    this._animation = "default";
+
+    /**
+     * The default frame rate used by the animations.
+     * @name  FORGE.SpriteAnimationManager#_frameRate
+     * @type {number}
+     * @private
+     */
+    this._frameRate = 30;
 
     /**
      * List of pending actions.<br>
@@ -55,6 +63,9 @@ FORGE.SpriteAnimationManager.prototype.constructor = FORGE.SpriteAnimationManage
  */
 FORGE.SpriteAnimationManager.prototype._boot = function()
 {
+    // Add the default animation that includes all frames @60fps
+    this.add("default");
+
     if(this._sprite.loaded === false)
     {
         this._sprite.onLoadComplete.addOnce(this._spriteLoadComplete, this);
@@ -82,12 +93,32 @@ FORGE.SpriteAnimationManager.prototype._spriteLoadComplete = function()
 };
 
 /**
+ * Add a configuration for animations
+ * @method FORGE.SpriteAnimationManager#addConfig
+ * @param {Array<SpriteAnimationConfig>} config - The configuration to add
+ */
+FORGE.SpriteAnimationManager.prototype.addConfig = function(config)
+{
+    if(Array.isArray(config) === true)
+    {
+        var anim;
+
+        for(var i = 0, ii = config.length; i < ii; i++)
+        {
+            anim = config[i];
+            this.add(anim.name, anim.start, anim.end, anim.frameRate, anim.loop);
+        }
+    }
+};
+
+/**
  * Add an animation sequence to this sprite.
- * @param {string} name - The name of your animation sequence.
- * @param {number} start - The starting frame index of the full frames array.
- * @param {number} end - The end frame index of the full frame array.
- * @param {number} frameRate - The frame rate of this animation (default: 60)
- * @param {boolean} loop - Does the animation have to loop? (default: false)
+ * @method FORGE.SpriteAnimationManager#add
+ * @param {string=} name - The name of your animation sequence.
+ * @param {number=} start - The starting frame index of the full frames array.
+ * @param {number=} end - The end frame index of the full frame array.
+ * @param {number=} frameRate - The frame rate of this animation (default: 60)
+ * @param {boolean=} loop - Does the animation have to loop? (default: false)
  */
 FORGE.SpriteAnimationManager.prototype.add = function(name, start, end, frameRate, loop)
 {
@@ -103,32 +134,27 @@ FORGE.SpriteAnimationManager.prototype.add = function(name, start, end, frameRat
 
     this.log("add");
 
-    if(typeof name !== "string")
-    {
-        name = "default";
-    }
-
+    name = (typeof name === "string") ? name : "default";
     start = parseInt(start, 10);
     end = parseInt(end, 10);
+    frameRate = (typeof frameRate === "number") ? frameRate : this._frameRate;
+    loop = (typeof loop === "boolean") ? loop : true;
 
     var frames = this._sprite.frames;
+
     if(typeof start !== "number" || isNaN(start) === true || start < 0 || start >= frames.length)
     {
         start = 0;
     }
+
     if(typeof end !== "number" || isNaN(end) === true || end < 0 || end >= frames.length)
     {
-        end = frames.length;
+        end = frames.length - 1;
     }
 
-    frameRate = frameRate || 60;
-    loop = (typeof loop === "undefined") ? false : Boolean(loop);
+    var selectedFrames = frames.slice(start, end + 1);
 
-    var selectedFrames = frames.slice(start, end);
-
-    this._anims[name] = new FORGE.SpriteAnimation(this._sprite, name, selectedFrames, frameRate);
-
-    this._currentAnimation = this._anims[name];
+    this._anims[name] = new FORGE.SpriteAnimation(this._sprite, name, selectedFrames, frameRate, loop);
 };
 
 /**
@@ -143,27 +169,26 @@ FORGE.SpriteAnimationManager.prototype.play = function(animation, loop, index)
 {
     if(this._sprite.loaded === false)
     {
-        this._pending.push({
+        this._pending.push(
+        {
             method: "play",
-            args: arguments
+            args: [animation, loop, index]
         });
 
         return;
     }
 
-    var anim = this._currentAnimation;
+    // if there is an animation name use it, if not play the current animation, if no current animation, play the default one.
+    animation = (typeof animation === "string") ? animation : (this.current !== null) ? this.current.name : "default";
+    loop = (typeof loop === "boolean") ? loop : true;
+    index = (typeof index === "number" && isNaN(index) === false) ? index : 0;
 
-    if(typeof animation === "string" && animation !== null)
-    {
-        anim = this.get(animation);
-    }
+    var anim = this.get(animation);
 
     if(anim !== null)
     {
         anim.play(loop, index);
     }
-
-    //@todo play should also resume the current paused animation ?
 };
 
 /**
@@ -173,11 +198,19 @@ FORGE.SpriteAnimationManager.prototype.play = function(animation, loop, index)
  */
 FORGE.SpriteAnimationManager.prototype.pause = function(index)
 {
-    var anim = this._currentAnimation;
-
-    if(anim !== null)
+    if(this._sprite.loaded === false)
     {
-        anim.pause(index);
+        this._pending.push({
+            method: "pause",
+            args: [index]
+        });
+
+        return;
+    }
+
+    if(this.current !== null)
+    {
+        this.current.pause(index);
     }
 };
 
@@ -188,11 +221,19 @@ FORGE.SpriteAnimationManager.prototype.pause = function(index)
  */
 FORGE.SpriteAnimationManager.prototype.resume = function(index)
 {
-    var anim = this._currentAnimation;
-
-    if(anim !== null)
+    if(this._sprite.loaded === false)
     {
-        anim.resume(index);
+        this._pending.push({
+            method: "resume",
+            args: [index]
+        });
+
+        return;
+    }
+
+    if(this.current !== null)
+    {
+        this.current.resume(index);
     }
 };
 
@@ -202,11 +243,19 @@ FORGE.SpriteAnimationManager.prototype.resume = function(index)
  */
 FORGE.SpriteAnimationManager.prototype.stop = function()
 {
-    var anim = this._currentAnimation;
-
-    if(anim !== null)
+    if(this._sprite.loaded === false)
     {
-        anim.stop();
+        this._pending.push({
+            method: "stop",
+            args: []
+        });
+
+        return;
+    }
+
+    if(this.current !== null)
+    {
+        this.current.stop();
     }
 };
 
@@ -234,9 +283,9 @@ FORGE.SpriteAnimationManager.prototype.get = function(name)
  */
 FORGE.SpriteAnimationManager.prototype.update = function()
 {
-    if(this._currentAnimation !== null)
+    if(this.current !== null)
     {
-        this._currentAnimation.update();
+        this.current.update();
     }
 };
 
@@ -254,23 +303,45 @@ FORGE.SpriteAnimationManager.prototype.destroy = function()
 
     this._sprite = null;
     this._anims = null;
-    this._currentAnimation = null;
     this._pending = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**
- * Get and set the current animation.
- * @name FORGE.SpriteAnimationManager#currentAnimation
- * @type {FORGE.SpriteAnimation}
+ * Get and set the default frame raet.
+ * @name FORGE.SpriteAnimationManager#frameRate
+ * @type {number}
  */
-Object.defineProperty(FORGE.SpriteAnimationManager.prototype, "currentAnimation",
+Object.defineProperty(FORGE.SpriteAnimationManager.prototype, "frameRate",
 {
     /** @this {FORGE.SpriteAnimationManager} */
     get: function()
     {
-        return this._currentAnimation;
+        return this._frameRate;
+    },
+
+    /** @this {FORGE.SpriteAnimationManager} */
+    set: function(value)
+    {
+        if(typeof value === "number")
+        {
+            this._frameRate = value;
+        }
+    }
+});
+
+/**
+ * Get and set the current animation.
+ * @name FORGE.SpriteAnimationManager#current
+ * @type {FORGE.SpriteAnimation}
+ */
+Object.defineProperty(FORGE.SpriteAnimationManager.prototype, "current",
+{
+    /** @this {FORGE.SpriteAnimationManager} */
+    get: function()
+    {
+        return this.get(this._animation);
     },
 
     /** @this {FORGE.SpriteAnimationManager} */
@@ -278,7 +349,23 @@ Object.defineProperty(FORGE.SpriteAnimationManager.prototype, "currentAnimation"
     {
         if(FORGE.Utils.isTypeOf(animation, "SpriteAnimation") === true)
         {
-            this._currentAnimation = animation;
+            this._animation = animation.name;
         }
     }
 });
+
+/**
+ * Get all the animations.
+ * @name FORGE.SpriteAnimationManager#all
+ * @type {FORGE.SpriteAnimation}
+ */
+Object.defineProperty(FORGE.SpriteAnimationManager.prototype, "all",
+{
+    /** @this {FORGE.SpriteAnimationManager} */
+    get: function()
+    {
+        return this._anims;
+    }
+});
+
+

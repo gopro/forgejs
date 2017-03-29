@@ -117,7 +117,6 @@ FORGE.Hotspot3D.prototype._boot = function()
 
     this._transform = new FORGE.HotspotTransform();
     this._animation = new FORGE.HotspotAnimation(this._viewer, this._transform);
-    this._material = new FORGE.HotspotMaterial(this._viewer);
 
     this._onBeforeRenderBound = this._onBeforeRender.bind(this);
     this._onAfterRenderBound = this._onAfterRender.bind(this);
@@ -156,6 +155,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
     this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
 
+    this._material = new FORGE.HotspotMaterial(this._viewer, this._uid);
     this._states = new FORGE.HotspotStates(this._viewer, this._uid);
 
     if (typeof config.states === "object" && config.states !== null)

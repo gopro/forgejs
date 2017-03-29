@@ -6,7 +6,7 @@
  * @param {FORGE.Viewer} viewer - The viewer reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.HotspotMaterial = function(viewer)
+FORGE.HotspotMaterial = function(viewer, hotspotUid)
 {
     /**
      * Viewer reference.
@@ -15,6 +15,14 @@ FORGE.HotspotMaterial = function(viewer)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * The hotspot uid
+     * @name FORGE.HotspotMaterial#_hotspotUid
+     * @type {string}
+     * @private
+     */
+    this._hotspotUid = hotspotUid;
 
     /**
      * Hotspot material config
@@ -40,14 +48,6 @@ FORGE.HotspotMaterial = function(viewer)
      * @private
      */
     this._texture = null;
-
-    /**
-     * Texture frame.
-     * @name FORGE.HotspotMaterial#_textureFrame
-     * @type {FORGE.Rectangle}
-     * @private
-     */
-    this._textureFrame = null;
 
     /**
      * THREE material.
@@ -140,6 +140,20 @@ FORGE.HotspotMaterial.types = {};
 FORGE.HotspotMaterial.types.IMAGE = "image";
 
 /**
+ * @name FORGE.HotspotMaterial.types.SPRITE
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotMaterial.types.SPRITE = "sprite";
+
+/**
+ * @name FORGE.HotspotMaterial.types.VIDEO
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotMaterial.types.VIDEO = "video";
+
+/**
  * @name FORGE.HotspotMaterial.types.PLUGIN
  * @type {string}
  * @const
@@ -205,6 +219,18 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
         this._setupWithImage(config.image);
     }
 
+    // Hotspot with animated sprite as background
+    else if (typeof config.sprite !== "undefined" && config.sprite !== null)
+    {
+        this._setupWithSprite(config.sprite);
+    }
+
+    // Hotspot with video as background
+    else if (typeof config.video !== "undefined" && config.video !== null)
+    {
+        this._setupWithVideo(config.video);
+    }
+
     // Hotspot with plugin that provide a texture as background
     else if (typeof config.plugin !== "undefined" && config.plugin !== null)
     {
@@ -266,11 +292,112 @@ FORGE.HotspotMaterial.prototype._createTextureFromImage = function(image)
 {
     this._displayObject = image;
 
+    this._texture = new THREE.Texture();
+    this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
+
     this.setTextureFrame(image.frame);
 
-    this._texture.image.crossOrigin = "anonymous";
-
     this.log("create texture from image");
+
+    this._setupComplete();
+};
+
+/**
+ * Setup hotspot material with a sprite as texture.
+ * @method FORGE.HotspotMaterial#_setupWithSprite
+ * @param {(string|SpriteConfig)} config - The sprite configuration you want to load and use as a texture.
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._setupWithSprite = function(config)
+{
+    this._type = FORGE.HotspotMaterial.types.SPRITE;
+    this._update = true;
+
+    this._displayObject = new FORGE.Sprite(this._viewer, config);
+    this._displayObject.onLoadComplete.addOnce(this._spriteLoadCompleteHandler, this);
+};
+
+/**
+ * Sprite loaded event handler for the sprite setup.
+ * @method FORGE.HotspotMaterial#_spriteLoadCompleteHandler
+ * @param {FORGE.Event} event - load event
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._spriteLoadCompleteHandler = function(event)
+{
+    var sprite = /** @type {FORGE.Sprite} */ (event.emitter);
+
+    this.log("sprite load complete");
+    this._createTextureFromSprite(sprite);
+};
+
+/**
+ * Create a THREE.Texture from the loaded FORGE.Sprite
+ * @method  FORGE.HotspotMaterial#_createTextureFromSprite
+ * @param  {FORGE.Sprite} sprite - The FORGE.Sprite used to create the texture.
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._createTextureFromSprite = function(sprite)
+{
+    this._texture = new THREE.Texture();
+    this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
+
+    this.setTextureFrame(sprite.frame);
+
+    this.log("create texture from sprite");
+
+    this._setupComplete();
+};
+
+/**
+ * Setup hotspot material with a video as texture.
+ * @method FORGE.HotspotMaterial#_setupWithVideo
+ * @param {(string|VideoConfig)} config - The video configuration you want to load and use as a texture.
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._setupWithVideo = function(config)
+{
+    this._type = FORGE.HotspotMaterial.types.VIDEO;
+    this._update = true;
+
+    this._displayObject = new FORGE.VideoHTML5(this._viewer, this._hotspotUid+"-material-video");
+    this._displayObject.currentTime = 100000;
+    this._displayObject.onLoadedMetaData.addOnce(this._videoLoadedMetaDataHandler, this);
+    this._displayObject.load(config.url);
+};
+
+/**
+ * Video meta data loaded event handler for the video setup.
+ * @method FORGE.HotspotMaterial#_videoLoadedMetaDataHandler
+ * @param {FORGE.Event} event - load event
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._videoLoadedMetaDataHandler = function(event)
+{
+    var video = /** @type {FORGE.VideoBase} */ (event.emitter);
+    video.play();
+
+    this.log("video load complete");
+    this._createTextureFromVideo(video);
+};
+
+/**
+ * Create a THREE.Texture from the loaded FORGE.Video
+ * @method FORGE.HotspotMaterial#_createTextureFromVideo
+ * @param {FORGE.VideoBase} video - The FORGE.Video used to create the texture.
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._createTextureFromVideo = function(video)
+{
+    this.log("create texture from video");
+
+    this._texture = new THREE.Texture();
+    this._texture.generateMipmaps = false;
+    this._texture.minFilter = THREE.LinearFilter;
+
+    this._texture.image = video.element;
 
     this._setupComplete();
 };
@@ -490,41 +617,25 @@ FORGE.HotspotMaterial.prototype.update = function()
 
 
 /**
- * Set texture source
- * @method FORGE.HotspotMaterial#setTextureSource
- * @param {FORGE.Image} image - texture source image
- */
-FORGE.HotspotMaterial.prototype.setTextureSource = function(image)
-{
-    if (this._displayObject !== null)
-    {
-        this._displayObject.destroy();
-        this._displayObject = null;
-    }
-
-    this._displayObject = image;
-
-    this.setTextureFrame();
-};
-
-/**
  * Set texture frame
  * @method FORGE.HotspotMaterial#setTextureFrame
  * @param {FORGE.Rectangle=} frame - texture frame
  */
 FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 {
-    // Only support type IMAGE at the moment
-    if (this._displayObject === null || this._type !== FORGE.HotspotMaterial.types.IMAGE)
+    // Only support type IMAGE and SPRITE
+    if (this._displayObject === null || (this._type !== FORGE.HotspotMaterial.types.IMAGE && this._type !== FORGE.HotspotMaterial.types.SPRITE))
     {
         return;
     }
 
-    this._textureFrame = frame || new FORGE.Rectangle(0, 0, this._displayObject.element.naturalWidth, this._displayObject.element.naturalHeight);
+    var textureFrame = frame || new FORGE.Rectangle(0, 0, this._displayObject.element.naturalWidth, this._displayObject.element.naturalHeight);
 
-    this._displayObject.frame = this._textureFrame;
+    this._displayObject.frame = textureFrame;
 
-    this._texture = new THREE.CanvasTexture(this._displayObject.canvas);
+    this._texture.image = this._displayObject.canvas;
+    this._texture.image.crossOrigin = "anonymous";
+    this._texture.needsUpdate = true;
 
     this.update();
 };
@@ -535,10 +646,6 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
  */
 FORGE.HotspotMaterial.prototype.destroy = function()
 {
-    this._textureFrame = null;
-
-    this._textureFrame = null;
-
     if (this._texture !== null)
     {
         this._texture.dispose();

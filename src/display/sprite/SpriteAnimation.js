@@ -5,12 +5,13 @@
  * @param {FORGE.Sprite} sprite - The Sprite that is animated.
  * @param {string} name - Name of the animation.
  * @param {Array} frames - The frames taht compose this animation.
- * @param {number} [frameRate=60] - Frame rate of this animation (default: 60)
+ * @param {number=} [frameRate=30] - Frame rate of this animation (default: 30)
+ * @param {boolean=} [loop=true] - The loop flag
  * @extends {FORGE.BaseObject}
  *
  * @todo Work on trimmed textures
  */
-FORGE.SpriteAnimation = function(sprite, name, frames, frameRate)
+FORGE.SpriteAnimation = function(sprite, name, frames, frameRate, loop)
 {
     /**
      * The sprite attached to this animation.
@@ -45,12 +46,12 @@ FORGE.SpriteAnimation = function(sprite, name, frames, frameRate)
     this._frameIndex = 0;
 
     /**
-     * Frame rate of this animation, this is the number of frames per second. (default = 60)
+     * Frame rate of this animation, this is the number of frames per second.
      * @name  FORGE.SpriteAnimation#_frameRate
      * @type {number}
      * @private
      */
-    this._frameRate = frameRate || 60;
+    this._frameRate = frameRate || 30;
 
     /**
      * Does this animation loop?
@@ -58,7 +59,7 @@ FORGE.SpriteAnimation = function(sprite, name, frames, frameRate)
      * @type {boolean}
      * @private
      */
-    this._loop = false;
+    this._loop = loop || false;
 
     /**
      * The number of times this animation has looped.
@@ -241,7 +242,7 @@ FORGE.SpriteAnimation.prototype.play = function(loop, index)
 
     this._setFrameIndex(index); //Default will be 0 :)
 
-    this._sprite.animations.currentSpriteAnimation = this;
+    this._sprite.animations.current = this;
 
     if(this._onPlay !== null)
     {

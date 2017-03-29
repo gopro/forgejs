@@ -95,6 +95,28 @@ FORGE.BackgroundRenderer.prototype._boot = function()
 };
 
 /**
+ * Abstract method that should be implemented by subclass.
+ * @method FORGE.BackgroundRenderer#_setDisplayObject
+ * @param {FORGE.DisplayObject} displayObject - The display object to set.
+ * @private
+ */
+FORGE.BackgroundRenderer.prototype._setDisplayObject = function(displayObject)
+{
+    this.log(displayObject); //@closure
+    throw "Please implement " + this._className + "::_setDisplayObject";
+};
+
+/**
+ * Abstract method that should be implemented by subclass.
+ * @method FORGE.BackgroundRenderer#_clear
+ * @private
+ */
+FORGE.BackgroundRenderer.prototype._clear = function()
+{
+    throw "Please implement " + this._className + "::_clear";
+};
+
+/**
  * Update texture if needed (video only).
  * @method FORGE.BackgroundRenderer#_updateTexture
  * @private

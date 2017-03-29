@@ -30,12 +30,41 @@ FORGE.Sprite.prototype.constructor = FORGE.Sprite;
  */
 FORGE.Sprite.prototype._boot = function()
 {
-    this._renderMode = FORGE.Image.renderModes.CANVAS;
+    this._animations = new FORGE.SpriteAnimationManager(this);
 
     FORGE.Image.prototype._boot.call(this);
 
-    this._animations = new FORGE.SpriteAnimationManager(this);
     this._viewer.display.register(this, true);
+};
+
+/**
+ * Parse Sprite configuration
+ * @method FORGE.Sprite#_parseConfig
+ */
+FORGE.Sprite.prototype._parseConfig = function(config)
+{
+    FORGE.Image.prototype._parseConfig.call(this, config);
+
+    if(typeof config.frameRate === "number")
+    {
+        this._animations.frameRate = config.frameRate;
+    }
+
+    if(Array.isArray(config.animations) === true)
+    {
+        this._animations.addConfig(config.animations);
+    }
+
+    var animation = (typeof config.animation === "string") ? config.animation : "default";
+    var loop = (typeof config.loop === "boolean") ? config.loop : true;
+    var frame = (typeof config.frame === "number" && isNaN(config.frame) === false) ? config.frame : 0;
+
+    this._animations.play(animation, loop, frame);
+
+    if(config.paused === true || typeof config.paused === "number")
+    {
+        this._animations.pause(frame);
+    }
 };
 
 /**
@@ -135,6 +164,6 @@ Object.defineProperty(FORGE.Sprite.prototype, "animation",
     /** @this {FORGE.Sprite} */
     get: function()
     {
-        return this._animations.currentAnimation;
+        return this._animations.current;
     }
 });
