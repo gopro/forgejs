@@ -12,21 +12,32 @@ FORGE.HotspotGeometry = {};
  */
 FORGE.HotspotGeometry.SHAPE = function(options)
 {
-    // options = options || {};
+    options = options || {};
 
-    //@todo default set of options
-    //@todo create JSON reference for points Array
-
-    if (typeof options === "undefined" || options === null || typeof options.points === "undefined")
+    //Default points array that is a square
+    if(Array.isArray(options.points) === false)
     {
-        return null;
+        options.points =
+        [
+            [-10, 10],
+            [10, 10],
+            [10, -10],
+            [-10, -10]
+        ];
     }
 
     var points = [];
     for (var i = 0, ii = options.points.length; i < ii; i++)
     {
         var point = options.points[i];
-        points.push(new THREE.Vector2(point[0], point[1]));
+        var x, y;
+
+        if(Array.isArray(point) === true)
+        {
+            x = (typeof point[0] === "number" && isNaN(point[0]) === false) ? point[0] : 0;
+            y = (typeof point[1] === "number" && isNaN(point[1]) === false) ? point[1] : 0;
+            points.push(new THREE.Vector2(x, y));
+        }
     }
 
     return new THREE.ShapeBufferGeometry(new THREE.Shape(points));
