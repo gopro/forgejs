@@ -113,6 +113,15 @@
             ]
         },
         {
+            "title": "Display",
+            "slug": "display",
+            "schemas": [
+                "video",
+                "sprite",
+                "sprite-animation"
+            ]
+        },
+        {
             "title": "Hotspot",
             "slug": "hotspot",
             "schemas": [
@@ -362,6 +371,21 @@
                 "scene-media-source",
                 "scene-media-level",
                 "scene-media-options"
+            ]
+        }]
+    },
+    {
+        "file": "display.html",
+        "title": "JSON Reference",
+        "sections": [
+        {
+            "title": "Display",
+            "slug": "display",
+            "description": "Display object are helpers to manipulate visual elements built on DOM like images, videos, sprites.",
+            "schemas": [
+                "video",
+                "sprite",
+                "sprite-animation"
             ]
         }]
     },
