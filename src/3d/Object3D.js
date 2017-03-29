@@ -150,6 +150,20 @@ FORGE.Object3D.prototype._createEvents = function(events)
 };
 
 /**
+ * Clear all object events.
+ * @method FORGE.Object3D#_clearEvents
+ * @private
+ */
+FORGE.Plugin.prototype._clearEvents = function()
+{
+    for(var e in this._events)
+    {
+        this._events[e].destroy();
+        this._events[e] = null;
+    }
+};
+
+/**
  * Triggers actions for the click event
  * @method FORGE.Object3D#click
  */
@@ -258,6 +272,9 @@ FORGE.Object3D.prototype.destroy = function()
         this._onReady.destroy();
         this._onReady = null;
     }
+
+    this._clearEvents();
+    this._events = null;
 
     this._viewer = null;
 
