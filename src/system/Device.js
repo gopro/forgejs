@@ -717,7 +717,9 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._deviceOrientationHandler = function(event)
     {
-        if (typeof event.alpha !== "undefined" && typeof event.beta !== "undefined" && typeof event.gamma !== "undefined")
+        if (typeof event.alpha !== "undefined" && event.alpha !== null
+            && typeof event.beta !== "undefined" && event.beta !== null
+            && typeof event.gamma !== "undefined" && event.gamma !== null)
         {
             this._deviceOrientationMagnetometer = true;
         }

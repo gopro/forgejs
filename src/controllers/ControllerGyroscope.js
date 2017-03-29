@@ -87,7 +87,7 @@ FORGE.ControllerGyroscope.prototype._boot = function()
 
     this._parseConfig(this._config);
 
-    if (this._enabled === true)
+    if (this._enabled === true && FORGE.Device.gyroscope)
     {
         this.enable();
     }
