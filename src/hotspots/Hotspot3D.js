@@ -241,6 +241,10 @@ FORGE.Hotspot3D.prototype._createGeometry = function(config)
                 this._mesh.geometry = FORGE.HotspotGeometry.PLANE(options);
                 break;
 
+            case FORGE.HotspotGeometryType.SHAPE:
+                this._mesh.geometry = FORGE.HotspotGeometry.SHAPE(options);
+                break;
+
             default:
                 this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
                 break;

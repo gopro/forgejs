@@ -6,6 +6,44 @@
 FORGE.HotspotGeometry = {};
 
 /**
+ * @method FORGE.HotspotGeometry.SHAPE
+ * @param {HotspotGeometryShape=} options
+ * @return {THREE.ShapeBufferGeometry}
+ */
+FORGE.HotspotGeometry.SHAPE = function(options)
+{
+    options = options || {};
+
+    //Default points array that is a square
+    if(Array.isArray(options.points) === false)
+    {
+        options.points =
+        [
+            [-10, 10],
+            [10, 10],
+            [10, -10],
+            [-10, -10]
+        ];
+    }
+
+    var points = [];
+    for (var i = 0, ii = options.points.length; i < ii; i++)
+    {
+        var point = options.points[i];
+        var x, y;
+
+        if(Array.isArray(point) === true)
+        {
+            x = (typeof point[0] === "number" && isNaN(point[0]) === false) ? point[0] : 0;
+            y = (typeof point[1] === "number" && isNaN(point[1]) === false) ? point[1] : 0;
+            points.push(new THREE.Vector2(x, y));
+        }
+    }
+
+    return new THREE.ShapeBufferGeometry(new THREE.Shape(points));
+};
+
+/**
  * @method FORGE.HotspotGeometry.PLANE
  * @param {HotspotGeometryPlane=} options
  * @return {THREE.PlaneBufferGeometry}
@@ -14,8 +52,8 @@ FORGE.HotspotGeometry.PLANE = function(options)
 {
     options = options || {};
 
-    var width = options.width || 100;
-    var height = options.height || 100;
+    var width = options.width || 20;
+    var height = options.height || 20;
     var widthSegments = options.widthSegments || 8;
     var heightSegments = options.heightSegments || 8;
 
@@ -31,9 +69,9 @@ FORGE.HotspotGeometry.BOX = function(options)
 {
     options = options || {};
 
-    var width = options.width || 100;
-    var height = options.height || 100;
-    var depth = options.depth || 100;
+    var width = options.width || 20;
+    var height = options.height || 20;
+    var depth = options.depth || 20;
     var widthSegments = options.widthSegments || 8;
     var heightSegments = options.heightSegments || 8;
     var depthSegments = options.depthSegments || 8;

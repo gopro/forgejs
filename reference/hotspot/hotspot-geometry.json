@@ -21,7 +21,13 @@
             "example": {
                 "width": 30,
                 "height": 42,
-                "depth": 21
+                "depth": 21,
+                "points":
+                [
+                    [ 0, 0],
+                    [10, 0],
+                    [ 5, 4]
+                ]
             }
         }
     }

@@ -1237,6 +1237,21 @@ THREE.WireframeGeometry = function(arg1) {};
 
 /**
  * @constructor
+ * @param  {Array<THREE.Vector2>} points
+ * @return {!THREE.Shape}
+ */
+THREE.Path = function(points) {};
+
+/**
+ * @constructor
+ * @param  {Array<THREE.Vector2>=} arg1
+ * @extends {THREE.Path}
+ * @return {!THREE.Shape}
+ */
+THREE.Shape = function(arg1) {};
+
+/**
+ * @constructor
  * @param  {TypedArray} array
  * @param  {number} itemSize
  * @param  {boolean=} normalized
@@ -1266,6 +1281,15 @@ THREE.BufferAttribute.prototype.version;
  * @param {Array<number>|TypedArray} arg1
  */
 THREE.BufferAttribute.prototype.set = function(arg1) {};
+
+/**
+ * @constructor
+ * @param {THREE.Shape|Array<THREE.Shape>} arg1
+ * @param {number=} arg2
+ * @extends {THREE.BufferGeometry}
+ * @return {!THREE.ShapeBufferGeometry}
+ */
+THREE.ShapeBufferGeometry = function(arg1, arg2) {};
 
 /**
  * @constructor

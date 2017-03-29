@@ -15,6 +15,11 @@ var HotspotTransformRotation;
 var HotspotTransformScale;
 
 /**
+ * @typedef {{points:(Array<THREE.Vector2>|undefined)}}
+ */
+var HotspotGeometryShape;
+
+/**
  * @typedef {{width:(number|undefined), height:(number|undefined), widthSegments:(number|undefined), heightSegments:(number|undefined)}}
  */
 var HotspotGeometryPlane;
