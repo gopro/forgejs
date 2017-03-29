@@ -12,6 +12,11 @@ FORGE.HotspotGeometry = {};
  */
 FORGE.HotspotGeometry.SHAPE = function(options)
 {
+    // options = options || {};
+
+    //@todo default set of options
+    //@todo create JSON reference for points Array
+
     if (typeof options === "undefined" || options === null || typeof options.points === "undefined")
     {
         return null;
@@ -36,8 +41,8 @@ FORGE.HotspotGeometry.PLANE = function(options)
 {
     options = options || {};
 
-    var width = options.width || 100;
-    var height = options.height || 100;
+    var width = options.width || 20;
+    var height = options.height || 20;
     var widthSegments = options.widthSegments || 8;
     var heightSegments = options.heightSegments || 8;
 
@@ -53,9 +58,9 @@ FORGE.HotspotGeometry.BOX = function(options)
 {
     options = options || {};
 
-    var width = options.width || 100;
-    var height = options.height || 100;
-    var depth = options.depth || 100;
+    var width = options.width || 20;
+    var height = options.height || 20;
+    var depth = options.depth || 20;
     var widthSegments = options.widthSegments || 8;
     var heightSegments = options.heightSegments || 8;
     var depthSegments = options.depthSegments || 8;
