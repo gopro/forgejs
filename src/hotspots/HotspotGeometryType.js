@@ -4,6 +4,13 @@
 FORGE.HotspotGeometryType = {};
 
 /**
+ * @name FORGE.HotspotGeometryType.SHAPE
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotGeometryType.SHAPE = "shape";
+
+/**
  * @name FORGE.HotspotGeometryType.PLANE
  * @type {string}
  * @const

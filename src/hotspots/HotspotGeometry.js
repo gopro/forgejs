@@ -6,6 +6,24 @@
 FORGE.HotspotGeometry = {};
 
 /**
+ * @method FORGE.HotspotGeometry.SHAPE
+ * @param {HotspotGeometryShape=} options
+ * @return {THREE.ShapeBufferGeometry}
+ */
+FORGE.HotspotGeometry.SHAPE = function(options)
+{
+    options = options || {};
+
+    var points = [];
+    for (var i = 0, ii = options.points.length; i < ii; i++) {
+        var point = options.points[i];
+        points.push(new THREE.Vector3(point[0], point[1], point[2]));
+    }
+
+    return new THREE.ShapeBufferGeometry(new THREE.Shape(points));
+};
+
+/**
  * @method FORGE.HotspotGeometry.PLANE
  * @param {HotspotGeometryPlane=} options
  * @return {THREE.PlaneBufferGeometry}
