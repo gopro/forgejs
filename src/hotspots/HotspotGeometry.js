@@ -12,13 +12,16 @@ FORGE.HotspotGeometry = {};
  */
 FORGE.HotspotGeometry.SHAPE = function(options)
 {
-    options = options || {};
+    if (typeof options === "undefined" || options === null || typeof options.points === "undefined")
+    {
+        return null;
+    }
 
     var points = [];
     for (var i = 0, ii = options.points.length; i < ii; i++)
     {
         var point = options.points[i];
-        points.push(new THREE.Vector3(point[0], point[1], point[2]));
+        points.push(new THREE.Vector2(point[0], point[1]));
     }
 
     return new THREE.ShapeBufferGeometry(new THREE.Shape(points));
