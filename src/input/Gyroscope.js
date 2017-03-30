@@ -82,15 +82,14 @@ FORGE.Gyroscope.prototype._deviceOrientationHandler = function(event)
 /**
  * Screen orientation handler
  * @method FORGE.Gyroscope#_screenOrientationHandler
- * @param {ScreenOrientationEvent} event - the event associated to the screen orientation
  * @private
  */
-FORGE.Gyroscope.prototype._screenOrientationHandler = function(event)
+FORGE.Gyroscope.prototype._screenOrientationHandler = function()
 {
     // Fire the event
     if (this._onScreenOrientationChange !== null && this._enabled === true)
     {
-        this._onScreenOrientationChange.dispatch(event);
+        this._onScreenOrientationChange.dispatch();
     }
 };
 
