@@ -82,6 +82,7 @@ FORGE.ViewManager.prototype._setView = function(type)
 
         case FORGE.ViewType.RECTILINEAR:
         default:
+            this._viewer.controllers.gyroscopeRunning = true;
             this._view = new FORGE.ViewRectilinear(this._viewer);
             break;
     }
@@ -99,6 +100,7 @@ FORGE.ViewManager.prototype._setView = function(type)
 FORGE.ViewManager.prototype._clearView = function()
 {
     this._ready = false;
+    this._viewer.controllers.gyroscopeRunning = false;
 
     if (this._view !== null)
     {

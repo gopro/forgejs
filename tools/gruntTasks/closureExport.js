@@ -191,7 +191,7 @@ module.exports = function(grunt)
             var rr = re.exec(string);
 
             var rew;
-            var exceptions = ['length', 'uniforms', 'story', 'opacity'];
+            var exceptions = ['length', 'uniforms', 'story', 'opacity', 'gyroscope'];
             var subexceptions = ['prototype', 'Quaternion', 'thetaphi', 'Pointer', 'Video', 'Hotspot3D'];
             var regexception = /^"[\S ]+(?!\w+)[\S ]+"/gm;
 

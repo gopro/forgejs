@@ -169,8 +169,8 @@ FORGE.ControllerGyroscope.prototype.enable = function()
 
     FORGE.ControllerBase.prototype.enable.call(this);
 
-    this._viewer.gyroscope.onDeviceOrientationChange.add(this._deviceOrientationChangeHandler, this);
-    this._viewer.gyroscope.onScreenOrientationChange.add(this._screenOrientationChangeHandler, this);
+    this._viewer["gyroscope"].onDeviceOrientationChange.add(this._deviceOrientationChangeHandler, this);
+    this._viewer["gyroscope"].onScreenOrientationChange.add(this._screenOrientationChangeHandler, this);
 
     this._screenOrientationChangeHandler();
     this._deviceOrientationChangeHandler();
@@ -189,8 +189,8 @@ FORGE.ControllerGyroscope.prototype.disable = function()
 
     FORGE.ControllerBase.prototype.disable.call(this);
 
-    this._viewer.gyroscope.onDeviceOrientationChange.remove(this._deviceOrientationChangeHandler, this);
-    this._viewer.gyroscope.onScreenOrientationChange.remove(this._screenOrientationChangeHandler, this);
+    this._viewer["gyroscope"].onDeviceOrientationChange.remove(this._deviceOrientationChangeHandler, this);
+    this._viewer["gyroscope"].onScreenOrientationChange.remove(this._screenOrientationChangeHandler, this);
 };
 
 /**
