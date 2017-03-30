@@ -92,7 +92,10 @@ FORGE.ControllerPointer.DEFAULT_OPTIONS =
         hardness: 0.6, //Hardness factor impatcing controller response to some instant force.
         damping: 0.15, //Damping factor controlling inertia.
         velocityMax: 300,
-        invert: false
+        invert: {
+            x: false,
+            y: false
+        }
     },
 
     zoom:
@@ -376,7 +379,9 @@ FORGE.ControllerPointer.prototype.update = function()
 
     // this.log("Current velocity: " + this._velocity.x + ", " + this._velocity.y);
 
-    var invert = this._orientation.invert ? -1 : 1;
+    var invert = this._orientation.invert;
+    var invertX = (invert === true) ? -1 : (typeof invert === "object" && invert.x === true) ? -1 : 1;
+    var invertY = (invert === true) ? -1 : (typeof invert === "object" && invert.y === true) ? -1 : 1;
 
     var dx = this._velocity.x + this._inertia.x;
     var dy = this._velocity.y + this._inertia.y;
@@ -386,15 +391,15 @@ FORGE.ControllerPointer.prototype.update = function()
         return;
     }
 
+    var yaw = invertX * dx;
     //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
-    var yaw = invert * dx;
     if(Math.abs(yaw) > 0.05)
     {
         this._camera.yaw += yaw;
         this._camera.flat.position.x += dx;
     }
 
-    var pitch = invert * dy;
+    var pitch = invertY * dy;
     //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
     if(Math.abs(pitch) > 0.05)
     {
