@@ -33,6 +33,24 @@ FORGE.ActionEventDispatcher = function(viewer, name)
      */
     this._actions = [];
 
+    /**
+     * Flag to know if the dispatcher is currently dispatching the events.
+     * It happen that the dispatcher destroy method is called during the dispatching the events.
+     * This allows us to re schedule the destroy call after all events have been executed.
+     * @name  FORGE.ActionEventDispatcher#_dispatching
+     * @type {boolean}
+     * @private
+     */
+    this._dispatching = false;
+
+    /**
+     * Is the destroy method have been called during the dispatching?
+     * @name  FORGE.ActionEventDispatcher#_pendingDestroy
+     * @type {boolean}
+     * @private
+     */
+    this._pendingDestroy = false;
+
     FORGE.BaseObject.call(this, "ActionEventDispatcher");
 };
 
@@ -58,6 +76,8 @@ FORGE.ActionEventDispatcher.prototype.addActions = function(actions)
  */
 FORGE.ActionEventDispatcher.prototype.dispatch = function()
 {
+    this._dispatching = true;
+
     for(var i = 0, ii = this._actions.length; i < ii; i++)
     {
         var action = this._viewer.actions.get(this._actions[i]);
@@ -67,6 +87,13 @@ FORGE.ActionEventDispatcher.prototype.dispatch = function()
             action.execute();
         }
     }
+
+    this._dispatching = false;
+
+    if(this._pendingDestroy === true)
+    {
+        this.destroy();
+    }
 };
 
 /**
@@ -75,6 +102,13 @@ FORGE.ActionEventDispatcher.prototype.dispatch = function()
  */
 FORGE.ActionEventDispatcher.prototype.destroy = function()
 {
+    //If dispatching, wait for the dispatch is complete to execute the destroy
+    if(this._dispatching === true)
+    {
+        this._pendingDestroy = true;
+        return;
+    }
+
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
