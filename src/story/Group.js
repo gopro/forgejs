@@ -93,7 +93,6 @@ FORGE.Group = function(viewer, config)
     FORGE.BaseObject.call(this, "Group");
 
     this._boot();
-
 };
 
 FORGE.Group.prototype = Object.create(FORGE.BaseObject.prototype);
@@ -221,7 +220,6 @@ FORGE.Group.prototype.load = function(value)
     {
         throw "Impossible to load group child with uid " + uid + ", it seems to be neither a scene or a group!";
     }
-
 };
 
 /**
@@ -351,23 +349,9 @@ FORGE.Group.prototype.getChildrenUids = function(className)
     }
 
     var children = [];
-    //var child;
 
     for (var i = 0, ii = this._children.length; i < ii; i++)
     {
-        /*
-        child = FORGE.UID.get(this._children[i]);
-
-        if(typeof child === "undefined" || child === null)
-        {
-            continue;
-        }
-
-        if(child.className === className)
-        {
-            children.push(this._children[i]);
-        }*/
-
         if (FORGE.UID.isTypeOf(this._children[i], className))
         {
             children.push(this._children[i]);
