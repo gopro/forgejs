@@ -1196,13 +1196,6 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMin",
     get: function()
     {
         return FORGE.Math.radToDeg(this._fovMin);
-    },
-
-    /** @this {FORGE.Camera} */
-    set: function(value)
-    {
-        this._fovMin = FORGE.Math.degToRad(value);
-        this._setFov(this._fov, FORGE.Math.RADIANS);
     }
 });
 
@@ -1217,13 +1210,6 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMax",
     get: function()
     {
         return FORGE.Math.radToDeg(this._fovMax);
-    },
-
-    /** @this {FORGE.Camera} */
-    set: function(value)
-    {
-        this._fovMax = FORGE.Math.degToRad(value);
-        this._setFov(this._fov, FORGE.Math.RADIANS);
     }
 });
 
