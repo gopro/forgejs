@@ -318,7 +318,7 @@ FORGE.Story.prototype._parseConfig = function(config)
  * Create events dispatchers.
  * @method FORGE.Story#_createEvents
  * @private
- * @param {Object=} events - The events config of the scene.
+ * @param {StoryEventsConfig} events - The events config of the story.
  */
 FORGE.Story.prototype._createEvents = function(events)
 {
