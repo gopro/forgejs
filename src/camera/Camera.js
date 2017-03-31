@@ -778,6 +778,8 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
         return false;
     }
 
+    var oldPitch = this._pitch;
+
     // If unit is not well defined, default will be radians
     unit = (unit === FORGE.Math.DEGREES || unit === FORGE.Math.RADIANS) ? unit : FORGE.Math.RADIANS;
 
@@ -807,6 +809,13 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
 
     var pitch = FORGE.Math.clamp(value, min, max);
 
+    // If old view accepted pitch out of [-PI/2 , PI/2] and new one does not,
+    // check if old pitch value was in authorized range and if not, set to zero
+    if (Math.abs(oldPitch) > Math.PI / 2 && Math.abs(pitch) === Math.PI / 2)
+    {
+        pitch = 0;
+    }
+    
     var changed = this._pitch !== pitch;
 
     this._pitch = pitch;
@@ -908,16 +917,16 @@ FORGE.Camera.prototype._setFov = function(value, unit)
 
     var changed = this._fov !== fov;
 
+    this._fov = fov;
+
     // If fov has changed, ensure angles are inside camera and view boundaries
     // by calling their setters with their current value
-    if (changed === true)
+    var eulerChanged = this._setYaw(this._yaw) || this._setPitch(this._pitch) || this._setRoll(this._roll);
+    if (eulerChanged)
     {
-        this._setYaw(this._yaw);
-        this._setPitch(this._pitch);
-        this._setRoll(this._roll);
+        this._updateFromEuler();
+        this._updateComplete();
     }
-
-    this._fov = fov;
 
     return changed;
 };
