@@ -88,12 +88,12 @@ FORGE.Story = function(viewer)
     this._groupUid = "";
 
     /**
-     * Scene events from the json configuration
+     * Story events from the json configuration
      * @name FORGE.Story#_events
      * @type {Object<FORGE.ActionEventDispatcher>}
      * @private
      */
-    this._events = null;
+    this._events = {};
 
     /**
      * On ready event dispatcher
@@ -322,8 +322,6 @@ FORGE.Story.prototype._parseConfig = function(config)
  */
 FORGE.Story.prototype._createEvents = function(events)
 {
-    this._events = {};
-
     var event;
     for(var e in events)
     {
