@@ -104,22 +104,10 @@ FORGE.Scene = function(viewer)
     this._onConfigLoadComplete = null;
 
     FORGE.BaseObject.call(this, "Scene");
-
-    // this._boot();
 };
 
 FORGE.Scene.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.Scene.prototype.constructor = FORGE.Scene;
-
-/**
- * Boot sequence.
- * @method FORGE.Scene#_boot
- * @private
- */
-FORGE.Scene.prototype._boot = function()
-{
-    this.log("FORGE.Scene._boot();");
-};
 
 /**
  * Parse scene configuration.
