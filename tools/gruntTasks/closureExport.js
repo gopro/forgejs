@@ -163,7 +163,7 @@ module.exports = function(grunt)
             var string = buffer.toString('utf-8');
             var content = "";
 
-            var re = /\*\/\s*(Object\.defineProperty\((\$_[\w.]+\.prototype), "(\w+)",)/g;
+            var re = /\*\/\s*(Object\.defineProperty\(((?:\$_)?[\w.]+\.prototype), "(\w+)",)/g;
 
             content = string.replace(re, '*/\n$2.$3;\n$1');
 

@@ -83,8 +83,6 @@ FORGE.Media.prototype._boot = function()
  */
 FORGE.Media.prototype._parseConfig = function(config)
 {
-    this.warn("FORGE.Media config validator not implemented");
-
     // media configuration
     var mediaConfig = config.media;
 

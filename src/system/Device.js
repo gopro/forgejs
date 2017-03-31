@@ -1,10 +1,13 @@
 /**
- * @namespace FORGE.Device
+ * Manage Devices inside FORGE.<br>
+ * Device is singleton, so if you have multiple instances in the same page you MUST avoid UID conflict.
+ * @constructor
+ * @extends {FORGE.BaseObject}
  */
 FORGE.Device = (function(c)
  {
     var Tmp = c();
-    Tmp.prototype = Object.create(null);
+    Tmp.prototype = Object.create(FORGE.BaseObject.prototype);
     Tmp.prototype.constructor = Tmp;
 
     /**
@@ -15,90 +18,90 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkOS = function()
     {
-        if (/Playstation Vita/.test(this.ua))
+        if (/Playstation Vita/.test(this._ua))
         {
-            this.os = "Playstation Vita";
-            this.vita = true;
+            this._os = "playstationvita";
+            this._vita = true;
         }
-        else if (/Xbox/.test(this.ua))
+        else if (/Xbox/.test(this._ua))
         {
-            this.os = "Xbox";
-            this.xbox = true;
+            this._os = "xbox";
+            this._xbox = true;
         }
-        else if (/Kindle/.test(this.ua) || /\bKF[A-Z][A-Z]+/.test(this.ua) || /Silk.*Mobile Safari/.test(this.ua))
+        else if (/Kindle/.test(this._ua) || /\bKF[A-Z][A-Z]+/.test(this._ua) || /Silk.*Mobile Safari/.test(this._ua))
         {
-            this.os = "Kindle";
-            this.kindle = true;
+            this._os = "kindle";
+            this._kindle = true;
         }
-        else if ((/Windows Phone/i).test(this.ua) || (/IEMobile/i).test(this.ua))
+        else if ((/Windows Phone/i).test(this._ua) || (/IEMobile/i).test(this._ua))
         {
-            this.os = "Windows Phone";
-            this.windowsPhone = true;
-            if (/Windows Phone (\d+)/.test(this.ua))
+            this._os = "windowsphone";
+            this._windowsPhone = true;
+            if (/Windows Phone (\d+)/.test(this._ua))
             {
-                this.osVersion = parseInt(RegExp.$1, 10);
+                this._osVersion = parseInt(RegExp.$1, 10);
             }
         }
-        else if (/Android/.test(this.ua))
+        else if (/Android/.test(this._ua))
         {
-            this.os = "Android";
-            this.android = true;
-            if (/Android ([\.\_\d]+)/.test(this.ua))
+            this._os = "android";
+            this._android = true;
+            if (/Android ([\.\_\d]+)/.test(this._ua))
             {
-                this.osVersion = parseInt(RegExp.$1, 10);
+                this._osVersion = parseInt(RegExp.$1, 10);
             }
         }
-        else if (/CrOS/.test(this.ua))
+        else if (/CrOS/.test(this._ua))
         {
-            this.os = "Chrome OS";
-            this.chromeOS = true;
+            this._os = "chromeos";
+            this._chromeOS = true;
         }
-        else if (/iP[ao]d|iPhone/i.test(this.ua))
+        else if (/iP[ao]d|iPhone/i.test(this._ua))
         {
-            this.os = "iOS";
-            this.iOS = true;
+            this._os = "ios";
+            this._iOS = true;
             if (/OS (\d+)/.test(navigator.appVersion))
             {
-                this.osVersion = parseInt(RegExp.$1, 10);
+                this._osVersion = parseInt(RegExp.$1, 10);
             }
         }
-        else if (/(Linux|X11)/.test(this.ua))
+        else if (/(Linux|X11)/.test(this._ua))
         {
-            this.os = "Linux";
-            this.linux = true;
+            this._os = "linux";
+            this._linux = true;
         }
-        else if (/Mac OS X/.test(this.ua))
+        else if (/Mac OS X/.test(this._ua))
         {
-            this.os = "Mac OS X";
-            this.macOS = true;
-            if (/Mac OS X (10[\.\_\d]+)/.test(this.ua))
+            this._os = "macosx";
+            this._macOS = true;
+            if (/Mac OS X (10[\.\_\d]+)/.test(this._ua))
             {
-                this.osVersion = parseInt(RegExp.$1, 10);
+                this._osVersion = parseInt(RegExp.$1, 10);
             }
         }
-        else if (/Windows/.test(this.ua) || (/WPDesktop/i).test(this.ua))
+        else if (/Windows/.test(this._ua) || (/WPDesktop/i).test(this._ua))
         {
-            if ((/WPDesktop/i).test(this.ua))
+            if ((/WPDesktop/i).test(this._ua))
             {
-                this.os = "Windows Phone";
-                this.windowsPhone = true;
+                this._os = "windowsphone";
+                this._windowsPhone = true;
             }
             else
             {
-                this.os = "Windows";
-                this.windows = true;
+                this._os = "windows";
+                this._windows = true;
             }
-            if (/(Windows 10.0|Windows NT 10.0)/.test(this.ua))
+            if (/(Windows 10.0|Windows NT 10.0)/.test(this._ua))
             {
-                this.osVersion = 10;
+                this._osVersion = 10;
             }
-            else if (/(Windows 8.1|Windows NT 6.3)/.test(this.ua) || /(Windows 8|Windows NT 6.2)/.test(this.ua))
+            else if (/(Windows 8.1|Windows NT 6.3)/.test(this._ua) || /(Windows 8|Windows NT 6.2)/.test(this._ua))
             {
-                this.osVersion = 8;
+                this._osVersion = 8;
             }
-            else if (/(Windows 7|Windows NT 6.1)/.test(this.ua))
+            else if (/(Windows 7|Windows NT 6.1)/.test(this._ua))
             {
-                this.osVersion = 7;
+                this._osVersion = 7;
             }
         }
     };
@@ -111,106 +114,106 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkBrowsers = function()
     {
-        this.ie = /*@cc_on!@*/ false || typeof document["documentMode"] !== "undefined";
-        this.edge = this.ie === false && Boolean(window["StyleMedia"]) === true;
-        this.firefox = typeof window["InstallTrigger"] !== "undefined";
-        this.opera = Boolean(window["opr"]) === true || this.ua.indexOf(" OPR/") >= 0 || this.ua.indexOf("Opera") >= 0;
-        this.safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        this.chrome = this.ie === false && this.edge === false && this.opera === false && (Boolean(window["chrome"]) === true || this.ua.indexOf("CriOS") >= 0);
+        this._ie = /** @type {boolean} */ (/*@cc_on!@*/ false || typeof document["documentMode"] !== "undefined");
+        this._edge = this._ie === false && Boolean(window["StyleMedia"]) === true;
+        this._firefox = typeof window["InstallTrigger"] !== "undefined";
+        this._opera = Boolean(window["opr"]) === true || this._ua.indexOf(" OPR/") >= 0 || this._ua.indexOf("Opera") >= 0;
+        this._safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        this._chrome = this._ie === false && this._edge === false && this._opera === false && (Boolean(window["chrome"]) === true || this._ua.indexOf("CriOS") >= 0);
 
-        if (this.edge)
+        if (this._edge)
         {
-            this.browser = "Edge";
-            if (/Edge\/(\d+)/.test(this.ua))
+            this._browser = "edge";
+            if (/Edge\/(\d+)/.test(this._ua))
             {
-                this.browserVersion = this.edgeVersion = parseInt(RegExp.$1, 10);
+                this._browserVersion = this._edgeVersion = parseInt(RegExp.$1, 10);
             }
         }
-        else if (this.chrome)
+        else if (this._chrome)
         {
-            this.browser = "Chrome";
-            if (/CriOS\/(\d+)/.test(this.ua))
+            this._browser = "chrome";
+            if (/CriOS\/(\d+)/.test(this._ua))
             {
-                this.browserVersion = this.chromeVersion = parseInt(RegExp.$1, 10);
+                this._browserVersion = this._chromeVersion = parseInt(RegExp.$1, 10);
             }
-            else if (/Chrome\/(\d+)/.test(this.ua))
+            else if (/Chrome\/(\d+)/.test(this._ua))
             {
-                this.browserVersion = this.chromeVersion = parseInt(RegExp.$1, 10);
+                this._browserVersion = this._chromeVersion = parseInt(RegExp.$1, 10);
             }
         }
-        else if (this.firefox)
+        else if (this._firefox)
         {
-            this.browser = "Firefox";
-            if (/Firefox\D+(\d+)/.test(this.ua))
+            this._browser = "firefox";
+            if (/Firefox\D+(\d+)/.test(this._ua))
             {
-                this.browserVersion = this.firefoxVersion = parseInt(RegExp.$1, 10);
+                this._browserVersion = this._firefoxVersion = parseInt(RegExp.$1, 10);
             }
         }
-        else if (this.kindle)
+        else if (this._kindle)
         {
             // Silk gets its own if clause because its ua also contains 'Safari'
-            if (/Silk/.test(this.ua))
+            if (/Silk/.test(this._ua))
             {
-                this.browser = "Silk";
-                this.silk = true;
+                this._browser = "silk";
+                this._silk = true;
             }
         }
-        else if (this.ie)
+        else if (this._ie)
         {
-            this.browser = "Internet Explorer";
-            if (/MSIE (\d+\.\d+);/.test(this.ua))
+            this._browser = "internetexplorer";
+            if (/MSIE (\d+\.\d+);/.test(this._ua))
             {
-                this.browserVersion = this.ieVersion = parseInt(RegExp.$1, 10);
+                this._browserVersion = this._ieVersion = parseInt(RegExp.$1, 10);
             }
-            else if (/Trident\/(\d+\.\d+)(.*)rv:(\d+\.\d+)/.test(this.ua))
+            else if (/Trident\/(\d+\.\d+)(.*)rv:(\d+\.\d+)/.test(this._ua))
             {
-                this.browserVersion = this.ieVersion = parseInt(RegExp.$3, 10);
+                this._browserVersion = this._ieVersion = parseInt(RegExp.$3, 10);
             }
         }
-        else if (this.opera)
+        else if (this._opera)
         {
-            this.browser = "Opera";
-            if (/OPR\/(\d+)/.test(this.ua))
+            this._browser = "opera";
+            if (/OPR\/(\d+)/.test(this._ua))
             {
-                this.browserVersion = this.operaVersion = parseInt(RegExp.$1, 10);
+                this._browserVersion = this._operaVersion = parseInt(RegExp.$1, 10);
             }
-            else if (this.ua.indexOf("Opera/") >= 0)
+            else if (this._ua.indexOf("Opera/") >= 0)
             {
-                if (/Version\/(\d+)/.test(this.ua))
+                if (/Version\/(\d+)/.test(this._ua))
                 {
-                    this.browserVersion = this.operaVersion = parseInt(RegExp.$1, 10);
+                    this._browserVersion = this._operaVersion = parseInt(RegExp.$1, 10);
                 }
             }
-            else if (/Opera (\d+)/.test(this.ua))
+            else if (/Opera (\d+)/.test(this._ua))
             {
-                this.browserVersion = this.operaVersion = parseInt(RegExp.$1, 10);
+                this._browserVersion = this._operaVersion = parseInt(RegExp.$1, 10);
             }
         }
-        else if (this.safari)
+        else if (this._safari)
         {
-            this.browser = "Safari";
-            if ((/version\/(\d+(\.\d+)?)/i).test(this.ua))
+            this._browser = "safari";
+            if ((/version\/(\d+(\.\d+)?)/i).test(this._ua))
             {
-                this.browserVersion = this.safariVersion = parseInt(RegExp.$1, 10);
+                this._browserVersion = this._safariVersion = parseInt(RegExp.$1, 10);
             }
         }
         else
         {
-            var matches = this.ua.match(/Android.*AppleWebKit\/([\d.]+)/);
+            var matches = this._ua.match(/Android.*AppleWebKit\/([\d.]+)/);
             if (matches && matches[1] < 537)
             {
-                this.browser = "Android Stock";
-                this.isAndroidStockBrowser = true;
-                this.browserVersion = this.androidStockBrowserVersion = parseFloat(this.ua.slice(this.ua.indexOf("Android") + 8));
+                this._browser = "androidstock";
+                this._isAndroidStockBrowser = true;
+                this._browserVersion = this._androidStockBrowserVersion = parseFloat(this._ua.slice(this._ua.indexOf("Android") + 8));
             }
         }
         //  WebApp mode
         if (navigator.standalone)
         {
-            this.webApp = true;
+            this._webApp = true;
         }
 
-        this.quirksMode = (document.compatMode === "CSS1Compat") ? false : true;
+        this._quirksMode = (document.compatMode === "CSS1Compat") ? false : true;
     };
 
     /**
@@ -220,33 +223,33 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkDevice = function()
     {
-        this.pixelRatio = window.devicePixelRatio || 1;
+        this._pixelRatio = window.devicePixelRatio || 1;
 
-        this.iPhone = this.iOS === true && this.ua.toLowerCase().indexOf("iphone") !== -1;
-        this.iPod = this.iOS === true && this.ua.toLowerCase().indexOf("ipod") !== -1;
-        this.iPad = this.iOS === true && this.ua.toLowerCase().indexOf("ipad") !== -1;
-        this.retina = this.pixelRatio >= 2 && this.iOS === true;
+        this._iPhone = this._iOS === true && this._ua.toLowerCase().indexOf("iphone") !== -1;
+        this._iPod = this._iOS === true && this._ua.toLowerCase().indexOf("ipod") !== -1;
+        this._iPad = this._iOS === true && this._ua.toLowerCase().indexOf("ipad") !== -1;
+        this._retina = this._pixelRatio >= 2 && this._iOS === true;
 
-        if ((this.windows && !this.windowsPhone) || this.macOS || (this.linux && !this.silk) || this.chromeOS)
+        if ((this._windows && !this._windowsPhone) || this._macOS || (this._linux && !this._silk) || this._chromeOS)
         {
-            this.desktop = true;
+            this._desktop = true;
         }
-        else if (/Mobi/i.test(this.ua) && this.iPad === false)
+        else if (/Mobi/i.test(this._ua) && this._iPad === false)
         {
-            this.mobile = true;
+            this._mobile = true;
         }
         else
         {
-            this.tablet = true;
+            this._tablet = true;
         }
 
         //smart TV, Playstation, Table Windows
-        if (/TV/i.test(this.ua) || this.vita === true || this.xbox === true || (this.desktop && /Windows NT/i.test(this.ua) && /Touch/i.test(this.ua)))
+        if (/TV/i.test(this._ua) || this._vita === true || this._xbox === true || (this._desktop && /Windows NT/i.test(this._ua) && /Touch/i.test(this._ua)))
         {
-            this.other = true;
-            this.mobile = false;
-            this.tablet = false;
-            this.desktop = false;
+            this._other = true;
+            this._mobile = false;
+            this._tablet = false;
+            this._desktop = false;
         }
     };
 
@@ -265,29 +268,29 @@ FORGE.Device = (function(c)
             {
                 if (videoElement.canPlayType("video/ogg; codecs=\"theora\"").replace(/^no$/, ""))
                 {
-                    this.oggVideo = true;
+                    this._oggVideo = true;
                 }
 
                 if (videoElement.canPlayType("video/mp4; codecs=\"avc1.42E01E\"").replace(/^no$/, ""))
                 {
                     // without QuickTime, this value will be "undefined"
-                    this.h264Video = true;
-                    this.mp4Video = true;
+                    this._h264Video = true;
+                    this._mp4Video = true;
                 }
 
                 if (videoElement.canPlayType("video/webm; codecs=\"vp8, vorbis\"").replace(/^no$/, ""))
                 {
-                    this.webmVideo = true;
+                    this._webmVideo = true;
                 }
 
                 if (videoElement.canPlayType("video/webm; codecs=\"vp9\"").replace(/^no$/, ""))
                 {
-                    this.vp9Video = true;
+                    this._vp9Video = true;
                 }
 
                 if (videoElement.canPlayType("application/x-mpegURL; codecs=\"avc1.42E01E\"").replace(/^no$/, ""))
                 {
-                    this.hlsVideo = true;
+                    this._hlsVideo = true;
                 }
             }
         }
@@ -302,8 +305,8 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkAudio = function()
     {
-        this.audioTag = (typeof window.Audio !== "undefined");
-        this.webAudio = (typeof window.AudioContext !== "undefined" || typeof window.webkitAudioContext !== "undefined");
+        this._audioTag = (typeof window.Audio !== "undefined");
+        this._webAudio = (typeof window.AudioContext !== "undefined" || typeof window.webkitAudioContext !== "undefined");
 
         var audioElement = document.createElement("audio");
 
@@ -313,43 +316,43 @@ FORGE.Device = (function(c)
             {
                 if (audioElement.canPlayType("audio/ogg; codecs=\"vorbis\"").replace(/^no$/, ""))
                 {
-                    this.ogg = true;
+                    this._ogg = true;
                 }
 
                 if (audioElement.canPlayType("audio/mpeg;").replace(/^no$/, ""))
                 {
-                    this.mp3 = true;
+                    this._mp3 = true;
                 }
 
                 if (audioElement.canPlayType("audio/ogg; codecs=\"opus\"").replace(/^no$/, "") || audioElement.canPlayType("audio/opus;").replace(/^no$/, ""))
                 {
-                    this.opus = true;
+                    this._opus = true;
                 }
 
                 if (audioElement.canPlayType("audio/wav; codecs=\"1\"").replace(/^no$/, ""))
                 {
-                    this.wav = true;
+                    this._wav = true;
                 }
 
                 if (audioElement.canPlayType("audio/aac;").replace(/^no$/, ""))
                 {
-                    this.aac = true;
+                    this._aac = true;
                 }
 
                 if (audioElement.canPlayType("audio/x-m4a;") || audioElement.canPlayType("audio/m4a;") || audioElement.canPlayType("audio/aac;").replace(/^no$/, ""))
                 {
-                    this.m4a = true;
+                    this._m4a = true;
                 }
 
                 if (audioElement.canPlayType("audio/x-mp4;") || audioElement.canPlayType("audio/mp4;") || audioElement.canPlayType("audio/aac;").replace(/^no$/, ""))
                 {
-                    this.mp4 = true;
+                    this._mp4 = true;
                 }
 
                 if (audioElement.canPlayType("audio/webm; codecs=\"vorbis\"").replace(/^no$/, ""))
                 {
-                    this.webm = true;
-                    this.weba = true;
+                    this._webm = true;
+                    this._weba = true;
                 }
 
             }
@@ -365,9 +368,9 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkDeviceFeatures = function()
     {
-        this.vibrate = (typeof navigator.vibrate !== "undefined" || typeof navigator.webkitVibrate !== "undefined" || typeof navigator.mozVibrate !== "undefined" || typeof navigator.msVibrate !== "undefined");
+        this._vibrate = (typeof navigator.vibrate !== "undefined" || typeof navigator.webkitVibrate !== "undefined" || typeof navigator.mozVibrate !== "undefined" || typeof navigator.msVibrate !== "undefined");
 
-        this.battery = (typeof navigator.getBattery === "function");
+        this._battery = (typeof navigator.getBattery === "function");
     };
 
     /**
@@ -377,65 +380,65 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkFeatures = function()
     {
-        this.canvas = (typeof window.CanvasRenderingContext2D !== "undefined");
-        if (this.canvas === true)
+        this._canvas = (typeof window.CanvasRenderingContext2D !== "undefined");
+        if (this._canvas === true)
         {
-            this.canvasText = (typeof document.createElement("canvas").getContext("2d").fillText === "function");
+            this._canvasText = (typeof document.createElement("canvas").getContext("2d").fillText === "function");
             var canvasCtx = document.createElement("canvas").getContext("2d");
             canvasCtx.rect(0, 0, 10, 10);
             canvasCtx.rect(2, 2, 6, 6);
-            this.canvasWinding = (canvasCtx.isPointInPath(5, 5, "evenodd") === false);
+            this._canvasWinding = (canvasCtx.isPointInPath(5, 5, "evenodd") === false);
         }
 
         try
         {
-            this.localStorage = (typeof window.localStorage === "object" && typeof window.localStorage.getItem === "function");
+            this._localStorage = (typeof window.localStorage === "object" && typeof window.localStorage.getItem === "function");
         }
         catch (error)
         {
-            this.localStorage = false;
+            this._localStorage = false;
         }
 
-        this.mediaSource = (typeof window.MediaSource === "function");
+        this._mediaSource = (typeof window.MediaSource === "function");
 
-        this.encryptedMedia = (typeof window.HTMLMediaElement === "function" && typeof window.MediaKeys === "function" && typeof window.MediaKeySystemAccess === "function" && typeof navigator.requestMediaKeySystemAccess === "function");
+        this._encryptedMedia = (typeof window.HTMLMediaElement === "function" && typeof window.MediaKeys === "function" && typeof window.MediaKeySystemAccess === "function" && typeof navigator.requestMediaKeySystemAccess === "function");
 
-        this.applicationCache = (typeof window.applicationCache === "object");
+        this._applicationCache = (typeof window.applicationCache === "object");
 
-        this.addEventListener = (typeof window.addEventListener === "function");
+        this._addEventListener = (typeof window.addEventListener === "function");
 
-        this.raf = (typeof window.requestAnimationFrame === "function" || typeof window.webkitRequestAnimationFrame === "function" || typeof window.mozRequestAnimationFrame === "function");
+        this.__raf = (typeof window.requestAnimationFrame === "function" || typeof window.webkitRequestAnimationFrame === "function" || typeof window.mozRequestAnimationFrame === "function");
 
         try
         {
             var canvas = document.createElement("canvas");
             /* Force screencanvas to false */
             canvas.screencanvas = false;
-            this.webGL = (typeof canvas.getContext === "function" && typeof window.WebGLRenderingContext !== "undefined" && Boolean(canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
+            this._webGL = (typeof canvas.getContext === "function" && typeof window.WebGLRenderingContext !== "undefined" && Boolean(canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
         }
         catch (e)
         {
-            this.webGL = false;
+            this._webGL = false;
         }
 
         if (typeof navigator.getVRDisplays === "function")
         {
-            this.webVR = true;
+            this._webVR = true;
         }
         else
         {
-            this.webVR = false;
+            this._webVR = false;
         }
 
-        this.JSON = (typeof window.JSON === "object" && typeof window.JSON.parse === "function" && typeof window.JSON.stringify === "function");
+        this._JSON = (typeof window.JSON === "object" && typeof window.JSON.parse === "function" && typeof window.JSON.stringify === "function");
 
-        this.geolocation = (typeof navigator.geolocation === "object");
+        this._geolocation = (typeof navigator.geolocation === "object");
 
-        this.history = (typeof window.history === "object" && typeof window.history.pushState === "function");
+        this._history = (typeof window.history === "object" && typeof window.history.pushState === "function");
 
-        this.svg = (typeof document.createElementNS === "function" && typeof document.createElementNS("http://www.w3.org/2000/svg", "svg").createSVGRect === "function");
+        this._svg = (typeof document.createElementNS === "function" && typeof document.createElementNS("http://www.w3.org/2000/svg", "svg").createSVGRect === "function");
 
-        this.contextMenu = (typeof document.documentElement.contextMenu !== "undefined" && typeof window.HTMLMenuItemElement === "function");
+        this._contextMenu = (typeof document.documentElement.contextMenu !== "undefined" && typeof window.HTMLMenuItemElement === "function");
     };
 
     /**
@@ -445,15 +448,15 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkEnvironment = function()
     {
-        this.isSecure = /^https/i.test(window.location.protocol);
+        this._isSecure = /^https/i.test(window.location.protocol);
 
         try
         {
-            this.isIframe = (window.self !== window.top);
+            this._isIframe = (window.self !== window.top);
         }
         catch (e)
         {
-            this.isIframe = true;
+            this._isIframe = true;
         }
     };
 
@@ -464,16 +467,16 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkInput = function()
     {
-        this.touch = (typeof window.ontouchstart !== "undefined" || typeof window.DocumentTouch !== "undefined" && document instanceof window.DocumentTouch || (typeof navigator.maxTouchPoints === "number" && navigator.maxTouchPoints > 0) || (typeof navigator.msMaxTouchPoints === "number" && navigator.msMaxTouchPoints > 0));
+        this._touch = (typeof window.ontouchstart !== "undefined" || typeof window.DocumentTouch !== "undefined" && document instanceof window.DocumentTouch || (typeof navigator.maxTouchPoints === "number" && navigator.maxTouchPoints > 0) || (typeof navigator.msMaxTouchPoints === "number" && navigator.msMaxTouchPoints > 0));
 
         // Test for Safari iOS touch force feature
         if (typeof window.onmouseforcewillbegin !== "undefined" || typeof window.onwebkitmouseforcewillbegin !== "undefined")
         {
             // Test if the browser provides thresholds defining a "force touch" from a normal touch/click event
-            this.touchForce = Boolean(MouseEvent.WEBKIT_FORCE_AT_MOUSE_DOWN && MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN);
+            this._touchForce = Boolean(MouseEvent.WEBKIT_FORCE_AT_MOUSE_DOWN && MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN);
         }
 
-        this.gamepad = (typeof navigator.getGamepads === "function" || typeof navigator.webkitGetGamepads === "function");
+        this._gamepad = (typeof navigator.getGamepads === "function" || typeof navigator.webkitGetGamepads === "function");
     };
 
     /**
@@ -520,7 +523,7 @@ FORGE.Device = (function(c)
         {
             if (element[requestFullscreen[i]])
             {
-                this.requestFullscreen = requestFullscreen[i];
+                this._requestFullscreen = requestFullscreen[i];
                 break;
             }
         }
@@ -528,7 +531,7 @@ FORGE.Device = (function(c)
         {
             if (document[exitFullscreen[j]])
             {
-                this.exitFullscreen = exitFullscreen[j];
+                this._exitFullscreen = exitFullscreen[j];
                 break;
             }
         }
@@ -536,7 +539,7 @@ FORGE.Device = (function(c)
         // Keyboard Input on full screen mode?
         if (typeof window.Element === "function" && Element.ALLOW_KEYBOARD_INPUT)
         {
-            this.fullscreenKeyboard = true;
+            this._fullscreenKeyboard = true;
         }
 
         var fullscreenElement =
@@ -551,7 +554,7 @@ FORGE.Device = (function(c)
         {
             if (typeof document[fullscreenElement[k]] !== "undefined")
             {
-                this.fullscreenElement = fullscreenElement[k];
+                this._fullscreenElement = fullscreenElement[k];
                 break;
             }
         }
@@ -568,7 +571,7 @@ FORGE.Device = (function(c)
         {
             if (typeof document[fullscreenEnabled[l]] !== "undefined")
             {
-                this.fullscreenEnabled = fullscreenEnabled[l];
+                this._fullscreenEnabled = fullscreenEnabled[l];
                 break;
             }
         }
@@ -582,12 +585,12 @@ FORGE.Device = (function(c)
     Tmp.prototype._checkBrowserApi = function()
     {
         //Page Visibility API
-        this.visibilityState = "visibilityState" in document ? "visibilityState" :
+        this._visibilityState = "visibilityState" in document ? "visibilityState" :
             "webkitVisibilityState" in document ? "webkitVisibilityState" :
             "mozVisibilityState" in document ? "mozVisibilityState" :
             null;
 
-        this.visibilityChange = this.visibilityState.slice(0, -5) + "change";
+        this._visibilityChange = this._visibilityState.slice(0, -5) + "change";
 
         //Screen orientation API
         var orientation =
@@ -600,12 +603,12 @@ FORGE.Device = (function(c)
         {
             if (typeof screen[orientation[i]] === "string")
             {
-                this.orientation = orientation[i];
+                this._orientation = orientation[i];
                 break;
             }
         }
 
-        this.screenOrientation = (typeof screen.orientation === "object" && typeof screen.orientation.type === "string" && typeof screen.orientation.lock === "function");
+        this._screenOrientation = (typeof screen.orientation === "object" && typeof screen.orientation.type === "string" && typeof screen.orientation.lock === "function");
 
         var lockOrientation =
             [
@@ -623,18 +626,18 @@ FORGE.Device = (function(c)
         {
             if (typeof screen[lockOrientation[j]] === "function")
             {
-                this.lockOrientation = lockOrientation[j];
-                this.unlockOrientation = unlockOrientation[j];
+                this._lockOrientation = lockOrientation[j];
+                this._unlockOrientation = unlockOrientation[j];
                 break;
             }
         }
 
         //File API
-        this.file = (typeof window.File !== "undefined" && typeof window.FileReader !== "undefined" && typeof window.FileList !== "undefined" && typeof window.Blob !== "undefined");
-        this.fileSystem = (typeof window.requestFileSystem !== "undefined" || typeof window.webkitRequestFileSystem !== "undefined");
+        this._file = (typeof window.File !== "undefined" && typeof window.FileReader !== "undefined" && typeof window.FileList !== "undefined" && typeof window.Blob !== "undefined");
+        this._fileSystem = (typeof window.requestFileSystem !== "undefined" || typeof window.webkitRequestFileSystem !== "undefined");
 
         //Pointer Lock API
-        this.pointerLock = (typeof document.pointerLockElement !== "undefined" || typeof document.mozPointerLockElement !== "undefined" || typeof document.webkitPointerLockElement !== "undefined");
+        this._pointerLock = (typeof document.pointerLockElement !== "undefined" || typeof document.mozPointerLockElement !== "undefined" || typeof document.webkitPointerLockElement !== "undefined");
     };
 
     /**
@@ -647,13 +650,13 @@ FORGE.Device = (function(c)
         // pointer events
         var cssStyle = document.createElement("a").style;
         cssStyle.cssText = "pointer-events:auto";
-        this.cssPointerEvents = (cssStyle.pointerEvents === "auto");
+        this._cssPointerEvents = (cssStyle.pointerEvents === "auto");
 
         // rgba
         cssStyle.cssText = "background-color:rgba(150,255,150,.5)";
-        this.cssRgba = (("" + cssStyle.backgroundColor).indexOf("rgba") > -1);
+        this._cssRgba = (("" + cssStyle.backgroundColor).indexOf("rgba") > -1);
 
-        this.cssAnimation = (typeof cssStyle.animationName !== "undefined" || typeof cssStyle.webkitAnimationName !== "undefined" || typeof cssStyle.mozAnimationName !== "undefined" || typeof cssStyle.msAnimationName !== "undefined");
+        this._cssAnimation = (typeof cssStyle.animationName !== "undefined" || typeof cssStyle.webkitAnimationName !== "undefined" || typeof cssStyle.mozAnimationName !== "undefined" || typeof cssStyle.msAnimationName !== "undefined");
 
         // css transform and css3D check
         var el = document.createElement("p");
@@ -677,7 +680,7 @@ FORGE.Device = (function(c)
             }
         }
         document.body.removeChild(el);
-        this.css3D = (typeof has3d !== "undefined" && has3d.length > 0 && has3d !== "none");
+        this._css3D = (typeof has3d !== "undefined" && has3d.length > 0 && has3d !== "none");
     };
 
     /**
@@ -691,11 +694,11 @@ FORGE.Device = (function(c)
 
         if (event.rotationRate !== null && typeof event.rotationRate.alpha !== "undefined" && typeof event.rotationRate.beta !== "undefined" && typeof event.rotationRate.gamma !== "undefined")
         {
-            this.deviceMotionRotationRate = true;
+            this._deviceMotionRotationRate = true;
         }
         if (typeof event.acceleration !== "undefined" && typeof event.acceleration.x !== "undefined" && typeof event.acceleration.y !== "undefined" && typeof event.acceleration.z !== "undefined")
         {
-            this.deviceMotionAcceleration = true;
+            this._deviceMotionAcceleration = true;
         }
 
         this._removeDeviceMotionHandler();
@@ -716,7 +719,7 @@ FORGE.Device = (function(c)
     {
         if (typeof event.alpha !== "undefined" && typeof event.beta !== "undefined" && typeof event.gamma !== "undefined")
         {
-            this.deviceOrientationMagnetometer = true;
+            this._deviceOrientationMagnetometer = true;
         }
 
         this._removeDeviceOrientationHandler();
@@ -756,8 +759,8 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._checkGyroscope = function()
     {
-        this.deviceMotion = (typeof window.DeviceMotionEvent !== "undefined");
-        this.deviceOrientation = (typeof window.DeviceOrientationEvent !== "undefined");
+        this._deviceMotion = (typeof window.DeviceMotionEvent !== "undefined");
+        this._deviceOrientation = (typeof window.DeviceOrientationEvent !== "undefined");
 
         window.addEventListener("deviceorientation", this._deviceOrientationBind, false);
         window.addEventListener("devicemotion", this._deviceMotionBind, false);
@@ -775,20 +778,20 @@ FORGE.Device = (function(c)
         div.style.height = "1in";
         document.body.appendChild(div);
 
-        this.dpi = div.offsetWidth;
+        this._dpi = div.offsetWidth;
 
         document.body.removeChild(div);
         div = null;
 
-        if (this.mobile)
+        if (this._mobile)
         {
-            this.screenWidth = Math.floor(Math.min(window.screen.width, window.screen.height) * this.pixelRatio);
-            this.screenHeight = Math.floor(Math.max(window.screen.width, window.screen.height) * this.pixelRatio);
+            this._screenWidth = Math.floor(Math.min(window.screen.width, window.screen.height) * this._pixelRatio);
+            this._screenHeight = Math.floor(Math.max(window.screen.width, window.screen.height) * this._pixelRatio);
         }
         else
         {
-            this.screenWidth = Math.floor(Math.max(window.screen.width, window.screen.height) * this.pixelRatio);
-            this.screenHeight = Math.floor(Math.min(window.screen.width, window.screen.height) * this.pixelRatio);
+            this._screenWidth = Math.floor(Math.max(window.screen.width, window.screen.height) * this._pixelRatio);
+            this._screenHeight = Math.floor(Math.min(window.screen.width, window.screen.height) * this._pixelRatio);
         }
     };
 
@@ -799,9 +802,9 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._check = function()
     {
-        this.ua = navigator["userAgent"];
+        this._ua = navigator["userAgent"];
 
-        this.language = ((navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || "");
+        this._language = ((navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || "");
 
         this._checkOS();
         this._checkBrowsers();
@@ -823,7 +826,7 @@ FORGE.Device = (function(c)
         this._checkScreen();
 
         //lock Device object
-        if (this.deviceMotion === false && this.deviceOrientation === false)
+        if (this._deviceMotion === false && this._deviceOrientation === false)
         {
             this._checkComplete();
         }
@@ -845,12 +848,12 @@ FORGE.Device = (function(c)
             this._removeDeviceOrientationHandler();
         }
 
-        if (this.deviceMotionRotationRate === true && this.deviceMotionAcceleration === true && this.deviceOrientationMagnetometer === true)
+        if (this._deviceMotionRotationRate === true && this._deviceMotionAcceleration === true && this._deviceOrientationMagnetometer === true)
         {
-            this.gyroscope = true;
+            this._gyroscope = true;
         }
 
-        this.ready = true;
+        this._ready = true;
 
         Object.freeze(FORGE.Device);
     };
@@ -863,39 +866,39 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype.canPlayAudio = function(type)
     {
-        if (type === "mp3" && this.mp3 === true)
+        if (type === "mp3" && this._mp3 === true)
         {
             return true;
         }
-        else if (type === "ogg" && (this.ogg === true || this.opus === true))
+        else if (type === "ogg" && (this._ogg === true || this._opus === true))
         {
             return true;
         }
-        else if (type === "m4a" && this.m4a === true)
+        else if (type === "m4a" && this._m4a === true)
         {
             return true;
         }
-        else if (type === "mp4" && this.mp4 === true)
+        else if (type === "mp4" && this._mp4 === true)
         {
             return true;
         }
-        else if (type === "opus" && this.opus === true)
+        else if (type === "opus" && this._opus === true)
         {
             return true;
         }
-        else if (type === "wav" && this.wav === true)
+        else if (type === "wav" && this._wav === true)
         {
             return true;
         }
-        else if (type === "aac" && this.aac === true)
+        else if (type === "aac" && this._aac === true)
         {
             return true;
         }
-        else if (type === "webm" && this.webm === true)
+        else if (type === "webm" && this._webm === true)
         {
             return true;
         }
-        else if (type === "weba" && this.weba === true)
+        else if (type === "weba" && this._weba === true)
         {
             return true;
         }
@@ -911,19 +914,19 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype.canPlayVideo = function(type)
     {
-        if (type === "webm" && (this.webmVideo === true || this.vp9Video === true))
+        if (type === "webm" && (this._webmVideo === true || this._vp9Video === true))
         {
             return true;
         }
-        else if (type === "mp4" && (this.mp4Video === true || this.h264Video === true))
+        else if (type === "mp4" && (this._mp4Video === true || this._h264Video === true))
         {
             return true;
         }
-        else if ((type === "ogg" || type === "ogv") && this.oggVideo === true)
+        else if ((type === "ogg" || type === "ogv") && this._oggVideo === true)
         {
             return true;
         }
-        else if (type === "mpeg" && this.hlsVideo === true)
+        else if (type === "mpeg" && this._hlsVideo === true)
         {
             return true;
         }
@@ -944,7 +947,7 @@ FORGE.Device = (function(c)
         return navigator.getBattery()
             .then(function(battery)
             {
-                return this.battery && !battery.charging && battery.level <= minLevel;
+                return this._battery && !battery.charging && battery.level <= minLevel;
             }.bind(this), function()
             {
                 return false;
@@ -967,6 +970,11 @@ FORGE.Device = (function(c)
 
         for(var i in config)
         {
+            if (typeof i === "string")
+            {
+                i.toLowerCase();
+            }
+
             if(typeof this[i] === "undefined")
             {
                 this.warn("Unable to check plugin device compatibility for: "+i);
@@ -980,753 +988,2417 @@ FORGE.Device = (function(c)
         return true;
     };
 
-    return new Tmp();
+    /**
+     * Is device detection done?
+     * @name FORGE.Device#ready
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "ready",
+    {
+        get: function()
+        {
+            return this._ready;
+        }
+    });
 
+    /**
+     * The user agent string.
+     * @name FORGE.Device#ua
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "ua",
+    {
+        get: function()
+        {
+            return this._ua;
+        }
+    });
+
+    /**
+     * The browser language.
+     * @name FORGE.Device#language
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "language",
+    {
+        get: function()
+        {
+            return this._language;
+        }
+    });
+
+    //OS
+
+    /**
+     * The OS name
+     * @name FORGE.Device#os
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "os",
+    {
+        get: function()
+        {
+            return this._os;
+        }
+    });
+
+    /**
+     * The OS major version number.
+     * @name FORGE.Device#osVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "osVersion",
+    {
+        get: function()
+        {
+            return this._osVersion;
+        }
+    });
+
+    /**
+     * Is running on PS Vita?
+     * @name FORGE.Device#vita
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "vita",
+    {
+        get: function()
+        {
+            return this._vita;
+        }
+    });
+
+    /**
+     * Is running on XBox?
+     * @name FORGE.Device#xbox
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "xbox",
+    {
+        get: function()
+        {
+            return this._xbox;
+        }
+    });
+
+    /**
+     * Is running on Kindle?
+     * @name FORGE.Device#kindle
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "kindle",
+    {
+        get: function()
+        {
+            return this._kindle;
+        }
+    });
+
+    /**
+     * Is running on android?
+     * @name FORGE.Device#android
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "android",
+    {
+        get: function()
+        {
+            return this._android;
+        }
+    });
+
+    /**
+     * Is running on chromeOS?
+     * @name FORGE.Device#chromeOS
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "chromeOS",
+    {
+        get: function()
+        {
+            return this._chromeOS;
+        }
+    });
+
+    /**
+     * Is running on iOS?
+     * @name FORGE.Device#iOS
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "iOS",
+    {
+        get: function()
+        {
+            return this._iOS;
+        }
+    });
+
+    /**
+     * Is running on Linux?
+     * @name FORGE.Device#linux
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "linux",
+    {
+        get: function()
+        {
+            return this._linux;
+        }
+    });
+
+    /**
+     * Is running on MacOS?
+     * @name FORGE.Device#macOS
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "macOS",
+    {
+        get: function()
+        {
+            return this._macOS;
+        }
+    });
+
+    /**
+     * Is running on Windows?
+     * @name FORGE.Device#windows
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "windows",
+    {
+        get: function()
+        {
+            return this._windows;
+        }
+    });
+
+    /**
+     * Is running on Windows Phone?
+     * @name FORGE.Device#windowsPhone
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "windowsPhone",
+    {
+        get: function()
+        {
+            return this._windowsPhone;
+        }
+    });
+
+    // Browsers
+
+    /**
+     * Is running in Firefox?
+     * @name FORGE.Device#firefox
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "firefox",
+    {
+        get: function()
+        {
+            return this._firefox;
+        }
+    });
+
+    /**
+     * Firefox major version number.
+     * @name FORGE.Device#firefoxVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "firefoxVersion",
+    {
+        get: function()
+        {
+            return this._firefoxVersion;
+        }
+    });
+
+    /**
+     * Is running in Chrome?
+     * @name FORGE.Device#chrome
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "chrome",
+    {
+        get: function()
+        {
+            return this._chrome;
+        }
+    });
+
+    /**
+     * Chrome major version number.
+     * @name FORGE.Device#chromeVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "chromeVersion",
+    {
+        get: function()
+        {
+            return this._chromeVersion;
+        }
+    });
+
+    /**
+     * Is running in Internet Explorer?
+     * @name FORGE.Device#ie
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "ie",
+    {
+        get: function()
+        {
+            return this._ie;
+        }
+    });
+
+    /**
+     * Internet Explorer major version number.
+     * @name FORGE.Device#ieVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "ieVersion",
+    {
+        get: function()
+        {
+            return this._ieVersion;
+        }
+    });
+
+    /**
+     * Is running in Opera?
+     * @name FORGE.Device#opera
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "opera",
+    {
+        get: function()
+        {
+            return this._opera;
+        }
+    });
+
+    /**
+     * Opera major version number.
+     * @name FORGE.Device#operaVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "operaVersion",
+    {
+        get: function()
+        {
+            return this._operaVersion;
+        }
+    });
+
+    /**
+     * Is running in Edge?
+     * @name FORGE.Device#edge
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "edge",
+    {
+        get: function()
+        {
+            return this._edge;
+        }
+    });
+
+    /**
+     * Edge major version number.
+     * @name FORGE.Device#edgeVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "edgeVersion",
+    {
+        get: function()
+        {
+            return this._edgeVersion;
+        }
+    });
+
+    /**
+     * Is running in Safari?
+     * @name FORGE.Device#safari
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "safari",
+    {
+        get: function()
+        {
+            return this._safari;
+        }
+    });
+
+    /**
+     * Safari (or Mobile Safari) major version number.
+     * @name FORGE.Device#safariVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "safariVersion",
+    {
+        get: function()
+        {
+            return this._safariVersion;
+        }
+    });
+
+    /**
+     * Is running in Silk (Kindle)?
+     * @name FORGE.Device#silk
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "silk",
+    {
+        get: function()
+        {
+            return this._silk;
+        }
+    });
+
+    /**
+     * The nick name of the browser.
+     * @name FORGE.Device#browser
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "browser",
+    {
+        get: function()
+        {
+            return this._browser;
+        }
+    });
+
+    /**
+     * The browser major version.
+     * @name FORGE.Device#browserVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "browserVersion",
+    {
+        get: function()
+        {
+            return this._browserVersion;
+        }
+    });
+
+    /**
+     * Is running in a standalone app?
+     * @name FORGE.Device#webApp
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "webApp",
+    {
+        get: function()
+        {
+            return this._webApp;
+        }
+    });
+
+    /**
+     * Detect if it's an Android Stock browser.
+     * @name FORGE.Device#isAndroidStockBrowser
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "isAndroidStockBrowser",
+    {
+        get: function()
+        {
+            return this._isAndroidStockBrowser;
+        }
+    });
+
+    /**
+     * The Android version linked to the stock browser.
+     * @name FORGE.Device#androidStockBrowserVersion
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "androidStockBrowserVersion",
+    {
+        get: function()
+        {
+            return this._androidStockBrowserVersion;
+        }
+    });
+
+    /**
+     * Is the browser running in strict mode or quirks mode?
+     * @name FORGE.Device#quirksMode
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "quirksMode",
+    {
+        get: function()
+        {
+            return this._quirksMode;
+        }
+    });
+
+    // Capabilities
+
+    /**
+     * Does the browser support full screen API?
+     * @name FORGE.Device#fullscreenEnabled
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "fullscreenEnabled",
+    {
+        get: function()
+        {
+            return this._fullscreenEnabled;
+        }
+    });
+
+    /**
+     * Request full screen method name.
+     * @name FORGE.Device#requestFullscreen
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "requestFullscreen",
+    {
+        get: function()
+        {
+            return this._requestFullscreen;
+        }
+    });
+
+    /**
+     * Exit full screen method name.
+     * @name FORGE.Device#exitFullscreen
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "exitFullscreen",
+    {
+        get: function()
+        {
+            return this._exitFullscreen;
+        }
+    });
+
+    /**
+     * fullscreenElement accessor name.
+     * @name  FORGE.Device#fullscreenElement
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "fullscreenElement",
+    {
+        get: function()
+        {
+            return this._fullscreenElement;
+        }
+    });
+
+    /**
+     * Does the browser support keyboard during full screen mode?
+     * @name FORGE.Device#fullscreenKeyboard
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "fullscreenKeyboard",
+    {
+        get: function()
+        {
+            return this._fullscreenKeyboard;
+        }
+    });
+
+    // Device
+
+    /**
+     * Is running on iPhone?
+     * @name FORGE.Device#iPhone
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "iPhone",
+    {
+        get: function()
+        {
+            return this._iPhone;
+        }
+    });
+
+    /**
+     * Is running on Apple Retina display?
+     * @name FORGE.Device#retina
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "retina",
+    {
+        get: function()
+        {
+            return this._retina;
+        }
+    });
+
+    /**
+     * Is running on iPod?
+     * @name FORGE.Device#iPod
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "iPod",
+    {
+        get: function()
+        {
+            return this._iPod;
+        }
+    });
+
+    /**
+     * Is running on iPad?
+     * @name FORGE.Device#iPad
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "iPad",
+    {
+        get: function()
+        {
+            return this._iPad;
+        }
+    });
+
+    /**
+     * Pixel ratio of the device.
+     * @name FORGE.Device#pixelRatio
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "pixelRatio",
+    {
+        get: function()
+        {
+            return this._pixelRatio;
+        }
+    });
+
+    /**
+     * Does the device support the Vibration API?
+     * @name FORGE.Device#vibrate
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "vibrate",
+    {
+        get: function()
+        {
+            return this._vibrate;
+        }
+    });
+
+    /**
+     * Is the Battery API available?
+     * @name FORGE.Device#battery
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "battery",
+    {
+        get: function()
+        {
+            return this._battery;
+        }
+    });
+
+    /**
+     * Is running on a desktop?
+     * @name FORGE.Device#desktop
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "desktop",
+    {
+        get: function()
+        {
+            return this._desktop;
+        }
+    });
+
+    /**
+     * Is running on a tablet?
+     * @name FORGE.Device#tablet
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "tablet",
+    {
+        get: function()
+        {
+            return this._tablet;
+        }
+    });
+
+    /**
+     * Is running on a mobile?
+     * @name FORGE.Device#mobile
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "mobile",
+    {
+        get: function()
+        {
+            return this._mobile;
+        }
+    });
+
+    /**
+     * Is running on a other device as smartTv...?
+     * @name FORGE.Device#other
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "other",
+    {
+        get: function()
+        {
+            return this._other;
+        }
+    });
+
+    // Inputs
+
+    /**
+     * Is Touch API available?
+     * @name FORGE.Device#touch
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "touch",
+    {
+        get: function()
+        {
+            return this._touch;
+        }
+    });
+
+    /**
+     * Is Gamepad API available?
+     * @name FORGE.Device#gamepad
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "gamepad",
+    {
+        get: function()
+        {
+            return this._gamepad;
+        }
+    });
+
+    /**
+     * Are Force Touch Events supported?
+     * Force Touch events are available in OS X 10.11 and later on devices equipped with Force Touch trackpads.
+     * @name FORGE.Device#touchForce
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "touchForce",
+    {
+        get: function()
+        {
+            return this._touchForce;
+        }
+    });
+
+    // Audio
+
+    /**
+     * Are Audio tags available?
+     * @name FORGE.Device#audioTag
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "audioTag",
+    {
+        get: function()
+        {
+            return this._audioTag;
+        }
+    });
+
+    /**
+     * Is the WebAudio API available?
+     * @name FORGE.Device#webAudio
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "webAudio",
+    {
+        get: function()
+        {
+            return this._webAudio;
+        }
+    });
+
+    /**
+     * Can play ogg files?
+     * @name FORGE.Device#ogg
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "ogg",
+    {
+        get: function()
+        {
+            return this._ogg;
+        }
+    });
+
+    /**
+     * Can play mp3 files?
+     * @name FORGE.Device#mp3
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "mp3",
+    {
+        get: function()
+        {
+            return this._mp3;
+        }
+    });
+
+    /**
+     * Can play opus files?
+     * @name FORGE.Device#opus
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "opus",
+    {
+        get: function()
+        {
+            return this._opus;
+        }
+    });
+
+    /**
+     * Can play wav files?
+     * @name FORGE.Device#wav
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "wav",
+    {
+        get: function()
+        {
+            return this._wav;
+        }
+    });
+
+    /**
+     * Can play m4a files?
+     * @name FORGE.Device#m4a
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "m4a",
+    {
+        get: function()
+        {
+            return this._m4a;
+        }
+    });
+
+    /**
+     * Can play mp4 files?
+     * @name FORGE.Device#mp4
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "mp4",
+    {
+        get: function()
+        {
+            return this._mp4;
+        }
+    });
+
+    /**
+     * Can play aac files?
+     * @name FORGE.Device#aac
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "aac",
+    {
+        get: function()
+        {
+            return this._aac;
+        }
+    });
+
+    /**
+     * Can play webm files?
+     * @name FORGE.Device#webm
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "webm",
+    {
+        get: function()
+        {
+            return this._webm;
+        }
+    });
+
+    /**
+     * Can play weba files?
+     * @name FORGE.Device#weba
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "weba",
+    {
+        get: function()
+        {
+            return this._weba;
+        }
+    });
+
+    // Video
+
+    /**
+     * Can play ogg video files?
+     * @name FORGE.Device#oggVideo
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "oggVideo",
+    {
+        get: function()
+        {
+            return this._oggVideo;
+        }
+    });
+
+    /**
+     * Can play h264 video files?
+     * @name FORGE.Device#h264Video
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "h264Video",
+    {
+        get: function()
+        {
+            return this._h264Video;
+        }
+    });
+
+    /**
+     * Can play mp4 video files?
+     * @name FORGE.Device#mp4Video
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "mp4Video",
+    {
+        get: function()
+        {
+            return this._mp4Video;
+        }
+    });
+
+    /**
+     * Can play webm video files?
+     * @name FORGE.Device#webmVideo
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "webmVideo",
+    {
+        get: function()
+        {
+            return this._webmVideo;
+        }
+    });
+
+    /**
+     * Can play vp9 video files?
+     * @name FORGE.Device#vp9Video
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "vp9Video",
+    {
+        get: function()
+        {
+            return this._vp9Video;
+        }
+    });
+
+    /**
+     * Can play hls video files?
+     * @name FORGE.Device#hlsVideo
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "hlsVideo",
+    {
+        get: function()
+        {
+            return this._hlsVideo;
+        }
+    });
+
+    // Features
+
+    /**
+     * Is canvas available?
+     * @name FORGE.Device#canvas
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "canvas",
+    {
+        get: function()
+        {
+            return this._canvas;
+        }
+    });
+
+    /**
+     * Are winding rules for '<canvas>' (go clockwise or counterclockwise) available?
+     * @name FORGE.Device#canvasWinding
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "canvasWinding",
+    {
+        get: function()
+        {
+            return this._canvasWinding;
+        }
+    });
+
+    /**
+     * Is text API for canvas available?
+     * @name FORGE.Device#canvasText
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "canvasText",
+    {
+        get: function()
+        {
+            return this._canvasText;
+        }
+    });
+
+    /**
+     * Is native support of addEventListener available?
+     * @name FORGE.Device#addEventListener
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "addEventListener",
+    {
+        get: function()
+        {
+            return this._addEventListener;
+        }
+    });
+
+    /**
+     * Is requestAnimationFrame API supported?
+     * @name FORGE.Device#raf
+     * @type {boolean}
+     * @private
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "raf",
+    {
+        get: function()
+        {
+            return this._raf;
+        }
+    });
+
+    /**
+     * Is webGL available?
+     * @name FORGE.Device#webGL
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "webGL",
+    {
+        get: function()
+        {
+            return this._webGL;
+        }
+    });
+
+    /**
+     * Is WebVR available?
+     * @name FORGE.Device#webVR
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "webVR",
+    {
+        get: function()
+        {
+            return this._webVR;
+        }
+    });
+
+    /**
+     * Is file available?
+     * @name FORGE.Device#file
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "file",
+    {
+        get: function()
+        {
+            return this._file;
+        }
+    });
+
+    /**
+     * Is fileSystem available?
+     * @name FORGE.Device#fileSystem
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "fileSystem",
+    {
+        get: function()
+        {
+            return this._fileSystem;
+        }
+    });
+
+    /**
+     * Is localStorage available?
+     * @name FORGE.Device#localStorage
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "localStorage",
+    {
+        get: function()
+        {
+            return this._localStorage;
+        }
+    });
+
+    /**
+     * Is Application Cache supported to enable web-based applications run offline?
+     * @name FORGE.Device#applicationCache
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "applicationCache",
+    {
+        get: function()
+        {
+            return this._applicationCache;
+        }
+    });
+
+    /**
+     * Is Geolocation API available?
+     * @name FORGE.Device#geolocation
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "geolocation",
+    {
+        get: function()
+        {
+            return this._geolocation;
+        }
+    });
+
+    /**
+     * Is pointerLock available?
+     * @name FORGE.Device#pointerLock
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "pointerLock",
+    {
+        get: function()
+        {
+            return this._pointerLock;
+        }
+    });
+
+    /**
+     * Is context menu available?
+     * @name FORGE.Device#contextMenu
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "contextMenu",
+    {
+        get: function()
+        {
+            return this._contextMenu;
+        }
+    });
+
+    /**
+     * Is Media Source Extensions API available?
+     * @name  FORGE.Device#mediaSource
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "mediaSource",
+    {
+        get: function()
+        {
+            return this._mediaSource;
+        }
+    });
+
+    /**
+     * Is Encrypted Media Extensions API available?
+     * @name  FORGE.Device#encryptedMedia
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "encryptedMedia",
+    {
+        get: function()
+        {
+            return this._encryptedMedia;
+        }
+    });
+
+    /**
+     * Is JSON native support available?
+     * @name FORGE.Device#JSON
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "JSON",
+    {
+        get: function()
+        {
+            return this._JSON;
+        }
+    });
+
+    /**
+     * Is History API available?
+     * @name FORGE.Device#history
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "history",
+    {
+        get: function()
+        {
+            return this._history;
+        }
+    });
+
+    /**
+     * Is SVG in '<embed>' or '<object>' supported?
+     * @name FORGE.Device#svg
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "svg",
+    {
+        get: function()
+        {
+            return this._svg;
+        }
+    });
+
+    /**
+     * Is the current page in secure mode?
+     * @name FORGE.Device#isSecure
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "isSecure",
+    {
+        get: function()
+        {
+            return this._isSecure;
+        }
+    });
+
+    /**
+     * Is the current page is into an Iframe ?
+     * @name FORGE.Device#isIframe
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "isIframe",
+    {
+        get: function()
+        {
+            return this._isIframe;
+        }
+    });
+
+    /**
+     * Hidden state name for the PageVisibility API.
+     * @name FORGE.Device#visibilityState
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "visibilityState",
+    {
+        get: function()
+        {
+            return this._visibilityState;
+        }
+    });
+
+    /**
+     * Visibility change event name for the PageVisibility API.
+     * @name FORGE.Device#visibilityChange
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "visibilityChange",
+    {
+        get: function()
+        {
+            return this._visibilityChange;
+        }
+    });
+
+    // CSS
+
+    /**
+     * Is css3D available?
+     * @name FORGE.Device#css3D
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "css3D",
+    {
+        get: function()
+        {
+            return this._css3D;
+        }
+    });
+
+    /**
+     * Is rgba (alpha) available?
+     * @name FORGE.Device#cssRgba
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "cssRgba",
+    {
+        get: function()
+        {
+            return this._cssRgba;
+        }
+    });
+
+    /**
+     * Is pointer-events available?
+     * @name FORGE.Device#cssPointerEvents
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "cssPointerEvents",
+    {
+        get: function()
+        {
+            return this._cssPointerEvents;
+        }
+    });
+
+    /**
+     * Are css animations (keyframes) supported?
+     * @name FORGE.Device#cssAnimation
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "cssAnimation",
+    {
+        get: function()
+        {
+            return this._cssAnimation;
+        }
+    });
+
+    // Gyroscope
+
+    /**
+     * Device has a real gyroscope?
+     * @name FORGE.Device#gyroscope
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "gyroscope",
+    {
+        get: function()
+        {
+            return this._gyroscope;
+        }
+    });
+
+    /**
+     * Is Device Motion Event supported? (Accelerometer)
+     * @name FORGE.Device#deviceMotion
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "deviceMotion",
+    {
+        get: function()
+        {
+            return this._deviceMotion;
+        }
+    });
+
+    /**
+     * Is Device Orientation Event supported? (Magnetometer)
+     * @name FORGE.Device#deviceOrientation
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "deviceOrientation",
+    {
+        get: function()
+        {
+            return this._deviceOrientation;
+        }
+    });
+
+    /**
+     * Is Device Motion acceleration supported?
+     * @name FORGE.Device#deviceMotionAcceleration
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "deviceMotionAcceleration",
+    {
+        get: function()
+        {
+            return this._deviceMotionAcceleration;
+        }
+    });
+
+    /**
+     * Is Device Motion rotation supported?
+     * @name FORGE.Device#deviceMotionRotationRate
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "deviceMotionRotationRate",
+    {
+        get: function()
+        {
+            return this._deviceMotionRotationRate;
+        }
+    });
+
+    /**
+     * Is Device Orientation motion supported?
+     * @name FORGE.Device#deviceOrientationMagnetometer
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "deviceOrientationMagnetometer",
+    {
+        get: function()
+        {
+            return this._deviceOrientationMagnetometer;
+        }
+    });
+
+    /**
+     * Pixel density of the screen.
+     * @name  FORGE.Device#dpi
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "dpi",
+    {
+        get: function()
+        {
+            return this._dpi;
+        }
+    });
+
+    /**
+     * Device screen width in pixels.
+     * @name  FORGE.Device#screenWidth
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "screenWidth",
+    {
+        get: function()
+        {
+            return this._screenWidth;
+        }
+    });
+
+    /**
+     * Device screen height in pixels.
+     * @name  FORGE.Device#screenHeight
+     * @type {number}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "screenHeight",
+    {
+        get: function()
+        {
+            return this._screenHeight;
+        }
+    });
+
+    /**
+     * Is screen orienation API available?
+     * @name  FORGE.Device#screenOrientation
+     * @type {boolean}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "screenOrientation",
+    {
+        get: function()
+        {
+            return this._screenOrientation;
+        }
+    });
+
+    /**
+     * Screen orientation object name.
+     * @name FORGE.Device#orientation
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "orientation",
+    {
+        get: function()
+        {
+            return this._orientation;
+        }
+    });
+
+    /**
+     * Lock screen orientation method name.
+     * @name FORGE.Device#lockOrientation
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "lockOrientation",
+    {
+        get: function()
+        {
+            return this._lockOrientation;
+        }
+    });
+
+    /**
+     * Unlock screen orientation method name.
+     * @name FORGE.Device#unlockOrientation
+     * @type {string}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "unlockOrientation",
+    {
+        get: function()
+        {
+            return this._unlockOrientation;
+        }
+    });
+
+    return new Tmp();
 })(function()
 {
     return function()
     {
         /**
          * Is device detection done?
-         * @name FORGE.Device#ready
+         * @name FORGE.Device#_ready
          * @type {boolean}
+         * @private
          */
-        this.ready = false;
+        this._ready = false;
 
         /**
          * The user agent string.
-         * @name FORGE.Device#ua
+         * @name FORGE.Device#_ua
          * @type {string}
+         * @private
          */
-        this.ua = "";
+        this._ua = "";
 
         /**
          * The browser language.
-         * @name FORGE.Device#language
+         * @name FORGE.Device#_language
          * @type {string}
+         * @private
          */
-        this.language = "";
+        this._language = "";
 
         //OS
 
         /**
          * The OS name
-         * @name FORGE.Device#os
+         * @name FORGE.Device#_os
          * @type {string}
+         * @private
          */
-        this.os = "";
+        this._os = "";
 
         /**
          * The OS major version number.
-         * @name FORGE.Device#osVersion
+         * @name FORGE.Device#_osVersion
          * @type {number}
+         * @private
          */
-        this.osVersion = 0;
+        this._osVersion = 0;
 
         /**
          * Is running on PS Vita?
-         * @name FORGE.Device#vita
+         * @name FORGE.Device#_vita
          * @type {boolean}
+         * @private
          */
-        this.vita = false;
+        this._vita = false;
 
         /**
          * Is running on XBox?
-         * @name FORGE.Device#xbox
+         * @name FORGE.Device#_xbox
          * @type {boolean}
+         * @private
          */
-        this.xbox = false;
+        this._xbox = false;
 
         /**
          * Is running on Kindle?
-         * @name FORGE.Device#kindle
+         * @name FORGE.Device#_kindle
          * @type {boolean}
+         * @private
          */
-        this.kindle = false;
+        this._kindle = false;
 
         /**
          * Is running on android?
-         * @name FORGE.Device#android
+         * @name FORGE.Device#_android
          * @type {boolean}
+         * @private
          */
-        this.android = false;
+        this._android = false;
 
         /**
          * Is running on chromeOS?
-         * @name FORGE.Device#chromeOS
+         * @name FORGE.Device#_chromeOS
          * @type {boolean}
+         * @private
          */
-        this.chromeOS = false;
+        this._chromeOS = false;
 
         /**
          * Is running on iOS?
-         * @name FORGE.Device#iOS
+         * @name FORGE.Device#_iOS
          * @type {boolean}
+         * @private
          */
-        this.iOS = false;
+        this._iOS = false;
 
         /**
          * Is running on Linux?
-         * @name FORGE.Device#linux
+         * @name FORGE.Device#_linux
          * @type {boolean}
+         * @private
          */
-        this.linux = false;
+        this._linux = false;
 
         /**
          * Is running on MacOS?
-         * @name FORGE.Device#macOS
+         * @name FORGE.Device#_macOS
          * @type {boolean}
+         * @private
          */
-        this.macOS = false;
+        this._macOS = false;
 
         /**
          * Is running on Windows?
-         * @name FORGE.Device#windows
+         * @name FORGE.Device#_windows
          * @type {boolean}
+         * @private
          */
-        this.windows = false;
+        this._windows = false;
 
         /**
          * Is running on Windows Phone?
-         * @name FORGE.Device#windowsPhone
+         * @name FORGE.Device#_windowsPhone
          * @type {boolean}
+         * @private
          */
-        this.windowsPhone = false;
+        this._windowsPhone = false;
 
         // Browsers
 
         /**
          * Is running in Firefox?
-         * @name FORGE.Device#firefox
+         * @name FORGE.Device#_firefox
          * @type {boolean}
+         * @private
          */
-        this.firefox = false;
+        this._firefox = false;
 
         /**
          * Firefox major version number.
-         * @name FORGE.Device#firefoxVersion
+         * @name FORGE.Device#_firefoxVersion
          * @type {number}
+         * @private
          */
-        this.firefoxVersion = 0;
+        this._firefoxVersion = 0;
 
         /**
          * Is running in Chrome?
-         * @name FORGE.Device#chrome
+         * @name FORGE.Device#_chrome
          * @type {boolean}
+         * @private
          */
-        this.chrome = false;
+        this._chrome = false;
 
         /**
          * Chrome major version number.
-         * @name FORGE.Device#chromeVersion
+         * @name FORGE.Device#_chromeVersion
          * @type {number}
+         * @private
          */
-        this.chromeVersion = 0;
+        this._chromeVersion = 0;
 
         /**
          * Is running in Internet Explorer?
-         * @name FORGE.Device#ie
+         * @name FORGE.Device#_ie
          * @type {boolean}
+         * @private
          */
-        this.ie = false;
+        this._ie = false;
 
         /**
          * Internet Explorer major version number.
-         * @name FORGE.Device#ieVersion
+         * @name FORGE.Device#_ieVersion
          * @type {number}
+         * @private
          */
-        this.ieVersion = 0;
+        this._ieVersion = 0;
 
         /**
          * Is running in Opera?
-         * @name FORGE.Device#opera
+         * @name FORGE.Device#_opera
          * @type {boolean}
+         * @private
          */
-        this.opera = false;
+        this._opera = false;
 
         /**
          * Opera major version number.
-         * @name FORGE.Device#operaVersion
+         * @name FORGE.Device#_operaVersion
          * @type {number}
+         * @private
          */
-        this.operaVersion = 0;
+        this._operaVersion = 0;
 
         /**
          * Is running in Edge?
-         * @name FORGE.Device#edge
+         * @name FORGE.Device#_edge
          * @type {boolean}
+         * @private
          */
-        this.edge = false;
+        this._edge = false;
 
         /**
          * Edge major version number.
-         * @name FORGE.Device#edgeVersion
+         * @name FORGE.Device#_edgeVersion
          * @type {number}
+         * @private
          */
-        this.edgeVersion = 0;
+        this._edgeVersion = 0;
 
         /**
          * Is running in Safari?
-         * @name FORGE.Device#safari
+         * @name FORGE.Device#_safari
          * @type {boolean}
+         * @private
          */
-        this.safari = false;
+        this._safari = false;
 
         /**
          * Safari (or Mobile Safari) major version number.
-         * @name FORGE.Device#safariVersion
+         * @name FORGE.Device#_safariVersion
          * @type {number}
+         * @private
          */
-        this.safariVersion = 0;
+        this._safariVersion = 0;
 
         /**
          * Is running in Silk (Kindle)?
-         * @name FORGE.Device#silk
+         * @name FORGE.Device#_silk
          * @type {boolean}
+         * @private
          */
-        this.silk = false;
+        this._silk = false;
 
         /**
          * The nick name of the browser.
-         * @name FORGE.Device#browser
+         * @name FORGE.Device#_browser
          * @type {string}
+         * @private
          */
-        this.browser = "";
+        this._browser = "";
 
         /**
          * The browser major version.
-         * @name FORGE.Device#browserVersion
+         * @name FORGE.Device#_browserVersion
          * @type {number}
+         * @private
          */
-        this.browserVersion = 0;
+        this._browserVersion = 0;
 
         /**
          * Is running in a standalone app?
-         * @name FORGE.Device#webApp
+         * @name FORGE.Device#_webApp
          * @type {boolean}
+         * @private
          */
-        this.webApp = false;
+        this._webApp = false;
 
         /**
          * Detect if it's an Android Stock browser.
-         * @name FORGE.Device#isAndroidStockBrowser
+         * @name FORGE.Device#_isAndroidStockBrowser
          * @type {boolean}
+         * @private
          */
-        this.isAndroidStockBrowser = false;
+        this._isAndroidStockBrowser = false;
 
         /**
          * The Android version linked to the stock browser.
-         * @name FORGE.Device#androidStockBrowserVersion
+         * @name FORGE.Device#_androidStockBrowserVersion
          * @type {number}
+         * @private
          */
-        this.androidStockBrowserVersion = 0;
+        this._androidStockBrowserVersion = 0;
 
         /**
          * Is the browser running in strict mode or quirks mode?
-         * @name FORGE.Device#quirksMode
+         * @name FORGE.Device#_quirksMode
          * @type {boolean}
+         * @private
          */
-        this.quirksMode = false;
+        this._quirksMode = false;
 
         // Capabilities
 
         /**
          * Does the browser support full screen API?
-         * @name FORGE.Device#fullscreenEnabled
+         * @name FORGE.Device#_fullscreenEnabled
          * @type {string}
+         * @private
          */
-        this.fullscreenEnabled = "";
+        this._fullscreenEnabled = "";
 
         /**
          * Request full screen method name.
-         * @name FORGE.Device#requestFullscreen
+         * @name FORGE.Device#_requestFullscreen
          * @type {string}
+         * @private
          */
-        this.requestFullscreen = "";
+        this._requestFullscreen = "";
 
         /**
          * Exit full screen method name.
-         * @name FORGE.Device#exitFullscreen
+         * @name FORGE.Device#_exitFullscreen
          * @type {string}
+         * @private
          */
-        this.exitFullscreen = "";
+        this._exitFullscreen = "";
 
         /**
          * fullscreenElement accessor name.
-         * @name  FORGE.Device#fullscreenElement
+         * @name  FORGE.Device#_fullscreenElement
          * @type {string}
+         * @private
          */
-        this.fullscreenElement = "";
+        this._fullscreenElement = "";
 
         /**
          * Does the browser support keyboard during full screen mode?
-         * @name FORGE.Device#fullscreenKeyboard
+         * @name FORGE.Device#_fullscreenKeyboard
          * @type {boolean}
+         * @private
          */
-        this.fullscreenKeyboard = false;
+        this._fullscreenKeyboard = false;
 
         // Device
 
         /**
          * Is running on iPhone?
-         * @name FORGE.Device#iPhone
+         * @name FORGE.Device#_iPhone
          * @type {boolean}
+         * @private
          */
-        this.iPhone = false;
+        this._iPhone = false;
 
         /**
          * Is running on Apple Retina display?
-         * @name FORGE.Device#retina
+         * @name FORGE.Device#_retina
          * @type {boolean}
+         * @private
          */
-        this.retina = false;
+        this._retina = false;
 
         /**
          * Is running on iPod?
-         * @name FORGE.Device#iPod
+         * @name FORGE.Device#_iPod
          * @type {boolean}
+         * @private
          */
-        this.iPod = false;
+        this._iPod = false;
 
         /**
          * Is running on iPad?
-         * @name FORGE.Device#iPad
+         * @name FORGE.Device#_iPad
          * @type {boolean}
+         * @private
          */
-        this.iPad = false;
+        this._iPad = false;
 
         /**
          * Pixel ratio of the device.
-         * @name FORGE.Device#pixelRatio
+         * @name FORGE.Device#_pixelRatio
          * @type {number}
+         * @private
          */
-        this.pixelRatio = 1;
+        this._pixelRatio = 1;
 
         /**
          * Does the device support the Vibration API?
-         * @name FORGE.Device#vibrate
+         * @name FORGE.Device#_vibrate
          * @type {boolean}
+         * @private
          */
-        this.vibrate = false;
+        this._vibrate = false;
 
         /**
          * Is the Battery API available?
-         * @name FORGE.Device#battery
+         * @name FORGE.Device#_battery
          * @type {boolean}
+         * @private
          */
-        this.battery = false;
+        this._battery = false;
 
         /**
          * Is running on a desktop?
-         * @name FORGE.Device#desktop
+         * @name FORGE.Device#_desktop
          * @type {boolean}
+         * @private
          */
-        this.desktop = false;
+        this._desktop = false;
 
         /**
          * Is running on a tablet?
-         * @name FORGE.Device#tablet
+         * @name FORGE.Device#_tablet
          * @type {boolean}
+         * @private
          */
-        this.tablet = false;
+        this._tablet = false;
 
         /**
          * Is running on a mobile?
-         * @name FORGE.Device#mobile
+         * @name FORGE.Device#_mobile
          * @type {boolean}
+         * @private
          */
-        this.mobile = false;
+        this._mobile = false;
 
         /**
          * Is running on a other device as smartTv...?
-         * @name FORGE.Device#other
+         * @name FORGE.Device#_other
          * @type {boolean}
+         * @private
          */
-        this.other = false;
+        this._other = false;
 
         // Inputs
 
         /**
          * Is Touch API available?
-         * @name FORGE.Device#touch
+         * @name FORGE.Device#_touch
          * @type {boolean}
+         * @private
          */
-        this.touch = false;
+        this._touch = false;
 
         /**
          * Is Gamepad API available?
-         * @name FORGE.Device#gamepad
+         * @name FORGE.Device#_gamepad
          * @type {boolean}
+         * @private
          */
-        this.gamepad = false;
+        this._gamepad = false;
 
         /**
          * Are Force Touch Events supported?
          * Force Touch events are available in OS X 10.11 and later on devices equipped with Force Touch trackpads.
-         * @name FORGE.Device#touchForce
+         * @name FORGE.Device#_touchForce
          * @type {boolean}
+         * @private
          */
-        this.touchForce = false;
+        this._touchForce = false;
 
         // Audio
 
         /**
          * Are Audio tags available?
-         * @name FORGE.Device#audioTag
+         * @name FORGE.Device#_audioTag
          * @type {boolean}
+         * @private
          */
-        this.audioTag = false;
+        this._audioTag = false;
 
         /**
          * Is the WebAudio API available?
-         * @name FORGE.Device#webAudio
+         * @name FORGE.Device#_webAudio
          * @type {boolean}
+         * @private
          */
-        this.webAudio = false;
+        this._webAudio = false;
 
         /**
          * Can play ogg files?
-         * @name FORGE.Device#ogg
+         * @name FORGE.Device#_ogg
          * @type {boolean}
+         * @private
          */
-        this.ogg = false;
+        this._ogg = false;
 
         /**
          * Can play mp3 files?
-         * @name FORGE.Device#mp3
+         * @name FORGE.Device#_mp3
          * @type {boolean}
+         * @private
          */
-        this.mp3 = false;
+        this._mp3 = false;
 
         /**
          * Can play opus files?
-         * @name FORGE.Device#opus
+         * @name FORGE.Device#_opus
          * @type {boolean}
+         * @private
          */
-        this.opus = false;
+        this._opus = false;
 
         /**
          * Can play wav files?
-         * @name FORGE.Device#wav
+         * @name FORGE.Device#_wav
          * @type {boolean}
+         * @private
          */
-        this.wav = false;
+        this._wav = false;
 
         /**
          * Can play m4a files?
-         * @name FORGE.Device#m4a
+         * @name FORGE.Device#_m4a
          * @type {boolean}
+         * @private
          */
-        this.m4a = false;
+        this._m4a = false;
 
         /**
          * Can play mp4 files?
-         * @name FORGE.Device#mp4
+         * @name FORGE.Device#_mp4
          * @type {boolean}
+         * @private
          */
-        this.mp4 = false;
+        this._mp4 = false;
 
         /**
          * Can play aac files?
-         * @name FORGE.Device#aac
+         * @name FORGE.Device#_aac
          * @type {boolean}
+         * @private
          */
-        this.aac = false;
+        this._aac = false;
 
         /**
          * Can play webm files?
-         * @name FORGE.Device#webm
+         * @name FORGE.Device#_webm
          * @type {boolean}
+         * @private
          */
-        this.webm = false;
+        this._webm = false;
 
         /**
          * Can play weba files?
-         * @name FORGE.Device#weba
+         * @name FORGE.Device#_weba
          * @type {boolean}
+         * @private
          */
-        this.weba = false;
+        this._weba = false;
 
         // Video
 
         /**
          * Can play ogg video files?
-         * @name FORGE.Device#oggVideo
+         * @name FORGE.Device#_oggVideo
          * @type {boolean}
+         * @private
          */
-        this.oggVideo = false;
+        this._oggVideo = false;
 
         /**
          * Can play h264 video files?
-         * @name FORGE.Device#h264Video
+         * @name FORGE.Device#_h264Video
          * @type {boolean}
+         * @private
          */
-        this.h264Video = false;
+        this._h264Video = false;
 
         /**
          * Can play mp4 video files?
-         * @name FORGE.Device#mp4Video
+         * @name FORGE.Device#_mp4Video
          * @type {boolean}
+         * @private
          */
-        this.mp4Video = false;
+        this._mp4Video = false;
 
         /**
          * Can play webm video files?
-         * @name FORGE.Device#webmVideo
+         * @name FORGE.Device#_webmVideo
          * @type {boolean}
+         * @private
          */
-        this.webmVideo = false;
+        this._webmVideo = false;
 
         /**
          * Can play vp9 video files?
-         * @name FORGE.Device#vp9Video
+         * @name FORGE.Device#_vp9Video
          * @type {boolean}
+         * @private
          */
-        this.vp9Video = false;
+        this._vp9Video = false;
 
         /**
          * Can play hls video files?
-         * @name FORGE.Device#hlsVideo
+         * @name FORGE.Device#_hlsVideo
          * @type {boolean}
+         * @private
          */
-        this.hlsVideo = false;
+        this._hlsVideo = false;
 
         // Features
 
         /**
          * Is canvas available?
-         * @name FORGE.Device#canvas
+         * @name FORGE.Device#_canvas
          * @type {boolean}
+         * @private
          */
-        this.canvas = false;
+        this._canvas = false;
 
         /**
          * Are winding rules for '<canvas>' (go clockwise or counterclockwise) available?
-         * @name FORGE.Device#canvasWinding
+         * @name FORGE.Device#_canvasWinding
          * @type {boolean}
+         * @private
          */
-        this.canvasWinding = false;
+        this._canvasWinding = false;
 
         /**
          * Is text API for canvas available?
-         * @name FORGE.Device#canvasText
+         * @name FORGE.Device#_canvasText
          * @type {boolean}
+         * @private
          */
-        this.canvasText = false;
+        this._canvasText = false;
 
         /**
          * Is native support of addEventListener available?
-         * @name FORGE.Device#addEventListener
+         * @name FORGE.Device#_addEventListener
          * @type {boolean}
+         * @private
          */
-        this.addEventListener = false;
+        this._addEventListener = false;
 
         /**
          * Is requestAnimationFrame API supported?
-         * @name FORGE.Device#raf
+         * @name FORGE.Device#_raf
          * @type {boolean}
+         * @private
          */
-        this.raf = false;
+        this._raf = false;
 
         /**
          * Is webGL available?
-         * @name FORGE.Device#webGL
+         * @name FORGE.Device#_webGL
          * @type {boolean}
+         * @private
          */
-        this.webGL = false;
+        this._webGL = false;
 
         /**
          * Is WebVR available?
-         * @name FORGE.Device#webVR
+         * @name FORGE.Device#_webVR
          * @type {boolean}
+         * @private
          */
-        this.webVR = false;
+        this._webVR = false;
 
         /**
          * Is file available?
-         * @name FORGE.Device#file
+         * @name FORGE.Device#_file
          * @type {boolean}
+         * @private
          */
-        this.file = false;
+        this._file = false;
 
         /**
          * Is fileSystem available?
-         * @name FORGE.Device#fileSystem
+         * @name FORGE.Device#_fileSystem
          * @type {boolean}
+         * @private
          */
-        this.fileSystem = false;
+        this._fileSystem = false;
 
         /**
          * Is localStorage available?
-         * @name FORGE.Device#localStorage
+         * @name FORGE.Device#_localStorage
          * @type {boolean}
+         * @private
          */
-        this.localStorage = false;
+        this._localStorage = false;
 
         /**
          * Is Application Cache supported to enable web-based applications run offline?
-         * @name FORGE.Device#applicationCache
+         * @name FORGE.Device#_applicationCache
          * @type {boolean}
+         * @private
          */
-        this.applicationCache = false;
+        this._applicationCache = false;
 
         /**
          * Is Geolocation API available?
-         * @name FORGE.Device#geolocation
+         * @name FORGE.Device#_geolocation
          * @type {boolean}
+         * @private
          */
-        this.geolocation = false;
+        this._geolocation = false;
 
         /**
          * Is pointerLock available?
-         * @name FORGE.Device#pointerLock
+         * @name FORGE.Device#_pointerLock
          * @type {boolean}
+         * @private
          */
-        this.pointerLock = false;
+        this._pointerLock = false;
 
         /**
          * Is context menu available?
-         * @name FORGE.Device#contextMenu
+         * @name FORGE.Device#_contextMenu
          * @type {boolean}
+         * @private
          */
-        this.contextMenu = false;
+        this._contextMenu = false;
 
         /**
          * Is Media Source Extensions API available?
-         * @name  FORGE.Device#mediaSource
+         * @name  FORGE.Device#_mediaSource
          * @type {boolean}
+         * @private
          */
-        this.mediaSource = false;
+        this._mediaSource = false;
 
         /**
          * Is Encrypted Media Extensions API available?
-         * @name  FORGE.Device#encryptedMedia
+         * @name  FORGE.Device#_encryptedMedia
          * @type {boolean}
+         * @private
          */
-        this.encryptedMedia = false;
+        this._encryptedMedia = false;
 
         /**
          * Is JSON native support available?
-         * @name FORGE.Device#JSON
+         * @name FORGE.Device#_JSON
          * @type {boolean}
+         * @private
          */
-        this.JSON = false;
+        this._JSON = false;
 
         /**
          * Is History API available?
-         * @name FORGE.Device#history
+         * @name FORGE.Device#_history
          * @type {boolean}
+         * @private
          */
-        this.history = false;
+        this._history = false;
 
         /**
          * Is SVG in '<embed>' or '<object>' supported?
-         * @name FORGE.Device#svg
+         * @name FORGE.Device#_svg
          * @type {boolean}
+         * @private
          */
-        this.svg = false;
+        this._svg = false;
 
         /**
          * Is the current page in secure mode?
-         * @name FORGE.Device#isSecure
+         * @name FORGE.Device#_isSecure
          * @type {boolean}
+         * @private
          */
-        this.isSecure = false;
+        this._isSecure = false;
 
         /**
          * Is the current page is into an Iframe ?
-         * @name FORGE.Device#isIframe
+         * @name FORGE.Device#_isIframe
          * @type {boolean}
+         * @private
          */
-        this.isIframe = false;
+        this._isIframe = false;
 
         /**
          * Hidden state name for the PageVisibility API.
-         * @name FORGE.Device#visibilityState
+         * @name FORGE.Device#_visibilityState
          * @type {string}
+         * @private
          */
-        this.visibilityState = "";
+        this._visibilityState = "";
 
         /**
          * Visibility change event name for the PageVisibility API.
-         * @name FORGE.Device#visibilityChange
+         * @name FORGE.Device#_visibilityChange
          * @type {string}
+         * @private
          */
-        this.visibilityChange = "";
+        this._visibilityChange = "";
 
         // CSS
 
         /**
          * Is css3D available?
-         * @name FORGE.Device#css3D
+         * @name FORGE.Device#_css3D
          * @type {boolean}
+         * @private
          */
-        this.css3D = false;
+        this._css3D = false;
 
         /**
          * Is rgba (alpha) available?
-         * @name FORGE.Device#cssRgba
+         * @name FORGE.Device#_cssRgba
          * @type {boolean}
+         * @private
          */
-        this.cssRgba = false;
+        this._cssRgba = false;
 
         /**
          * Is pointer-events available?
-         * @name FORGE.Device#cssPointerEvents
+         * @name FORGE.Device#_cssPointerEvents
          * @type {boolean}
+         * @private
          */
-        this.cssPointerEvents = false;
+        this._cssPointerEvents = false;
 
         /**
          * Are css animations (keyframes) supported?
-         * @name FORGE.Device#cssAnimation
+         * @name FORGE.Device#_cssAnimation
          * @type {boolean}
+         * @private
          */
-        this.cssAnimation = false;
+        this._cssAnimation = false;
 
         // Gyroscope
 
         /**
          * Device has a real gyroscope?
-         * @name FORGE.Device#gyroscope
+         * @name FORGE.Device#_gyroscope
          * @type {boolean}
+         * @private
          */
-        this.gyroscope = false;
+        this._gyroscope = false;
 
         /**
          * Is Device Motion Event supported? (Accelerometer)
-         * @name FORGE.Device#deviceMotion
+         * @name FORGE.Device#_deviceMotion
          * @type {boolean}
+         * @private
          */
-        this.deviceMotion = false;
+        this._deviceMotion = false;
 
         /**
          * Is Device Orientation Event supported? (Magnetometer)
-         * @name FORGE.Device#deviceOrientation
+         * @name FORGE.Device#_deviceOrientation
          * @type {boolean}
+         * @private
          */
-        this.deviceOrientation = false;
+        this._deviceOrientation = false;
 
         /**
          * Is Device Motion acceleration supported?
-         * @name FORGE.Device#deviceMotionAcceleration
+         * @name FORGE.Device#_deviceMotionAcceleration
          * @type {boolean}
+         * @private
          */
-        this.deviceMotionAcceleration = false;
+        this._deviceMotionAcceleration = false;
 
         /**
          * Is Device Motion rotation supported?
-         * @name FORGE.Device#deviceMotionRotationRate
+         * @name FORGE.Device#_deviceMotionRotationRate
          * @type {boolean}
+         * @private
          */
-        this.deviceMotionRotationRate = false;
+        this._deviceMotionRotationRate = false;
 
         /**
          * Is Device Orientation motion supported?
-         * @name FORGE.Device#deviceOrientationMagnetometer
+         * @name FORGE.Device#_deviceOrientationMagnetometer
          * @type {boolean}
+         * @private
          */
-        this.deviceOrientationMagnetometer = false;
+        this._deviceOrientationMagnetometer = false;
 
         /**
          * This is a copy of device motion handler with this as this reference (bind).
@@ -1748,52 +3420,61 @@ FORGE.Device = (function(c)
 
         /**
          * Pixel density of the screen.
-         * @name  FORGE.Device#dpi
+         * @name  FORGE.Device#_dpi
          * @type {number}
+         * @private
          */
-        this.dpi = 0;
+        this._dpi = 0;
 
         /**
          * Device screen width in pixels.
-         * @name  FORGE.Device#screenWidth
+         * @name  FORGE.Device#_screenWidth
          * @type {number}
+         * @private
          */
-        this.screenWidth = 0;
+        this._screenWidth = 0;
 
         /**
          * Device screen height in pixels.
-         * @name  FORGE.Device#screenHeight
+         * @name  FORGE.Device#_screenHeight
          * @type {number}
+         * @private
          */
-        this.screenHeight = 0;
+        this._screenHeight = 0;
 
         /**
          * Is screen orienation API available?
-         * @name  FORGE.Device#screenOrientation
+         * @name  FORGE.Device#_screenOrientation
          * @type {boolean}
+         * @private
          */
-        this.screenOrientation = false;
+        this._screenOrientation = false;
 
         /**
          * Screen orientation object name.
-         * @name FORGE.Device#orientation
+         * @name FORGE.Device#_orientation
          * @type {string}
+         * @private
          */
-        this.orientation = "";
+        this._orientation = "";
 
         /**
          * Lock screen orientation method name.
-         * @name FORGE.Device#lockOrientation
+         * @name FORGE.Device#_lockOrientation
          * @type {string}
+         * @private
          */
-        this.lockOrientation = "";
+        this._lockOrientation = "";
 
         /**
          * Unlock screen orientation method name.
-         * @name FORGE.Device#unlockOrientation
+         * @name FORGE.Device#_unlockOrientation
          * @type {string}
+         * @private
          */
-        this.unlockOrientation = "";
+        this._unlockOrientation = "";
+
+        FORGE.BaseObject.call(this, "Device");
 
         this._check();
     };
