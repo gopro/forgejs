@@ -154,7 +154,7 @@ FORGE.Object3D.prototype._createEvents = function(events)
  * @method FORGE.Object3D#_clearEvents
  * @private
  */
-FORGE.Plugin.prototype._clearEvents = function()
+FORGE.Object3D.prototype._clearEvents = function()
 {
     for(var e in this._events)
     {

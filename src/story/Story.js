@@ -320,7 +320,7 @@ FORGE.Story.prototype._parseConfig = function(config)
  * @private
  * @param {Object=} events - The events config of the scene.
  */
-FORGE.Plugin.prototype._createEvents = function(events)
+FORGE.Story.prototype._createEvents = function(events)
 {
     this._events = {};
 
@@ -338,7 +338,7 @@ FORGE.Plugin.prototype._createEvents = function(events)
  * @method FORGE.Story#_clearEvents
  * @private
  */
-FORGE.Plugin.prototype._clearEvents = function()
+FORGE.Story.prototype._clearEvents = function()
 {
     for(var e in this._events)
     {
