@@ -1,0 +1,49 @@
+{
+    "id": "story-events",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "StoryEventsConfig",
+    "description": "An instance of <a href=\"#story-events\">the story events configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "onReady": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onReady",
+            "description": "The onReady event of the story. The action uid or an array of action uids",
+            "example": "action-0"
+        },
+
+        "onGroupChange": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onGroupChange",
+            "description": "The onGroupChange event of the story. The action uid or an array of action uids",
+            "example": "action-0"
+        },
+
+        "onSceneLoadStart": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onSceneLoadStart",
+            "description": "The onSceneLoadStart event of the story. The action uid or an array of action uids",
+            "example": "action-0"
+        },
+
+        "onSceneLoadComplete": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onSceneLoadComplete",
+            "description": "The onSceneLoadComplete event of the story. The action uid or an array of action uids",
+            "example": "action-0"
+        }
+    }
+}
