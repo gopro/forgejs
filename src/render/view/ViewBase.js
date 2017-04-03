@@ -35,56 +35,56 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Yaw min angle for current view type [radians].
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._yawMin = -Infinity;
 
     /**
      * Yaw max angle for current view type [radians].
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._yawMax = Infinity;
 
     /**
      * Pitch min angle for current view type [radians].
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._pitchMin = -Infinity;
 
     /**
      * Pitch min angle for current view type [radians].
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._pitchMax = Infinity;
 
     /**
      * Roll min angle for current view type [radians].
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._rollMin = -Infinity;
 
     /**
      * Roll max angle for current view type [radians].
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._rollMax = Infinity;
 
     /**
      * Fov min angle for current view type [radians].
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._fovMin = 0;
 
     /**
      * Fov max angle for current view type [radians].
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._fovMax = Infinity;

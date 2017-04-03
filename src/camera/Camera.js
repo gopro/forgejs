@@ -34,7 +34,7 @@ FORGE.Camera = function(viewer)
     /**
      * The yaw minimum value in radians.
      * @name FORGE.Camera#_yawMin
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._yawMin = -Infinity;
@@ -769,7 +769,7 @@ FORGE.Camera.prototype._getYawBoundaries = function()
         max = Math.min(view.yawMax, max);
     }
 
-    return { min: /** @type {number} */ (min), max: /** @type {number} */ (max) };
+    return { min: min, max: max };
 };
 
 /**
@@ -834,7 +834,7 @@ FORGE.Camera.prototype._getPitchBoundaries = function()
         max = Math.min(view.pitchMax, max);
     }
 
-    return { min: /** @type {number} */ (min), max: /** @type {number} */ (max) };
+    return { min: min, max: max };
 };
 
 /**
@@ -890,7 +890,7 @@ FORGE.Camera.prototype._getRollBoundaries = function()
         max = Math.min(view.rollMax, max);
     }
 
-    return { min: /** @type {number} */ (min), max: /** @type {number} */ (max) };
+    return { min: min, max: max };
 };
 
 /**
@@ -943,7 +943,7 @@ FORGE.Camera.prototype._getFovBoundaries = function()
         max = Math.min(view.fovMax, max);
     }
 
-    return { min: /** @type {number} */ (min), max: /** @type {number} */ (max) };
+    return { min: min, max: max };
 };
 
 /**
