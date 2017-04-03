@@ -34,7 +34,7 @@ FORGE.Camera = function(viewer)
     /**
      * The yaw minimum value in radians.
      * @name FORGE.Camera#_yawMin
-     * @type {?number}
+     * @type {number}
      * @private
      */
     this._yawMin = -Infinity;
@@ -288,6 +288,8 @@ FORGE.Camera.prototype._boot = function()
     this._quaternion = new THREE.Quaternion();
 
     this._gaze = new FORGE.CameraGaze(this._viewer, FORGE.Camera.DEFAULT_CONFIG.gaze);
+
+    this._viewer.renderer.view.onChange.add(this._onViewChange, this);
 
     this._createMainCamera();
     this._createFlatCamera();
@@ -674,7 +676,7 @@ FORGE.Camera.prototype._updateFlatCamera = function()
 
     if (view !== null && view.fovMax !== null)
     {
-        max = Math.min(FORGE.Math.degToRad(view.fovMax), this._fovMax);
+        max = Math.min(view.fovMax, this._fovMax);
         this._flat.zoom = max / this._fov;
     }
     else
@@ -698,6 +700,7 @@ FORGE.Camera.prototype._updateComplete = function()
     }
 };
 
+
 /**
  * Internal setter for yaw, take a value and a unit. Default unit is radians.
  * @method FORGE.Camera#_setYaw
@@ -720,15 +723,16 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
     value = (unit === FORGE.Math.DEGREES) ? FORGE.Math.degToRad(value) : value;
 
     // Wrap the value between -PI and +PI, except for FLAT view where we apply texture ratio
-    if (this._viewer.renderer.backgroundRenderer !== null &&
-        this._viewer.renderer.view.type === FORGE.ViewType.FLAT)
+    if (this._viewer.renderer.backgroundRenderer !== null && this._viewer.renderer.view.type === FORGE.ViewType.FLAT)
     {
-        var disp = this._viewer.renderer.backgroundRenderer.displayObject;
-        var ratio = disp.pixelWidth / disp.pixelHeight;
-        if (disp.element instanceof HTMLVideoElement)
+        var displayObject = this._viewer.renderer.backgroundRenderer.displayObject;
+        var ratio = displayObject.pixelWidth / displayObject.pixelHeight;
+
+        if (displayObject.element instanceof HTMLVideoElement)
         {
-            ratio = disp.element.videoWidth / disp.element.videoHeight;
+            ratio = displayObject.element.videoWidth / displayObject.element.videoHeight;
         }
+
         value = FORGE.Math.wrap(value, -Math.PI * ratio, Math.PI * ratio);
     }
     else
@@ -736,31 +740,36 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
         value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
     }
 
-    // Clamp the value between min and max
-    var min = this._yawMin;
-    var max = this._yawMax;
-    var view = this._viewer.renderer.view.current;
+    var boundaries = this._getYawBoundaries();
 
-    if (typeof view !== "undefined")
-    {
-        if (view.yawMin !== null)
-        {
-            min = Math.max(view.yawMin, min);
-        }
-
-        if (view.yawMax !== null)
-        {
-            max = Math.min(view.yawMax, max);
-        }
-    }
-
-    var yaw = FORGE.Math.clamp(value, min, max);
+    var yaw = FORGE.Math.clamp(value, boundaries.min, boundaries.max);
 
     var changed = this._yaw !== yaw;
 
     this._yaw = yaw;
 
     return changed;
+};
+
+/**
+ * Compute the yaw boundaries with yaw min and yaw max.
+ * @method FORGE.Camera#_getYawBoundaries
+ * @return {CameraBoundaries} Returns the min and max yaw computed from the camera configuration and the view limits.
+ * @private
+ */
+FORGE.Camera.prototype._getYawBoundaries = function()
+{
+    var min = this._yawMin;
+    var max = this._yawMax;
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
+    {
+        min = Math.max(view.yawMin, min);
+        max = Math.min(view.yawMax, max);
+    }
+
+    return { min: min, max: max };
 };
 
 /**
@@ -778,6 +787,8 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
         return false;
     }
 
+    var oldPitch = this._pitch;
+
     // If unit is not well defined, default will be radians
     unit = (unit === FORGE.Math.DEGREES || unit === FORGE.Math.RADIANS) ? unit : FORGE.Math.RADIANS;
 
@@ -787,31 +798,43 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
     // Wrap the value between -PI and +PI
     value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
 
-    // Clamp the value between min and max
-    var min = this._pitchMin;
-    var max = this._pitchMax;
-    var view = this._viewer.renderer.view.current;
+    var boundaries = this._getPitchBoundaries();
 
-    if (typeof view !== "undefined")
+    var pitch = FORGE.Math.clamp(value, boundaries.min, boundaries.max);
+
+    // If old view accepted pitch out of [-PI/2 , PI/2] and new one does not,
+    // check if old pitch value was in authorized range and if not, set to zero
+    if (Math.abs(oldPitch) > Math.PI / 2 && Math.abs(pitch) === Math.PI / 2)
     {
-        if (view.pitchMin !== null)
-        {
-            min = Math.max(view.pitchMin, min);
-        }
-
-        if (view.pitchMax !== null)
-        {
-            max = Math.min(view.pitchMax, max);
-        }
+        pitch = 0;
     }
-
-    var pitch = FORGE.Math.clamp(value, min, max);
 
     var changed = this._pitch !== pitch;
 
     this._pitch = pitch;
 
     return changed;
+};
+
+/**
+ * Compute the pitch boundaries with yaw min and yaw max.
+ * @method FORGE.Camera#_getPitchBoundaries
+ * @return {CameraBoundaries} Returns the min and max pitch computed from the camera configuration and the view limits.
+ * @private
+ */
+FORGE.Camera.prototype._getPitchBoundaries = function()
+{
+    var min = this._pitchMin;
+    var max = this._pitchMax;
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
+    {
+        min = Math.max(view.pitchMin, min);
+        max = Math.min(view.pitchMax, max);
+    }
+
+    return { min: min, max: max };
 };
 
 /**
@@ -838,31 +861,36 @@ FORGE.Camera.prototype._setRoll = function(value, unit)
     // Wrap the value between -PI and +PI
     value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
 
-    // Clamp the value between min and max
-    var min = this._rollMin;
-    var max = this._rollMax;
-    var view = this._viewer.renderer.view.current;
+    var boundaries = this._getRollBoundaries();
 
-    if (typeof view !== "undefined")
-    {
-        if (view.rollMin !== null)
-        {
-            min = Math.max(view.rollMin, min);
-        }
-
-        if (view.rollMax !== null)
-        {
-            max = Math.min(view.rollMax, max);
-        }
-    }
-
-    var roll = FORGE.Math.clamp(value, min, max);
+    var roll = FORGE.Math.clamp(value, boundaries.min, boundaries.max);
 
     var changed = this._roll !== roll;
 
     this._roll = roll;
 
     return changed;
+};
+
+/**
+ * Compute the roll boundaries with yaw min and yaw max.
+ * @method FORGE.Camera#_getRollBoundaries
+ * @return {CameraBoundaries} Returns the min and max roll computed from the camera configuration and the view limits.
+ * @private
+ */
+FORGE.Camera.prototype._getRollBoundaries = function()
+{
+    var min = this._rollMin;
+    var max = this._rollMax;
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
+    {
+        min = Math.max(view.rollMin, min);
+        max = Math.min(view.rollMax, max);
+    }
+
+    return { min: min, max: max };
 };
 
 /**
@@ -886,40 +914,36 @@ FORGE.Camera.prototype._setFov = function(value, unit)
     // Convert value in radians for clamp if unit is in degrees.
     value = (unit === FORGE.Math.DEGREES) ? FORGE.Math.degToRad(value) : value;
 
-    // Clamp the value between min and max
-    var min = this._fovMin;
-    var max = this._fovMax;
-    var view = this._viewer.renderer.view.current;
+    var boundaries = this._getFovBoundaries();
 
-    if (typeof view !== "undefined")
-    {
-        if (view.fovMin !== null)
-        {
-            min = Math.max(FORGE.Math.degToRad(view.fovMin), min);
-        }
-
-        if (view.fovMax !== null)
-        {
-            max = Math.min(FORGE.Math.degToRad(view.fovMax), max);
-        }
-    }
-
-    var fov = FORGE.Math.clamp(value, min, max);
+    var fov = FORGE.Math.clamp(value, boundaries.min, boundaries.max);
 
     var changed = this._fov !== fov;
-
-    // If fov has changed, ensure angles are inside camera and view boundaries
-    // by calling their setters with their current value
-    if (changed === true)
-    {
-        this._setYaw(this._yaw);
-        this._setPitch(this._pitch);
-        this._setRoll(this._roll);
-    }
 
     this._fov = fov;
 
     return changed;
+};
+
+/**
+ * Compute the fov boundaries with yaw min and yaw max.
+ * @method FORGE.Camera#_getFovBoundaries
+ * @return {CameraBoundaries} Returns the min and max fov computed from the camera configuration and the view limits.
+ * @private
+ */
+FORGE.Camera.prototype._getFovBoundaries = function()
+{
+    var min = this._fovMin;
+    var max = this._fovMax;
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
+    {
+        min = Math.max(view.fovMin, min);
+        max = Math.min(view.fovMax, max);
+    }
+
+    return { min: min, max: max };
 };
 
 /**
@@ -941,6 +965,27 @@ FORGE.Camera.prototype._setAll = function(yaw, pitch, roll, fov, unit)
     var fovChanged = this._setFov(fov, unit);
 
     return (yawChanged === true || pitchChanged === true || rollChanged === true || fovChanged === true);
+};
+
+/**
+ * On view change handler
+ * @method FORGE.Camera#_onViewChange
+ * @private
+ */
+FORGE.Camera.prototype._onViewChange = function()
+{
+    // Force camera to update its fov to bound it in new fov range after view change
+    this._setFov(this._fov);
+
+    // If fov has changed, ensure angles are inside camera and view boundaries
+    // by calling their setters with their current value
+    var eulerChanged = this._setYaw(this._yaw) || this._setPitch(this._pitch) || this._setRoll(this._roll);
+
+    if (eulerChanged === true)
+    {
+        this._updateFromEuler();
+        this._updateComplete();
+    }
 };
 
 /**
@@ -1100,6 +1145,38 @@ Object.defineProperty(FORGE.Camera.prototype, "yaw",
 });
 
 /**
+ * Get the yaw min value.
+ * Return the most restrictive value between the camera value and the view value.
+ * @name FORGE.Camera#yawMin
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "yawMin",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        var boundaries = this._getYawBoundaries();
+        return FORGE.Math.radToDeg(boundaries.min);
+    }
+});
+
+/**
+ * Get the yaw max value.
+ * Return the most restrictive value between the camera value and the view value.
+ * @name FORGE.Camera#yawMax
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "yawMax",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        var boundaries = this._getYawBoundaries();
+        return FORGE.Math.radToDeg(boundaries.max);
+    }
+});
+
+/**
  * Get and set the pitch value in degree.
  * @name FORGE.Camera#pitch
  * @type {number}
@@ -1122,6 +1199,38 @@ Object.defineProperty(FORGE.Camera.prototype, "pitch",
             this._updateFromEuler();
             this._updateComplete();
         }
+    }
+});
+
+/**
+ * Get the pitch min value.
+ * Return the most restrictive value between the camera value and the view value.
+ * @name FORGE.Camera#pitchMin
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "pitchMin",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        var boundaries = this._getPitchBoundaries();
+        return FORGE.Math.radToDeg(boundaries.min);
+    }
+});
+
+/**
+ * Get the pitch max value.
+ * Return the most restrictive value between the camera value and the view value.
+ * @name FORGE.Camera#pitchMax
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "pitchMax",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        var boundaries = this._getPitchBoundaries();
+        return FORGE.Math.radToDeg(boundaries.max);
     }
 });
 
@@ -1152,6 +1261,38 @@ Object.defineProperty(FORGE.Camera.prototype, "roll",
 });
 
 /**
+ * Get the roll min value.
+ * Return the most restrictive value between the camera value and the view value.
+ * @name FORGE.Camera#rollMin
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "rollMin",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        var boundaries = this._getRollBoundaries();
+        return FORGE.Math.radToDeg(boundaries.min);
+    }
+});
+
+/**
+ * Get the roll max value.
+ * Return the most restrictive value between the camera value and the view value.
+ * @name FORGE.Camera#rollMax
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "rollMax",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        var boundaries = this._getRollBoundaries();
+        return FORGE.Math.radToDeg(boundaries.max);
+    }
+});
+
+/**
  * Get and set the fov value in degree.
  * @name FORGE.Camera#fov
  * @type {number}
@@ -1177,7 +1318,8 @@ Object.defineProperty(FORGE.Camera.prototype, "fov",
 });
 
 /**
- * Get and set the minimum fov value in degree.
+ * Get the fov min value.
+ * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#fovMin
  * @type {number}
  */
@@ -1186,19 +1328,14 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMin",
     /** @this {FORGE.Camera} */
     get: function()
     {
-        return FORGE.Math.radToDeg(this._fovMin);
-    },
-
-    /** @this {FORGE.Camera} */
-    set: function(value)
-    {
-        this._fovMin = FORGE.Math.degToRad(value);
-        this._setFov(this._fov, FORGE.Math.RADIANS);
+        var boundaries = this._getFovBoundaries();
+        return FORGE.Math.radToDeg(boundaries.min);
     }
 });
 
 /**
- * Get and set the maximum fov value in degree.
+ * Get the fov max value.
+ * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#fovMax
  * @type {number}
  */
@@ -1207,14 +1344,8 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMax",
     /** @this {FORGE.Camera} */
     get: function()
     {
-        return FORGE.Math.radToDeg(this._fovMax);
-    },
-
-    /** @this {FORGE.Camera} */
-    set: function(value)
-    {
-        this._fovMax = FORGE.Math.degToRad(value);
-        this._setFov(this._fov, FORGE.Math.RADIANS);
+        var boundaries = this._getFovBoundaries();
+        return FORGE.Math.radToDeg(boundaries.max);
     }
 });
 

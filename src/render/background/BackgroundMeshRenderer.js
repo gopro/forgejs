@@ -129,8 +129,6 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
 
     // Set perspective camera
     this._camera = this._viewer.renderer.camera.main;
-    this._viewer.renderer.camera.fovMin = this._viewer.renderer.view.current.fovMin;
-    this._viewer.renderer.camera.fovMax = this._viewer.renderer.view.current.fovMax;
 
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
 
