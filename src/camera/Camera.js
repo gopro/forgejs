@@ -700,52 +700,6 @@ FORGE.Camera.prototype._updateComplete = function()
     }
 };
 
-/**
- * Compute the  boundaries with min and max for the requested value (yaw, pitch, roll, fov).
- * @method FORGE.Camera#_getBoundaries
- * @param {string} angle - The angle name (yaw, pitch, roll, fov).
- * @return {CameraBoundaries} Returns the min and max computed from the camera configuration and the view limits.
- * @private
- */
-FORGE.Camera.prototype._getBoundaries = function(angle)
-{
-    var min, max;
-
-    // I need to use a switch beacause closure compiler
-    // can't work with this["_"+angle+"Min"]; syntax ...
-    switch(angle)
-    {
-        case "yaw":
-            min = this._yawMin;
-            max = this._yawMax;
-            break;
-
-        case "pitch":
-            min = this._pitchMin;
-            max = this._pitchMax;
-            break;
-
-        case "roll":
-            min = this._rollMin;
-            max = this._rollMax;
-            break;
-
-        case "fov":
-            min = this._fovMin;
-            max = this._fovMax;
-            break;
-    }
-
-    var view = this._viewer.renderer.view.current;
-
-    if (view !== null)
-    {
-        min = Math.max(view[angle+"Min"], min);
-        max = Math.min(view[angle+"Max"], max);
-    }
-
-    return {angle: angle, min: /** @type {number} */ (min), max: /** @type {number} */ (max)};
-};
 
 /**
  * Internal setter for yaw, take a value and a unit. Default unit is radians.
@@ -805,7 +759,17 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
  */
 FORGE.Camera.prototype._getYawBoundaries = function()
 {
-    return this._getBoundaries("yaw");
+    var min = this._yawMin;
+    var max = this._yawMax;
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
+    {
+        min = Math.max(view.yawMin, min);
+        max = Math.min(view.yawMax, max);
+    }
+
+    return { min: /** @type {number} */ (min), max: /** @type {number} */ (max) };
 };
 
 /**
@@ -860,7 +824,17 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
  */
 FORGE.Camera.prototype._getPitchBoundaries = function()
 {
-    return this._getBoundaries("pitch");
+    var min = this._pitchMin;
+    var max = this._pitchMax;
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
+    {
+        min = Math.max(view.pitchMin, min);
+        max = Math.min(view.pitchMax, max);
+    }
+
+    return { min: /** @type {number} */ (min), max: /** @type {number} */ (max) };
 };
 
 /**
@@ -887,7 +861,7 @@ FORGE.Camera.prototype._setRoll = function(value, unit)
     // Wrap the value between -PI and +PI
     value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
 
-    var boundaries = this._getBoundaries("roll");
+    var boundaries = this._getRollBoundaries();
 
     var roll = FORGE.Math.clamp(value, boundaries.min, boundaries.max);
 
@@ -906,7 +880,17 @@ FORGE.Camera.prototype._setRoll = function(value, unit)
  */
 FORGE.Camera.prototype._getRollBoundaries = function()
 {
-    return this._getBoundaries("roll");
+    var min = this._rollMin;
+    var max = this._rollMax;
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
+    {
+        min = Math.max(view.rollMin, min);
+        max = Math.min(view.rollMax, max);
+    }
+
+    return { min: /** @type {number} */ (min), max: /** @type {number} */ (max) };
 };
 
 /**
@@ -930,7 +914,7 @@ FORGE.Camera.prototype._setFov = function(value, unit)
     // Convert value in radians for clamp if unit is in degrees.
     value = (unit === FORGE.Math.DEGREES) ? FORGE.Math.degToRad(value) : value;
 
-    var boundaries = this._getBoundaries("fov");
+    var boundaries = this._getFovBoundaries();
 
     var fov = FORGE.Math.clamp(value, boundaries.min, boundaries.max);
 
@@ -949,7 +933,17 @@ FORGE.Camera.prototype._setFov = function(value, unit)
  */
 FORGE.Camera.prototype._getFovBoundaries = function()
 {
-    return this._getBoundaries("fov");
+    var min = this._fovMin;
+    var max = this._fovMax;
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
+    {
+        min = Math.max(view.fovMin, min);
+        max = Math.min(view.fovMax, max);
+    }
+
+    return { min: /** @type {number} */ (min), max: /** @type {number} */ (max) };
 };
 
 /**
