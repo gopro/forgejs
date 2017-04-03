@@ -93,6 +93,14 @@ FORGE.ControllerGyroscope.prototype.constructor = FORGE.ControllerGyroscope;
  */
 FORGE.ControllerGyroscope.prototype._boot = function()
 {
+    // Check every 10 milliseconds if FORGE.Device is ready, so we can read a correct value of
+    // FORGE.Device.gyroscope
+    if (FORGE.Device.ready === false)
+    {
+        window.setTimeout(FORGE.ControllerGyroscope.prototype._boot.bind(this), 10);
+        return;
+    }
+
     FORGE.ControllerBase.prototype._boot.call(this);
 
     this._posEuler = new THREE.Euler();
@@ -109,8 +117,8 @@ FORGE.ControllerGyroscope.prototype._boot = function()
         this.enable();
     }
 
-    this._viewer.gyroscope.onDeviceOrientationChange.add(this._deviceOrientationChangeHandler, this);
-    this._viewer.gyroscope.onScreenOrientationChange.add(this._screenOrientationChangeHandler, this);
+    this._viewer.controllers.onControlStart.add(this._controllerPointerStartHandler, this);
+    this._viewer.controllers.onControlEnd.add(this._controllerPointerEndHandler, this);
 };
 
 /**
@@ -123,7 +131,7 @@ FORGE.ControllerGyroscope.prototype._parseConfig = function(config)
     this._uid = config.uid;
     this._register();
 
-    this._enabled = (typeof config.enabled === "boolean") ? config.enabled : false;
+    this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
 };
 
 /**
@@ -155,11 +163,10 @@ FORGE.ControllerGyroscope.prototype._deviceOrientationChangeHandler = function(e
     this._posEuler.set(FORGE.Math.degToRad(position.beta), FORGE.Math.degToRad(position.alpha), -FORGE.Math.degToRad(position.gamma), "YXZ");
     this._posQuatIndermediate.setFromEuler(this._posEuler);
 
-    // Add the offset provided by the camera or the touch
+    // Add the offset provided by the camera
     this._posQuatIndermediate.multiply(this._posQuatOffset);
 
     // Adjust given the screen orientation
-    this._posQuatScreenOrientation.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -this._screenOrientation);
     this._posQuatIndermediate.multiply(this._posQuatScreenOrientation);
 
     // Final inversion, see FORGE.RenderDisplay#getQuaternionFromPose method
@@ -184,6 +191,8 @@ FORGE.ControllerGyroscope.prototype._screenOrientationChangeHandler = function()
     {
         this._screenOrientation = FORGE.Math.degToRad(window.orientation);
     }
+
+    this._posQuatScreenOrientation.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -this._screenOrientation);
 };
 
 /**
@@ -198,9 +207,6 @@ FORGE.ControllerGyroscope.prototype._controllerPointerStartHandler = function(ev
 
     if (!(event.data.controller instanceof FORGE.ControllerGyroscope))
     {
-        this._viewer.gyroscope.onDeviceOrientationChange.remove(this._deviceOrientationChangeHandler, this);
-        this._viewer.gyroscope.onScreenOrientationChange.remove(this._screenOrientationChangeHandler, this);
-
         this._paused = true;
     }
 };
@@ -219,10 +225,8 @@ FORGE.ControllerGyroscope.prototype._controllerPointerEndHandler = function(even
     {
         // Get the quaternion difference between the previous and the current position
         // We are using P = QR <=> Q = PR-1
-        this._posPointerOffset = this._posQuatFinal.clone().inverse().multiply(this._viewer.camera.quaternion.clone());
-
-        this._viewer.gyroscope.onDeviceOrientationChange.add(this._deviceOrientationChangeHandler, this);
-        this._viewer.gyroscope.onScreenOrientationChange.add(this._screenOrientationChangeHandler, this);
+        var offsetToAdd = this._posQuatFinal.clone().inverse().multiply(this._viewer.camera.quaternion.clone());
+        this._posPointerOffset.multiply(offsetToAdd).normalize();
 
         // Update all of this
         this._deviceOrientationChangeHandler();
@@ -243,8 +247,8 @@ FORGE.ControllerGyroscope.prototype.enable = function()
 
     FORGE.ControllerBase.prototype.enable.call(this);
 
-    this._viewer.controllers.onControlStart.add(this._controllerPointerStartHandler, this);
-    this._viewer.controllers.onControlEnd.add(this._controllerPointerEndHandler, this);
+    this._viewer.gyroscope.onDeviceOrientationChange.add(this._deviceOrientationChangeHandler, this);
+    this._viewer.gyroscope.onScreenOrientationChange.add(this._screenOrientationChangeHandler, this);
 
     this._screenOrientationChangeHandler();
     this._deviceOrientationChangeHandler();
