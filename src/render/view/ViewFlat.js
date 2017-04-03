@@ -54,8 +54,8 @@ FORGE.ViewFlat.prototype._boot = function()
     this._yawMin = FORGE.Math.degToRad(-360);
     this._yawMax = FORGE.Math.degToRad(360);
 
-    this._pitchMin = FORGE.Math.degToRad(-90);
-    this._pitchMax = FORGE.Math.degToRad(90);
+    this._pitchMin = FORGE.Math.degToRad(-180);
+    this._pitchMax = FORGE.Math.degToRad(180);
 
     this._fovMin = FORGE.Math.degToRad(20);
     this._fovMax = FORGE.Math.degToRad(180);
@@ -82,11 +82,22 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
             this._yawMax = Math.max(0, (Math.PI * texRatio - hfov) * 0.5); // image
             this._yawMin = -this._yawMax;
         }
+        else
+        {
+            this._yawMin = FORGE.Math.degToRad(-360);
+            this._yawMax = FORGE.Math.degToRad(360);
+        }
+
 
         if (this._repeatY === false)
         {
             this._pitchMax = 0.5 * Math.max(0, Math.PI - vfov);
             this._pitchMin = -this._pitchMax;
+        }
+        else
+        {
+            this._pitchMin = FORGE.Math.degToRad(-180);
+            this._pitchMax = FORGE.Math.degToRad(180);
         }
     }
 
@@ -190,6 +201,9 @@ Object.defineProperty(FORGE.ViewFlat.prototype, "repeatX",
     {
         this._repeatX = value;
         this._updateViewParams();
+
+        // Notify the view manager of the change
+        this._viewer.view.notifyChange();
     }
 });
 
@@ -211,5 +225,8 @@ Object.defineProperty(FORGE.ViewFlat.prototype, "repeatY",
     {
         this._repeatY = value;
         this._updateViewParams();
+
+        // Notify the view manager of the change
+        this._viewer.view.notifyChange();
     }
 });
