@@ -34,46 +34,60 @@ FORGE.ViewBase = function(viewer, className, type)
     this._type = type;
 
     /**
-     * Fov min angle for current view type [radians].
-     * @type {?number}
-     * @private
-     */
-    this._fovMin = null;
-
-    /**
-     * Fov max angle for current view type [radians].
-     * @type {?number}
-     * @private
-     */
-    this._fovMax = null;
-
-    /**
      * Yaw min angle for current view type [radians].
      * @type {?number}
      * @private
      */
-    this._yawMin = null;
+    this._yawMin = -Infinity;
 
     /**
      * Yaw max angle for current view type [radians].
      * @type {?number}
      * @private
      */
-    this._yawMax = null;
+    this._yawMax = Infinity;
 
     /**
      * Pitch min angle for current view type [radians].
      * @type {?number}
      * @private
      */
-    this._pitchMin = null;
+    this._pitchMin = -Infinity;
 
     /**
      * Pitch min angle for current view type [radians].
      * @type {?number}
      * @private
      */
-    this._pitchMax = null;
+    this._pitchMax = Infinity;
+
+    /**
+     * Roll min angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._rollMin = -Infinity;
+
+    /**
+     * Roll max angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._rollMax = Infinity;
+
+    /**
+     * Fov min angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._fovMin = 0;
+
+    /**
+     * Fov max angle for current view type [radians].
+     * @type {?number}
+     * @private
+     */
+    this._fovMax = Infinity;
 
     FORGE.BaseObject.call(this, className || "ViewBase");
 };
@@ -217,7 +231,91 @@ Object.defineProperty(FORGE.ViewBase.prototype, "type",
 });
 
 /**
- * Get minimum fov for current view [degrees]
+ * Get the minimum yaw value in radians.
+ * @name FORGE.ViewBase#yawMin
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "yawMin",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._yawMin;
+    }
+});
+
+/**
+ * Get the maximum yaw value in radians.
+ * @name FORGE.ViewBase#yawMax
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "yawMax",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._yawMax;
+    }
+});
+
+/**
+ * Get the minimum pitch value in radians.
+ * @name FORGE.ViewBase#pitchMin
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "pitchMin",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._pitchMin;
+    }
+});
+
+/**
+ * Get the maximum pitch value in radians.
+ * @name FORGE.ViewBase#pitchMax
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "pitchMax",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._pitchMax;
+    }
+});
+
+/**
+ * Get the minimum roll value in radians.
+ * @name FORGE.ViewBase#rollMin
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "rollMin",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._rollMin;
+    }
+});
+
+/**
+ * Get the maximum roll value in radians.
+ * @name FORGE.ViewBase#rollMax
+ * @type {number}
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "rollMax",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._rollMax;
+    }
+});
+
+/**
+ * Get minimum fov for current view in radians.
  * @name FORGE.ViewBase#fovMin
  * @type {number}
  * @readonly
@@ -232,7 +330,7 @@ Object.defineProperty(FORGE.ViewBase.prototype, "fovMin",
 });
 
 /**
- * Get maximum fov for current view [degrees]
+ * Get maximum fov for current view in radians.
  * @name FORGE.ViewBase#fovMax
  * @type {number}
  * @readonly
@@ -245,60 +343,3 @@ Object.defineProperty(FORGE.ViewBase.prototype, "fovMax",
         return this._fovMax;
     }
 });
-
-/**
- * Get the minimum yaw value in degree.
- * @name FORGE.ViewBase#yawMin
- * @type {number}
- */
-Object.defineProperty(FORGE.ViewBase.prototype, "yawMin",
-{
-    /** @this {FORGE.ViewBase} */
-    get: function()
-    {
-        return this._yawMin;
-    }
-});
-
-/**
- * Get the maximum yaw value in degree.
- * @name FORGE.ViewBase#yawMax
- * @type {number}
- */
-Object.defineProperty(FORGE.ViewBase.prototype, "yawMax",
-{
-    /** @this {FORGE.ViewBase} */
-    get: function()
-    {
-        return this._yawMax;
-    }
-});
-
-/**
- * Get the minimum pitch value in degree.
- * @name FORGE.ViewBase#pitchMin
- * @type {number}
- */
-Object.defineProperty(FORGE.ViewBase.prototype, "pitchMin",
-{
-    /** @this {FORGE.ViewBase} */
-    get: function()
-    {
-        return this._pitchMin;
-    }
-});
-
-/**
- * Get the maximum pitch value in degree.
- * @name FORGE.ViewBase#pitchMax
- * @type {number}
- */
-Object.defineProperty(FORGE.ViewBase.prototype, "pitchMax",
-{
-    /** @this {FORGE.ViewBase} */
-    get: function()
-    {
-        return this._pitchMax;
-    }
-});
-
