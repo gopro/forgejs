@@ -88,10 +88,7 @@ FORGE.ViewManager.prototype._setView = function(type)
 
     this._ready = true;
 
-    if(this._onChange !== null)
-    {
-        this._onChange.dispatch();
-    }
+    this.notifyChange();
 };
 
 /**
@@ -109,6 +106,19 @@ FORGE.ViewManager.prototype._clearView = function()
 
         this._view.destroy();
         this._view = null;
+    }
+};
+
+/**
+ * Used by views to notify a change to the manager.
+ * @method FORGE.ViewManager#notifyChange
+ * @private
+ */
+FORGE.ViewManager.prototype.notifyChange = function()
+{
+    if(this._onChange !== null)
+    {
+        this._onChange.dispatch();
     }
 };
 

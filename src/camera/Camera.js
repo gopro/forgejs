@@ -974,14 +974,10 @@ FORGE.Camera.prototype._setAll = function(yaw, pitch, roll, fov, unit)
  */
 FORGE.Camera.prototype._onViewChange = function()
 {
-    // Force camera to update its fov to bound it in new fov range after view change
-    this._setFov(this._fov);
+    // Force camera to update its values to bound it in new boundaries after view change
+    var changed = this._setAll(this._yaw, this._pitch, this._roll, this._fov);
 
-    // If fov has changed, ensure angles are inside camera and view boundaries
-    // by calling their setters with their current value
-    var eulerChanged = this._setYaw(this._yaw) || this._setPitch(this._pitch) || this._setRoll(this._roll);
-
-    if (eulerChanged === true)
+    if (changed === true)
     {
         this._updateFromEuler();
         this._updateComplete();
