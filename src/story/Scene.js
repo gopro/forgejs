@@ -56,6 +56,14 @@ FORGE.Scene = function(viewer)
     this._useExternalConfig = false;
 
     /**
+     * Scene events from the json configuration
+     * @name FORGE.Story#_events
+     * @type {Object<FORGE.ActionEventDispatcher>}
+     * @private
+     */
+    this._events = {};
+
+    /**
      * Load start event dispatcher.
      * @name  FORGE.Scene#_onLoadStart
      * @type {FORGE.EventDispatcher}
@@ -96,22 +104,10 @@ FORGE.Scene = function(viewer)
     this._onConfigLoadComplete = null;
 
     FORGE.BaseObject.call(this, "Scene");
-
-    // this._boot();
 };
 
 FORGE.Scene.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.Scene.prototype.constructor = FORGE.Scene;
-
-/**
- * Boot sequence.
- * @method FORGE.Scene#_boot
- * @private
- */
-FORGE.Scene.prototype._boot = function()
-{
-    this.log("FORGE.Scene._boot();");
-};
 
 /**
  * Parse scene configuration.
@@ -126,6 +122,11 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._uid = this._config.uid;
     this._tags = this._config.tags;
     this._register();
+
+    if(typeof config.events === "object" && config.events !== null)
+    {
+        this._createEvents(config.events);
+    }
 
     if (this._booted === false && typeof config.url === "string" && config.url !== "")
     {
@@ -169,6 +170,37 @@ FORGE.Scene.prototype._configLoadComplete = function(file)
 };
 
 /**
+ * Create events dispatchers.
+ * @method FORGE.Scene#_createEvents
+ * @private
+ * @param {SceneEventsConfig} events - The events config of the scene.
+ */
+FORGE.Scene.prototype._createEvents = function(events)
+{
+    var event;
+    for(var e in events)
+    {
+        event = new FORGE.ActionEventDispatcher(this._viewer, e);
+        event.addActions(events[e]);
+        this._events[e] = event;
+    }
+};
+
+/**
+ * Clear all events.
+ * @method FORGE.Scene#_clearEvents
+ * @private
+ */
+FORGE.Scene.prototype._clearEvents = function()
+{
+    for(var e in this._events)
+    {
+        this._events[e].destroy();
+        this._events[e] = null;
+    }
+};
+
+/**
  * Add a scene configuration object.
  * @method  FORGE.Scene#addConfig
  * @param {SceneConfig} config - The scene configuration object to add.
@@ -198,11 +230,21 @@ FORGE.Scene.prototype.load = function()
         this._onLoadStart.dispatch();
     }
 
+    if(FORGE.Utils.isTypeOf(this._events.onLoadStart, "ActionEventDispatcher") === true)
+    {
+        this._events.onLoadStart.dispatch();
+    }
+
     this._viewCount++;
 
     if (this._onLoadComplete !== null)
     {
         this._onLoadComplete.dispatch();
+    }
+
+    if(FORGE.Utils.isTypeOf(this._events.onLoadComplete, "ActionEventDispatcher") === true)
+    {
+        this._events.onLoadComplete.dispatch();
     }
 };
 
@@ -218,9 +260,19 @@ FORGE.Scene.prototype.unload = function()
         this._onUnloadStart.dispatch();
     }
 
+    if(FORGE.Utils.isTypeOf(this._events.onUnloadStart, "ActionEventDispatcher") === true)
+    {
+        this._events.onUnloadStart.dispatch();
+    }
+
     if (this._onUnloadComplete !== null)
     {
         this._onUnloadComplete.dispatch();
+    }
+
+    if(FORGE.Utils.isTypeOf(this._events.onUnloadComplete, "ActionEventDispatcher") === true)
+    {
+        this._events.onUnloadComplete.dispatch();
     }
 };
 
@@ -302,6 +354,9 @@ FORGE.Scene.prototype.destroy = function()
         this._onUnloadComplete.destroy();
         this._onUnloadComplete = null;
     }
+
+    this._clearEvents();
+    this._events = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };

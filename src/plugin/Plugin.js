@@ -415,11 +415,7 @@ FORGE.Plugin.prototype.destroy = function()
         this._onInstanceReady = null;
     }
 
-    var count = this._events.length;
-    while(count--)
-    {
-        this._events[count].destroy();
-    }
+    this._clearEvents();
     this._events = null;
 
     this._viewer = null;

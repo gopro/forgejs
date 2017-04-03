@@ -66,6 +66,10 @@
             "items": {
                 "$ref": "group"
             }
+        },
+
+        "events": {
+            "$ref": "story-events"
         }
     },
 

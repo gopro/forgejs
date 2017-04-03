@@ -1,0 +1,49 @@
+{
+    "id": "scene-events",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneEventsConfig",
+    "description": "An instance of <a href=\"#scene-events\">the scene events configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "onLoadStart": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onLoadStart",
+            "description": "The onLoadStart event of the scene. The action uid or an array of action uids",
+            "example": "action-0"
+        },
+
+        "onLoadComplete": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onLoadComplete",
+            "description": "The onLoadComplete event of the scene. The action uid or an array of action uids",
+            "example": "action-0"
+        },
+
+        "onUnloadStart": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onUnloadStart",
+            "description": "The onUnloadStart event of the scene. The action uid or an array of action uids",
+            "example": "action-0"
+        },
+
+        "onUnloadComplete": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onUnloadComplete",
+            "description": "The onUnloadComplete event of the scene. The action uid or an array of action uids",
+            "example": "action-0"
+        }
+    }
+}

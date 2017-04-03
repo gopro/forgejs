@@ -97,7 +97,8 @@
             "title": "Story",
             "slug": "story",
             "schemas": [
-                "story"
+                "story",
+                "story-events"
             ]
         },
         {
@@ -109,7 +110,8 @@
                 "scene-media",
                 "scene-media-source",
                 "scene-media-level",
-                "scene-media-options"
+                "scene-media-options",
+                "scene-events"
             ]
         },
         {
@@ -352,7 +354,8 @@
             "slug": "st$",
             "description": "This is the main section of ForgeJS, describing each scene present in the story. It is essentially composed of <a href=\"#scene\">scenes</a> that can be put in <a href=\"#group\">groups</a>.",
             "schemas": [
-                "story"
+                "story",
+                "story-events"
             ]
         }]
     },
@@ -370,7 +373,8 @@
                 "scene-media",
                 "scene-media-source",
                 "scene-media-level",
-                "scene-media-options"
+                "scene-media-options",
+                "scene-events"
             ]
         }]
     },

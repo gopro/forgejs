@@ -65,7 +65,7 @@ FORGE.Story = function(viewer)
 
     /**
      * Uid of the current scene.
-     * @name  FORGE.Story#_sceneUid
+     * @name FORGE.Story#_sceneUid
      * @type {string}
      * @private
      */
@@ -81,15 +81,23 @@ FORGE.Story = function(viewer)
 
     /**
      * Uid of the current group.
-     * @name  FORGE.Story#_groupUid
+     * @name FORGE.Story#_groupUid
      * @type {?string}
      * @private
      */
     this._groupUid = "";
 
     /**
+     * Story events from the json configuration
+     * @name FORGE.Story#_events
+     * @type {Object<FORGE.ActionEventDispatcher>}
+     * @private
+     */
+    this._events = {};
+
+    /**
      * On ready event dispatcher
-     * @name  FORGE.Story#_onReady
+     * @name FORGE.Story#_onReady
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -105,7 +113,7 @@ FORGE.Story = function(viewer)
 
     /**
      * On scene load progress event dispatcher.
-     * @name  FORGE.Story#_onSceneLoadProgress
+     * @name FORGE.Story#_onSceneLoadProgress
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -113,7 +121,7 @@ FORGE.Story = function(viewer)
 
     /**
      * On scene load complete event dispatcher.
-     * @name  FORGE.Story#_onSceneLoadComplete
+     * @name FORGE.Story#_onSceneLoadComplete
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -121,7 +129,7 @@ FORGE.Story = function(viewer)
 
     /**
      * On scene load error event dispatcher.
-     * @name  FORGE.Story#_onSceneLoadError
+     * @name FORGE.Story#_onSceneLoadError
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -129,7 +137,7 @@ FORGE.Story = function(viewer)
 
     /**
      * On scene preview event dispatcher.
-     * @name  FORGE.Story#_onScenePreview
+     * @name FORGE.Story#_onScenePreview
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -137,7 +145,7 @@ FORGE.Story = function(viewer)
 
     /**
      * On group change event dispatcher.
-     * @name  FORGE.Story#_onGroupChange
+     * @name FORGE.Story#_onGroupChange
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -298,7 +306,43 @@ FORGE.Story.prototype._parseConfig = function(config)
         this._createGroups(this._config.groups);
     }
 
+    if(typeof this._config.events === "object" && this._config.events !== null)
+    {
+        this._createEvents(this._config.events);
+    }
+
     this._checkStoryScenes();
+};
+
+/**
+ * Create events dispatchers.
+ * @method FORGE.Story#_createEvents
+ * @private
+ * @param {StoryEventsConfig} events - The events config of the story.
+ */
+FORGE.Story.prototype._createEvents = function(events)
+{
+    var event;
+    for(var e in events)
+    {
+        event = new FORGE.ActionEventDispatcher(this._viewer, e);
+        event.addActions(events[e]);
+        this._events[e] = event;
+    }
+};
+
+/**
+ * Clear all events.
+ * @method FORGE.Story#_clearEvents
+ * @private
+ */
+FORGE.Story.prototype._clearEvents = function()
+{
+    for(var e in this._events)
+    {
+        this._events[e].destroy();
+        this._events[e] = null;
+    }
 };
 
 /**
@@ -324,6 +368,11 @@ FORGE.Story.prototype._setStoryReady = function()
     if(this._onReady !== null)
     {
         this._onReady.dispatch();
+    }
+
+    if(FORGE.Utils.isTypeOf(this._events.onReady, "ActionEventDispatcher") === true)
+    {
+        this._events.onReady.dispatch();
     }
 
     // If slug name in URL load the associated object
@@ -493,6 +542,11 @@ FORGE.Story.prototype._sceneLoadStart = function(event)
             this._onGroupChange.dispatch();
         }
 
+        if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
+        {
+            this._events.onGroupChange.dispatch();
+        }
+
     }
     else if (scene.hasGroups() === true && scene.hasGroup(this._groupUid) === false)
     {
@@ -504,10 +558,14 @@ FORGE.Story.prototype._sceneLoadStart = function(event)
         this._onSceneLoadStart.dispatch({ uid: scene.uid });
     }
 
+    if(FORGE.Utils.isTypeOf(this._events.onSceneLoadStart, "ActionEventDispatcher") === true)
+    {
+        this._events.onSceneLoadStart.dispatch();
+    }
 };
 
 /**
- * Internal event handmer for scene load complete, re-dispatch the load complete event at the story level.
+ * Internal event handler for scene load complete, re-dispatch the load complete event at the story level.
  * @method FORGE.Story#_sceneLoadComplete
  * @private
  */
@@ -516,6 +574,11 @@ FORGE.Story.prototype._sceneLoadComplete = function()
     if(this._onSceneLoadComplete !== null)
     {
         this._onSceneLoadComplete.dispatch();
+    }
+
+    if(FORGE.Utils.isTypeOf(this._events.onSceneLoadComplete, "ActionEventDispatcher") === true)
+    {
+        this._events.onSceneLoadComplete.dispatch();
     }
 };
 
@@ -550,6 +613,11 @@ FORGE.Story.prototype._setGroupUid = function(uid)
         if(this._onGroupChange !== null)
         {
             this._onGroupChange.dispatch();
+        }
+
+        if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
+        {
+            this._events.onGroupChange.dispatch();
         }
     }
 };
@@ -666,6 +734,9 @@ FORGE.Story.prototype.destroy = function()
         this._onGroupChange.destroy();
         this._onGroupChange = null;
     }
+
+    this._clearEvents();
+    this._events = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };

@@ -204,10 +204,14 @@ FORGE.Action.prototype._parseTarget = function(target)
 
         var i = 0;
         // If it is the viewer, reset the result to it
-        if (path[0].toLowerCase() === "viewer")
+        if (path[0].toLowerCase() === "viewer" && result === null)
         {
             result = this._viewer;
             i = 1;
+        }
+        else if (result === null)
+        {
+            result = window;
         }
 
         for (var ii = path.length; i < ii; i++)
