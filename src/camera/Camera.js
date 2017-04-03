@@ -703,23 +703,48 @@ FORGE.Camera.prototype._updateComplete = function()
 /**
  * Compute the  boundaries with min and max for the requested value (yaw, pitch, roll, fov).
  * @method FORGE.Camera#_getBoundaries
+ * @param {string} angle - The angle name (yaw, pitch, roll, fov).
  * @return {CameraBoundaries} Returns the min and max computed from the camera configuration and the view limits.
  * @private
  */
-FORGE.Camera.prototype._getBoundaries = function(axis)
+FORGE.Camera.prototype._getBoundaries = function(angle)
 {
-    // Clamp the value between min and max
-    var min = this["_"+axis+"Min"];
-    var max = this["_"+axis+"Max"];
+    var min, max;
+
+    // I need to use a switch beacause closure compiler
+    // can't work with this["_"+angle+"Min"]; syntax ...
+    switch(angle)
+    {
+        case "yaw":
+            min = this._yawMin;
+            max = this._yawMax;
+            break;
+
+        case "pitch":
+            min = this._pitchMin;
+            max = this._pitchMax;
+            break;
+
+        case "roll":
+            min = this._rollMin;
+            max = this._rollMax;
+            break;
+
+        case "fov":
+            min = this._fovMin;
+            max = this._fovMax;
+            break;
+    }
+
     var view = this._viewer.renderer.view.current;
 
     if (view !== null)
     {
-        min = Math.max(view[axis+"Min"], min);
-        max = Math.min(view[axis+"Max"], max);
+        min = Math.max(view[angle+"Min"], min);
+        max = Math.min(view[angle+"Max"], max);
     }
 
-    return {axis: axis, min: min, max: max};
+    return {angle: angle, min: /** @type {number} */ (min), max: /** @type {number} */ (max)};
 };
 
 /**

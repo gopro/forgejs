@@ -1,7 +1,7 @@
 /**
- * @typedef {{axis:string, min:number, max:number}}
+ * @typedef {{angle:string, min:number, max:number}}
  * @name CameraBoundaries
- * @property {string} axis
+ * @property {string} angle
  * @property {number} max
  * @property {number} min
  */
