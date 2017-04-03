@@ -289,6 +289,8 @@ FORGE.Camera.prototype._boot = function()
 
     this._gaze = new FORGE.CameraGaze(this._viewer, FORGE.Camera.DEFAULT_CONFIG.gaze);
 
+    this._viewer.renderer.view.onChange.add(this._onViewChange, this);
+
     this._createMainCamera();
     this._createFlatCamera();
     this._createVRCameras();
@@ -919,15 +921,6 @@ FORGE.Camera.prototype._setFov = function(value, unit)
 
     this._fov = fov;
 
-    // If fov has changed, ensure angles are inside camera and view boundaries
-    // by calling their setters with their current value
-    var eulerChanged = this._setYaw(this._yaw) || this._setPitch(this._pitch) || this._setRoll(this._roll);
-    if (eulerChanged)
-    {
-        this._updateFromEuler();
-        this._updateComplete();
-    }
-
     return changed;
 };
 
@@ -950,6 +943,27 @@ FORGE.Camera.prototype._setAll = function(yaw, pitch, roll, fov, unit)
     var fovChanged = this._setFov(fov, unit);
 
     return (yawChanged === true || pitchChanged === true || rollChanged === true || fovChanged === true);
+};
+
+/**
+ * On view change handler
+ * @method FORGE.Camera#_onViewChange
+ * @private
+ */
+FORGE.Camera.prototype._onViewChange = function()
+{
+    // Force camera to update its fov to bound it in new fov range after view change
+    this._setFov(this._fov);
+
+    // If fov has changed, ensure angles are inside camera and view boundaries
+    // by calling their setters with their current value
+    var eulerChanged = this._setYaw(this._yaw) || this._setPitch(this._pitch) || this._setRoll(this._roll);
+
+    if (eulerChanged === true)
+    {
+        this._updateFromEuler();
+        this._updateComplete();
+    }
 };
 
 /**

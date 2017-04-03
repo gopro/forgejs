@@ -88,9 +88,6 @@ FORGE.ViewManager.prototype._setView = function(type)
 
     this._ready = true;
 
-    // Force camera to update its fov to bound it in new fov range after view change
-    this._viewer.camera.fov = this._viewer.camera.fov;
-
     if(this._onChange !== null)
     {
         this._onChange.dispatch();
