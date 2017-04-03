@@ -202,8 +202,8 @@ Object.defineProperty(FORGE.ViewFlat.prototype, "repeatX",
         this._repeatX = value;
         this._updateViewParams();
 
-        // Ensure camera yaw is in the authorized boundaries by forcing update
-        this._viewer.camera.yaw = this._viewer.camera.yaw;
+        // Notify the view manager of the change
+        this._viewer.view.notifyChange();
     }
 });
 
@@ -226,7 +226,7 @@ Object.defineProperty(FORGE.ViewFlat.prototype, "repeatY",
         this._repeatY = value;
         this._updateViewParams();
 
-        // Ensure camera pitch is in the authorized boundaries by forcing update
-        this._viewer.camera.pitch = this._viewer.camera.pitch;
+        // Notify the view manager of the change
+        this._viewer.view.notifyChange();
     }
 });
