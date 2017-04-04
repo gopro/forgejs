@@ -117,8 +117,9 @@ FORGE.ControllerGyroscope.prototype._boot = function()
         this.enable();
     }
 
-    this._viewer.controllers.onControlStart.add(this._controllerPointerStartHandler, this);
-    this._viewer.controllers.onControlEnd.add(this._controllerPointerEndHandler, this);
+    // Controller pointer entry point are here
+    //this._viewer.controllers.onControlStart.add(this._controllerPointerStartHandler, this);
+    //this._viewer.controllers.onControlEnd.add(this._controllerPointerEndHandler, this);
 };
 
 /**
@@ -292,8 +293,8 @@ FORGE.ControllerGyroscope.prototype.destroy = function()
 {
     this.disable();
 
-    this._viewer.controllers.onControlStart.remove(this._controllerPointerStartHandler, this);
-    this._viewer.controllers.onControlEnd.remove(this._controllerPointerEndHandler, this);
+    //this._viewer.controllers.onControlStart.remove(this._controllerPointerStartHandler, this);
+    //this._viewer.controllers.onControlEnd.remove(this._controllerPointerEndHandler, this);
 
     this._posEuler = null;
     this._posQuatIndermediate = null;
