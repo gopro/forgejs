@@ -79,7 +79,7 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
         {
             var hfov = vfov * this._viewer.renderer.displayResolution.ratio;
             var texRatio = this._viewer.renderer.backgroundRenderer.textureSize.ratio;
-            this._yawMax = Math.max(0, (Math.PI * texRatio - hfov) * 0.5); // image
+            this._yawMax = Math.min(360, Math.max(0, (Math.PI * texRatio - hfov) * 0.5)); // image
             this._yawMin = -this._yawMax;
         }
         else
@@ -98,6 +98,8 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
             this._pitchMin = FORGE.Math.degToRad(-180);
             this._pitchMax = FORGE.Math.degToRad(180);
         }
+
+        this._viewer.view.notifyChange();
     }
 
     // Mesh rendering in flat view is limited around -+ 20 degrees
