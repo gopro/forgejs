@@ -147,7 +147,7 @@ FORGE.ControllerGyroscope.prototype._deviceOrientationChangeHandler = function(e
         return;
     }
 
-    /** @type {DeviceOrientationEvent} */
+    /** @type {DeviceOrientation} */
     var position = {
         beta: 0,
         alpha: 0,
@@ -300,6 +300,7 @@ FORGE.ControllerGyroscope.prototype.destroy = function()
     this._posQuatOffset = null;
     this._posQuatScreenOrientation = null;
     this._posQuatFinal = null;
+    this._posPointerOffset = null;
 
     FORGE.ControllerBase.prototype.destroy.call(this);
 };
