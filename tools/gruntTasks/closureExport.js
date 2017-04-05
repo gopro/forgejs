@@ -8,11 +8,32 @@
 
 module.exports = function(grunt)
 {
-    grunt.registerMultiTask('closureExport', 'Auto extract keywords for Closure compilation and generate file according to those.', function()
+    grunt.registerMultiTask('closureExport', 'Auto extract keywords for Closure compilation and generate file according to those.', function(debug)
     {
         var self = this;
 
         var output = [];
+
+        var removeDebugLog = function(file)
+        {
+            var buffer = grunt.file.read(file);
+            var content = buffer.toString('utf-8');
+
+            // Remove every occurence of this.log
+            var re = /(\{)?\s*(this\.log.*(;|\s*".*;))\s*(\})?/g;
+
+            content = content.replace(re, function(match, p1, p2, p3, p4)
+            {
+                if (p1 === '{' && p4 === '}')
+                {
+                    return match;
+                }
+
+                return (p1 || '\n') + (p4 || '\n');
+            });
+
+            grunt.file.write(file, content);
+        };
 
         var prepareNamespace = function(file)
         {
@@ -406,6 +427,11 @@ module.exports = function(grunt)
 
             for (var i = 0; i < src.length; i++)
             {
+                if (self.args[0] !== 'true')
+                {
+                    removeDebugLog(src[i]);
+                }
+
                 prepareNamespace(src[i]);
                 output.push(extractFromJS(src[i]));
                 createPropertiesRef(src[i]);

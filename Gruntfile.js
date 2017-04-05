@@ -710,8 +710,10 @@ module.exports = function(grunt)
     ]);
 
     // Build with closure compiler
-    grunt.registerTask("min", "Compile the source with closure compiler", function()
+    grunt.registerTask("min", "Compile the source with closure compiler", function(arg1)
     {
+        var debug = (arg1 === "debug");
+
         var tasks =
         [
             "gitinfo",
@@ -724,7 +726,7 @@ module.exports = function(grunt)
             "replace:log",
             "copy:license",
             "copy:closure",
-            "closureExport:build",
+            "closureExport:build:" + debug,
             "referenceConcat:build",
             "externsGeneration:build",
             "concat:closure",
