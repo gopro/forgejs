@@ -20,7 +20,7 @@ FORGE.Media = function(viewer, config)
     /**
      * Input scene and media config
      * @name FORGE.Media#_config
-     * @type {FORGE.SceneParser}
+     * @type {SceneMediaConfig}
      * @private
      */
     this._config = config;
@@ -78,44 +78,41 @@ FORGE.Media.prototype._boot = function()
 /**
  * Configuration parsing.
  * @method FORGE.Media#_parseConfig
- * @param {FORGE.SceneParser} config input media configuration
+ * @param {SceneMediaConfig} config input media configuration
  * @private
  */
 FORGE.Media.prototype._parseConfig = function(config)
 {
-    // media configuration
-    var mediaConfig = config.media;
-
-    if (typeof mediaConfig === "undefined" || mediaConfig === null)
+    if (typeof config === "undefined" || config === null)
     {
         return;
     }
 
     // Warning : UID is not registered and applied to the FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
-    this._uid = mediaConfig.uid;
+    this._uid = config.uid;
 
-    this._options = (typeof mediaConfig.options !== "undefined") ? mediaConfig.options : null;
+    this._options = (typeof config.options !== "undefined") ? config.options : null;
 
-    var source = mediaConfig.source;
+    var source = config.source;
 
-    if (typeof mediaConfig.source !== "undefined" &&
-        typeof mediaConfig.source.format === "undefined")
+    if (typeof config.source !== "undefined" &&
+        typeof config.source.format === "undefined")
     {
-        mediaConfig.source.format = FORGE.MediaFormat.FLAT;
+        config.source.format = FORGE.MediaFormat.FLAT;
     }
 
-    if (mediaConfig.type === FORGE.MediaType.GRID)
+    if (config.type === FORGE.MediaType.GRID)
     {
         this._ready = true;
         return;
     }
 
-    if (typeof mediaConfig.source === "undefined" || mediaConfig.source === null)
+    if (typeof config.source === "undefined" || config.source === null)
     {
         return;
     }
 
-    if (mediaConfig.type === FORGE.MediaType.IMAGE)
+    if (config.type === FORGE.MediaType.IMAGE)
     {
         var imageConfig;
 
@@ -154,7 +151,7 @@ FORGE.Media.prototype._parseConfig = function(config)
         return;
     }
 
-    if (mediaConfig.type === FORGE.MediaType.VIDEO)
+    if (config.type === FORGE.MediaType.VIDEO)
     {
         // If the levels property is present, we get all urls from it and put it
         // inside source.url: it means that there is multi-quality. It is way
@@ -206,6 +203,7 @@ FORGE.Media.prototype._parseConfig = function(config)
 FORGE.Media.prototype._onImageLoadComplete = function()
 {
     this._ready = true;
+
     if (this._onLoadComplete !== null)
     {
         this._onLoadComplete.dispatch();
@@ -265,14 +263,26 @@ FORGE.Media.prototype.destroy = function()
     this._config = null;
 };
 
+/**
+ * Get the media config.
+ * @name  FORGE.Media#config
+ * @type {SceneMediaConfig}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Media.prototype, "config",
+{
+    /** @this {FORGE.Media} */
+    get: function()
+    {
+        return this._config;
+    }
+});
 
 /**
  * Get the displayObject.
  * @name  FORGE.Media#displayObject
- * @readonly
  * @type {FORGE.DisplayObject}
- *
- * @todo  This is temporary
+ * @readonly
  */
 Object.defineProperty(FORGE.Media.prototype, "displayObject",
 {
@@ -301,8 +311,8 @@ Object.defineProperty(FORGE.Media.prototype, "ready",
 /**
  * Get the onLoadComplete {@link FORGE.EventDispatcher}.
  * @name FORGE.Media#onLoadComplete
- * @readonly
  * @type {FORGE.EventDispatcher}
+ * @readonly
  */
 Object.defineProperty(FORGE.Media.prototype, "onLoadComplete",
 {

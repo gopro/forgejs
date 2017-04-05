@@ -18,10 +18,34 @@ FORGE.Scene = function(viewer)
     /**
      * The scene config object.
      * @name FORGE.Scene#_sceneConfig
-     * @type {FORGE.SceneParser}
+     * @type {SceneConfig}
      * @private
      */
     this._config = null;
+
+    /**
+     * The internationalizable name of the scene.
+     * @name FORGE.Scene#_name
+     * @type {?FORGE.LocaleString}
+     * @private
+     */
+    this._name = null;
+
+    /**
+     * The internationalizable slug name of the scene.
+     * @name FORGE.Scene#_slug
+     * @type {?FORGE.LocaleString}
+     * @private
+     */
+    this._slug = null;
+
+    /**
+     * The internationalizable description of the scene.
+     * @name FORGE.Scene#_description
+     * @type {?FORGE.LocaleString}
+     * @private
+     */
+    this._description = null;
 
     /**
      * The number of times this has been viewed.
@@ -117,11 +141,15 @@ FORGE.Scene.prototype.constructor = FORGE.Scene;
  */
 FORGE.Scene.prototype._parseConfig = function(config)
 {
-    this._config = new FORGE.SceneParser(this._viewer, config);
+    this._config = config;
 
-    this._uid = this._config.uid;
-    this._tags = this._config.tags;
+    this._uid = config.uid;
+    this._tags = config.tags;
     this._register();
+
+    this._name = new FORGE.LocaleString(this._viewer, this._config.name);
+    this._slug = new FORGE.LocaleString(this._viewer, this._config.slug);
+    this._description = new FORGE.LocaleString(this._viewer, this._config.description);
 
     if(typeof config.events === "object" && config.events !== null)
     {
@@ -159,7 +187,7 @@ FORGE.Scene.prototype._configLoadComplete = function(file)
     }
 
     // extend init config
-    this._config.extendConfiguration(file.data);
+    this._config = /** @type {SceneConfig} */ (FORGE.Utils.extendSimpleObject(this._config, file.data));
 
     this._viewer.story.notifySceneConfigLoadComplete(this);
 
@@ -318,6 +346,53 @@ FORGE.Scene.prototype.hasGroups = function()
 };
 
 /**
+ * Know if the scene has sound source?
+ * @method FORGE.Scene#hasSoundSource
+ * @return {boolean} Returns true if the scene has a sound source, false if not.
+ */
+FORGE.Scene.prototype.hasSoundSource = function()
+{
+    if (typeof this._config.sound !== "undefined" && typeof this._config.sound.source !== "undefined" && ((typeof this._config.sound.source.url !== "undefined" && this._config.sound.source.url !== "") || (typeof this._config.sound.source.target !== "undefined" && this._config.sound.source.target !== "")))
+    {
+        return true;
+    }
+
+    return false;
+};
+
+/**
+ * Know if the scene has sound target as source?
+ * @method FORGE.Scene#hasSoundTarget
+ * @param {string} uid - The target source UID to verify.
+ * @return {boolean} Returns true if the scene has a sound source target, false if not.
+ */
+FORGE.Scene.prototype.hasSoundTarget = function(uid)
+{
+    if (typeof this._config.sound !== "undefined" && typeof this._config.sound.source !== "undefined" && typeof this._config.sound.source.target !== "undefined" && this._config.sound.source.target !== "" && this._config.sound.source.target === uid)
+    {
+        return true;
+    }
+
+    return false;
+};
+
+/**
+ * Know if an ambisonic sound is attached to the scene?
+ * @method FORGE.Scene#isAmbisonic
+ * @return {boolean} Returns true if the scene has an ambisonic sound source, false if not.
+ */
+FORGE.Scene.prototype.isAmbisonic = function()
+{
+    //@todo real check of the UID target object rather then the isAmbisonic method of the FORGE.Scene
+    if (this.hasSoundSource() === true && this._config.sound.type === FORGE.SoundType.AMBISONIC)
+    {
+        return true;
+    }
+
+    return false;
+};
+
+/**
  * Destroy method
  * @method FORGE.Scene#destroy
  */
@@ -325,11 +400,14 @@ FORGE.Scene.prototype.destroy = function()
 {
     this._viewer = null;
 
-    if (this._config !== null)
-    {
-        this._config.destroy();
-        this._config = null;
-    }
+    this._name.destroy();
+    this._name = null;
+
+    this._slug.destroy();
+    this._slug = null;
+
+    this._description.destroy();
+    this._description = null;
 
     if (this._onLoadStart !== null)
     {
@@ -380,7 +458,7 @@ Object.defineProperty(FORGE.Scene.prototype, "booted",
 * Get the group config object.
 * @name FORGE.Scene#config
 * @readonly
-* @type {FORGE.SceneParser}
+* @type {SceneConfig}
 */
 Object.defineProperty(FORGE.Scene.prototype, "config",
 {
@@ -432,7 +510,7 @@ Object.defineProperty(FORGE.Scene.prototype, "name",
     /** @this {FORGE.Scene} */
     get: function()
     {
-        return this._config.name;
+        return this._name.value;
     }
 });
 
@@ -447,7 +525,7 @@ Object.defineProperty(FORGE.Scene.prototype, "slug",
     /** @this {FORGE.Scene} */
     get: function()
     {
-        return this._config.slug;
+        return this._slug.value;
     }
 });
 
@@ -462,7 +540,7 @@ Object.defineProperty(FORGE.Scene.prototype, "description",
     /** @this {FORGE.Scene} */
     get: function()
     {
-        return this._config.description;
+        return this._description.value;
     }
 });
 
@@ -524,6 +602,22 @@ Object.defineProperty(FORGE.Scene.prototype, "thumbnails",
     get: function()
     {
         return this._config.thumbnails;
+    }
+});
+
+/**
+/**
+ * Get the background of the scene.
+ * @name  FORGE.Scene#background
+ * @readonly
+ * @type {string}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "background",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return (typeof this._config.background !== "undefined") ? this._config.background : this._viewer.config.background;
     }
 });
 
