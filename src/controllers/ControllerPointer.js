@@ -32,6 +32,14 @@ FORGE.ControllerPointer = function(viewer, config)
     this._zoom;
 
     /**
+     * Fullscreen configuration.
+     * @name FORGE.ControllerPointer#_fullscreen
+     * @type {boolean}
+     * @private
+     */
+    this._fullscreen = true;
+
+    /**
      * Previous position vector.
      * @name FORGE.ControllerPointer#_positionStart
      * @type {THREE.Vector2}
@@ -76,6 +84,8 @@ FORGE.ControllerPointer.prototype.constructor = FORGE.ControllerPointer;
  */
 FORGE.ControllerPointer.DEFAULT_OPTIONS =
 {
+    fullscreen: true,
+
     orientation:
     {
         hardness: 0.6, //Hardness factor impatcing controller response to some instant force.
@@ -127,6 +137,7 @@ FORGE.ControllerPointer.prototype._parseConfig = function(config)
 
     this._orientation = /** @type {ControllerOrientationConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.ControllerPointer.DEFAULT_OPTIONS.orientation, options.orientation));
     this._zoom = /** @type {ControllerZoomConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.ControllerPointer.DEFAULT_OPTIONS.zoom, options.zoom));
+    this._fullscreen = (typeof options.fullscreen === "boolean") ? options.fullscreen : FORGE.ControllerPointer.DEFAULT_OPTIONS.fullscreen;
 
     this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
 };
@@ -298,7 +309,7 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
  */
 FORGE.ControllerPointer.prototype._doubleTapHandler = function()
 {
-    if (this._viewer.controllers.enabled === false)
+    if (this._viewer.controllers.enabled === false || this._fullscreen === false)
     {
         return;
     }
