@@ -33,7 +33,7 @@ function GenericHammerType() {};
 
 /**
  * @constructor
- * @param {Object=} arg1
+ * @param {HammerTapOptions=} arg1
  * @extends {GenericHammerType}
  * @return {!Tap}
  */
@@ -44,7 +44,7 @@ Hammer.Tap = Tap;
 
 /**
  * @constructor
- * @param {Object=} arg1
+ * @param {HammerPressOptions=} arg1
  * @extends {GenericHammerType}
  * @return {!Press}
  */
@@ -55,7 +55,7 @@ Hammer.Press = Press;
 
 /**
  * @constructor
- * @param {Object=} arg1
+ * @param {HammerPanOptions=} arg1
  * @extends {GenericHammerType}
  * @return {!Pan}
  */
@@ -66,7 +66,7 @@ Hammer.Pan = Pan;
 
 /**
  * @constructor
- * @param {Object=} arg1
+ * @param {HammerPinchOptions=} arg1
  * @extends {GenericHammerType}
  * @return {!Pinch}
  */
@@ -77,7 +77,7 @@ Hammer.Pinch = Pinch;
 
 /**
  * @constructor
- * @param {Object=} arg1
+ * @param {HammerRotateOptions=} arg1
  * @extends {GenericHammerType}
  * @return {!Rotate}
  */
@@ -88,7 +88,7 @@ Hammer.Rotate = Rotate;
 
 /**
  * @constructor
- * @param {Object=} arg1
+ * @param {HammerSwipeOptions=} arg1
  * @extends {GenericHammerType}
  * @return {!Swipe}
  */
@@ -188,3 +188,59 @@ Swipe.prototype.recognizeWith = function(arg1) {};
  * @property {number} velocityY
  */
 var HammerEvent;
+
+/**
+ * @typedef {{event:(string|undefined), pointers:(number|undefined), taps:(number|undefined), interval:(number|undefined), time:(number|undefined), threshold:(number|undefined), posThreshold:(number|undefined)}}
+ * @property {string} event - Name of the event.
+ * @property {number} pointers - Required pointers.
+ * @property {number} taps - Amount of taps required.
+ * @property {number} interval - Maximum time in ms between multiple taps.
+ * @property {number} time - Maximum press time in ms.
+ * @property {number} threshold - While doing a tap some small movement is allowed.
+ * @property {number} posThreshold - The maximum position difference between multiple taps.
+ */
+var HammerTapOptions;
+
+/**
+ * @typedef {{event:(string|undefined), pointers:(number|undefined), threshold:(number|undefined), time:(number|undefined)}}
+ * @property {string} event - Name of the event.
+ * @property {number} pointers - Required pointers.
+ * @property {number} threshold - Minimal movement that is allowed while pressing.
+ * @property {number} time - Minimal press time in ms.
+ */
+var HammerPressOptions;
+
+/**
+ * @typedef {{event:(string|undefined), pointers:(number|undefined), threshold:(number|undefined), direction:(number|undefined)}}
+ * @property {string} event - Name of the event.
+ * @property {number} pointers - Required pointers. 0 for all pointers.
+ * @property {number} threshold - Minimal pan distance required before recognizing.
+ * @property {number} direction - Direction of the panning.
+ */
+var HammerPanOptions;
+
+/**
+ * @typedef {{event:(string|undefined), pointers:(number|undefined), threshold:(number|undefined)}}
+ * @property {string} event - Name of the event.
+ * @property {number} pointers - Required pointers, with a minimal of 2.
+ * @property {number} threshold - Minimal scale before recognizing.
+ */
+var HammerPinchOptions;
+
+/**
+ * @typedef {{event:(string|undefined), pointers:(number|undefined), threshold:(number|undefined)}}
+ * @property {string} event - Name of the event.
+ * @property {number} pointers - Required pointers, with a minimal of 2.
+ * @property {number} threshold - Minimal rotation before recognizing.
+ */
+var HammerRotateOptions;
+
+/**
+ * @typedef {{event:(string|undefined), pointers:(number|undefined), threshold:(number|undefined), direction:(number|undefined), velocity:(number|undefined)}}
+ * @property {string} event - Name of the event.
+ * @property {number} pointers - Required pointers.
+ * @property {number} threshold - Minimal distance required before recognizing.
+ * @property {number} direction - Direction of the panning.
+ * @property {number} velocity - Minimal velocity required before recognizing, unit is in px per ms.
+ */
+var HammerSwipeOptions;

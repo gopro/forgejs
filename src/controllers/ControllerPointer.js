@@ -292,6 +292,21 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
 };
 
 /**
+ * Double tap event handler. Toggle the fullscreen.
+ * @method FORGE.ControllerPointer#_doubleTapHandler
+ * @private
+ */
+FORGE.ControllerPointer.prototype._doubleTapHandler = function()
+{
+    if (this._viewer.controllers.enabled === false)
+    {
+        return;
+    }
+
+    this._viewer.fullscreen = !this._viewer.fullscreen;
+};
+
+/**
  * Enable controller
  * @method FORGE.ControllerPointer#enable
  */
@@ -305,6 +320,8 @@ FORGE.ControllerPointer.prototype.enable = function()
     this._viewer.canvas.pointer.onPinchStart.add(this._pinchStartHandler, this);
     this._viewer.canvas.pointer.onPinchEnd.add(this._pinchEndHandler, this);
     this._viewer.canvas.pointer.onWheel.add(this._wheelHandler, this);
+
+    this._viewer.canvas.pointer.onDoubleTap.add(this._doubleTapHandler, this);
 };
 
 /**
@@ -323,6 +340,8 @@ FORGE.ControllerPointer.prototype.disable = function()
     this._viewer.canvas.pointer.onPinchMove.remove(this._pinchEndHandler, this);
     this._viewer.canvas.pointer.onPinchEnd.remove(this._pinchEndHandler, this);
     this._viewer.canvas.pointer.onWheel.remove(this._wheelHandler, this);
+
+    this._viewer.canvas.pointer.onDoubleTap.remove(this._doubleTapHandler, this);
 };
 
 /**
@@ -349,7 +368,7 @@ FORGE.ControllerPointer.prototype.update = function()
 
     var dx = this._velocity.x + this._inertia.x;
     var dy = this._velocity.y + this._inertia.y;
-    
+
     if (dx === 0 && dy === 0)
     {
         return;
