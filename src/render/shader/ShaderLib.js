@@ -125,6 +125,19 @@ FORGE.ShaderLib = {
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
                 fragmentShader: FORGE.ShaderChunk.wts_frag
             },
+
+             wireframe:
+            {
+                /** @type {FORGEUniform} */
+                uniforms:
+                {
+                    tColor: { type: "c", value: null },
+                    tProjectionScale: { type: "f", value: 1 },
+                    tModelViewMatrixInverse: { type: "m4", value: null }
+                },
+                vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear_wireframe,
+                fragmentShader: FORGE.ShaderChunk.wts_frag_wireframe
+            }
         },
 
         littlePlanet:
