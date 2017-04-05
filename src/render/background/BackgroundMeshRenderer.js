@@ -133,8 +133,6 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
 
     this._subdivision = 32;
-
-    this._updateInternals();
 };
 
 /**
