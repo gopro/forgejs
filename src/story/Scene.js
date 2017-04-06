@@ -18,7 +18,7 @@ FORGE.Scene = function(viewer)
     /**
      * The scene config object.
      * @name FORGE.Scene#_sceneConfig
-     * @type {SceneConfig}
+     * @type {?SceneConfig}
      * @private
      */
     this._config = null;
@@ -88,6 +88,22 @@ FORGE.Scene = function(viewer)
     this._events = {};
 
     /**
+     * The media of the scene
+     * @name FORGE.Scene#_media
+     * @type {FORGE.Media}
+     * @private
+     */
+    this._media = null;
+
+    /**
+     * Load request event dispatcher.
+     * @name  FORGE.Scene#_onLoadRequest
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onLoadRequest = null;
+
+    /**
      * Load start event dispatcher.
      * @name  FORGE.Scene#_onLoadStart
      * @type {FORGE.EventDispatcher}
@@ -126,6 +142,14 @@ FORGE.Scene = function(viewer)
      * @private
      */
     this._onConfigLoadComplete = null;
+
+    /**
+     * media create event dispatcher.
+     * @name  FORGE.Scene#_onMediaCreate
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onMediaCreate = null;
 
     FORGE.BaseObject.call(this, "Scene");
 };
@@ -178,6 +202,8 @@ FORGE.Scene.prototype._parseConfig = function(config)
  */
 FORGE.Scene.prototype._configLoadComplete = function(file)
 {
+    this.log("config load complete");
+
     this._booted = true;
 
     //extend the config
@@ -205,6 +231,8 @@ FORGE.Scene.prototype._configLoadComplete = function(file)
  */
 FORGE.Scene.prototype._createEvents = function(events)
 {
+    this.log("create events");
+
     var event;
     for(var e in events)
     {
@@ -221,10 +249,32 @@ FORGE.Scene.prototype._createEvents = function(events)
  */
 FORGE.Scene.prototype._clearEvents = function()
 {
+    this.log("clear events");
+
     for(var e in this._events)
     {
         this._events[e].destroy();
         this._events[e] = null;
+    }
+};
+
+/**
+ * Create the scene media
+ * @param  {SceneMediaConfig} media - media configuration
+ * @private
+ */
+FORGE.Scene.prototype._createMedia = function(media)
+{
+    this.log("create media");
+
+    if(this._media === null)
+    {
+        this._media = new FORGE.Media(this._viewer, media);
+
+        if(this._onMediaCreate !== null)
+        {
+            this._onMediaCreate.dispatch({ media: this._media });
+        }
     }
 };
 
@@ -246,12 +296,24 @@ FORGE.Scene.prototype.addConfig = function(config)
  */
 FORGE.Scene.prototype.load = function()
 {
-    this.log("FORGE.Scene.load();");
+    this.log("load");
 
     if (this._viewer.story.scene === this)
     {
         return;
     }
+
+    if (this._onLoadRequest !== null)
+    {
+        this._onLoadRequest.dispatch();
+    }
+
+    if(FORGE.Utils.isTypeOf(this._events.onLoadRequest, "ActionEventDispatcher") === true)
+    {
+        this._events.onLoadRequest.dispatch();
+    }
+
+    this._createMedia(this._config.media);
 
     if (this._onLoadStart !== null)
     {
@@ -283,6 +345,8 @@ FORGE.Scene.prototype.load = function()
  */
 FORGE.Scene.prototype.unload = function()
 {
+    this.log("unload");
+
     if (this._onUnloadStart !== null)
     {
         this._onUnloadStart.dispatch();
@@ -292,6 +356,9 @@ FORGE.Scene.prototype.unload = function()
     {
         this._events.onUnloadStart.dispatch();
     }
+
+    this._media.destroy();
+    this._media = null;
 
     if (this._onUnloadComplete !== null)
     {
@@ -606,6 +673,20 @@ Object.defineProperty(FORGE.Scene.prototype, "thumbnails",
 });
 
 /**
+ * Get the scene media.
+ * @name  FORGE.Scene#media
+ * @readonly
+ * @type {FORGE.Media}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "media",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._media;
+    }
+});
+
 /**
  * Get the background of the scene.
  * @name  FORGE.Scene#background
@@ -618,6 +699,26 @@ Object.defineProperty(FORGE.Scene.prototype, "background",
     get: function()
     {
         return (typeof this._config.background !== "undefined") ? this._config.background : this._viewer.config.background;
+    }
+});
+
+/**
+ * Get the onLoadRequest {@link FORGE.EventDispatcher}.
+ * @name  FORGE.Scene#onLoadRequest
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "onLoadRequest",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        if (this._onLoadRequest === null)
+        {
+            this._onLoadRequest = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onLoadRequest;
     }
 });
 
@@ -718,5 +819,25 @@ Object.defineProperty(FORGE.Scene.prototype, "onConfigLoadComplete",
         }
 
         return this._onConfigLoadComplete;
+    }
+});
+
+/**
+ * Get the onMediaCreate {@link FORGE.EventDispatcher}.
+ * @name  FORGE.Scene#onMediaCreate
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "onMediaCreate",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        if (this._onMediaCreate === null)
+        {
+            this._onMediaCreate = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onMediaCreate;
     }
 });

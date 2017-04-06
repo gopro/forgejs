@@ -104,6 +104,14 @@ FORGE.Story = function(viewer)
     this._onReady = null;
 
     /**
+     * On scene load requset event dispatcher.
+     * @name  FORGE.Story#_onSceneLoadRequest
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onSceneLoadRequest = null;
+
+    /**
      * On scene load start event dispatcher.
      * @name  FORGE.Story#_onSceneLoadStart
      * @type {FORGE.EventDispatcher}
@@ -157,103 +165,6 @@ FORGE.Story = function(viewer)
 
 FORGE.Story.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.Story.prototype.constructor = FORGE.Story;
-
-/**
- * Boot sequence.
- * @method FORGE.Story#boot
- */
-FORGE.Story.prototype.boot = function()
-{
-    this.log("FORGE.Story.boot();");
-
-    this._scenes = [];
-    this._groups = [];
-
-    this._name = new FORGE.LocaleString(this._viewer);
-    this._slug = new FORGE.LocaleString(this._viewer);
-    this._description = new FORGE.LocaleString(this._viewer);
-};
-
-/**
- * Load a JSON story configuration.
- * @method FORGE.Story#load
- * @param  {(string|StoryConfig)} config - The URL of the configuration JSON file to load or a story configuration object.
- */
-FORGE.Story.prototype.load = function(config)
-{
-    this.log("FORGE.Story.load();");
-
-    if(typeof config === "string")
-    {
-        this._viewer.load.json("forge.story.config", config, this._configLoadComplete, this);
-    }
-    else if (typeof config === "object")
-    {
-        this._parseConfig(config);
-    }
-};
-
-/**
- * Know if the story have any {@link FORGE.Scene}.
- * @method FORGE.Story#hasScenes
- * @return {boolean} Returns true if the story have at least a {@link FORGE.Scene}, false if not.
- */
-FORGE.Story.prototype.hasScenes = function()
-{
-    return this._scenes.length !== 0;
-};
-
-/**
- * Know if the story have any {@link FORGE.Group}.
- * @method FORGE.Story#hasGroups
- * @return {boolean} Returns true if the story have at least a {@link FORGE.Group}, false if not.
- */
-FORGE.Story.prototype.hasGroups = function()
-{
-    return this._groups.length !== 0;
-};
-
-/**
- * Load the next scene of the story.
- * @method FORGE.Story#nextScene
- */
-FORGE.Story.prototype.nextScene = function()
-{
-    var index = this._scenes.indexOf(this._sceneUid);
-    var uid;
-
-    if(index + 1 < this._scenes.length)
-    {
-        uid = this._scenes[index + 1];
-    }
-    else
-    {
-        uid = this._scenes[0];
-    }
-
-    this.loadScene(uid);
-};
-
-/**
- * Load the previous scene of the story.
- * @method FORGE.Story#previousScene
- */
-FORGE.Story.prototype.previousScene = function()
-{
-    var index = this._scenes.indexOf(this._sceneUid);
-    var uid;
-
-    if(index - 1 >= 0)
-    {
-        uid = this._scenes[index - 1];
-    }
-    else
-    {
-        uid = this._scenes[this._scenes.length - 1];
-    }
-
-    this.loadScene(uid);
-};
 
 /**
  * Event handler for the configuration JSON load complete.
@@ -434,94 +345,36 @@ FORGE.Story.prototype._createScenes = function(config)
 };
 
 /**
- * Event handler for scene loaded from an external json file into config.
- * @method  FORGE.Story#_sceneConfigComplete
- * @param  {FORGE.Scene} scene - The scene that has finish to load its configuration.
- * @private
- */
-FORGE.Story.prototype.notifySceneConfigLoadComplete = function(scene)
-{
-    this._addScene(scene);
-
-    //check if all scenes are loaded
-    this._checkStoryScenes();
-};
-
-/**
  * Add a scene into the scenes array.
  * @param {FORGE.Scene} scene - The scene to add.
  * @private
  */
 FORGE.Story.prototype._addScene = function(scene)
 {
-    scene.onLoadStart.add(this._sceneLoadStart, this);
-    scene.onLoadComplete.add(this._sceneLoadComplete, this);
+    scene.onLoadRequest.add(this._sceneLoadRequestHandler, this);
+    scene.onLoadStart.add(this._sceneLoadStartHandler, this);
+    scene.onLoadComplete.add(this._sceneLoadCompleteHandler, this);
 
     this._scenes.push(scene.uid);
 };
 
 /**
- * Internal method to load a {@link FORGE.Scene}.
- * @method FORGE.Story#loadScene
- * @param  {(FORGE.Scene|number|string)} value - Either the {@link FORGE.Scene} itself its index in the main _scenes Array or its uid.
- */
-FORGE.Story.prototype.loadScene = function(value)
-{
-    var uid;
-
-    // use the index of the group array
-    if (typeof value === "number")
-    {
-        if(value >= 0 && value < this._scenes.length)
-        {
-            uid = this._scenes[value];
-        }
-        else
-        {
-            this.warn("Load scene, index "+value+" is out of bounds");
-        }
-    }
-    // use the uid
-    else if (typeof value === "string" && FORGE.UID.isTypeOf(value, "Scene"))
-    {
-        uid = value;
-    }
-    // use a Group object directly
-    else if (typeof value === "object" && FORGE.Utils.isTypeOf(value, "Scene"))
-    {
-        uid = value.uid;
-    }
-
-    //If uid is defined and if it's not the current scene
-    if(typeof uid !== "undefined" && uid !== this._sceneUid)
-    {
-        // Disable picking while the scene is loading
-        this._viewer.renderer.pickingManager.stop();
-
-        // Readd it when the background is ready again
-        this._viewer.renderer.onBackgroundReady.addOnce(this._onBackgroundReadyHandler, this);
-
-        this._loadUid(uid);
-    }
-};
-
-/**
  * Handler for the onBackgroundReady event of the FORGE.Scene that is being loaded.
- * @method FORGE.Story#_onBackgroundReadyHandler
+ * @method FORGE.Story#_backgroundReadyHandler
  * @private
  */
-FORGE.Story.prototype._onBackgroundReadyHandler = function()
+FORGE.Story.prototype._backgroundReadyHandler = function()
 {
     this._viewer.renderer.pickingManager.start();
 };
 
 /**
- * Internal envent handler for scene load start, updates the group index, re-dispatch scene load start at the story level.
- * @method FORGE.Story#_sceneLoadStart
+ * Internal envent handler for scene load request.
+ * @method FORGE.Story#_sceneLoadRequestHandler
+ * @param  {FORGE.Event} event - The {@link FORGE.Event} emitted by the scene that its load method is requested.
  * @private
- * @param  {FORGE.Event} event - The {@link FORGE.Event} emitted by the scene that starts to load.
  */
-FORGE.Story.prototype._sceneLoadStart = function(event)
+FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
 {
     //Unload the previous scene
     if(this._sceneUid !== "" && this._sceneUid !== null)
@@ -532,6 +385,8 @@ FORGE.Story.prototype._sceneLoadStart = function(event)
     var scene = event.emitter;
     this._sceneUid = scene.uid;
 
+    this.log("scene load request");
+
     //The scene has no group so nullify the _groupUid
     if(scene.hasGroups() === false)
     {
@@ -539,23 +394,43 @@ FORGE.Story.prototype._sceneLoadStart = function(event)
 
         if(this._onGroupChange !== null)
         {
-            this._onGroupChange.dispatch();
+            this._onGroupChange.dispatch({ groupUid: this._groupUid });
         }
 
         if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
         {
             this._events.onGroupChange.dispatch();
         }
-
     }
     else if (scene.hasGroups() === true && scene.hasGroup(this._groupUid) === false)
     {
         this._setGroupUid(scene.groups[0].uid);
     }
 
+    if(this._onSceneLoadRequest !== null)
+    {
+        this._onSceneLoadRequest.dispatch({ sceneUid: this._sceneUid });
+    }
+
+    if(FORGE.Utils.isTypeOf(this._events.onSceneLoadRequest, "ActionEventDispatcher") === true)
+    {
+        this._events.onSceneLoadRequest.dispatch();
+    }
+};
+
+/**
+ * Internal envent handler for scene load start, updates the group index, re-dispatch scene load start at the story level.
+ * @method FORGE.Story#_sceneLoadStartHandler
+ * @private
+ * @param  {FORGE.Event} event - The {@link FORGE.Event} emitted by the scene that starts to load.
+ */
+FORGE.Story.prototype._sceneLoadStartHandler = function(event)
+{
+    this.log("scene load start");
+
     if(this._onSceneLoadStart !== null)
     {
-        this._onSceneLoadStart.dispatch({ uid: scene.uid });
+        this._onSceneLoadStart.dispatch({ sceneUid: this._sceneUid });
     }
 
     if(FORGE.Utils.isTypeOf(this._events.onSceneLoadStart, "ActionEventDispatcher") === true)
@@ -566,14 +441,16 @@ FORGE.Story.prototype._sceneLoadStart = function(event)
 
 /**
  * Internal event handler for scene load complete, re-dispatch the load complete event at the story level.
- * @method FORGE.Story#_sceneLoadComplete
+ * @method FORGE.Story#_sceneLoadCompleteHandler
  * @private
  */
-FORGE.Story.prototype._sceneLoadComplete = function()
+FORGE.Story.prototype._sceneLoadCompleteHandler = function()
 {
+    this.log("scene load complete");
+
     if(this._onSceneLoadComplete !== null)
     {
-        this._onSceneLoadComplete.dispatch();
+        this._onSceneLoadComplete.dispatch({ sceneUid: this._sceneUid });
     }
 
     if(FORGE.Utils.isTypeOf(this._events.onSceneLoadComplete, "ActionEventDispatcher") === true)
@@ -612,13 +489,155 @@ FORGE.Story.prototype._setGroupUid = function(uid)
 
         if(this._onGroupChange !== null)
         {
-            this._onGroupChange.dispatch();
+            this._onGroupChange.dispatch({ groupUid: this._groupUid });
         }
 
         if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
         {
             this._events.onGroupChange.dispatch();
         }
+    }
+};
+
+/**
+ * Boot sequence.
+ * @method FORGE.Story#boot
+ */
+FORGE.Story.prototype.boot = function()
+{
+    this.log("FORGE.Story.boot();");
+
+    this._scenes = [];
+    this._groups = [];
+
+    this._name = new FORGE.LocaleString(this._viewer);
+    this._slug = new FORGE.LocaleString(this._viewer);
+    this._description = new FORGE.LocaleString(this._viewer);
+};
+
+/**
+ * Load a JSON story configuration.
+ * @method FORGE.Story#load
+ * @param  {(string|StoryConfig)} config - The URL of the configuration JSON file to load or a story configuration object.
+ */
+FORGE.Story.prototype.load = function(config)
+{
+    this.log("load");
+
+    if(typeof config === "string")
+    {
+        this._viewer.load.json("forge.story.config", config, this._configLoadComplete, this);
+    }
+    else if (typeof config === "object")
+    {
+        this._parseConfig(config);
+    }
+};
+
+/**
+ * Know if the story have any {@link FORGE.Scene}.
+ * @method FORGE.Story#hasScenes
+ * @return {boolean} Returns true if the story have at least a {@link FORGE.Scene}, false if not.
+ */
+FORGE.Story.prototype.hasScenes = function()
+{
+    return this._scenes.length !== 0;
+};
+
+/**
+ * Know if the story have any {@link FORGE.Group}.
+ * @method FORGE.Story#hasGroups
+ * @return {boolean} Returns true if the story have at least a {@link FORGE.Group}, false if not.
+ */
+FORGE.Story.prototype.hasGroups = function()
+{
+    return this._groups.length !== 0;
+};
+
+/**
+ * Load the next scene of the story.
+ * @method FORGE.Story#nextScene
+ */
+FORGE.Story.prototype.nextScene = function()
+{
+    var index = this._scenes.indexOf(this._sceneUid);
+    var uid;
+
+    if(index + 1 < this._scenes.length)
+    {
+        uid = this._scenes[index + 1];
+    }
+    else
+    {
+        uid = this._scenes[0];
+    }
+
+    this.loadScene(uid);
+};
+
+/**
+ * Load the previous scene of the story.
+ * @method FORGE.Story#previousScene
+ */
+FORGE.Story.prototype.previousScene = function()
+{
+    var index = this._scenes.indexOf(this._sceneUid);
+    var uid;
+
+    if(index - 1 >= 0)
+    {
+        uid = this._scenes[index - 1];
+    }
+    else
+    {
+        uid = this._scenes[this._scenes.length - 1];
+    }
+
+    this.loadScene(uid);
+};
+
+/**
+ * Load a {@link FORGE.Scene}.
+ * @method FORGE.Story#loadScene
+ * @param  {(FORGE.Scene|number|string)} value - Either the {@link FORGE.Scene} itself its index in the main _scenes Array or its uid.
+ */
+FORGE.Story.prototype.loadScene = function(value)
+{
+    var uid;
+
+    // use the index of the group array
+    if (typeof value === "number")
+    {
+        if(value >= 0 && value < this._scenes.length)
+        {
+            uid = this._scenes[value];
+        }
+        else
+        {
+            this.warn("Load scene error: index "+value+" is out of bounds");
+        }
+    }
+    // use the uid
+    else if (typeof value === "string" && FORGE.UID.isTypeOf(value, "Scene"))
+    {
+        uid = value;
+    }
+    // use a Group object directly
+    else if (typeof value === "object" && FORGE.Utils.isTypeOf(value, "Scene"))
+    {
+        uid = value.uid;
+    }
+
+    //If uid is defined and if it's not the current scene
+    if(typeof uid !== "undefined" && uid !== this._sceneUid)
+    {
+        // Disable picking while the scene is loading
+        this._viewer.renderer.pickingManager.stop();
+
+        // Read it when the background is ready again
+        this._viewer.renderer.onBackgroundReady.addOnce(this._backgroundReadyHandler, this);
+
+        this._loadUid(uid);
     }
 };
 
@@ -660,6 +679,20 @@ FORGE.Story.prototype.loadGroup = function(value)
         this._setGroupUid(uid);
         this._loadUid(uid);
     }
+};
+
+/**
+ * Event handler for scene loaded from an external json file into config.
+ * @method  FORGE.Story#_sceneConfigComplete
+ * @param  {FORGE.Scene} scene - The scene that has finish to load its configuration.
+ * @private
+ */
+FORGE.Story.prototype.notifySceneConfigLoadComplete = function(scene)
+{
+    this._addScene(scene);
+
+    //check if all scenes are loaded
+    this._checkStoryScenes();
 };
 
 /**
@@ -969,6 +1002,26 @@ Object.defineProperty(FORGE.Story.prototype, "onReady",
         }
 
         return this._onReady;
+    }
+});
+
+/**
+ * Get the onSceneLoadRequest {@link FORGE.EventDispatcher}.
+ * @name  FORGE.Story#onSceneLoadRequest
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Story.prototype, "onSceneLoadRequest",
+{
+    /** @this {FORGE.Story} */
+    get: function()
+    {
+        if(this._onSceneLoadRequest === null)
+        {
+            this._onSceneLoadRequest = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onSceneLoadRequest;
     }
 });
 
