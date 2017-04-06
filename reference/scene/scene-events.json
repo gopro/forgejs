@@ -6,6 +6,16 @@
     "type": "object",
 
     "properties": {
+        "onLoadRequest": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onLoadRequest",
+            "description": "The onLoadRequest event of the scene. The action uid or an array of action uids",
+            "example": "action-0"
+        },
+
         "onLoadStart": {
             "anyOf": [
                 { "type": "string" },
