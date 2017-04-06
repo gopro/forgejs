@@ -58,6 +58,16 @@
             "example": [ "awesome", "beach", "surf" ]
         },
 
+        "sync": {
+            "type": "array",
+            "title": "Sync",
+            "description": "The list of scene uids to sync this scene with.",
+            "items": {
+                "type": "string"
+            },
+            "example": [ "scene-0", "scene-1" ]
+        },
+
         "thumbnails": {
             "type": "array",
             "title": "Thumbnails",

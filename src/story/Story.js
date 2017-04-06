@@ -433,9 +433,8 @@ FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
  * Internal envent handler for scene load start, updates the group index, re-dispatch scene load start at the story level.
  * @method FORGE.Story#_sceneLoadStartHandler
  * @private
- * @param  {FORGE.Event} event - The {@link FORGE.Event} emitted by the scene that starts to load.
  */
-FORGE.Story.prototype._sceneLoadStartHandler = function(event)
+FORGE.Story.prototype._sceneLoadStartHandler = function()
 {
     this.log("scene load start");
 

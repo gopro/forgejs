@@ -301,7 +301,7 @@ FORGE.Scene.prototype.addConfig = function(config)
  * Load just emmit a load request. The story will trigger the loadStart.
  * @method FORGE.Scene#load
  */
-FORGE.Scene.prototype.load = function(time)
+FORGE.Scene.prototype.load = function()
 {
     this.log("load");
 
