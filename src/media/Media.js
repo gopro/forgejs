@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.Media
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
- * @param {FORGE.SceneParser} config input media configuration from json
+ * @param {SceneMediaConfig} config input media configuration from json
  * @extends {FORGE.BaseObject}
  *
  */
@@ -26,6 +26,14 @@ FORGE.Media = function(viewer, config)
     this._config = config;
 
     /**
+     * Type of the media
+     * @name FORGE.Media#_type
+     * @type {string}
+     * @private
+     */
+    this._type = "";
+
+    /**
      * Media options
      * @name  FORGE.Media#_options
      * @type {Object}
@@ -42,12 +50,12 @@ FORGE.Media = function(viewer, config)
     this._displayObject = null;
 
     /**
-     * Ready flag
-     * @name FORGE.Media#_ready
+     * Loaded flag
+     * @name FORGE.Media#_loaded
      * @type {boolean}
      * @private
      */
-    this._ready = false;
+    this._loaded = false;
 
     /**
      * On load complete event dispatcher.
@@ -72,6 +80,9 @@ FORGE.Media.prototype.constructor = FORGE.Media;
  */
 FORGE.Media.prototype._boot = function()
 {
+    // This event can no be a lazzy one (memorize is true)
+    this._onLoadComplete = new FORGE.EventDispatcher(this, true);
+
     this._parseConfig(this._config);
 };
 
@@ -85,6 +96,9 @@ FORGE.Media.prototype._parseConfig = function(config)
 {
     if (typeof config === "undefined" || config === null)
     {
+        this._type = FORGE.MediaType.UNDEFINED;
+        this._notifyLoadComplete();
+
         return;
     }
 
@@ -93,17 +107,18 @@ FORGE.Media.prototype._parseConfig = function(config)
 
     this._options = (typeof config.options !== "undefined") ? config.options : null;
 
+    this._type = config.type;
+
     var source = config.source;
 
-    if (typeof config.source !== "undefined" &&
-        typeof config.source.format === "undefined")
+    if (typeof config.source !== "undefined" && typeof config.source.format === "undefined")
     {
         config.source.format = FORGE.MediaFormat.FLAT;
     }
 
-    if (config.type === FORGE.MediaType.GRID)
+    if (this._type === FORGE.MediaType.GRID)
     {
-        this._ready = true;
+        this._notifyLoadComplete();
         return;
     }
 
@@ -112,7 +127,7 @@ FORGE.Media.prototype._parseConfig = function(config)
         return;
     }
 
-    if (config.type === FORGE.MediaType.IMAGE)
+    if (this._type === FORGE.MediaType.IMAGE)
     {
         var imageConfig;
 
@@ -151,7 +166,7 @@ FORGE.Media.prototype._parseConfig = function(config)
         return;
     }
 
-    if (config.type === FORGE.MediaType.VIDEO)
+    if (this._type === FORGE.MediaType.VIDEO)
     {
         // If the levels property is present, we get all urls from it and put it
         // inside source.url: it means that there is multi-quality. It is way
@@ -182,8 +197,10 @@ FORGE.Media.prototype._parseConfig = function(config)
         }
         else
         {
+            var scene = this._viewer.story.scene;
+
             // check of the ambisonic state of the video sound prior to the video instanciation
-            this._displayObject = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (this._config.hasSoundTarget(this._uid) === true && this._config.isAmbisonic() === true ? true : false));
+            this._displayObject = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
         }
 
         // At this point, source.url is either a streaming address, a simple
@@ -202,12 +219,7 @@ FORGE.Media.prototype._parseConfig = function(config)
  */
 FORGE.Media.prototype._onImageLoadComplete = function()
 {
-    this._ready = true;
-
-    if (this._onLoadComplete !== null)
-    {
-        this._onLoadComplete.dispatch();
-    }
+    this._notifyLoadComplete();
 };
 
 /**
@@ -217,8 +229,6 @@ FORGE.Media.prototype._onImageLoadComplete = function()
  */
 FORGE.Media.prototype._onLoadedMetaDataHandler = function()
 {
-    this._ready = true;
-
     if (this._options !== null)
     {
         this._displayObject.volume = (typeof this._options.volume === "number") ? this._options.volume : 1;
@@ -234,10 +244,17 @@ FORGE.Media.prototype._onLoadedMetaDataHandler = function()
         this._displayObject.autoResume = this._options.autoResume;
     }
 
-    if (this._onLoadComplete !== null)
-    {
-        this._onLoadComplete.dispatch();
-    }
+    this._notifyLoadComplete();
+};
+
+/**
+ * Method to dispatch the load complete event and set the media ready.
+ * @method FORGE.Media#_onLoadedMetaDataHandler
+ */
+FORGE.Media.prototype._notifyLoadComplete = function()
+{
+    this._loaded = true;
+    this._onLoadComplete.dispatch();
 };
 
 /**
@@ -260,7 +277,6 @@ FORGE.Media.prototype.destroy = function()
     }
 
     this._viewer = null;
-    this._config = null;
 };
 
 /**
@@ -275,6 +291,21 @@ Object.defineProperty(FORGE.Media.prototype, "config",
     get: function()
     {
         return this._config;
+    }
+});
+
+/**
+ * Get the media type.
+ * @name  FORGE.Media#type
+ * @type {string}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Media.prototype, "type",
+{
+    /** @this {FORGE.Media} */
+    get: function()
+    {
+        return this._type;
     }
 });
 
@@ -294,17 +325,17 @@ Object.defineProperty(FORGE.Media.prototype, "displayObject",
 });
 
 /**
- * Get the ready flag
- * @name FORGE.Media#ready
+ * Get the loaded flag
+ * @name FORGE.Media#loaded
+ * @type {boolean}
  * @readonly
- * @type boolean
  */
-Object.defineProperty(FORGE.Media.prototype, "ready",
+Object.defineProperty(FORGE.Media.prototype, "loaded",
 {
     /** @this {FORGE.Media} */
     get: function()
     {
-        return this._ready;
+        return this._loaded;
     }
 });
 
@@ -319,11 +350,6 @@ Object.defineProperty(FORGE.Media.prototype, "onLoadComplete",
     /** @this {FORGE.Media} */
     get: function()
     {
-        if (this._onLoadComplete === null)
-        {
-            this._onLoadComplete = new FORGE.EventDispatcher(this);
-        }
-
         return this._onLoadComplete;
     }
 });
