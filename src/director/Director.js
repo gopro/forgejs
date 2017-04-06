@@ -189,17 +189,17 @@ FORGE.Director.prototype._sceneLoadCompleteHandler = function()
         // Add specific behavior if the current media is a video
         if (typeof this._viewer.story.scene.config.media !== "undefined" && this._viewer.story.scene.config.media.type === FORGE.MediaType.VIDEO)
         {
-            this._viewer.renderer.media.displayObject.onPause.add(this._pauseHandler, this);
+            this._viewer.story.scene.media.displayObject.onPause.add(this._pauseHandler, this);
 
             // React on loading/buffering event
-            this._viewer.renderer.media.displayObject.onWaiting.add(this._waitingHandler, this);
-            this._viewer.renderer.media.displayObject.onStalled.add(this._waitingHandler, this);
+            this._viewer.story.scene.media.displayObject.onWaiting.add(this._waitingHandler, this);
+            this._viewer.story.scene.media.displayObject.onStalled.add(this._waitingHandler, this);
 
             // The director's cut begin again if video is looping
-            this._viewer.renderer.media.displayObject.onEnded.add(this._endedHandler, this);
+            this._viewer.story.scene.media.displayObject.onEnded.add(this._endedHandler, this);
 
             // Synchronization !
-            this._viewer.renderer.media.displayObject.onCurrentTimeChange.add(this._synchronizeWithVideo, this);
+            this._viewer.story.scene.media.displayObject.onCurrentTimeChange.add(this._synchronizeWithVideo, this);
 
             // Double synchronization when the window lose visibility
             // Needed because we rely on RAF which is only working on visibility
@@ -227,8 +227,8 @@ FORGE.Director.prototype._pauseHandler = function()
 
     // Event handling
     // for animation
-    this._viewer.renderer.media.displayObject.onPause.remove(this._pauseHandler, this);
-    this._viewer.renderer.media.displayObject.onPlay.add(this._playHandler, this);
+    this._viewer.story.scene.media.displayObject.onPause.remove(this._pauseHandler, this);
+    this._viewer.story.scene.media.displayObject.onPlay.add(this._playHandler, this);
     // for controllers
     this._viewer.controllers.onControlStart.remove(this._controlStartHandler, this);
     this._viewer.controllers.onControlEnd.remove(this._controlEndHandler, this);
@@ -249,8 +249,8 @@ FORGE.Director.prototype._playHandler = function()
 
     // Event handling
     // for animation
-    this._viewer.renderer.media.displayObject.onPause.add(this._pauseHandler, this);
-    this._viewer.renderer.media.displayObject.onPlay.remove(this._playHandler, this);
+    this._viewer.story.scene.media.displayObject.onPause.add(this._pauseHandler, this);
+    this._viewer.story.scene.media.displayObject.onPlay.remove(this._playHandler, this);
     // for controllers
     this._viewer.controllers.onControlStart.add(this._controlStartHandler, this);
     this._viewer.controllers.onControlEnd.add(this._controlEndHandler, this);
@@ -268,9 +268,9 @@ FORGE.Director.prototype._waitingHandler = function()
 
     // Event handling
     // for waiting
-    this._viewer.renderer.media.displayObject.onWaiting.remove(this._waitingHandler, this);
-    this._viewer.renderer.media.displayObject.onStalled.remove(this._waitingHandler, this);
-    this._viewer.renderer.media.displayObject.onPlaying.add(this._playingHandler, this);
+    this._viewer.story.scene.media.displayObject.onWaiting.remove(this._waitingHandler, this);
+    this._viewer.story.scene.media.displayObject.onStalled.remove(this._waitingHandler, this);
+    this._viewer.story.scene.media.displayObject.onPlaying.add(this._playingHandler, this);
     // for controllers
     this._viewer.controllers.onControlStart.remove(this._controlStartHandler, this);
     this._viewer.controllers.onControlEnd.remove(this._controlEndHandler, this);
@@ -291,9 +291,9 @@ FORGE.Director.prototype._playingHandler = function()
 
     // Event handling
     // for waiting
-    this._viewer.renderer.media.displayObject.onPlaying.remove(this._playingHandler, this);
-    this._viewer.renderer.media.displayObject.onWaiting.add(this._waitingHandler, this);
-    this._viewer.renderer.media.displayObject.onStalled.add(this._waitingHandler, this);
+    this._viewer.story.scene.media.displayObject.onPlaying.remove(this._playingHandler, this);
+    this._viewer.story.scene.media.displayObject.onWaiting.add(this._waitingHandler, this);
+    this._viewer.story.scene.media.displayObject.onStalled.add(this._waitingHandler, this);
     // for controllers
     this._viewer.controllers.onControlStart.add(this._controlStartHandler, this);
     this._viewer.controllers.onControlEnd.add(this._controlEndHandler, this);
@@ -306,7 +306,7 @@ FORGE.Director.prototype._playingHandler = function()
  */
 FORGE.Director.prototype._endedHandler = function()
 {
-    if (this._viewer.renderer.media.displayObject.loop === true)
+    if (this._viewer.story.scene.media.displayObject.loop === true)
     {
         // Starting the animation by considering it is a new scene
         this._sceneLoadCompleteHandler();
@@ -414,7 +414,7 @@ FORGE.Director.prototype._onVisibilityChange = function()
 {
     if (document[FORGE.Device.visibilityState] !== "hidden")
     {
-        this._viewer.renderer.media.displayObject.onCurrentTimeChange.dispatch(this._viewer.renderer.media.displayObject.currentTime);
+        this._viewer.story.scene.media.displayObject.onCurrentTimeChange.dispatch(this._viewer.story.scene.media.displayObject.currentTime);
     }
 };
 
@@ -442,7 +442,7 @@ FORGE.Director.prototype._synchronizeWithVideo = function(time)
     }
     else
     {
-        time = this._viewer.renderer.media.displayObject.currentTimeMS;
+        time = this._viewer.story.scene.media.displayObject.currentTimeMS;
     }
 
     var offset = 0;
@@ -527,13 +527,13 @@ FORGE.Director.prototype._clearEvents = function()
 
     if (typeof this._viewer.story.scene.config.media !== "undefined" && this._viewer.story.scene.config.media.type === FORGE.MediaType.VIDEO)
     {
-        this._viewer.renderer.media.displayObject.onPlay.remove(this._playHandler, this);
-        this._viewer.renderer.media.displayObject.onPause.remove(this._pauseHandler, this);
-        this._viewer.renderer.media.displayObject.onWaiting.remove(this._waitingHandler, this);
-        this._viewer.renderer.media.displayObject.onStalled.remove(this._waitingHandler, this);
-        this._viewer.renderer.media.displayObject.onPlaying.remove(this._playingHandler, this);
-        this._viewer.renderer.media.displayObject.onEnded.remove(this._endedHandler, this);
-        this._viewer.renderer.media.displayObject.onCurrentTimeChange.remove(this._synchronizeWithVideo, this);
+        this._viewer.story.scene.media.displayObject.onPlay.remove(this._playHandler, this);
+        this._viewer.story.scene.media.displayObject.onPause.remove(this._pauseHandler, this);
+        this._viewer.story.scene.media.displayObject.onWaiting.remove(this._waitingHandler, this);
+        this._viewer.story.scene.media.displayObject.onStalled.remove(this._waitingHandler, this);
+        this._viewer.story.scene.media.displayObject.onPlaying.remove(this._playingHandler, this);
+        this._viewer.story.scene.media.displayObject.onEnded.remove(this._endedHandler, this);
+        this._viewer.story.scene.media.displayObject.onCurrentTimeChange.remove(this._synchronizeWithVideo, this);
 
         document.removeEventListener(FORGE.Device.visibilityChange, this._onVisibilityChangeBind);
     }
