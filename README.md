@@ -57,7 +57,8 @@ grunt build
 
 Build a minified build of ForgeJS:
 ```
-grunt min
+grunt min // without logs on FORGE.DEBUG = true
+grunt min:debug // with logs
 ```
 
 Generate the documentation and the json reference:
