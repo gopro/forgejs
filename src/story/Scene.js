@@ -328,7 +328,7 @@ FORGE.Scene.prototype.load = function(time)
  */
 FORGE.Scene.prototype.loadStart = function(time)
 {
-    if(typeof time === "number" && isNaN(time) === false)
+    if(typeof time === "number" && isNaN(time) === false && typeof this._config.media !== "undefined")
     {
         if(typeof this._config.media.options === "undefined")
         {
