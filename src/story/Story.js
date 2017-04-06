@@ -376,19 +376,30 @@ FORGE.Story.prototype._backgroundReadyHandler = function()
  */
 FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
 {
+    var previousScene = this.scene;
+    var nextScene = event.emitter;
+    var time = 0;
+
     //Unload the previous scene
-    if(this._sceneUid !== "" && this._sceneUid !== null)
+    if(previousScene !== null)
     {
-        this.scene.unload();
+        // If the next scene have to be sync with the previous one
+        if(nextScene.sync.indexOf(previousScene.uid) !== -1 && previousScene.media.type === FORGE.MediaType.VIDEO)
+        {
+            time = previousScene.media.displayObject.currentTime;
+        }
+
+        previousScene.unload();
     }
 
-    var scene = event.emitter;
-    this._sceneUid = scene.uid;
+    this._sceneUid = nextScene.uid;
+
+    nextScene.loadStart(time);
 
     this.log("scene load request");
 
     //The scene has no group so nullify the _groupUid
-    if(scene.hasGroups() === false)
+    if(nextScene.hasGroups() === false)
     {
         this._groupUid = null;
 
@@ -402,9 +413,9 @@ FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
             this._events.onGroupChange.dispatch();
         }
     }
-    else if (scene.hasGroups() === true && scene.hasGroup(this._groupUid) === false)
+    else if (nextScene.hasGroups() === true && nextScene.hasGroup(this._groupUid) === false)
     {
-        this._setGroupUid(scene.groups[0].uid);
+        this._setGroupUid(nextScene.groups[0].uid);
     }
 
     if(this._onSceneLoadRequest !== null)

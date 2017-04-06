@@ -48,6 +48,14 @@ FORGE.Scene = function(viewer)
     this._description = null;
 
     /**
+     * The array of scene uids to be sync with
+     * @name FORGE.Scene#_sync
+     * @type {Array<string>}
+     * @private
+     */
+    this._sync = [];
+
+    /**
      * The number of times this has been viewed.
      * @name  FORGE.Scene#_viewCount
      * @type {number}
@@ -174,6 +182,7 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._name = new FORGE.LocaleString(this._viewer, this._config.name);
     this._slug = new FORGE.LocaleString(this._viewer, this._config.slug);
     this._description = new FORGE.LocaleString(this._viewer, this._config.description);
+    this._sync = (FORGE.Utils.isArrayOf(this._config.sync, "string") === true) ? this._config.sync : [];
 
     if(typeof config.events === "object" && config.events !== null)
     {
@@ -289,12 +298,10 @@ FORGE.Scene.prototype.addConfig = function(config)
 };
 
 /**
- * Load the scene.
+ * Load just emmit a load request. The story will trigger the loadStart.
  * @method FORGE.Scene#load
- *
- * @todo  better scene loader for the loadComplete event
  */
-FORGE.Scene.prototype.load = function()
+FORGE.Scene.prototype.load = function(time)
 {
     this.log("load");
 
@@ -311,6 +318,24 @@ FORGE.Scene.prototype.load = function()
     if(FORGE.Utils.isTypeOf(this._events.onLoadRequest, "ActionEventDispatcher") === true)
     {
         this._events.onLoadRequest.dispatch();
+    }
+};
+
+/**
+ * Create the media and start to load.
+ * @method FORGE.Scene#loadStart
+ * @param {number} time - The time of the media (if video)
+ */
+FORGE.Scene.prototype.loadStart = function(time)
+{
+    if(typeof time === "number" && isNaN(time) === false)
+    {
+        if(typeof this._config.media.options === "undefined")
+        {
+            this._config.media.options = {};
+        }
+
+        this._config.media.options.startTime = time;
     }
 
     this._createMedia(this._config.media);
@@ -608,6 +633,21 @@ Object.defineProperty(FORGE.Scene.prototype, "description",
     get: function()
     {
         return this._description.value;
+    }
+});
+
+/**
+ * Get the sync array.
+ * @name FORGE.Scene#sync
+ * @readonly
+ * @type {Array<string>}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "sync",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._sync;
     }
 });
 
