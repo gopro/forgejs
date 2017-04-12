@@ -6,6 +6,13 @@
     "type": "object",
 
     "properties": {
+        "fullscreen":{
+            "type": "boolean",
+            "title": "Fullscreen",
+            "description": "Does a double click/tap/touch toggle the fullscreen mode ?",
+            "default": true
+        },
+
         "orientation":{
             "$ref": "controller-options-orientation"
         },
