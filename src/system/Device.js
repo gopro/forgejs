@@ -858,6 +858,8 @@ FORGE.Device = (function(c)
 
         this._ready = true;
 
+        this._onReady.dispatch();
+
         Object.freeze(FORGE.Device);
     };
 
@@ -2553,7 +2555,22 @@ FORGE.Device = (function(c)
         }
     });
 
+    /**
+     * Get the onReady EventDispatcher.
+     * @name FORGE.Device#onReady
+     * @type {FORGE.EventDispatcher}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "onReady",
+    {
+        get: function()
+        {
+            return this._onReady;
+        }
+    });
+
     return new Tmp();
+
 })(function()
 {
     return function()
@@ -3476,6 +3493,14 @@ FORGE.Device = (function(c)
          * @private
          */
         this._unlockOrientation = "";
+
+        /**
+         * Event dispatcher for the ready event
+         * @name FORGE.Device#_onReady
+         * @type {FORGE.EventDispatcher}
+         * @private
+         */
+        this._onReady = new FORGE.EventDispatcher(this, true);
 
         FORGE.BaseObject.call(this, "Device");
 
