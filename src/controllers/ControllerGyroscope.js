@@ -114,6 +114,9 @@ FORGE.ControllerGyroscope.prototype._boot = function()
  */
 FORGE.ControllerGyroscope.prototype._deviceReadyHandler = function()
 {
+    this._viewer.render.display.onDisplayChange.add(this._displayChangeHandler, this);
+
+
     if (this._enabled === true && FORGE.Device.gyroscope === true)
     {
         this.enable();
@@ -131,6 +134,23 @@ FORGE.ControllerGyroscope.prototype._parseConfig = function(config)
     this._register();
 
     this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
+};
+
+/**
+ * Display change handler, disable the gyro in VR (WebVR handles the gyro antoher way)
+ * @method FORGE.ControllerGyroscope#_displayChangeHandler
+ * @private
+ */
+FORGE.ControllerGyroscope.prototype._displayChangeHandler = function()
+{
+    if(this._viewer.render.display.prensentingVR === true)
+    {
+        this.disable();
+    }
+    else
+    {
+        this.enable();
+    }
 };
 
 /**
