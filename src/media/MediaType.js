@@ -5,6 +5,13 @@
 FORGE.MediaType = {};
 
 /**
+ * @name FORGE.MediaType.UNDEFINED
+ * @type {string}
+ * @const
+ */
+FORGE.MediaType.UNDEFINED = "undefined";
+
+/**
  * @name FORGE.MediaType.IMAGE
  * @type {string}
  * @const

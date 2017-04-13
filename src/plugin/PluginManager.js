@@ -105,9 +105,9 @@ FORGE.PluginManager.prototype._parseConfig = function(config)
  */
 FORGE.PluginManager.prototype._sceneLoadStartHandler = function(event)
 {
-    //Remove plugin taht have keep @ false and plugin that have scene restrictions.
+    //Remove plugin that have keep = false and plugin that have scene restrictions.
 
-    this._removeUnkeptPlugins(event.data.uid);
+    this._removeUnkeptPlugins(this._viewer.story.sceneUid);
 
     //Add plugins =============================================
 
@@ -124,7 +124,6 @@ FORGE.PluginManager.prototype._sceneLoadStartHandler = function(event)
     //Reset plugins ============================================
 
     this._resetPlugins();
-
 };
 
 /**

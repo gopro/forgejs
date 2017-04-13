@@ -51,6 +51,14 @@ FORGE.EventDispatcher = function(emitter, memorize)
      */
     this._active = true;
 
+    /**
+     * Dispatched flag, set to true at the first dispatch
+     * @name  FORGE.EventDispatcher#_dispatched
+     * @type {boolean}
+     * @private
+     */
+    this._dispatched = false;
+
     FORGE.BaseObject.call(this, "EventDispatcher");
 };
 
@@ -86,7 +94,7 @@ FORGE.EventDispatcher.prototype._addListener = function(listener, isOnce, contex
     //register the listener with priority
     this._registerListener(lis);
 
-    if(this._memorize === true && this._active === true && this._previousData !== null)
+    if(this._memorize === true && this._active === true && this._dispatched === true)
     {
         lis.execute(this._previousData);
     }
@@ -226,6 +234,8 @@ FORGE.EventDispatcher.prototype.has = function(listener, context)
  */
 FORGE.EventDispatcher.prototype.dispatch = function(data, async)
 {
+    this._dispatched = true;
+
     if(this._memorize === true)
     {
         this._previousData = data === undefined ? null : data;

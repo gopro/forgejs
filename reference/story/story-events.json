@@ -26,6 +26,16 @@
             "example": "action-0"
         },
 
+        "onSceneLoadRequest": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onSceneLoadRequest",
+            "description": "The onSceneLoadRequest event of the story. The action uid or an array of action uids",
+            "example": "action-0"
+        },
+
         "onSceneLoadStart": {
             "anyOf": [
                 { "type": "string" },

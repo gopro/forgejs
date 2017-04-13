@@ -103,6 +103,8 @@ FORGE.BaseObject.prototype.constructor = FORGE.BaseObject;
  */
 FORGE.BaseObject.prototype._register = function()
 {
+    this.log("register");
+
     //Generate a uid if undefined
     if(typeof this._uid !== "string" || this._uid === "")
     {
@@ -137,6 +139,8 @@ FORGE.BaseObject.prototype._register = function()
  */
 FORGE.BaseObject.prototype._unregister = function()
 {
+    this.log("unregister");
+
     if(this._uid !== "" && FORGE.UID.exists(this._uid) === true)
     {
         FORGE.UID.unregister(this);
@@ -211,6 +215,8 @@ FORGE.BaseObject.prototype.destroy = function()
     {
         return;
     }
+
+    this.log("destroy");
 
     this._unregister();
 
