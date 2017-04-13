@@ -405,7 +405,7 @@ FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
 
         if(this._onGroupChange !== null)
         {
-            this._onGroupChange.dispatch({ groupUid: this._groupUid });
+            this._onGroupChange.dispatch(/** @type {StoryEvent} */({ groupUid: this._groupUid }));
         }
 
         if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
@@ -420,7 +420,7 @@ FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
 
     if(this._onSceneLoadRequest !== null)
     {
-        this._onSceneLoadRequest.dispatch({ sceneUid: this._sceneUid });
+        this._onSceneLoadRequest.dispatch(/** @type {StoryEvent} */({ sceneUid: this._sceneUid }));
     }
 
     if(FORGE.Utils.isTypeOf(this._events.onSceneLoadRequest, "ActionEventDispatcher") === true)
@@ -440,7 +440,7 @@ FORGE.Story.prototype._sceneLoadStartHandler = function()
 
     if(this._onSceneLoadStart !== null)
     {
-        this._onSceneLoadStart.dispatch({ sceneUid: this._sceneUid });
+        this._onSceneLoadStart.dispatch(/** @type {StoryEvent} */({ sceneUid: this._sceneUid }));
     }
 
     if(FORGE.Utils.isTypeOf(this._events.onSceneLoadStart, "ActionEventDispatcher") === true)
@@ -460,7 +460,7 @@ FORGE.Story.prototype._sceneLoadCompleteHandler = function()
 
     if(this._onSceneLoadComplete !== null)
     {
-        this._onSceneLoadComplete.dispatch({ sceneUid: this._sceneUid });
+        this._onSceneLoadComplete.dispatch(/** @type {StoryEvent} */({ sceneUid: this._sceneUid }));
     }
 
     if(FORGE.Utils.isTypeOf(this._events.onSceneLoadComplete, "ActionEventDispatcher") === true)
@@ -499,7 +499,7 @@ FORGE.Story.prototype._setGroupUid = function(uid)
 
         if(this._onGroupChange !== null)
         {
-            this._onGroupChange.dispatch({ groupUid: this._groupUid });
+            this._onGroupChange.dispatch(/** @type {StoryEvent} */({ groupUid: this._groupUid }));
         }
 
         if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
