@@ -93,14 +93,6 @@ FORGE.ControllerGyroscope.prototype.constructor = FORGE.ControllerGyroscope;
  */
 FORGE.ControllerGyroscope.prototype._boot = function()
 {
-    // Check every 10 milliseconds if FORGE.Device is ready, so we can read a correct value of
-    // FORGE.Device.gyroscope
-    if (FORGE.Device.ready === false)
-    {
-        window.setTimeout(FORGE.ControllerGyroscope.prototype._boot.bind(this), 10);
-        return;
-    }
-
     FORGE.ControllerBase.prototype._boot.call(this);
 
     this._posEuler = new THREE.Euler();
@@ -112,14 +104,20 @@ FORGE.ControllerGyroscope.prototype._boot = function()
 
     this._parseConfig(this._config);
 
+    FORGE.Device.onReady.addOnce(this._deviceReadyHandler, this);
+};
+
+/**
+ * Device ready handler. Enables the gyro controller if gyro is available on the device.
+ * @method FORGE.ControlerGyroscope#_deviceReadyHandler
+ * @private
+ */
+FORGE.ControllerGyroscope.prototype._deviceReadyHandler = function()
+{
     if (this._enabled === true && FORGE.Device.gyroscope === true)
     {
         this.enable();
     }
-
-    // Controller pointer entry point are here
-    //this._viewer.controllers.onControlStart.add(this._controllerPointerStartHandler, this);
-    //this._viewer.controllers.onControlEnd.add(this._controllerPointerEndHandler, this);
 };
 
 /**
