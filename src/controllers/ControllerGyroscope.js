@@ -137,7 +137,7 @@ FORGE.ControllerGyroscope.prototype._parseConfig = function(config)
 };
 
 /**
- * Display change handler, disable the gyro in VR (WebVR handles the gyro antoher way)
+ * Display change handler, pause the gyro in VR (WebVR handles the gyro antoher way)
  * @method FORGE.ControllerGyroscope#_displayChangeHandler
  * @private
  */
@@ -145,11 +145,11 @@ FORGE.ControllerGyroscope.prototype._displayChangeHandler = function()
 {
     if(this._viewer.render.display.prensentingVR === true)
     {
-        this.disable();
+        this._paused = true;
     }
     else
     {
-        this.enable();
+        this._paused = false;
     }
 };
 
@@ -313,6 +313,7 @@ FORGE.ControllerGyroscope.prototype.destroy = function()
 
     //this._viewer.controllers.onControlStart.remove(this._controllerPointerStartHandler, this);
     //this._viewer.controllers.onControlEnd.remove(this._controllerPointerEndHandler, this);
+    this._viewer.render.display.onDisplayChange.remove(this._displayChangeHandler, this);
 
     this._posEuler = null;
     this._posQuatIndermediate = null;
