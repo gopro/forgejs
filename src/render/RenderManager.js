@@ -591,7 +591,7 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
     var config = {};
     var media = this._viewer.story.scene.media;
-    var mediaConfig = /** @type {SceneMediaConfig} */ (media.config);
+    var mediaConfig = media.config;
     if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
     {
         config.type = mediaConfig.type;
@@ -719,7 +719,7 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         return;
     }
 
-    var mediaConfig = /** @type {SceneMediaConfig} */ (media.config);
+    var mediaConfig = media.config;
 
     if (typeof mediaConfig.source === "undefined" || 
         mediaConfig.source.format === FORGE.MediaFormat.CUBE || 
