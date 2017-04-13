@@ -274,48 +274,6 @@ Object.defineProperty(FORGE.ControllerManager.prototype, "active",
 });
 
 /**
- * Know if there is currently a ControllerGyroscope running and allow to set it off/on if there is
- * on present in the manager.
- * @name FORGE.ControllerManager#gyroscope
- * @type {boolean}
- */
-Object.defineProperty(FORGE.ControllerManager.prototype, "gyroscope",
-{
-    /** @this {FORGE.ControllerManager} */
-    get: function()
-    {
-        for (var i = 0, ii = this._controllers.length; i < ii; i++)
-        {
-            if (this._controllers[i] instanceof FORGE.ControllerGyroscope && this._controllers[i].enabled === true)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    },
-
-    /** @this {FORGE.ControllerManager} */
-    set: function(value)
-    {
-        for (var i = 0, ii = this._controllers.length; i < ii; i++)
-        {
-            if (this._controllers[i] instanceof FORGE.ControllerGyroscope)
-            {
-                if (value === true)
-                {
-                    this._controllers[i].enable();
-                }
-                else if (value === false)
-                {
-                    this._controllers[i].disable();
-                }
-            }
-        }
-    }
-});
-
-/**
  * Get the "onControlStart" {@link FORGE.EventDispatcher} of the camera controller.
  * @name FORGE.ControllerManager#onControlStart
  * @readonly
