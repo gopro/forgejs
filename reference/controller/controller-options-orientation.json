@@ -28,7 +28,10 @@
         },
 
          "invert": {
-            "type": "boolean",
+            "anyOf": [
+                { "type": "boolean" },
+                { "$ref": "controller-options-orientation-invert" }
+            ],
             "title": "Invert",
             "description": "Inversion of axis.",
             "example": false

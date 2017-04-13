@@ -44,18 +44,16 @@ FORGE.Keyboard = function(viewer)
 
     /**
      * This is a copy of key down handler with this as this reference (bind).
-     * @name  FORGE.Drag#_keyDownBind
+     * @name  FORGE.Keyboard#_keyDownBind
      * @type {Function}
-     * @default  null
      * @private
      */
     this._keyDownBind = null;
 
     /**
      * This is a copy of key up handler with this as this reference (bind).
-     * @name  FORGE.Drag#_keyUpBind
+     * @name  FORGE.Keyboard#_keyUpBind
      * @type {Function}
-     * @default  null
      * @private
      */
     this._keyUpBind = null;
@@ -468,10 +466,10 @@ FORGE.Keyboard.prototype.destroy = function()
 };
 
 /**
-* Gets or sets the enabled status of the keyboard.
-* @name FORGE.Keyboard#enabled
-* @type {boolean}
-*/
+ * Gets or sets the enabled status of the keyboard.
+ * @name FORGE.Keyboard#enabled
+ * @type {boolean}
+ */
 Object.defineProperty(FORGE.Keyboard.prototype, "enabled",
 {
     /** @this {FORGE.Keyboard} */

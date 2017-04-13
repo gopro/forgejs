@@ -717,7 +717,9 @@ FORGE.Device = (function(c)
      */
     Tmp.prototype._deviceOrientationHandler = function(event)
     {
-        if (typeof event.alpha !== "undefined" && typeof event.beta !== "undefined" && typeof event.gamma !== "undefined")
+        if (typeof event.alpha !== "undefined" && event.alpha !== null
+            && typeof event.beta !== "undefined" && event.beta !== null
+            && typeof event.gamma !== "undefined" && event.gamma !== null)
         {
             this._deviceOrientationMagnetometer = true;
         }
@@ -825,7 +827,9 @@ FORGE.Device = (function(c)
         this._checkGyroscope();
         this._checkScreen();
 
-        //lock Device object
+        // _checkComplete is initially called by either _deviceMotionHandler or
+        // _deviceOrientationHandler, but if both _deviceMotion and _deviceOrientation are set to
+        // false, we need to force the call of _checkComplete
         if (this._deviceMotion === false && this._deviceOrientation === false)
         {
             this._checkComplete();
@@ -848,12 +852,13 @@ FORGE.Device = (function(c)
             this._removeDeviceOrientationHandler();
         }
 
-        if (this._deviceMotionRotationRate === true && this._deviceMotionAcceleration === true && this._deviceOrientationMagnetometer === true)
-        {
-            this._gyroscope = true;
-        }
+        this._gyroscope = (this._deviceMotionRotationRate === true
+                            && this._deviceMotionAcceleration === true
+                            && this._deviceOrientationMagnetometer === true);
 
         this._ready = true;
+
+        this._onReady.dispatch();
 
         Object.freeze(FORGE.Device);
     };
@@ -977,7 +982,7 @@ FORGE.Device = (function(c)
 
             if(typeof this[i] === "undefined")
             {
-                this.warn("Unable to check plugin device compatibility for: "+i);
+                console.warn("Unable to check plugin device compatibility for: "+i);
             }
             else if(this[i] !== config[i])
             {
@@ -2550,7 +2555,22 @@ FORGE.Device = (function(c)
         }
     });
 
+    /**
+     * Get the onReady EventDispatcher.
+     * @name FORGE.Device#onReady
+     * @type {FORGE.EventDispatcher}
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "onReady",
+    {
+        get: function()
+        {
+            return this._onReady;
+        }
+    });
+
     return new Tmp();
+
 })(function()
 {
     return function()
@@ -3473,6 +3493,14 @@ FORGE.Device = (function(c)
          * @private
          */
         this._unlockOrientation = "";
+
+        /**
+         * Event dispatcher for the ready event
+         * @name FORGE.Device#_onReady
+         * @type {FORGE.EventDispatcher}
+         * @private
+         */
+        this._onReady = new FORGE.EventDispatcher(this, true);
 
         FORGE.BaseObject.call(this, "Device");
 

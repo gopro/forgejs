@@ -17,6 +17,10 @@ module.exports = function(grunt)
         "src/core/Tags.js",
         "src/core/Uid.js",
 
+        "src/event/EventDispatcher.js",
+        "src/event/Event.js",
+        "src/event/Listener.js",
+
         "src/story/Story.js",
         "src/story/Group.js",
         "src/story/Scene.js",
@@ -96,6 +100,7 @@ module.exports = function(grunt)
         "src/controllers/ControllerBase.js",
         "src/controllers/ControllerPointer.js",
         "src/controllers/ControllerKeyboard.js",
+        "src/controllers/ControllerGyroscope.js",
 
         "src/audio/SoundManager.js",
         "src/audio/SoundType.js",
@@ -122,10 +127,6 @@ module.exports = function(grunt)
         "src/system/RequestAnimationFrame.js",
         "src/system/History.js",
 
-        "src/event/EventDispatcher.js",
-        "src/event/Event.js",
-        "src/event/Listener.js",
-
         "src/i18n/LocaleManager.js",
         "src/i18n/LocaleString.js",
         "src/i18n/Locale.js",
@@ -134,6 +135,7 @@ module.exports = function(grunt)
         "src/input/KeyBinding.js",
         "src/input/Drag.js",
         "src/input/Pointer.js",
+        "src/input/Gyroscope.js",
 
         "src/display/DisplayList.js",
         "src/display/DisplayObject.js",

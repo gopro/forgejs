@@ -18,3 +18,10 @@ FORGE.ControllerType.POINTER = "pointer";
  */
 FORGE.ControllerType.KEYBOARD = "keyboard";
 
+/**
+ * @name FORGE.ControllerType.GYROSCOPE
+ * @type {string}
+ * @const
+ */
+FORGE.ControllerType.GYROSCOPE = "gyroscope";
+

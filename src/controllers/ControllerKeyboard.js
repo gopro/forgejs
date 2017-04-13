@@ -1,6 +1,7 @@
 /**
  * @constructor FORGE.ControllerKeyboard
  * @param {FORGE.Viewer} viewer - viewer reference.
+ * @param {ControllerInstanceConfig} config - the configuration of the controller
  * @extends {FORGE.ControllerBase}
  */
 FORGE.ControllerKeyboard = function(viewer, config)
@@ -8,7 +9,7 @@ FORGE.ControllerKeyboard = function(viewer, config)
     /**
      * Configuration
      * @name FORGE.ControllerKeyboard#_config
-     * @type {ControllerKeyboardConfig}
+     * @type {ControllerInstanceConfig}
      * @private
      */
     this._config = config;
@@ -124,7 +125,7 @@ FORGE.ControllerKeyboard.prototype._boot = function()
 /**
  * Parse the configuration.
  * @method FORGE.ControllerKeyboard#_parseConfig
- * @param {ControllerKeyboardConfig} config - configuration object to parse.
+ * @param {ControllerInstanceConfig} config - configuration object to parse.
  */
 FORGE.ControllerKeyboard.prototype._parseConfig = function(config)
 {

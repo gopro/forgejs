@@ -749,6 +749,22 @@ THREE.Quaternion.prototype.conjugate = function() {};
 THREE.Quaternion.prototype.copy = function(arg1) {};
 
 /**
+ * @param {number} arg1
+ * @param {number} arg2
+ * @param {number} arg3
+ * @param {number} arg4
+ * @return {THREE.Quaternion}
+ */
+THREE.Quaternion.prototype.set = function(arg1, arg2, arg3, arg4) {};
+
+/**
+ * @param {THREE.Vector3} arg1
+ * @param {number} arg2
+ * @return {THREE.Quaternion}
+ */
+THREE.Quaternion.prototype.setFromAxisAngle = function(arg1, arg2) {};
+
+/**
  * @param {THREE.Matrix4} arg1
  * @return {THREE.Quaternion}
  */
