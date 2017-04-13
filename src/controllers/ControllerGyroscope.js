@@ -105,8 +105,8 @@ FORGE.ControllerGyroscope.prototype._boot = function()
  */
 FORGE.ControllerGyroscope.prototype._deviceReadyHandler = function()
 {
-    this._viewer.render.display.onDisplayChange.add(this._displayChangeHandler, this);
-    this._viewer.render.view.onChange.add(this._viewChangeHandler, this);
+    this._viewer.renderer.display.onDisplayChange.add(this._displayChangeHandler, this);
+    this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
 
     if (this._enabled === true && FORGE.Device.gyroscope === true)
     {
@@ -134,7 +134,7 @@ FORGE.ControllerGyroscope.prototype._parseConfig = function(config)
  */
 FORGE.ControllerGyroscope.prototype._displayChangeHandler = function()
 {
-    if(this._viewer.render.display.prensentingVR === true)
+    if(this._viewer.renderer.display.prensentingVR === true)
     {
         this._paused = true;
     }
@@ -151,7 +151,7 @@ FORGE.ControllerGyroscope.prototype._displayChangeHandler = function()
  */
 FORGE.ControllerGyroscope.prototype._viewChangeHandler = function()
 {
-    if(this._viewer.render.view.type !== FORGE.ViewType.RECTILINEAR)
+    if(this._viewer.renderer.view.type !== FORGE.ViewType.RECTILINEAR)
     {
         this._paused = true;
     }
@@ -277,8 +277,8 @@ FORGE.ControllerGyroscope.prototype.destroy = function()
 {
     this.disable();
 
-    this._viewer.render.display.onDisplayChange.remove(this._displayChangeHandler, this);
-    this._viewer.render.view.onChange.remove(this._viewChangeHandler, this);
+    this._viewer.renderer.display.onDisplayChange.remove(this._displayChangeHandler, this);
+    this._viewer.renderer.view.onChange.remove(this._viewChangeHandler, this);
 
     this._posEuler = null;
     this._posQuatIndermediate = null;
