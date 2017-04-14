@@ -134,7 +134,7 @@ FORGE.ControllerGyroscope.prototype._parseConfig = function(config)
  */
 FORGE.ControllerGyroscope.prototype._displayChangeHandler = function()
 {
-    if(this._viewer.renderer.display.prensentingVR === true)
+    if(this._viewer.renderer.display.presentingVR === true)
     {
         this._paused = true;
     }
