@@ -95,10 +95,6 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
         this._rotation.y = (typeof config.rotation.y === "number") ? config.rotation.y : 0;
         this._rotation.z = (typeof config.rotation.z === "number") ? config.rotation.z : 0;
     }
-    else
-    {
-        this._rotation = this._getAutoRotationFromPosition(this._position);
-    }
 
     if (typeof config.scale !== "undefined")
     {
@@ -106,36 +102,6 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
         this._scale.y = (typeof config.scale.y === "number") ? FORGE.Math.clamp(config.scale.y, 0.000001, 100000) : 1;
         this._scale.z = (typeof config.scale.z === "number") ? FORGE.Math.clamp(config.scale.z, 0.000001, 100000) : 1;
     }
-};
-
-/**
- * Computes actual position to an automatic rotation in a way that the object will faces the camera.
- * @method FORGE.HotspotTransform#_getAutoRotationFromPosition
- * @param {HotspotTransformPosition} position - The position used to determine the rotation.
- * @private
- */
-FORGE.HotspotTransform.prototype._getAutoRotationFromPosition = function(position)
-{
-    var rotation = {
-        x: 0,
-        y: 0,
-        z: 0
-    };
-
-    if (typeof position !== "undefined")
-    {
-        // Apply inverse rotation angles to make the spot facing the camera
-
-        var spherical = new THREE.Spherical().setFromVector3(new THREE.Vector3(this._position.x, this._position.y, this._position.z));
-
-        // y-axis rotation: yaw
-        rotation.y = -spherical.phi + Math.PI / 2;
-
-        // x-axis rotation: pitch
-        rotation.x = spherical.theta + Math.PI;
-    }
-
-    return rotation;
 };
 
 /**
