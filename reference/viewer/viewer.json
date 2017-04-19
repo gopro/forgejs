@@ -26,6 +26,13 @@
             "title": "Autoresume",
             "description": "Does any sound need to be resumed automatically when the page gains focus ?",
             "default": false
+        },
+
+        "update": {
+            "type": "string",
+            "title": "Update",
+            "description": "The method used to call the update method",
+            "example": "timeout"
         }
     }
 }
