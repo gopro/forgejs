@@ -23,7 +23,7 @@ FORGE.Viewer = function(parent, config, callbacks)
 
     /**
      * The main config of the FORGE project
-     * @type {MainConfig|string}
+     * @type {(MainConfig|string)}
      */
     this._mainConfig = config;
 
@@ -34,8 +34,7 @@ FORGE.Viewer = function(parent, config, callbacks)
      * @type {?ViewerConfig}
      * @private
      */
-    this._config = FORGE.Viewer.DEFAULT_CONFIG;
-
+    this._config = null;
 
     /**
      * Reference to the DisplayList manager
@@ -497,12 +496,7 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
  */
 FORGE.Viewer.prototype._parseConfig = function(config)
 {
-    this._config = FORGE.Utils.extendSimpleObject(FORGE.Viewer.DEFAULT_CONFIG, config);
-
-    // this._config.background = (typeof config !== "undefined" && typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
-    // this._container.background = this._config.background;
-    // this._config.autoPause = (typeof config !== "undefined" && typeof config.autoPause === "boolean") ? config.autoPause : FORGE.Viewer.DEFAULT_CONFIG.autoPause;
-    // this._config.autoResume = (typeof config !== "undefined" && typeof config.autoResume === "boolean") ? config.autoResume : FORGE.Viewer.DEFAULT_CONFIG.autoResume;
+    this._config = /** @type {ViewerConfig} */ (FORGE.Utils.extendSimpleObject(FORGE.Viewer.DEFAULT_CONFIG, config));
 };
 
 /**
@@ -689,9 +683,6 @@ FORGE.Viewer.prototype.destroy = function()
      */
 
     this._raf.stop();
-
-    this._mainConfig = null;
-    this._config = null;
 
     this._parent = null;
 
