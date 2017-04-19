@@ -381,8 +381,6 @@ FORGE.Viewer.prototype._boot = function(callback)
         this._callbacks.boot.call();
     }
 
-    this._raf.start();
-
     this._ready = true;
 
     if (this._onReady !== null)
@@ -487,6 +485,8 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
     {
         this._story.load(config.story);
     }
+
+    this._raf.start();
 };
 
 /**
