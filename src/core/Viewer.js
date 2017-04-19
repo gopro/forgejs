@@ -627,6 +627,11 @@ FORGE.Viewer.prototype.update = function(time)
  */
 FORGE.Viewer.prototype.pause = function(internal)
 {
+    if(this._paused === true)
+    {
+        return;
+    }
+
     this._paused = true;
 
     // Pause all media if autoPause is true
@@ -650,6 +655,11 @@ FORGE.Viewer.prototype.pause = function(internal)
  */
 FORGE.Viewer.prototype.resume = function(internal)
 {
+    if(this._paused === false)
+    {
+        return;
+    }
+
     this._paused = false;
 
     // Resume all media if autoResume is true
