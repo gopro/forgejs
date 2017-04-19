@@ -131,7 +131,7 @@ FORGE.ViewManager.prototype.notifyChange = function()
 FORGE.ViewManager.prototype.load = function(config)
 {
     var sceneViewConfig = /** @type {ViewConfig} */ (config);
-    var globalViewConfig = /** @type {ViewConfig} */ (this._viewer.config.view);
+    var globalViewConfig = /** @type {ViewConfig} */ (this._viewer.mainConfig.view);
     var extendedViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(globalViewConfig, sceneViewConfig));
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;

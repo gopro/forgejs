@@ -325,7 +325,7 @@ FORGE.RenderManager.prototype._onSceneUnloadStartHandler = function()
 FORGE.RenderManager.prototype._initCamera = function(sceneConfig)
 {
     var sceneCameraConfig = /** @type {CameraConfig} */ (sceneConfig.camera);
-    var storyCameraConfig = /** @type {CameraConfig} */ (this._viewer.config.camera);
+    var storyCameraConfig = /** @type {CameraConfig} */ (this._viewer.mainConfig.camera);
     var extendedCameraConfig = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(storyCameraConfig, sceneCameraConfig));
 
     this._camera.load(extendedCameraConfig);
