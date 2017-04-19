@@ -35,4 +35,4 @@ FORGE.DEBUG = false;
  * @type {boolean}
  * @const
  */
-FORGE.WARNING = false;
+FORGE.WARNING = true;

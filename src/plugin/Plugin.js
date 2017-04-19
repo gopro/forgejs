@@ -366,7 +366,7 @@ FORGE.Plugin.prototype.resetInstance = function()
         }
         else
         {
-            this.warn("There is no reset function on plugin "+this._engine.uid);
+            this.log("There is no reset function on plugin "+this._engine.uid);
         }
     }
 };
