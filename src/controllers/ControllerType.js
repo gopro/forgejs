@@ -5,6 +5,13 @@
 FORGE.ControllerType = {};
 
 /**
+ * @name FORGE.ControllerType.BASE
+ * @type {string}
+ * @const
+ */
+FORGE.ControllerType.BASE = "base";
+
+/**
  * @name FORGE.ControllerType.POINTER
  * @type {string}
  * @const
