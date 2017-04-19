@@ -103,7 +103,7 @@ FORGE.PluginManager.prototype._parseConfig = function(config)
  * @method FORGE.PluginManager#_sceneLoadStartHandler
  * @private
  */
-FORGE.PluginManager.prototype._sceneLoadStartHandler = function(event)
+FORGE.PluginManager.prototype._sceneLoadStartHandler = function()
 {
     //Remove plugin that have keep = false and plugin that have scene restrictions.
 

@@ -308,7 +308,7 @@ FORGE.Hotspot3D.prototype._stateLoadComplete = function()
     this.log("material ready handler");
 
     this._mesh.material = this._material.material;
-    this._mesh.visible = true;
+    this._mesh.visible = this._visible;
 
     if (this._animation.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
     {
