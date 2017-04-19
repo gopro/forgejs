@@ -114,6 +114,8 @@ FORGE.ControllerPointer.prototype._boot = function()
 {
     FORGE.ControllerBase.prototype._boot.call(this);
 
+    this._type = FORGE.ControllerType.POINTER;
+
     this._inertia = new THREE.Vector2();
     this._velocity = new THREE.Vector2();
     this._positionStart = new THREE.Vector2();

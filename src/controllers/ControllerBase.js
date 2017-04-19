@@ -20,6 +20,14 @@ FORGE.ControllerBase = function(viewer, className)
     this._viewer = viewer;
 
     /**
+     * Type of the controller
+     * @name FORGE.ControllerBase#_type
+     * @type {string}
+     * @private
+     */
+    this._type = FORGE.ControllerType.BASE;
+
+    /**
      * Main camera reference.
      * @type {FORGE.Camera}
      * @name FORGE.ControllerBase#_camera
@@ -156,6 +164,21 @@ Object.defineProperty(FORGE.ControllerBase.prototype, "enabled",
         {
             this.disable();
         }
+    }
+});
+
+/**
+ * Get type of the controller.
+ * @name FORGE.ControllerBase#type
+ * @type {string}
+ * @readonly
+ */
+Object.defineProperty(FORGE.ControllerBase.prototype, "type",
+{
+    /** @this {FORGE.ControllerBase} */
+    get: function()
+    {
+        return this._type;
     }
 });
 

@@ -107,6 +107,8 @@ FORGE.ControllerKeyboard.prototype._boot = function()
 {
     FORGE.ControllerBase.prototype._boot.call(this);
 
+    this._type = FORGE.ControllerType.KEYBOARD;
+
     this._keyBindings = [];
 
     this._inertia = new THREE.Vector2();
