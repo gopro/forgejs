@@ -188,6 +188,29 @@ FORGE.ControllerManager.prototype.addConfig = function(config)
 };
 
 /**
+ * Get a controller by its type.
+ * @method FORGE.ControllerManager#getByType
+ * @param {string} type - The type of the controller you want to get.
+ * @return {?FORGE.ControllerBase} return the desired type controller, null if not found
+ */
+FORGE.ControllerManager.prototype.getByType = function(type)
+{
+    var controller;
+
+    for(var i = 0, ii = this._controllers.length; i < ii; i++)
+    {
+        controller = this._controllers[i];
+
+        if(controller.type === type)
+        {
+            return controller;
+        }
+    }
+
+    return null;
+};
+
+/**
  * Destroy method.
  */
 FORGE.ControllerManager.prototype.destroy = function()

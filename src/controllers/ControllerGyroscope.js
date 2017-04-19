@@ -87,6 +87,8 @@ FORGE.ControllerGyroscope.prototype._boot = function()
 {
     FORGE.ControllerBase.prototype._boot.call(this);
 
+    this._type = FORGE.ControllerType.GYROSCOPE;
+
     this._posEuler = new THREE.Euler();
     this._posQuatIndermediate = new THREE.Quaternion();
     this._posQuatOffset = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
