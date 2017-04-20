@@ -723,7 +723,9 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
     value = (unit === FORGE.Math.DEGREES) ? FORGE.Math.degToRad(value) : value;
 
     // Wrap the value between -PI and +PI, except for FLAT view where we apply texture ratio
-    if (this._viewer.renderer.backgroundRenderer !== null && this._viewer.renderer.view.type === FORGE.ViewType.FLAT)
+    if (this._viewer.renderer.backgroundRenderer !== null &&
+        this._viewer.renderer.backgroundRenderer.displayObject !== null &&
+        this._viewer.renderer.view.type === FORGE.ViewType.FLAT)
     {
         var displayObject = this._viewer.renderer.backgroundRenderer.displayObject;
         var ratio = displayObject.pixelWidth / displayObject.pixelHeight;
