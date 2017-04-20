@@ -89,7 +89,7 @@ FORGE.HotspotMaterial = function(viewer, hotspotUid)
     /**
      * The display object used for the texture
      * @name  FORGE.HotspotMaterial#_displayObject
-     * @type {(FORGE.Image|FORGE.DisplayObject)}
+     * @type {FORGE.DisplayObject}
      * @private
      */
     this._displayObject = null;
@@ -658,11 +658,11 @@ FORGE.HotspotMaterial.prototype.destroy = function()
         this._material = null;
     }
 
-    if(this._type === FORGE.HotspotMaterial.types.IMAGE && this._displayObject !== null)
+    if(this._displayObject !== null)
     {
         this._displayObject.destroy();
+        this._displayObject = null;
     }
-    this._displayObject = null;
 
     if(this._onReady !== null)
     {
