@@ -22,16 +22,19 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._parent = parent;
 
     /**
+     * The main config of the FORGE project
+     * @type {(MainConfig|string)}
+     */
+    this._mainConfig = config;
+
+    /**
      * The viewer configuration or its URL.
      * After the config loading it will be a MainConfig in all cases.
      * @name FORGE.Viewer#_config
-     * @type {?(MainConfig|string)}
+     * @type {?ViewerConfig}
      * @private
      */
-    this._config = config ||
-    {
-        viewer: FORGE.Viewer.DEFAULT_CONFIG
-    };
+    this._config = null;
 
     /**
      * Reference to the DisplayList manager
@@ -302,7 +305,8 @@ FORGE.Viewer.prototype.constructor = FORGE.Viewer;
  * @type {MainConfig}
  * @const
  */
-FORGE.Viewer.DEFAULT_CONFIG = {
+FORGE.Viewer.DEFAULT_CONFIG =
+{
     background: "#000",
     autoResume: true,
     autoPause: true
@@ -376,8 +380,6 @@ FORGE.Viewer.prototype._boot = function(callback)
         this._callbacks.boot.call();
     }
 
-    this._raf.start();
-
     this._ready = true;
 
     if (this._onReady !== null)
@@ -385,7 +387,7 @@ FORGE.Viewer.prototype._boot = function(callback)
         this._onReady.dispatch();
     }
 
-    this._loadConfig(this._config);
+    this._loadConfig(this._mainConfig);
 };
 
 /**
@@ -398,7 +400,7 @@ FORGE.Viewer.prototype._loadConfig = function(config)
 {
     if (typeof config === "string")
     {
-        this._load.json(this._uid + "-configuration", config, this._configLoadComplete, this);
+        this._load.json(this._uid + "-configuration", config, this._mainConfigLoadComplete, this);
     }
     else if (config !== null && typeof config === "object")
     {
@@ -408,13 +410,13 @@ FORGE.Viewer.prototype._loadConfig = function(config)
 
 /**
  * Event handler for the configuration JSON load complete.
- * @method FORGE.Story#_configLoadComplete
+ * @method FORGE.Story#_mainConfigLoadComplete
  * @param  {FORGE.File} file - The {@link FORGE.File} that describes the loaded JSON file.
  * @private
  */
-FORGE.Viewer.prototype._configLoadComplete = function(file)
+FORGE.Viewer.prototype._mainConfigLoadComplete = function(file)
 {
-    this.log("FORGE.Viewer._configLoadComplete();");
+    this.log("FORGE.Viewer._mainConfigLoadComplete();");
 
     var json = this._cache.get(FORGE.Cache.types.JSON, file.key);
     var config = /** @type {MainConfig} */ (json.data);
@@ -430,7 +432,7 @@ FORGE.Viewer.prototype._configLoadComplete = function(file)
 FORGE.Viewer.prototype._parseMainConfig = function(config)
 {
     // Final assignement of the config
-    this._config = config;
+    this._mainConfig = config;
 
     this._parseConfig(config.viewer);
 
@@ -482,6 +484,8 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
     {
         this._story.load(config.story);
     }
+
+    this._raf.start();
 };
 
 /**
@@ -492,10 +496,7 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
  */
 FORGE.Viewer.prototype._parseConfig = function(config)
 {
-    this._config.background = (typeof config !== "undefined" && typeof config.background === "string") ? config.background : FORGE.Viewer.DEFAULT_CONFIG.background;
-    this._container.background = this._config.background;
-    this._config.autoPause = (typeof config !== "undefined" && typeof config.autoPause === "boolean") ? config.autoPause : FORGE.Viewer.DEFAULT_CONFIG.autoPause;
-    this._config.autoResume = (typeof config !== "undefined" && typeof config.autoResume === "boolean") ? config.autoResume : FORGE.Viewer.DEFAULT_CONFIG.autoResume;
+    this._config = /** @type {ViewerConfig} */ (FORGE.Utils.extendSimpleObject(FORGE.Viewer.DEFAULT_CONFIG, config));
 };
 
 /**
@@ -620,6 +621,11 @@ FORGE.Viewer.prototype.update = function(time)
  */
 FORGE.Viewer.prototype.pause = function(internal)
 {
+    if(this._paused === true)
+    {
+        return;
+    }
+
     this._paused = true;
 
     // Pause all media if autoPause is true
@@ -643,6 +649,11 @@ FORGE.Viewer.prototype.pause = function(internal)
  */
 FORGE.Viewer.prototype.resume = function(internal)
 {
+    if(this._paused === false)
+    {
+        return;
+    }
+
     this._paused = false;
 
     // Resume all media if autoResume is true
@@ -672,8 +683,6 @@ FORGE.Viewer.prototype.destroy = function()
      */
 
     this._raf.stop();
-
-    this._config = null;
 
     this._parent = null;
 
@@ -794,8 +803,23 @@ Object.defineProperty(FORGE.Viewer.prototype, "ready",
 
 /**
  * Get the main configuration.
- * @name FORGE.Viewer#config
+ * @name FORGE.Viewer#mainConfig
  * @type {MainConfig}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "mainConfig",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._mainConfig;
+    }
+});
+
+/**
+ * Get the viewer configuration.
+ * @name FORGE.Viewer#config
+ * @type {ViewerConfig}
  * @readonly
  */
 Object.defineProperty(FORGE.Viewer.prototype, "config",
