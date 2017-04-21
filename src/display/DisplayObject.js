@@ -620,7 +620,7 @@ FORGE.DisplayObject.prototype._notifyFullscreenEnter = function()
  */
 FORGE.DisplayObject.prototype._notifyFullscreenExit = function()
 {
-    this.log("_notifyFullscreenChange");
+    this.log("_notifyFullscreenExit");
 
     this._fullscreenRestoreData();
 

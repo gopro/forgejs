@@ -128,12 +128,9 @@ FORGE.RenderDisplay.prototype._boot = function()
     {
         var self = this;
 
-        navigator.getVRDisplays().then(
-            function(displays)
-            {
-                self._gotVRDisplays(displays);
-            }
-        );
+        var gotVRDisplaysBind = this._gotVRDisplays.bind(this);
+
+        navigator.getVRDisplays().then(gotVRDisplaysBind);
 
         this._addFullscreenListener();
     }
@@ -148,10 +145,9 @@ FORGE.RenderDisplay.prototype._boot = function()
  * Just keep the first interface available
  * @method FORGE.RenderDisplay#_gotVRDisplays
  * @param {Array<VRDisplay>} displays - array of VRDisplay interfaces available
- * @param {Function=} onError - error callback
  * @private
  */
-FORGE.RenderDisplay.prototype._gotVRDisplays = function(displays, onError)
+FORGE.RenderDisplay.prototype._gotVRDisplays = function(displays)
 {
     this._webVR = displays.length > 0;
 
@@ -166,12 +162,9 @@ FORGE.RenderDisplay.prototype._gotVRDisplays = function(displays, onError)
         }
     }
 
-    if (typeof this._vrDisplay === "undefined")
+    if (this._vrDisplay === null)
     {
-        if (typeof onError === "function")
-        {
-            onError("HMD not available");
-        }
+        this.warn("No HMD available");
     }
 };
 
@@ -213,7 +206,7 @@ FORGE.RenderDisplay.prototype._displayChangeHandler = function()
     var wasPresentingVR = this._presentingVR;
     var renderer = this._viewer.renderer.webGLRenderer;
 
-    this._presentingVR = typeof this._vrDisplay !== "undefined" &&
+    this._presentingVR = this._vrDisplay !== null &&
         (this._vrDisplay.isPresenting === true ||
             (this._webVR === false && document[FORGE.Device.fullscreenElement] instanceof window.HTMLElement));
 
@@ -249,13 +242,22 @@ FORGE.RenderDisplay.prototype._displayChangeHandler = function()
                             "R:[" + this._rightBounds[0] + ", " + this._rightBounds[1] + ", " + this._rightBounds[2] + ", " + this._rightBounds[3] + "]");
         }
 
-        if (wasPresentingVR === false)
+        if (wasPresentingVR === false || this._vrDisplay.displayName === "Cardboard VRDisplay (webvr-polyfill)")
         {
             this._rendererPixelRatio = renderer.getPixelRatio();
             var size = renderer.getSize();
             this._rendererSizeScreen.width = size.width;
             this._rendererSizeScreen.height = size.height;
-            this._rendererSize = new FORGE.Size(this._eyeWidth * 2, this._eyeHeight);
+
+            if (this._vrDisplay.displayName === "Cardboard VRDisplay (webvr-polyfill)")
+            {
+                this._rendererSize = new FORGE.Size(size.height, size.width)
+            }
+            else
+            {
+                this._rendererSize = new FORGE.Size(this._eyeWidth * 2, this._eyeHeight);
+            }
+
             renderer.setPixelRatio( 1 );
         }
     }
@@ -284,7 +286,7 @@ FORGE.RenderDisplay.prototype._setFullScreen = function (status)
 
     return new Promise(function (resolve, reject)
     {
-        if (typeof this._vrDisplay === "undefined")
+        if (this._vrDisplay === null)
         {
             reject(new Error("No VR hardware found."));
             return;
@@ -387,7 +389,7 @@ FORGE.RenderDisplay.prototype.disableVR = function()
  */
 FORGE.RenderDisplay.prototype.getQuaternionFromPose = function()
 {
-    if ( this._vrDisplay === null )
+    if (this._vrDisplay === null)
     {
         return null;
     }
@@ -423,7 +425,7 @@ FORGE.RenderDisplay.prototype.getRenderParams = function()
     var camera = this._viewer.renderer.camera;
     var renderParams = [];
 
-    if (typeof this._vrDisplay !== "undefined" && this._vrDisplay !== null && this._presentingVR === true)
+    if (this._vrDisplay !== null && this._presentingVR === true)
     {
         // Setup render rectangle, that will be use as glViewport
         var rx = this._rendererSize.width * this._leftBounds[0],
@@ -472,9 +474,9 @@ FORGE.RenderDisplay.prototype.setSize = function(size)
  */
 FORGE.RenderDisplay.prototype.submitFrame = function()
 {
-    if (this._webVR === true && typeof this._vrDisplay !== "undefined" && this._presentingVR === true)
+    if (this._webVR === true && this._vrDisplay !== null && this._presentingVR === true)
     {
-        if (this._vrDisplay.capabilities.hasExternalDisplay === true)
+        if (this._vrDisplay.capabilities.hasExternalDisplay === true || this._vrDisplay.displayName === "Cardboard VRDisplay (webvr-polyfill)")
         {
             this._vrDisplay.submitFrame();
         }

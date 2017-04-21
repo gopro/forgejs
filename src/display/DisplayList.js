@@ -92,12 +92,18 @@ FORGE.DisplayList.prototype._fullScreenChangeHandler = function()
             if(obj.dom === document[FORGE.Device.fullscreenElement])
             {
                 this._fullscreenObject = obj;
-                this._fullscreenObject._notifyFullscreenEnter();
                 break;
             }
         }
+
+        if (this._fullscreenObject === null)
+        {
+            this._fullscreenObject = this._objects[0];
+        }
+
+        this._fullscreenObject._notifyFullscreenEnter();
     }
-    else
+    else if (this._fullscreenObject !== null)
     {
         this._fullscreenObject._notifyFullscreenExit();
         this._fullscreenObject = null;
