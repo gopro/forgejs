@@ -77,8 +77,8 @@ FORGE.EffectComposer.prototype._boot = function()
 FORGE.EffectComposer.prototype.render = function(delta)
 {
     this._deltaSum += delta;
-
     var time = this._deltaSum;
+
     for (var i=0, ii=this.passes.length; i<ii; i++)
     {
         var pass = this.passes[i];
@@ -96,6 +96,7 @@ FORGE.EffectComposer.prototype.render = function(delta)
             pass.time = time;
         }
     }
+    
     THREE.EffectComposer.prototype.render.call(this, delta);
 };
 
