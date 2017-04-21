@@ -375,7 +375,7 @@ FORGE.Image.prototype._setRenderMode = function(mode)
     {
         this._dom.style.backgroundRepeat = "no-repeat";
     }
-    else if(this._renderMode === FORGE.Image.renderModes.CANVAS)
+    else if(this._renderMode === FORGE.Image.renderModes.CANVAS && this._canvas === null)
     {
         this._canvas = document.createElement("canvas");
         this._canvas.style.position = "absolute";
