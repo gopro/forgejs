@@ -290,7 +290,7 @@ FORGE.Story.prototype._setStoryReady = function()
     // NB: I couldn't find another way to correctly access the property without minification
     var hashParameters = FORGE.URL.parse()["hashParameters"];
 
-    if(hashParameters !== null && typeof hashParameters.uid === "string")
+    if(hashParameters !== null && typeof hashParameters.uid === "string" && FORGE.UID.exists(hashParameters.uid))
     {
         this._loadUid(hashParameters.uid);
 
