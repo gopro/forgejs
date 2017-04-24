@@ -249,7 +249,7 @@ FORGE.RenderDisplay.prototype._displayChangeHandler = function()
             this._rendererSizeScreen.width = size.width;
             this._rendererSizeScreen.height = size.height;
 
-            if (this._vrDisplay.displayName === "Cardboard VRDisplay (webvr-polyfill)")
+            if (this._vrDisplay.displayName === "Cardboard VRDisplay (webvr-polyfill)" && FORGE.Device.iOS === false)
             {
                 this._rendererSize = new FORGE.Size(size.height, size.width)
             }
