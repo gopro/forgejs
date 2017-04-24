@@ -1,7 +1,7 @@
 /**
  * A meta-animation, used to provide basic functionnality for the interface
  * between an ObjectAnimation and FORGE.Animation.
- * 
+ *
  * @constructor FORGE.MetaAnimation
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
  * @param {*} target - Target reference.
@@ -210,6 +210,26 @@ FORGE.MetaAnimation.prototype._emptyAnimations = function()
  */
 FORGE.MetaAnimation.prototype.destroy = function()
 {
+    this._emptyAnimations();
+
+    this._animations = null;
+
+    var instruction;
+
+    while (this._instructions && this._instructions.length > 0)
+    {
+        instruction = this._instructions.pop();
+        instruction = null;
+    }
+
+    this._instructions = null;
+
+    if (this._onComplete !== null)
+    {
+        this._onComplete.destroy();
+        this._onComplete = null;
+    }
+
     FORGE.BaseObject.prototype.destroy.call(this);
 };
 
