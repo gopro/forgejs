@@ -50,7 +50,7 @@ FORGE.HotspotAnimation = function(viewer, hotspot)
 
     /**
      * On animation progress event dispatcher.
-     * @name FORGE.MetaAnimation#_onProgress
+     * @name FORGE.HotspotAnimation#_onProgress
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -351,6 +351,23 @@ FORGE.HotspotAnimation.prototype.play = function(track)
     this._animations[0].play();
     this._animations[1].play();
     this._animations[2].play();
+};
+
+/**
+ * Destroy sequence.
+ * @method FORGE.HotspotAnimation#destroy
+ */
+FORGE.HotspotAnimation.prototype.destroy = function()
+{
+    this._tracks = null;
+
+    if (this._onProgress !== null)
+    {
+        this._onProgress.destroy();
+        this._onProgress = null;
+    }
+
+    FORGE.MetaAnimation.prototype.destroy.call(this);
 };
 
 /**
