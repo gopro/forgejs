@@ -314,7 +314,7 @@ FORGE.Plugin.prototype._instantiatePlugin = function()
 
     this._parseConfig(this._instanceConfig);
 
-    this._instance = this._engine.getNewInstance(this);
+    this._instance = this._engine.getNewInstance(this._viewer, this);
 
     this._instance.boot.call(this._instance);
 

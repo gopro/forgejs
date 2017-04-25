@@ -24,18 +24,6 @@ FORGE.ViewGoPro.prototype = Object.create(FORGE.ViewBase.prototype);
 FORGE.ViewGoPro.prototype.constructor = FORGE.ViewGoPro;
 
 /**
- * Background shader screen to world
- * @type {ScreenToWorldProgram}
- */
-FORGE.ViewGoPro.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.gopro;
-
-/**
- * Background shader world to screen
- * @type {WorldToScreenProgram}
- */
-FORGE.ViewGoPro.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.gopro;
-
-/**
  * Boot sequence.
  *
  * @method FORGE.ViewGoPro#_boot
@@ -44,6 +32,9 @@ FORGE.ViewGoPro.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.gopro;
 FORGE.ViewGoPro.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
+
+    this._shaderSTW = /** @type {ScreenToWorldProgram} */ (FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.screenToWorld.gopro));
+    this._shaderWTS = /** @type {WorldToScreenProgram} */ (FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.worldToScreen.gopro));
 
     this._fovMin = FORGE.Math.degToRad(30);
     this._fovMax = FORGE.Math.degToRad(330);

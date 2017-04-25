@@ -255,12 +255,25 @@ FORGE.PluginManager.prototype._parseConfigurations = function(configurations)
  */
 FORGE.PluginManager.prototype._addEngine = function(config)
 {
-    if(typeof config.uid === "string" && FORGE.UID.exists(config.uid) === false)
+    if(typeof config.uid === "string")
     {
-        var engine = new FORGE.PluginEngine(this._viewer);
-        this._engines.add(engine);
+        if(this._getEngine(config.uid) !== null)
+        {
+            return;
+        }
 
-        engine.load(config);
+        if(FORGE.UID.exists(config.uid) === false)
+        {
+            var engine = new FORGE.PluginEngine(this._viewer);
+            this._engines.add(engine);
+
+            engine.load(config);
+        }
+        else
+        {
+            // In some multiple viewer instance case the engine already exists, just get it from the UID
+            this._engines.add(FORGE.UID.get(config.uid));
+        }
     }
 };
 

@@ -35,6 +35,7 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Yaw min angle for current view type [radians].
+     * @name FORGE.ViewBase#_yawMin
      * @type {number}
      * @private
      */
@@ -42,6 +43,7 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Yaw max angle for current view type [radians].
+     * @name FORGE.ViewBase#_yawMax
      * @type {number}
      * @private
      */
@@ -49,6 +51,7 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Pitch min angle for current view type [radians].
+     * @name FORGE.ViewBase#_pitchMin
      * @type {number}
      * @private
      */
@@ -56,6 +59,7 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Pitch min angle for current view type [radians].
+     * @name FORGE.ViewBase#_pitchMax
      * @type {number}
      * @private
      */
@@ -63,6 +67,7 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Roll min angle for current view type [radians].
+     * @name FORGE.ViewBase#_rollMin
      * @type {number}
      * @private
      */
@@ -70,6 +75,7 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Roll max angle for current view type [radians].
+     * @name FORGE.ViewBase#_rollMax
      * @type {number}
      * @private
      */
@@ -77,6 +83,7 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Fov min angle for current view type [radians].
+     * @name FORGE.ViewBase#_fovMin
      * @type {number}
      * @private
      */
@@ -84,28 +91,33 @@ FORGE.ViewBase = function(viewer, className, type)
 
     /**
      * Fov max angle for current view type [radians].
+     * @name FORGE.ViewBase#_fovMax
      * @type {number}
      * @private
      */
     this._fovMax = Infinity;
+
+    /**
+     * Shader screen to world
+     * @name FORGE.ViewBase#_shaderSTW
+     * @type {?ScreenToWorldProgram}
+     * @private
+     */
+    this._shaderSTW = null;
+
+    /**
+     * Shader world to screen
+     * @name FORGE.ViewBase#_shaderWTS
+     * @type {?WorldToScreenProgram}
+     * @private
+     */
+    this._shaderWTS = null;
 
     FORGE.BaseObject.call(this, className || "ViewBase");
 };
 
 FORGE.ViewBase.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.ViewBase.prototype.constructor = FORGE.ViewBase;
-
-/**
- * Background shader screen to world
- * @type {ScreenToWorldProgram}
- */
-FORGE.ViewBase.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.rectilinear;
-
-/**
- * Background shader world to screen
- * @type {WorldToScreenProgram}
- */
-FORGE.ViewBase.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.rectilinear;
 
 /**
  * Boot sequence.
@@ -115,6 +127,7 @@ FORGE.ViewBase.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.rectilinear;
  */
 FORGE.ViewBase.prototype._boot = function()
 {
+
 };
 
 /**
@@ -211,6 +224,9 @@ FORGE.ViewBase.prototype.destroy = function()
 {
     this._viewer = null;
     this._camera = null;
+
+    this._shaderSTW = null;
+    this._shaderWTS = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
@@ -341,5 +357,35 @@ Object.defineProperty(FORGE.ViewBase.prototype, "fovMax",
     get: function()
     {
         return this._fovMax;
+    }
+});
+
+/**
+ * Shader screen to world
+ * @name FORGE.ViewBase#shaderSTW
+ * @type {ScreenToWorldProgram}
+ * @readonly
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "shaderSTW",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._shaderSTW;
+    }
+});
+
+/**
+ * Shader world to screen
+ * @name FORGE.ViewBase#shaderWTS
+ * @type {WorldToScreenProgram}
+ * @readonly
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "shaderWTS",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._shaderWTS;
     }
 });

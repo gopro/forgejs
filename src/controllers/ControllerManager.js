@@ -64,19 +64,16 @@ FORGE.ControllerManager.DEFAULT_CONFIG =
     instances:
     [
         {
-            uid: "controller-pointer-0",
             type: FORGE.ControllerType.POINTER,
             enabled: true
         },
 
         {
-            uid: "controller-keyboard-0",
             type: FORGE.ControllerType.KEYBOARD,
             enabled: true
         },
 
         {
-            uid: "controller-gyroscope-0",
             type: FORGE.ControllerType.GYROSCOPE,
             enabled: true
         }

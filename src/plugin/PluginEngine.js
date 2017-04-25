@@ -222,16 +222,17 @@ FORGE.PluginEngine.prototype.load = function(config)
 /**
  * Get a new instance of the engine and associate it to a {@link FORGE.Plugin} Object.
  * @method FORGE.PluginEngine#getNewInstance
+ * @param  {FORGE.Viewer} viewer - The viewer attached to this instance.
  * @param  {FORGE.Plugin} plugin - The plugin who will represent this instance.
  * @return {?PluginStructure} Returns the instance of the engine.
  */
-FORGE.PluginEngine.prototype.getNewInstance = function(plugin)
+FORGE.PluginEngine.prototype.getNewInstance = function(viewer, plugin)
 {
     var instance = /** @type {PluginStructure} */ (new this._constructorFunction());
 
     if(this._validateInstance(instance))
     {
-        instance._viewer = this._viewer;
+        instance._viewer = viewer;
         instance._plugin = plugin;
 
         this._instancesCount++;
