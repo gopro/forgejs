@@ -23,7 +23,9 @@ FORGE.Viewer = function(parent, config, callbacks)
 
     /**
      * The main config of the FORGE project
+     * @name  FORGE.Viewer#_mainConfig
      * @type {(MainConfig|string)}
+     * @private
      */
     this._mainConfig = config;
 
@@ -43,6 +45,14 @@ FORGE.Viewer = function(parent, config, callbacks)
      * @private
      */
     this._display = null;
+
+    /**
+     * This is a relative div between the parent and the viewer container.
+     * @name  FORGE.Viewer#_relative
+     * @type {HTMLElement}
+     * @private
+     */
+    this._relative = null;
 
     /**
      * The viewer container reference.
@@ -316,6 +326,7 @@ FORGE.Viewer.DEFAULT_CONFIG =
  * Boot sequence.
  * @method FORGE.Viewer#_boot
  * @param {Function} callback - Callback function.
+ * @private
  */
 FORGE.Viewer.prototype._boot = function(callback)
 {
@@ -516,7 +527,13 @@ FORGE.Viewer.prototype._createContainers = function()
         throw "FORGE.Viewer.boot : Viewer parent is invalid";
     }
 
-    this._container = new FORGE.DisplayObjectContainer(this, null, null, /** @type {Element} */ (this._parent));
+    this._relative = document.createElement("div");
+    this._relative.style.width = "100%";
+    this._relative.style.height = "100%";
+    this._relative.style.position = "relative";
+    this._parent.appendChild(this._relative);
+
+    this._container = new FORGE.DisplayObjectContainer(this, null, null, /** @type {Element} */ (this._relative));
     this._container.id = "FORGE-main-container-" + this._uid;
 
     this._canvasContainer = new FORGE.DisplayObjectContainer(this);
