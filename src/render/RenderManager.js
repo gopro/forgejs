@@ -721,7 +721,11 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
 
     var mediaConfig = media.config;
 
-    if (typeof mediaConfig.source === "undefined" || 
+    if (mediaConfig.type === FORGE.MediaType.GRID)
+    {
+        this._backgroundRendererType = FORGE.BackgroundType.MESH;
+    }
+    else if (typeof mediaConfig.source === "undefined" || 
         mediaConfig.source.format === FORGE.MediaFormat.CUBE || 
         mediaConfig.source.format === FORGE.MediaFormat.FLAT ||
         typeof mediaConfig.source === "undefined" ||
