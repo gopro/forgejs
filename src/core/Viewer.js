@@ -49,7 +49,7 @@ FORGE.Viewer = function(parent, config, callbacks)
     /**
      * This is a relative div between the parent and the viewer container.
      * @name  FORGE.Viewer#_relative
-     * @type {HTMLElement}
+     * @type {?Element}
      * @private
      */
     this._relative = null;

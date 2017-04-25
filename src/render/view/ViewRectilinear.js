@@ -25,8 +25,8 @@ FORGE.ViewRectilinear.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
 
-    this._shaderSTW = FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.screenToWorld.rectilinear);
-    this._shaderWTS = FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.worldToScreen.rectilinear);
+    this._shaderSTW = /** @type {ScreenToWorldProgram} */ (FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.screenToWorld.rectilinear));
+    this._shaderWTS = /** @type {WorldToScreenProgram} */ (FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.worldToScreen.rectilinear));
 
     this._pitchMin = -FORGE.Math.degToRad(90);
     this._pitchMax = FORGE.Math.degToRad(90);

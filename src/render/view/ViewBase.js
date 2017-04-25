@@ -100,7 +100,7 @@ FORGE.ViewBase = function(viewer, className, type)
     /**
      * Shader screen to world
      * @name FORGE.ViewBase#_shaderSTW
-     * @type {ScreenToWorldProgram}
+     * @type {?ScreenToWorldProgram}
      * @private
      */
     this._shaderSTW = null;
@@ -108,7 +108,7 @@ FORGE.ViewBase = function(viewer, className, type)
     /**
      * Shader world to screen
      * @name FORGE.ViewBase#_shaderWTS
-     * @type {WorldToScreenProgram}
+     * @type {?WorldToScreenProgram}
      * @private
      */
     this._shaderWTS = null;
@@ -224,6 +224,9 @@ FORGE.ViewBase.prototype.destroy = function()
 {
     this._viewer = null;
     this._camera = null;
+
+    this._shaderSTW = null;
+    this._shaderWTS = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
