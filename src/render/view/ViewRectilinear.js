@@ -16,18 +16,6 @@ FORGE.ViewRectilinear.prototype = Object.create(FORGE.ViewBase.prototype);
 FORGE.ViewRectilinear.prototype.constructor = FORGE.ViewRectilinear;
 
 /**
- * Background shader screen to world
- * @type {ScreenToWorldProgram}
- */
-FORGE.ViewRectilinear.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.rectilinear;
-
-/**
- * Background shader world to screen
- * @type {WorldToScreenProgram}
- */
-FORGE.ViewRectilinear.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.rectilinear;
-
-/**
  * Boot sequence.
  *
  * @method FORGE.ViewRectilinear#_boot
@@ -36,6 +24,9 @@ FORGE.ViewRectilinear.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.rectil
 FORGE.ViewRectilinear.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
+
+    this._shaderSTW = FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.screenToWorld.rectilinear);
+    this._shaderWTS = FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.worldToScreen.rectilinear);
 
     this._pitchMin = -FORGE.Math.degToRad(90);
     this._pitchMax = FORGE.Math.degToRad(90);

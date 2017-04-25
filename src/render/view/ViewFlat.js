@@ -30,18 +30,6 @@ FORGE.ViewFlat.prototype = Object.create(FORGE.ViewBase.prototype);
 FORGE.ViewFlat.prototype.constructor = FORGE.ViewFlat;
 
 /**
- * Background shader screen to world
- * @type {ScreenToWorldProgram}
- */
-FORGE.ViewFlat.prototype.shaderSTW = FORGE.ShaderLib.screenToWorld.flat;
-
-/**
- * Background shader world to screen
- * @type {WorldToScreenProgram}
- */
-FORGE.ViewFlat.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.flat;
-
-/**
  * Boot sequence.
  *
  * @method FORGE.ViewFlat#_boot
@@ -50,6 +38,9 @@ FORGE.ViewFlat.prototype.shaderWTS = FORGE.ShaderLib.worldToScreen.flat;
 FORGE.ViewFlat.prototype._boot = function()
 {
     FORGE.ViewBase.prototype._boot.call(this);
+
+    this._shaderSTW = FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.screenToWorld.gopro);
+    this._shaderWTS = FORGE.Utils.extendSimpleObject({}, FORGE.ShaderLib.worldToScreen.gopro);
 
     this._yawMin = FORGE.Math.degToRad(-360);
     this._yawMax = FORGE.Math.degToRad(360);
