@@ -194,6 +194,7 @@ FORGE.Director.prototype._sceneLoadCompleteHandler = function()
             // React on loading/buffering event
             this._viewer.story.scene.media.displayObject.onWaiting.add(this._waitingHandler, this);
             this._viewer.story.scene.media.displayObject.onStalled.add(this._waitingHandler, this);
+            this._viewer.story.scene.media.displayObject.onSeeked.add(this._waitingHandler, this);
 
             // The director's cut begin again if video is looping
             this._viewer.story.scene.media.displayObject.onEnded.add(this._endedHandler, this);
@@ -245,6 +246,11 @@ FORGE.Director.prototype._playHandler = function()
     if (this._track !== null)
     {
         this.play(this._track);
+
+        if (typeof this._viewer.story.scene.config.media !== "undefined" && this._viewer.story.scene.config.media.type === FORGE.MediaType.VIDEO)
+        {
+            this._synchronizeWithVideo();
+        }
     }
 
     // Event handling
@@ -270,6 +276,7 @@ FORGE.Director.prototype._waitingHandler = function()
     // for waiting
     this._viewer.story.scene.media.displayObject.onWaiting.remove(this._waitingHandler, this);
     this._viewer.story.scene.media.displayObject.onStalled.remove(this._waitingHandler, this);
+    this._viewer.story.scene.media.displayObject.onSeeked.remove(this._waitingHandler, this);
     this._viewer.story.scene.media.displayObject.onPlaying.add(this._playingHandler, this);
     // for controllers
     this._viewer.controllers.onControlStart.remove(this._controlStartHandler, this);
@@ -287,6 +294,11 @@ FORGE.Director.prototype._playingHandler = function()
     if (this._track !== null)
     {
         this.play(this._track);
+
+        if (typeof this._viewer.story.scene.config.media !== "undefined" && this._viewer.story.scene.config.media.type === FORGE.MediaType.VIDEO)
+        {
+            this._synchronizeWithVideo();
+        }
     }
 
     // Event handling
@@ -294,6 +306,7 @@ FORGE.Director.prototype._playingHandler = function()
     this._viewer.story.scene.media.displayObject.onPlaying.remove(this._playingHandler, this);
     this._viewer.story.scene.media.displayObject.onWaiting.add(this._waitingHandler, this);
     this._viewer.story.scene.media.displayObject.onStalled.add(this._waitingHandler, this);
+    this._viewer.story.scene.media.displayObject.onSeeked.add(this._waitingHandler, this);
     // for controllers
     this._viewer.controllers.onControlStart.add(this._controlStartHandler, this);
     this._viewer.controllers.onControlEnd.add(this._controlEndHandler, this);
@@ -421,7 +434,7 @@ FORGE.Director.prototype._onVisibilityChange = function()
 /**
  * When the currentTime property of the video change, synchronize the director's cut on it.
  * @method FORGE.Director#_synchronizeWithVideo
- * @param  {number|FORGE.Event} time - the emitted event, containing the time to synchronize to, or the time to synchronize to (in seconds).
+ * @param  {(number|FORGE.Event)=} time - the emitted event, containing the time to synchronize to, or the time to synchronize to (in seconds).
  * @private
  */
 FORGE.Director.prototype._synchronizeWithVideo = function(time)
@@ -436,7 +449,7 @@ FORGE.Director.prototype._synchronizeWithVideo = function(time)
     {
         time = time * 1000;
     }
-    else if (typeof time.data === "number")
+    else if (typeof time === "object" && typeof time.data === "number")
     {
         time = time.data * 1000;
     }
@@ -449,6 +462,7 @@ FORGE.Director.prototype._synchronizeWithVideo = function(time)
     var trackA, trackB;
     trackB = FORGE.UID.get(this._tracks[0]);
 
+    // If the time is lower than the duration of the first track, it is this one
     if (trackB.duration > time)
     {
         this._track = trackB.uid;
@@ -481,7 +495,7 @@ FORGE.Director.prototype._synchronizeWithVideo = function(time)
     }
     else
     {
-        this._viewer.renderer.camera.animation.play(this._track);
+        this._viewer.renderer.camera.animation.play(this._track, time);
     }
 };
 
@@ -518,6 +532,7 @@ FORGE.Director.prototype.play = function(track)
  */
 FORGE.Director.prototype.stop = function()
 {
+    this.log("stopping");
     this._viewer.renderer.camera.animation.stop();
 };
 

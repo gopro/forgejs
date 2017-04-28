@@ -24,6 +24,8 @@ FORGE.CameraAnimation.prototype.constructor = FORGE.CameraAnimation;
  */
 FORGE.CameraAnimation.prototype._boot = function()
 {
+    this._register();
+
     // Add the cancel roll effect
     var cameraAt = function()
     {
@@ -113,8 +115,9 @@ FORGE.CameraAnimation.prototype._prepareKeyframes = function(tracks, offset, eas
  *
  * @method FORGE.CameraAnimation#play
  * @param {string|FORGE.DirectorTrack} track - Track to play
+ * @param {number=} time - Time to start the animation at
  */
-FORGE.CameraAnimation.prototype.play = function(track)
+FORGE.CameraAnimation.prototype.play = function(track, time)
 {
     if (typeof track === "string")
     {
@@ -145,8 +148,8 @@ FORGE.CameraAnimation.prototype.play = function(track)
     this._prepareKeyframes(track.keyframes, track.offset, quatAnimation.tween.easing);
 
     // Play !
-    quatAnimation.play();
-    fovAnimation.play();
+    quatAnimation.play(time);
+    fovAnimation.play(time);
 };
 
 /**
