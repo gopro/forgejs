@@ -927,18 +927,6 @@ FORGE.RenderManager.prototype.destroy = function()
         this._onBackgroundReady = null;
     }
 
-    if (this._onViewReady !== null)
-    {
-        this._onViewReady.destroy();
-        this._onViewReady = null;
-    }
-
-    if (this._onHotspotsReady !== null)
-    {
-        this._onHotspotsReady.destroy();
-        this._onHotspotsReady = null;
-    }
-
     if (this._mediaSound !== null)
     {
         this._mediaSound.destroy();
@@ -1202,26 +1190,6 @@ Object.defineProperty(FORGE.RenderManager.prototype, "onBackgroundReady",
 });
 
 /**
- * Get the onViewReady {@link FORGE.EventDispatcher}.
- * @name FORGE.RenderManager#onViewReady
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.RenderManager.prototype, "onViewReady",
-{
-    /** @this {FORGE.RenderManager} */
-    get: function()
-    {
-        if (this._onViewReady === null)
-        {
-            this._onViewReady = new FORGE.EventDispatcher(this, true);
-        }
-
-        return this._onViewReady;
-    }
-});
-
-/**
  * Get the objects
  * @name FORGE.RenderManager#objects
  * @type {FORGE.ObjectRenderer}
@@ -1248,25 +1216,5 @@ Object.defineProperty(FORGE.RenderManager.prototype, "hotspotsReady",
     get: function()
     {
         return this._hotspotsReady;
-    }
-});
-
-/**
- * Get the onHotspotsReady {@link FORGE.EventDispatcher}.
- * @name FORGE.RenderManager#onHotspotsReady
- * @type {FORGE.EventDispatcher}
- * @readonly
- */
-Object.defineProperty(FORGE.RenderManager.prototype, "onHotspotsReady",
-{
-    /** @this {FORGE.RenderManager} */
-    get: function()
-    {
-        if (this._onHotspotsReady === null)
-        {
-            this._onHotspotsReady = new FORGE.EventDispatcher(this, true);
-        }
-
-        return this._onHotspotsReady;
     }
 });

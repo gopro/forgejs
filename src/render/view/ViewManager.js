@@ -163,6 +163,26 @@ FORGE.ViewManager.prototype.disableVR = function()
 };
 
 /**
+ * Destroy sequence
+ * @method FORGE.ViewManager#destroy
+ */
+FORGE.ViewManager.prototype.destroy = function()
+{
+    this._viewer = null;
+
+    this._view.destroy();
+    this._view = null;
+
+    if (this._onChange !== null)
+    {
+        this._onChange.destroy();
+        this._onChange = null;
+    }
+
+    FORGE.BaseObject.prototype.destroy.call(this);
+};
+
+/**
  * Get the current view object.
  * @name  FORGE.ViewManager#current
  * @type {FORGE.ViewBase}

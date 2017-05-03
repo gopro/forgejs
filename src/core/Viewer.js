@@ -703,6 +703,9 @@ FORGE.Viewer.prototype.destroy = function()
 
     this._parent = null;
 
+    this._system.destroy();
+    this._system = null;
+
     this._plugins.destroy();
     this._plugins = null;
 
