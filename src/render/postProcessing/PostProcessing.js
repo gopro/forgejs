@@ -148,7 +148,11 @@ FORGE.PostProcessing.prototype._parsePassConfig = function(passConfig)
         }
         else
         {
-            args = [null].concat(Object.values(passConfig.args));
+            args = [null];
+            for (var prop in passConfig.args)
+            {
+                args.push(passConfig.args[prop]);
+            }
         }
     }
 
