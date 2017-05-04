@@ -210,7 +210,7 @@ FORGE.Raycaster.prototype._raycast = function(event, screenPoint)
     // Get all objects of the object renderer that are ready and interactive
     var objects = this._viewer.renderer.objects.getRaycastable();
 
-    //Reset the hovered flag of all the objects
+    //Reset the hovered flag to false for all the objects
     this._setHovered(objects, false);
 
     // Get the first intersected object
@@ -220,6 +220,7 @@ FORGE.Raycaster.prototype._raycast = function(event, screenPoint)
     {
         if (event === "click")
         {
+            this._hoveredObject = intersected; // For mobile we have to set the last intersect as the hovered object.
             this.click();
         }
         else if (event === "move")
