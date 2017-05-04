@@ -492,27 +492,31 @@ FORGE.RenderManager.prototype._drawBackground = function(camera)
  */
 FORGE.RenderManager.prototype._setRendererSize = function(size)
 {
-    this.log("set renderer size: " + size.width + "x" + size.height);
-
     var vr = this._renderDisplay.presentingVR;
 
     var keepCanvasStyle = true;
 
     if (vr === true)
     {
+        size = this._renderDisplay.rendererSize;
         keepCanvasStyle = false;
     }
-
-    // Resize
-    if (vr === false)
+    else
     {
         this._renderDisplay.setSize(size);
     }
 
+    this.log("set renderer size: " + size.width + "x" + size.height);
+
     this._webGLRenderer.setSize(size.width, size.height, keepCanvasStyle);
     this._canvasResolution = size;
 
-    this._displayResolution = new FORGE.Size(size.width * (vr ? 0.5 : 1), size.height);
+    this._displayResolution = new FORGE.Size(size.width, size.height);
+
+    if (vr === true)
+    {
+        this._displayResolution.x *= 0.5;
+    }
 
     if (this._backgroundRenderer !== null)
     {
@@ -523,7 +527,7 @@ FORGE.RenderManager.prototype._setRendererSize = function(size)
 
     this._renderPipeline.setSize(this._displayResolution);
 
-    this.log("Render size change in " + (vr ? "VR" : "screen") + " mode, resolution: " + this._displayResolution.width + "x" + this._displayResolution.height);
+    this.log("render size change in " + (vr ? "VR" : "screen") + " mode, resolution: " + this._displayResolution.width + "x" + this._displayResolution.height);
 };
 
 /**
