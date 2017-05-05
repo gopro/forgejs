@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.HotspotAnimation
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.HotspotTransform} hotspot - {@link FORGE.Hotspot3D} reference
+ * @param {FORGE.Hotspot3D} hotspot - {@link FORGE.Hotspot3D} reference
  * @extends {FORGE.MetaAnimation}
  */
 FORGE.HotspotAnimation = function(viewer, hotspot)

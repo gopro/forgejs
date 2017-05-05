@@ -65,6 +65,18 @@ FORGE.HotspotStates = function(viewer, hotspotUid)
     this._ready = false;
 
     /**
+     * Loading flags
+     * @name FORGE.HotspotStates#_loading
+     * @type {Object}
+     * @private
+     */
+    this._loading =
+    {
+        transform: false,
+        material: false
+    };
+
+    /**
      * Load complete event dispatcher for state change.
      * @name  FORGE.HotspotStates#_onLoadComplete
      * @type {FORGE.EventDispatcher}
@@ -176,8 +188,9 @@ FORGE.HotspotStates.prototype._getStatesNames = function()
  */
 FORGE.HotspotStates.prototype._updateMaterial = function(config)
 {
-    var hotspot = FORGE.UID.get(this._hotspotUid);
+    this.log("update material");
 
+    var hotspot = FORGE.UID.get(this._hotspotUid);
     hotspot.material.onReady.addOnce(this._materialReadyHandler, this);
     hotspot.material.load(config);
 };
@@ -189,12 +202,51 @@ FORGE.HotspotStates.prototype._updateMaterial = function(config)
  */
 FORGE.HotspotStates.prototype._materialReadyHandler = function()
 {
+    this._loading.material = false;
+    this._checkLoading();
+};
+
+/**
+ * Update the transform for the current state
+ * @method FORGE.HotspotStates#_updateTransform
+ * @param  {HotspotMaterialConfig} config - The hotspot transform configuration object.
+ * @private
+ */
+FORGE.HotspotStates.prototype._updateTransform = function(config)
+{
+    this.log("update transform");
+
+    var hotspot = FORGE.UID.get(this._hotspotUid);
+    hotspot.transform.load(config, false);
+
+    this._loading.transform = false;
+    this._checkLoading();
+};
+
+/**
+ * Check the loading status of the current state.
+ * Dispatch the laod complete event if all check are ok.
+ * @method FORGE.HotspotStates#_checkLoading
+ * @private
+ */
+FORGE.HotspotStates.prototype._checkLoading = function()
+{
+    for(var prop in this._loading)
+    {
+        if(this._loading[prop] === true)
+        {
+            return true;
+        }
+    }
+
     this._ready = true;
 
     if(this._onLoadComplete !== null)
     {
         this._onLoadComplete.dispatch();
     }
+
+    return false;
 };
 
 /**
@@ -234,8 +286,18 @@ FORGE.HotspotStates.prototype.load = function(name)
 
     if(typeof this._config[name].material === "object")
     {
+        this._loading.material = true;
+
         var materialConfig = /** @type {!HotspotMaterialConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.material, this._config[name].material));
         this._updateMaterial(materialConfig);
+    }
+
+    if(typeof this._config[name].transform === "object")
+    {
+        this._loading.transform = true;
+
+        var transformConfig = /** @type {!HotspotTransformConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.transform, this._config[name].transform));
+        this._updateTransform(transformConfig);
     }
 };
 
