@@ -37,7 +37,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._yawMin = -Infinity;
+    this._yawMin = 0;
 
     /**
      * The yaw maximum value in radians.
@@ -45,7 +45,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._yawMax = Infinity;
+    this._yawMax = 0;
 
     /**
      * The pitch value in radians.
@@ -61,7 +61,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._pitchMin = -Infinity;
+    this._pitchMin = 0;
 
     /**
      * The pitch maximum value  in radians.
@@ -69,7 +69,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._pitchMax = Infinity;
+    this._pitchMax = 0;
 
     /**
      * The roll value in radians.
@@ -85,7 +85,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._rollMin = -Infinity;
+    this._rollMin = 0;
 
     /**
      * The roll maximum value in radians.
@@ -93,7 +93,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._rollMax = Infinity;
+    this._rollMax = 0;
 
     /**
      * The fov value in radians.
@@ -101,7 +101,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._fov = Math.PI / 2;
+    this._fov = 0;
 
     /**
      * The fov minimum value in radians.
@@ -117,7 +117,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._fovMax = Infinity;
+    this._fovMax = 0;
 
     /**
      * Parallax setting
@@ -242,18 +242,26 @@ FORGE.Camera.DEFAULT_CONFIG = {
     parallax: 0,
     yaw:
     {
-        default: 0
+        min: -Infinity,
+        max: Infinity,
+        default: 0,
     },
     pitch:
     {
+        min: -Infinity,
+        max: Infinity,
         default: 0
     },
     roll:
     {
+        min: -Infinity,
+        max: Infinity,
         default: 0
     },
     fov:
     {
+        min: 0,
+        max: Infinity,
         default: 90
     },
     gaze:
