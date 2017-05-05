@@ -41,7 +41,7 @@ FORGE.Gamepad = function(viewer, ref)
     this._enabled = true;
 
     /**
-     * The array that handles the {@link FORGE.KeyBinding} objects.
+     * The array that handles the {@link FORGE.ButtonBinding} objects.
      * @name FORGE.Gamepad#_buttonBindings
      * @type {?Array<FORGE.ButtonBinding>}
      * @private
@@ -86,9 +86,9 @@ FORGE.Gamepad.prototype._boot = function()
 };
 
 /**
- * Get the index of a KeyBinding.
+ * Get the index of a ButtonBinding.
  * @method FORGE.Gamepad#_indexOfBinding
- * @param  {FORGE.KeyBinding|number} value - The ButtonBinding or a button code (number).
+ * @param  {FORGE.ButtonBinding|number} value - The ButtonBinding or a button code (number).
  * @return {number} Returns the searched index if found, if not, returns -1.
  * @private
  */
@@ -99,7 +99,7 @@ FORGE.Gamepad.prototype._indexOfBinding = function(value)
         return -1;
     }
 
-    if (typeof value === "object" && value.type === "KeyBinding")
+    if (typeof value === "object" && value.type === "ButtonBinding")
     {
         return this._buttonBindings.indexOf(value);
     }
@@ -151,9 +151,9 @@ FORGE.Gamepad.prototype._processButtons = function(buttons)
     }
 
     // Then process bindings for hold actions
-    for (i = 0, ii = buttonBindings.length; i < ii; i++)
+    for (i = 0, ii = this._buttonBindings.length; i < ii; i++)
     {
-        binding = buttonBindings[i];
+        binding = this._buttonBindings[i];
 
         if (binding.pressed === true)
         {
@@ -161,6 +161,8 @@ FORGE.Gamepad.prototype._processButtons = function(buttons)
             {
                 continue;
             }
+
+            this.log("button hold " + i);
 
             binding.hold();
         }
@@ -171,7 +173,7 @@ FORGE.Gamepad.prototype._processButtons = function(buttons)
  * Get an array of bindings associated to the button.
  * @method FORGE.Gamepad#_getButtonBindings
  * @param {number} index - the index of the button
- * @return {Array<FORGE.KeyBinding>} an array of bindings
+ * @return {Array<FORGE.ButtonBinding>} an array of bindings
  * */
 FORGE.Gamepad.prototype._getButtonBindings = function(index)
 {
@@ -270,12 +272,12 @@ FORGE.Gamepad.prototype.update = function()
 /**
  * Add a ButtonBinding to the Gamepad's buttonBindings array.
  * @method FORGE.Gamepad#addBinding
- * @param {FORGE.KeyBinding} buttonBinding - The FORGE.KeyBinding you want to add.
+ * @param {FORGE.ButtonBinding} buttonBinding - The FORGE.ButtonBinding you want to add.
  * @return {boolean} Returns true if it's correctly added, false if it's already in or if wrong type.
  */
 FORGE.Gamepad.prototype.addBinding = function(buttonBinding)
 {
-    if (typeof buttonBinding !== "object" && buttonBinding.type !== "KeyBinding")
+    if (typeof buttonBinding !== "object" && buttonBinding.type !== "ButtonBinding")
     {
         return false;
     }
@@ -296,9 +298,9 @@ FORGE.Gamepad.prototype.addBinding = function(buttonBinding)
 };
 
 /**
- * Remove a {@link FORGE.KeyBinding} from the {@link FORGE.Gamepad} object.
+ * Remove a {@link FORGE.ButtonBinding} from the {@link FORGE.Gamepad} object.
  * @method FORGE.Gamepad#removeBinding
- * @param  {FORGE.KeyBinding|number} buttonBinding - A {@link FORGE.KeyBinding} or a number that represent a button code.
+ * @param  {FORGE.ButtonBinding|number} buttonBinding - A {@link FORGE.ButtonBinding} or a number that represent a button code.
  * @return {boolean} Returns true if it's removed, false if not found.
  */
 FORGE.Gamepad.prototype.removeBinding = function(buttonBinding)
@@ -355,7 +357,7 @@ Object.defineProperty(FORGE.Gamepad.prototype, "name",
     /** @this {FORGE.Gamepad} */
     get: function()
     {
-        return this._gamepad.id;
+        return this._gamepad.id + "-" + this._gamepad.index;
     }
 });
 

@@ -68,7 +68,7 @@ FORGE.GamepadsManager.prototype._isConnected = function(gamepad)
 {
     for (var i = 0, ii = this._gamepads.length; i < ii; i++)
     {
-        if (this._gamepads[i].name === gamepad.id)
+        if (this._gamepads[i].name === (gamepad.id + "-" + gamepad.index))
         {
             return true;
         }
@@ -93,7 +93,7 @@ FORGE.GamepadsManager.prototype._connect = function(pad)
 
     if (this._onGamepadConnected !== null)
     {
-        this._onGamepadConnected.dispatch();
+        this._onGamepadConnected.dispatch(gamepad);
     }
 };
 
@@ -105,12 +105,14 @@ FORGE.GamepadsManager.prototype._connect = function(pad)
  */
 FORGE.GamepadsManager.prototype._disconnect = function(index)
 {
+    var name = this._gamepads[index].name;
+
     this._gamepads[index].destroy();
     this._gamepads[index] = null;
 
     if (this._onGamepadDisconnected !== null)
     {
-        this._onGamepadDisconnected.dispatch();
+        this._onGamepadDisconnected.dispatch(name);
     }
 };
 

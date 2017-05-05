@@ -1325,6 +1325,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "gyroscope",
 });
 
 /**
+ * Get the viewer gamepad interface.
+ * @name FORGE.Viewer#gamepad
+ * @type {FORGE.GamepadsManager}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "gamepad",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._gamepad;
+    }
+});
+
+/**
  * Get and set the viewer width.
  * @name FORGE.Viewer#width
  * @type {number}

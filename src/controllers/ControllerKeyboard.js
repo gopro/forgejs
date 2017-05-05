@@ -500,7 +500,7 @@ FORGE.ControllerKeyboard.prototype.update = function()
     {
         return;
     }
-    
+
     var invert = this._orientation.invert ? -1 : 1;
     this._camera.yaw += invert * dx;
     this._camera.pitch -= invert * dy;

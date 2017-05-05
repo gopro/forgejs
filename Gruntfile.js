@@ -101,6 +101,7 @@ module.exports = function(grunt)
         "src/controllers/ControllerPointer.js",
         "src/controllers/ControllerKeyboard.js",
         "src/controllers/ControllerGyroscope.js",
+        "src/controllers/ControllerGamepad.js",
 
         "src/audio/SoundManager.js",
         "src/audio/SoundType.js",

@@ -76,6 +76,11 @@ FORGE.ControllerManager.DEFAULT_CONFIG =
         {
             type: FORGE.ControllerType.GYROSCOPE,
             enabled: true
+        },
+
+        {
+            type: FORGE.ControllerType.GAMEPAD,
+            enabled: true
         }
     ]
 };
@@ -111,6 +116,10 @@ FORGE.ControllerManager.prototype._parseConfig = function(config)
 
                 case FORGE.ControllerType.GYROSCOPE:
                     controller = new FORGE.ControllerGyroscope(this._viewer, controllerConfig);
+                    break;
+
+                case FORGE.ControllerType.GAMEPAD:
+                    controller = new FORGE.ControllerGamepad(this._viewer, controllerConfig);
                     break;
 
                 default:

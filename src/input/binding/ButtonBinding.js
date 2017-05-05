@@ -133,7 +133,7 @@ FORGE.ButtonBinding = function(viewer, buttonsIn, down, up, hold, buttonsOut, co
     this._boot();
 };
 
-FORGE.ButtonBinding.prototype = Object.create(FORGE.ButtonBinding.prototype);
+FORGE.ButtonBinding.prototype = Object.create(FORGE.BaseBinding.prototype);
 FORGE.ButtonBinding.prototype.constructor = FORGE.ButtonBinding;
 
 /**
