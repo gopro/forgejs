@@ -461,7 +461,7 @@ FORGE.Animation.prototype.play = function(time)
     this._time = time || 0;
 
     // Start the animation
-    this._goTo(0);
+    this._goTo(this._time);
 };
 
 /**
