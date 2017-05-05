@@ -207,6 +207,14 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._gyroscope = null;
 
     /**
+     * Gamepads manager.
+     * @name FORGE.Viewer#_gamepad
+     * @type {FORGE.GamepadsManager}
+     * @private
+     */
+    this._gamepad = null;
+
+    /**
      * Plugins interface reference.
      * @name FORGE.Viewer#_plugins
      * @type {FORGE.PluginManager}
@@ -365,6 +373,7 @@ FORGE.Viewer.prototype._boot = function(callback)
 
     this._keyboard = new FORGE.Keyboard(this);
     this._gyroscope = new FORGE.Gyroscope(this);
+    this._gamepad = new FORGE.GamepadsManager(this);
     this._cache = new FORGE.Cache(this);
     this._load = new FORGE.Loader(this);
     this._tween = new FORGE.TweenManager(this);
@@ -576,6 +585,7 @@ FORGE.Viewer.prototype._updateLogic = function()
 {
     this._display.update();
     this._keyboard.update();
+    this._gamepad.update();
     this._audio.update();
     this._plugins.update();
     this._tween.update();
@@ -726,6 +736,9 @@ FORGE.Viewer.prototype.destroy = function()
 
     this._gyroscope.destroy();
     this._gyroscope = null;
+
+    this._gamepad.destroy();
+    this._gamepad = null;
 
     this._hotspots.destroy();
     this._hotspots = null;

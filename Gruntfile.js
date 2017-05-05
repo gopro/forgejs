@@ -131,11 +131,16 @@ module.exports = function(grunt)
         "src/i18n/LocaleString.js",
         "src/i18n/Locale.js",
 
+        "src/input/binding/BaseBinding.js",
+        "src/input/binding/KeyBinding.js",
+        "src/input/binding/ButtonBinding.js",
+        "src/input/binding/AxisBinding.js",
         "src/input/Keyboard.js",
-        "src/input/KeyBinding.js",
         "src/input/Drag.js",
         "src/input/Pointer.js",
         "src/input/Gyroscope.js",
+        "src/input/GamepadsManager.js",
+        "src/input/Gamepad.js",
 
         "src/display/DisplayList.js",
         "src/display/DisplayObject.js",

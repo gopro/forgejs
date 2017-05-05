@@ -319,7 +319,7 @@ FORGE.Keyboard.prototype.update = function()
         {
             if(keyBinding.hasToWaitToHold === true && keyBinding.downComplete === false)
             {
-                return;
+                continue;
             }
 
             keyBinding.hold();
