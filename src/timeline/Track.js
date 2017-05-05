@@ -202,9 +202,9 @@ Object.defineProperty(FORGE.Track.prototype, "duration",
     /** @this {FORGE.Track} */
     get: function()
     {
-        var res;
+        var res = this._keyframes[0].time;
 
-        for (var i = 0, ii = this._keyframes.length; i < ii; i++)
+        for (var i = 1, ii = this._keyframes.length; i < ii; i++)
         {
             if (this._keyframes[i].time > res)
             {

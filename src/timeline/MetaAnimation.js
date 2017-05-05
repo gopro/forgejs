@@ -71,7 +71,12 @@ FORGE.MetaAnimation.prototype.constructor = FORGE.MetaAnimation;
  */
 FORGE.MetaAnimation.prototype.stop = function()
 {
-    for (var i = 0, ii = this._animations; i < ii; i++)
+    if (this._animations === null)
+    {
+        return;
+    }
+
+    for (var i = 0, ii = this._animations.length; i < ii; i++)
     {
         this._animations[i].stop();
     }
@@ -84,7 +89,12 @@ FORGE.MetaAnimation.prototype.stop = function()
  */
 FORGE.MetaAnimation.prototype.resume = function()
 {
-    for (var i = 0, ii = this._animations; i < ii; i++)
+    if (this._animations === null)
+    {
+        return;
+    }
+
+    for (var i = 0, ii = this._animations.length; i < ii; i++)
     {
         this._animations[i].resume();
     }

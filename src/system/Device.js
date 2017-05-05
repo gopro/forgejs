@@ -975,11 +975,6 @@ FORGE.Device = (function(c)
 
         for(var i in config)
         {
-            if (typeof i === "string")
-            {
-                i.toLowerCase();
-            }
-
             if(typeof this[i] === "undefined")
             {
                 console.warn("Unable to check plugin device compatibility for: "+i);

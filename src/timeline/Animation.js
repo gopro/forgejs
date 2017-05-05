@@ -168,6 +168,8 @@ FORGE.Animation.prototype.constructor = FORGE.Animation;
  */
 FORGE.Animation.prototype._boot = function()
 {
+    this._register();
+
     // Create the tween object
     this._tween = new FORGE.Tween(this._viewer, this);
     this._tween.onStart.add(this._onTweenStartHandler, this);
@@ -307,6 +309,8 @@ FORGE.Animation.prototype._at = function(t)
 FORGE.Animation.prototype._goTo = function(time)
 {
     time = time || this._time;
+
+    this.log("going to the next keyframes at " + time);
 
     // By default, increase keyframes by 1
     var kfs = this._timeline.getKeyframesIndexes(time || this._time);
@@ -449,18 +453,15 @@ FORGE.Animation.prototype._onTweenCompleteHandler = function()
  * Play the animation.
  *
  * @method  FORGE.Animation#play
+ * @param {number=} time - Time to start the animation at
  */
-FORGE.Animation.prototype.play = function()
+FORGE.Animation.prototype.play = function(time)
 {
     // Reset the time
-    this._time = 0;
-
-    // Set the first keyframes from the timeline
-    this._kfp = this._timeline.keyframes[0];
-    this._kfn = this._timeline.keyframes[1];
+    this._time = time || 0;
 
     // Start the animation
-    this._goTo(0);
+    this._goTo(this._time);
 };
 
 /**
