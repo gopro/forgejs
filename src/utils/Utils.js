@@ -52,10 +52,8 @@ FORGE.Utils.extendSimpleObject = function(from, to, recursive)
 {
     var result = {};
 
-    from = (typeof from !== "undefined") ? from :
-    {};
-    to = (typeof to !== "undefined") ? to :
-    {};
+    from = (typeof from !== "undefined") ? from : {};
+    to = (typeof to !== "undefined") ? to : {};
 
     for (var f in from)
     {
@@ -103,6 +101,69 @@ FORGE.Utils.extendMultipleObjects = function(obj)
     return res;
 };
 //jscs:enable
+
+/**
+ * Compare two objects
+ * @method FORGE.Utils.compareObjects
+ * @param  {*} objectA - The first object to compare
+ * @param  {*} objectB - The second object to compare
+ * @return {boolean} Returns true if the two objects are the same
+ */
+FORGE.Utils.compareObjects = function(objectA, objectB)
+{
+    if (typeof(objectA) !== typeof(objectB))
+    {
+        return false;
+    }
+
+    if (typeof(objectA) === "function")
+    {
+        return objectA.toString() === y.toString();
+    }
+
+    if (objectA instanceof Object && objectB instanceof Object)
+    {
+        if (FORGE.Utils.countProperties(objectA) !== FORGE.Utils.countProperties(objectB))
+        {
+            return false;
+        }
+
+        for (prop in objectA)
+        {
+            if(FORGE.Utils.compareObjects(objectA[prop], objectB[prop]) === false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    else
+    {
+        return objectA === objectB;
+    }
+};
+
+/**
+ * Count object properties
+ * @method FORGE.Utils.countProperties
+ * @param  {*} object
+ * @return {number} Returns the count of the object's properties
+ */
+FORGE.Utils.countProperties = function(object)
+{
+    var count = 0;
+
+    for (i in object)
+    {
+        if (object.hasOwnProperty(i))
+        {
+            count++;
+        }
+    }
+
+    return count;
+};
 
 /**
  * Clone an object deeply, without keeping a single reference.
