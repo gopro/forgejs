@@ -1033,7 +1033,7 @@ FORGE.Sound.prototype.resume = function()
         return;
     }
 
-    if (this._paused === true || this._playing === false)
+    if (this._paused === true || this._playing === false || this._resumed === true)
     {
         if (this._sound === null)
         {
@@ -1073,7 +1073,7 @@ FORGE.Sound.prototype.resume = function()
             }
             else if (this._viewer.audio.useAudioTag === true || this._isAmbisonic() === true)
             {
-                this._sound.data.currentTime = FORGE.Math.round10(time / 1000);
+                this._sound.data.currentTime = time;
                 this._sound.data.play();
             }
         }
