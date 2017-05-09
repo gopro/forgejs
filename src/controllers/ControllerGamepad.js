@@ -42,14 +42,6 @@ FORGE.ControllerGamepad = function(viewer, config)
 
     /**
      * Previous position vector.
-     * @name FORGE.ControllerGamepad#_positionStart
-     * @type {THREE.Vector2}
-     * @private
-     */
-    this._positionStart = null;
-
-    /**
-     * Previous position vector.
      * @name FORGE.ControllerGamepad#_positionCurrent
      * @type {THREE.Vector2}
      * @private
@@ -79,6 +71,14 @@ FORGE.ControllerGamepad = function(viewer, config)
      * @private
      */
     this._buttonBindings = null;
+
+    /**
+     * Array of all axis bindings
+     * @name FORGE.ControllerGamepad#_axisBindings
+     * @type {Array<FORGE.AxisBinding>}
+     * @private
+     */
+    this._axisBindings = null;
 
     FORGE.ControllerBase.call(this, viewer, "ControllerGamepad");
 };
@@ -121,6 +121,7 @@ FORGE.ControllerGamepad.prototype._boot = function()
     this._gamepads = [];
 
     this._buttonBindings = [];
+    this._axisBindings = [];
 
     this._inertia = new THREE.Vector2();
     this._velocity = new THREE.Vector2();
@@ -161,11 +162,22 @@ FORGE.ControllerGamepad.prototype._parseConfig = function(config)
         this._addDefaultBindings();
     }
 
-    if (Array.isArray(options.bindings) === true)
+    if (typeof options.bindings !== "undefined")
     {
-        for (var i = 0, ii = options.bindings.length; i < ii; i++)
+        if (typeof options.bindings.buttons !== "undefined" && Array.isArray(options.bindings.buttons) === true)
         {
-            this._addBinding(options.bindings[i]);
+            for (var i = 0, ii = options.bindings.buttons.length; i < ii; i++)
+            {
+                this._addButtonBinding(options.bindings.buttons[i]);
+            }
+        }
+
+        if (typeof options.bindings.axes !== "undefined" && Array.isArray(options.bindings.axes) === true)
+        {
+            for (var i = 0, ii = options.bindings.axes.length; i < ii; i++)
+            {
+                this._addAxisBinding(options.bindings.axes[i]);
+            }
         }
     }
 };
@@ -199,15 +211,31 @@ FORGE.ControllerGamepad.prototype._addDefaultBindings = function()
         "minus"
     );
     this._buttonBindings.push(bindingMinus);
+
+    var bindingYaw = new FORGE.AxisBinding(this._viewer,
+        2,
+        this._yawMoveHandler,
+        this,
+        "yaw"
+    );
+    this._axisBindings.push(bindingYaw);
+
+    var bindingPitch = new FORGE.AxisBinding(this._viewer,
+        3,
+        this._pitchMoveHandler,
+        this,
+        "pitch"
+    );
+    this._axisBindings.push(bindingPitch);
 };
 
 /**
  * Add a gamepad binding config to this controller.
- * @method FORGE.ControllerGamepad#_addBinding
- * @param {ControllerKeyboardBindingConfig} binding - The binding config to add.
+ * @method FORGE.ControllerGamepad#_addButtonBinding
+ * @param {ControllerGamepadButtonBindingConfig} binding - The binding config to add.
  * @private
  */
-FORGE.ControllerGamepad.prototype._addBinding = function(binding)
+FORGE.ControllerGamepad.prototype._addButtonBinding = function(binding)
 {
     var buttonsIn = binding.in;
     var buttonsOut = binding.out;
@@ -216,7 +244,7 @@ FORGE.ControllerGamepad.prototype._addBinding = function(binding)
 
     if (FORGE.Utils.isTypeOf(buttonsIn, "number") === false && FORGE.Utils.isArrayOf(buttonsIn, "number") === false)
     {
-        this.warn("Can't add custom gamepad binding, keys in are invalid!");
+        this.warn("Can't add custom gamepad binding, buttons in are invalid!");
         return;
     }
 
@@ -229,6 +257,75 @@ FORGE.ControllerGamepad.prototype._addBinding = function(binding)
     var binding = new FORGE.ButtonBinding(this._viewer, buttonsIn, events.onDown, events.onUp, events.onHold, buttonsOut, this, name);
 
     this._buttonBindings.push(binding);
+};
+
+/**
+ * Add a gamepad axis binding config to this controller.
+ * @method FORGE.ControllerGamepad#_addAxisBinding
+ * @param {ControllerGamepadAxisBindingConfig} binding - the binding config to add
+ * @private
+ */
+FORGE.ControllerGamepad.prototype._addAxisBinding = function(binding)
+{
+    var axes = binding.axes;
+    var name = binding.name;
+    var events = binding.events;
+
+    if (FORGE.Utils.isTypeOf(axes, "number") === false && FORGE.Utils.isArrayOf(axes, "number") === false)
+    {
+        this.warn("Can't add custom gamepad binding, axes in are invalid!");
+        return;
+    }
+
+    if (typeof events !== "object" && events === null)
+    {
+        this.warn("Can't add custom gamepad binding, events are invalid!");
+        return;
+    }
+
+    var binding = new FORGE.AxisBinding(this._viewer, axes, events.move, this, name);
+
+    this._axisBindings.push(binding);
+};
+
+/**
+ * Event handler for yaw movement.
+ * @method FORGE.ControllerGamepad#_yawMoveHandler
+ * @param {FORGE.AxisBinding} binding - the reference to the binding
+ * @param {number} value - the value of the move of the yaw
+ * @private
+ */
+FORGE.ControllerGamepad.prototype._yawMoveHandler = function(binding, value)
+{
+    // Check the delta, as the value isn't exactly 0 at rest
+    if (Math.abs(value) < 0.1)
+    {
+        this._velocity.setX(0);
+        this._positionCurrent.setX(0);
+        return;
+    }
+
+    this._positionCurrent.setX(180 * value);
+};
+
+/**
+ * Event handler for pitch movement.
+ * @method FORGE.ControllerGamepad#_pitchMoveHandler
+ * @param {FORGE.AxisBinding} binding - the reference to the binding
+ * @param {number} value - the value of the move of the pitch
+ * @private
+ */
+FORGE.ControllerGamepad.prototype._pitchMoveHandler = function(binding, value)
+{
+    // Check the delta, as the value isn't exactly 0 at rest
+    if (Math.abs(value) < 0.1)
+    {
+        this._velocity.setY(0);
+        this._positionCurrent.setY(0);
+        return;
+    }
+
+    this._positionCurrent.setY(180 * value);
 };
 
 /**
@@ -298,11 +395,11 @@ FORGE.ControllerGamepad.prototype._zoomProcessBinding = function(binding)
     switch (binding.name)
     {
         case "minus":
-            delta *= 10;
+            delta *= 5;
             break;
 
         case "plus":
-            delta *= -10;
+            delta *= -5;
             break;
     }
 
@@ -328,6 +425,12 @@ FORGE.ControllerGamepad.prototype._onGamepadConnectedHandler = function(gamepad)
     for (var i = 0, ii = this._buttonBindings.length; i < ii; i++)
     {
         binding = this._buttonBindings[i];
+        gamepad.addBinding(binding);
+    }
+
+    for (var i = 0, ii = this._axisBindings.length; i < ii; i++)
+    {
+        binding = this._axisBindings[i];
         gamepad.addBinding(binding);
     }
 };
@@ -377,6 +480,16 @@ FORGE.ControllerGamepad.prototype.enable = function()
             this._gamepads[j].addBinding(binding);
         }
     }
+
+    for (var i = 0, ii = this._axisBindings.length; i < ii; i++)
+    {
+        binding = this._axisBindings[i];
+
+        for (var j = 0, jj = this._gamepads.length; j < jj; j++)
+        {
+            this._gamepads[j].addBinding(binding);
+        }
+    }
 };
 
 /**
@@ -398,6 +511,50 @@ FORGE.ControllerGamepad.prototype.disable = function()
             this._gamepads[j].removeBinding(binding);
         }
     }
+
+    for (var i = 0, ii = this._axisBindings.length; i < ii; i++)
+    {
+        binding = this._axisBindings[i];
+
+        for (var j = 0, jj = this._gamepads.length; j < jj; j++)
+        {
+            this._gamepads[j].removeBinding(binding);
+        }
+    }
+};
+
+/**
+ * Update routine.
+ * @method FORGE.ControllerGamepad#update
+ */
+FORGE.ControllerGamepad.prototype.update = function()
+{
+    var size = this._viewer.renderer.displayResolution;
+    var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
+
+    this._velocity = this._positionCurrent.clone();
+
+    if (this._velocity.length() > this._orientation.velocityMax)
+    {
+        this._velocity.setLength(this._orientation.velocityMax);
+    }
+
+    this._velocity.multiplyScalar(hardness);
+
+    var dx = this._velocity.x + this._inertia.x;
+    var dy = this._velocity.y + this._inertia.y;
+
+    if (dx === 0 && dy === 0)
+    {
+        return;
+    }
+
+    var invert = this._orientation.invert ? -1 : 1;
+    this._camera.yaw += invert * dx;
+    this._camera.pitch -= invert * dy;
+
+    // Damping 1 -> stops instantly, 0 infinite rebounds
+    this._inertia.add(this._velocity).multiplyScalar(FORGE.Math.clamp(1 - this._orientation.damping, 0, 1));
 };
 
 /**

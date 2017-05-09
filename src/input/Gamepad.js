@@ -50,11 +50,11 @@ FORGE.Gamepad = function(viewer, ref)
 
     /**
      * The array that handles the {@link FORGE.AxesBinding} objects.
-     * @name FORGE.Gamepad#_axesBindings
+     * @name FORGE.Gamepad#_axisBindings
      * @type {?Array<FORGE.AxisBinding>}
      * @private
      */
-    this._axesBindings = null;
+    this._axisBindings = null;
 
     /**
      * The array that handles the button codes that are considered as pressed.
@@ -80,7 +80,7 @@ FORGE.Gamepad.prototype.constructor = FORGE.Gamepad;
 FORGE.Gamepad.prototype._boot = function()
 {
     this._buttonBindings = [];
-    this._axesBindings = [];
+    this._axisBindings = [];
 
     this._buttonPressed = [];
 };
@@ -88,7 +88,7 @@ FORGE.Gamepad.prototype._boot = function()
 /**
  * Get the index of a ButtonBinding.
  * @method FORGE.Gamepad#_indexOfBinding
- * @param  {FORGE.ButtonBinding|number} value - The ButtonBinding or a button code (number).
+ * @param  {FORGE.BaseBinding} value - The ButtonBinding.
  * @return {number} Returns the searched index if found, if not, returns -1.
  * @private
  */
@@ -99,19 +99,15 @@ FORGE.Gamepad.prototype._indexOfBinding = function(value)
         return -1;
     }
 
-    if (typeof value === "object" && value.type === "ButtonBinding")
+    if (typeof value === "object")
     {
-        return this._buttonBindings.indexOf(value);
-    }
-
-    if (typeof value === "number")
-    {
-        for (var i = 0, ii = this._buttonBindings.length; i < ii; i++)
+        if (value.type === "ButtonBinding")
         {
-            if (this._buttonBindings[i].hasButtonIn(value) === true)
-            {
-                return i;
-            }
+            return this._buttonBindings.indexOf(value);
+        }
+        else if (value.type === "AxisBinding")
+        {
+            return this._axisBindings.indexOf(value);
         }
     }
 
@@ -149,9 +145,18 @@ FORGE.Gamepad.prototype._processButtons = function(buttons)
             this._applyButton(i, button.value, false);
         }
     }
+};
 
-    // Then process bindings for hold actions
-    for (i = 0, ii = this._buttonBindings.length; i < ii; i++)
+/**
+ * Apply any hold action present for a button.
+ * @method FORGE.Gamepad#_applyHoldButtons
+ * @private
+ */
+FORGE.Gamepad.prototype._applyHoldButtons = function()
+{
+    var binding;
+
+    for (var i = 0, ii = this._buttonBindings.length; i < ii; i++)
     {
         binding = this._buttonBindings[i];
 
@@ -220,6 +225,27 @@ FORGE.Gamepad.prototype._applyButton = function(index, value, pressed)
 };
 
 /**
+ * Get an array of bindings associated to the axis.
+ * @method FORGE.Gamepad#_getAxisBindings
+ * @param {number} index - the index of the axis
+ * @return {Array<FORGE.AxisBinding>} an array of bindings
+ */
+FORGE.Gamepad.prototype._getAxisBindings = function(index)
+{
+    var bindings = [];
+
+    for (var i = 0, ii = this._axisBindings.length; i < ii; i++)
+    {
+        if (this._axisBindings[i].axis === index)
+        {
+            bindings.push(this._axisBindings[i]);
+        }
+    }
+
+    return bindings;
+};
+
+/**
  * Process all buttons in the gamepad.
  * @method FORGE.Gamepad#_processAxes
  * @param {Array<number>} axes - the value of each axis
@@ -227,6 +253,18 @@ FORGE.Gamepad.prototype._applyButton = function(index, value, pressed)
  */
 FORGE.Gamepad.prototype._processAxes = function(axes)
 {
+    var bindings;
+
+    // First process buttons
+    for (var i = 0, ii = axes.length; i < ii; i++)
+    {
+        bindings = this._getAxisBindings(i);
+
+        for (var j = 0, jj = bindings.length; j < jj; j++)
+        {
+            bindings[j].move(axes[i]);
+        }
+    }
 };
 
 /**
@@ -245,73 +283,96 @@ FORGE.Gamepad.prototype._processPose = function(pose)
  */
 FORGE.Gamepad.prototype.update = function()
 {
-    if (this._enabled === true && this._gamepad.timestamp > this._previousTimestamp)
+    if (this._enabled === true)
     {
-        this._previousTimestamp = this._gamepad.timestamp;
-
-        // Process buttons
-        if (typeof this._gamepad.buttons !== "undefined")
+        if (this._gamepad.timestamp > this._previousTimestamp)
         {
-            this._processButtons(this._gamepad.buttons);
+            this._previousTimestamp = this._gamepad.timestamp;
+
+            // Process buttons
+            if (typeof this._gamepad.buttons !== "undefined")
+            {
+                this._processButtons(this._gamepad.buttons);
+            }
+
+            // Process axis
+            if (typeof this._gamepad.axes !== "undefined")
+            {
+                this._processAxes(this._gamepad.axes);
+            }
+
+            // Process pose
+            if (typeof this._gamepad.pose !== "undefined")
+            {
+                this._processPose(this._gamepad.pose);
+            }
         }
 
-        // Process axis
-        if (typeof this._gamepad.axes !== "undefined")
-        {
-            this._processAxes(this._gamepad.axes);
-        }
-
-        // Process pose
-        if (typeof this._gamepad.pose !== "undefined")
-        {
-            this._processPose(this._gamepad.pose);
-        }
+        // Apply buttons holdings
+        this._applyHoldButtons();
     }
 };
 
 /**
- * Add a ButtonBinding to the Gamepad's buttonBindings array.
+ * Add a BaseBinding to the Gamepad's correct bindings array.
  * @method FORGE.Gamepad#addBinding
- * @param {FORGE.ButtonBinding} buttonBinding - The FORGE.ButtonBinding you want to add.
+ * @param {FORGE.BaseBinding} binding - The FORGE.BaseBinding you want to add.
  * @return {boolean} Returns true if it's correctly added, false if it's already in or if wrong type.
  */
-FORGE.Gamepad.prototype.addBinding = function(buttonBinding)
+FORGE.Gamepad.prototype.addBinding = function(binding)
 {
-    if (typeof buttonBinding !== "object" && buttonBinding.type !== "ButtonBinding")
+    if (typeof binding !== "object" && binding.type !== "ButtonBinding" && binding.type !== "AxisBinding")
     {
         return false;
     }
 
-    var index = this._indexOfBinding(buttonBinding);
+    var index = this._indexOfBinding(binding);
 
     if (index === -1)
     {
-        this._buttonBindings.push(buttonBinding);
-        return true;
+        if (binding.type === "ButtonBinding")
+        {
+            this._buttonBindings.push(binding);
+            return true;
+        }
+        else if (binding.type === "AxisBinding")
+        {
+            this._axisBindings.push(binding);
+            return true;
+        }
     }
     else
     {
-        this.warn("Trying to add a duplicate button binding on the gamepad !");
+        this.warn("Trying to add a duplicate binding on the gamepad !");
     }
 
     return false;
 };
 
 /**
- * Remove a {@link FORGE.ButtonBinding} from the {@link FORGE.Gamepad} object.
+ * Remove a BaseBinding of the Gamepad.
  * @method FORGE.Gamepad#removeBinding
- * @param  {FORGE.ButtonBinding|number} buttonBinding - A {@link FORGE.ButtonBinding} or a number that represent a button code.
+ * @param  {FORGE.BaseBinding} binding - The binding to remove.
  * @return {boolean} Returns true if it's removed, false if not found.
  */
-FORGE.Gamepad.prototype.removeBinding = function(buttonBinding)
+FORGE.Gamepad.prototype.removeBinding = function(binding)
 {
-    var index = this._indexOfBinding(buttonBinding);
+    var index = this._indexOfBinding(binding);
 
-    if (index !== -1)
+    if (index === -1)
     {
-        this._buttonBindings[index].destroy();
-        this._buttonBindings.splice(index, 1);
-        return true;
+        if (binding.type === "ButtonBinding")
+        {
+            this._buttonBindings[index].destroy();
+            this._buttonBindings.splice(index, 1);
+            return true;
+        }
+        else if (binding.type === "AxisBinding")
+        {
+            this._axisBindings[index].destroy();
+            this._axisBindings.splice(index, 1);
+            return true;
+        }
     }
 
     return false;
@@ -336,12 +397,12 @@ FORGE.Gamepad.prototype.destroy = function()
 
     var axisBinding;
 
-    while (this._axesBindings !== null && this._axesBindings.length > 0)
+    while (this._axisBindings !== null && this._axisBindings.length > 0)
     {
-        axisBinding = this._axesBindings.pop();
+        axisBinding = this._axisBindings.pop();
         axisBinding.destroy();
     }
-    this._axesBindings = null;
+    this._axisBindings = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };

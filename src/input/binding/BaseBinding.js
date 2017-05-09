@@ -65,3 +65,18 @@ Object.defineProperty(FORGE.BaseBinding.prototype, "name",
         return this._name;
     }
 });
+
+/**
+ * Gets the type of this BaseBinding.
+ * @name FORGE.BaseBinding#type
+ * @readonly
+ * @type {string}
+ */
+Object.defineProperty(FORGE.BaseBinding.prototype, "type",
+{
+    /** @this {FORGE.BaseBinding} */
+    get: function()
+    {
+        return this._className;
+    }
+});
