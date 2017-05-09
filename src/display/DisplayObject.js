@@ -758,19 +758,35 @@ FORGE.DisplayObject.prototype._updatePercentValues = function(property)
 {
     var widthRelated = property.toLowerCase().indexOf("width") !== -1 || property === "both";
     var heightRelated = property.toLowerCase().indexOf("height") !== -1 || property === "both";
+    var notification = 0;
 
     if(widthRelated === true && this._unitWidth === "%")
     {
         this._dom.style.width = this.pixelWidth+"px";
         this._dom.width = this.pixelWidth;
-        this._notifyResize({ property: "width" });
+        notification += 1;
     }
 
     if(heightRelated === true && this._unitHeight === "%")
     {
         this._dom.style.height = this.pixelHeight+"px";
         this._dom.height = this.pixelHeight;
-        this._notifyResize({ property: "height" });
+        notification += 2;
+    }
+
+    swith(notification)
+    {
+        case 1:
+            this._notifyResize({ property: "width" });
+            break;
+        case 2:
+            this._notifyResize({ property: "height" });
+            break;
+        case 3:
+            this._notifyResize({ property: "both" });
+            break;
+        default:
+            // no notification needed
     }
 };
 
@@ -929,20 +945,15 @@ FORGE.DisplayObject.prototype.maximize = function(keepMaximized)
         this._dom.style.width = this._parent.innerWidth+"px";
         this._dom.width = this._parent.innerWidth;
 
-        if(width !== this.pixelWidth)
-        {
-            this._notifyResize({ property: "width" });
-        }
-
         var height = this.pixelHeight;
         this._height = this._parent.innerHeight;
         this._unitHeight = "px";
         this._dom.style.height = this._parent.innerHeight+"px";
         this._dom.height = this._parent.innerHeight;
 
-        if(height !== this.pixelHeight)
+        if(width !== this.pixelWidth || height !== this.pixelHeight)
         {
-            this._notifyResize({ property: "height" });
+            this._notifyResize({ property: "both" });
         }
     }
 };
