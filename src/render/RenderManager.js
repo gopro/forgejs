@@ -515,7 +515,7 @@ FORGE.RenderManager.prototype._setRendererSize = function(size)
 
     if (vr === true)
     {
-        this._displayResolution.x *= 0.5;
+        this._displayResolution.width *= 0.5;
     }
 
     if (this._backgroundRenderer !== null)
