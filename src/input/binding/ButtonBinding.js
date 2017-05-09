@@ -214,9 +214,8 @@ FORGE.ButtonBinding.prototype.down = function(value)
  * This method is called by the input associated when a button is hold. This triggers the
  * hold callback associated to this binding and increases the holdCount value.
  * @method FORGE.ButtonBinding#hold
- * @param {number} value - the value of the button
  */
-FORGE.ButtonBinding.prototype.hold = function(value)
+FORGE.ButtonBinding.prototype.hold = function()
 {
     this.log("hold");
 
@@ -225,7 +224,7 @@ FORGE.ButtonBinding.prototype.hold = function(value)
     if (typeof this._hold === "function")
     {
         // Call the callback with a reference to this binding + the original event.
-        this._hold.call(this._context, this, value);
+        this._hold.call(this._context, this);
     }
     else if (this._holdActionEventDispatcher !== null)
     {

@@ -5,7 +5,7 @@
  * @constructor FORGE.AxisBinding
  * @param {FORGE.Viewer} viewer - the viewer reference
  * @param {number} axis - the axis code associated to this binding
- * @param {?(Function|string|Array<string>)} move - the callback function that will be called on an axis movement
+ * @param {?(Function|string|Array<string>)=} move - the callback function that will be called on an axis movement
  * @param {Object=} context - the context in which you want the callbacks to be executed
  * @param {string=} name - the name of the binding
  * @extends {FORGE.BaseBinding}
@@ -50,10 +50,10 @@ FORGE.AxisBinding.prototype.constructor = FORGE.AxisBinding;
  */
 FORGE.AxisBinding.prototype._boot = function()
 {
-    if (FORGE.Utils.isTypeOf(this._up, "string") === true || FORGE.Utils.isArrayOf(this._up, "string"))
+    if (FORGE.Utils.isTypeOf(this._move, "string") === true || FORGE.Utils.isArrayOf(this._move, "string"))
     {
         this._moveActionEventDispatcher = new FORGE.ActionEventDispatcher(this._viewer, "onMove");
-        this._moveActionEventDispatcher.addActions( /** @type {(string|Array<string>)} */ (this._up));
+        this._moveActionEventDispatcher.addActions( /** @type {(string|Array<string>)} */ (this._move));
     }
 };
 
@@ -68,7 +68,6 @@ FORGE.AxisBinding.prototype.move = function(value)
     this.log("move");
 
     this._pressed = true;
-    this._moveCount++;
 
     if (typeof this._move === "function")
     {

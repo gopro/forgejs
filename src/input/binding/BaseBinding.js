@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.BaseBinding
  * @param {FORGE.Viewer} viewer - The viewer reference.
- * @param {string=} className - The name of the class binding.
+ * @param {string} className - The name of the class binding.
  * @param {Object=} context - The context in which you want your callbacks to be executed.
  * @param {string=} name - The name of the binding, can be use as an identifier.
  * @extends {FORGE.BaseObject}

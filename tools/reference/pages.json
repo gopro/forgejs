@@ -65,7 +65,13 @@
                 "controller-options-zoom",
                 "controller-keyboard",
                 "controller-keyboard-binding",
-                "controller-keyboard-binding-events"
+                "controller-keyboard-binding-events",
+                "controller-gamepad",
+                "controller-gamepad-binding",
+                "controller-gamepad-button-binding",
+                "controller-gamepad-button-binding-events",
+                "controller-gamepad-axis-binding",
+                "controller-gamepad-axis-binding-events"
             ]
         },
         {
@@ -298,7 +304,13 @@
                 "controller-options-zoom",
                 "controller-keyboard",
                 "controller-keyboard-binding",
-                "controller-keyboard-binding-events"
+                "controller-keyboard-binding-events",
+                "controller-gamepad",
+                "controller-gamepad-binding",
+                "controller-gamepad-button-binding",
+                "controller-gamepad-button-binding-events",
+                "controller-gamepad-axis-binding",
+                "controller-gamepad-axis-binding-events"
             ]
         }]
     },

@@ -1,0 +1,36 @@
+{
+    "id": "controller-gamepad-button-binding-events",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerGamepadButtonBindingEventsConfig",
+    "description": "Available events to bind actions to for the <a href=\"#controller-gamepad\">controller gamepad.</a>",
+    "type": "object",
+
+    "properties": {
+        "onDown":{
+            "anyOf":[
+                {"type": "string"},
+                {"type": "array", "items": "string"}
+            ],
+            "title": "onDown",
+            "description": "The action or array of actions uid to trigger on button down event"
+        },
+
+        "onHold":{
+            "anyOf":[
+                {"type": "string"},
+                {"type": "array", "items": "string"}
+            ],
+            "title": "onHold",
+            "description": "The action or array of actions uid to trigger on button hold event"
+        },
+
+        "onUp":{
+            "anyOf":[
+                {"type": "string"},
+                {"type": "array", "items": "string"}
+            ],
+            "title": "onUp",
+            "description": "The action or array of actions uid to trigger on button up event"
+        }
+    }
+}

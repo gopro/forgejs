@@ -187,7 +187,7 @@ Object.defineProperty(FORGE.GamepadsManager.prototype, "onGamepadConnected",
     {
         if (this._onGamepadConnected === null)
         {
-            this._onGamepadConnected = new FORGE.EventDispatcher();
+            this._onGamepadConnected = new FORGE.EventDispatcher(this);
         }
 
         return this._onGamepadConnected;
@@ -207,7 +207,7 @@ Object.defineProperty(FORGE.GamepadsManager.prototype, "onGamepadDisconnected",
     {
         if (this._onGamepadDisconnected === null)
         {
-            this._onGamepadDisconnected = new FORGE.EventDispatcher();
+            this._onGamepadDisconnected = new FORGE.EventDispatcher(this);
         }
 
         return this._onGamepadDisconnected;

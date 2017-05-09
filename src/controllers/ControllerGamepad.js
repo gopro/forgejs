@@ -254,9 +254,9 @@ FORGE.ControllerGamepad.prototype._addButtonBinding = function(binding)
         return;
     }
 
-    var binding = new FORGE.ButtonBinding(this._viewer, buttonsIn, events.onDown, events.onUp, events.onHold, buttonsOut, this, name);
+    var buttonBinding = new FORGE.ButtonBinding(this._viewer, buttonsIn, events.onDown, events.onUp, events.onHold, buttonsOut, this, name);
 
-    this._buttonBindings.push(binding);
+    this._buttonBindings.push(buttonBinding);
 };
 
 /**
@@ -267,13 +267,13 @@ FORGE.ControllerGamepad.prototype._addButtonBinding = function(binding)
  */
 FORGE.ControllerGamepad.prototype._addAxisBinding = function(binding)
 {
-    var axes = binding.axes;
+    var axis = binding.axis;
     var name = binding.name;
     var events = binding.events;
 
-    if (FORGE.Utils.isTypeOf(axes, "number") === false && FORGE.Utils.isArrayOf(axes, "number") === false)
+    if (FORGE.Utils.isTypeOf(axis, "number") === false && FORGE.Utils.isArrayOf(axis, "number") === false)
     {
-        this.warn("Can't add custom gamepad binding, axes in are invalid!");
+        this.warn("Can't add custom gamepad binding, axis in is invalid!");
         return;
     }
 
@@ -283,9 +283,9 @@ FORGE.ControllerGamepad.prototype._addAxisBinding = function(binding)
         return;
     }
 
-    var binding = new FORGE.AxisBinding(this._viewer, axes, events.move, this, name);
+    var axisBinding = new FORGE.AxisBinding(this._viewer, axis, events.onMove, this, name);
 
-    this._axisBindings.push(binding);
+    this._axisBindings.push(axisBinding);
 };
 
 /**
@@ -435,7 +435,7 @@ FORGE.ControllerGamepad.prototype._onGamepadConnectedHandler = function(gamepad)
     }
 };
 
-/*
+/**
  * Remove a gamepad to this controller.
  * @method FORGE.ControllerGamepad#removeGamepad
  * @param {string} name - the name of the gamepad to remove

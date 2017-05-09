@@ -1,0 +1,27 @@
+{
+    "id": "controller-gamepad-axis-binding",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerGamepadAxisBindingConfig",
+    "description": "A custom <a href=\"#controller-gamepad-binding\">controller gamepad</a> axis binding.",
+    "type": "object",
+
+    "properties": {
+        "name":{
+            "type": "string",
+            "title": "Name",
+            "description": "The name of this axis binding"
+        },
+
+        "axis":{
+            "type": "number",
+            "title": "axis",
+            "description": "The axis code that is associated to this axis binding."
+        },
+
+        "events":{
+            "$ref": "controller-gamepad-axis-binding-events"
+        }
+    },
+
+    "required": ["axis", "events"]
+}

@@ -17,7 +17,7 @@
             "type": "string",
             "enum": ["pointer"],
             "title": "Type",
-            "description": "Type of the controller to instanciate. Can either be :<ul><li>pointer</li><li>keyboard</li><li>gyroscope</li></ul>",
+            "description": "Type of the controller to instanciate. Can either be :<ul><li>pointer</li><li>keyboard</li><li>gyroscope</li><li>gamepad</li></ul>",
             "example": "pointer"
         },
 
@@ -31,7 +31,8 @@
         "options":{
             "anyOf": [
                 { "$ref": "controller-pointer" },
-                { "$ref": "controller-keyboard" }
+                { "$ref": "controller-keyboard" },
+                { "$ref": "controller-gamepad" }
             ]
         }
     },

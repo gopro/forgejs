@@ -103,11 +103,11 @@ FORGE.Gamepad.prototype._indexOfBinding = function(value)
     {
         if (value.type === "ButtonBinding")
         {
-            return this._buttonBindings.indexOf(value);
+            return this._buttonBindings.indexOf(/** @type {FORGE.ButtonBinding} */ (value));
         }
         else if (value.type === "AxisBinding")
         {
-            return this._axisBindings.indexOf(value);
+            return this._axisBindings.indexOf(/** @type {FORGE.AxisBinding} */ (value));
         }
     }
 
@@ -173,6 +173,7 @@ FORGE.Gamepad.prototype._applyHoldButtons = function()
         }
     }
 };
+
 
 /**
  * Get an array of bindings associated to the button.
@@ -332,12 +333,12 @@ FORGE.Gamepad.prototype.addBinding = function(binding)
     {
         if (binding.type === "ButtonBinding")
         {
-            this._buttonBindings.push(binding);
+            this._buttonBindings.push(/** @type {FORGE.ButtonBinding} */ (binding));
             return true;
         }
         else if (binding.type === "AxisBinding")
         {
-            this._axisBindings.push(binding);
+            this._axisBindings.push(/** @type {FORGE.AxisBinding} */ (binding));
             return true;
         }
     }

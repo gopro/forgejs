@@ -1,0 +1,18 @@
+{
+    "id": "controller-gamepad-axis-binding-events",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerGamepadAxisBindingEventsConfig",
+    "description": "Available events to bind actions to an axis for the <a href=\"#controller-gamepad\">controller gamepad.</a>",
+    "type": "object",
+
+    "properties": {
+        "onMove":{
+            "anyOf":[
+                {"type": "string"},
+                {"type": "array", "items": "string"}
+            ],
+            "title": "onMove",
+            "description": "The action or array of actions uid to trigger on axis down event"
+        }
+    }
+}
