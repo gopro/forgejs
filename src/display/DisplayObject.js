@@ -774,7 +774,7 @@ FORGE.DisplayObject.prototype._updatePercentValues = function(property)
         notification += 2;
     }
 
-    swith(notification)
+    switch(notification)
     {
         case 1:
             this._notifyResize({ property: "width" });
