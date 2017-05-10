@@ -213,3 +213,18 @@ Object.defineProperty(FORGE.GamepadsManager.prototype, "onGamepadDisconnected",
         return this._onGamepadDisconnected;
     }
 });
+
+/**
+ * Get a list of all connected gamepads.
+ * @name FORGE.GamepadsManager#all
+ * @type {Array<FORGE.Gamepad>}
+ * @readonly
+ */
+Object.defineProperty(FORGE.GamepadsManager.prototype, "all",
+{
+    /** @this {FORGE.GamepadsManager} */
+    get: function()
+    {
+        return this._gamepads || [];
+    }
+});

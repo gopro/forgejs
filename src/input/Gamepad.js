@@ -79,6 +79,9 @@ FORGE.Gamepad.prototype.constructor = FORGE.Gamepad;
  */
 FORGE.Gamepad.prototype._boot = function()
 {
+    this._uid = this._gamepad.id + "-" + this._gamepad.index;
+    this._register();
+
     this._buttonBindings = [];
     this._axisBindings = [];
 
@@ -440,5 +443,20 @@ Object.defineProperty(FORGE.Gamepad.prototype, "enabled",
     set: function(value)
     {
         this._enabled = Boolean(value);
+    }
+});
+
+/**
+ * Gets the raw data of the gamepad (the Gamepad object, not the FORGE one).
+ * @name FORGE.Gamepad#gamepad
+ * @type {Gamepad}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Gamepad.prototype, "gamepad",
+{
+    /** @this {FORGE.Gamepad} */
+    get: function()
+    {
+        return this._gamepad;
     }
 });
