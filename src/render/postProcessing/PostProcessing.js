@@ -73,6 +73,104 @@ FORGE.PostProcessing.prototype._parseConfig = function(config)
 };
 
 /**
+ * Parse shader config
+ * @method FORGE.PostProcessing#_parseShaderConfig
+ * @param {FX} shaderConfig - a shader configuration
+ * @return {THREE.Pass} pass to be added to the render pipeline
+ */
+FORGE.PostProcessing.prototype._parseShaderConfig = function(shaderConfig)
+{
+    var shader = THREE[shaderConfig.type];
+    var pass = new FORGE.ShaderPass(shaderConfig.uid, shaderConfig.type, shader);
+
+    if (typeof pass.uniforms !== "undefined")
+    {
+        for (var param in shaderConfig.params)
+        {
+            var paramValue = shaderConfig.params[param];
+            var value = paramValue;
+
+            // Check if param is an object to build
+            if (typeof paramValue === "object" && paramValue.hasOwnProperty("type") && paramValue.hasOwnProperty("args"))
+            {
+                var args = paramValue.args;
+                switch (paramValue.type)
+                {
+                    case "THREE.Color":
+                        if (args.length === 3)
+                        {
+                            value = new THREE.Color(args[0], args[1], args[2]);
+                        }
+                        else if (typeof args === "string" || typeof args === "number")
+                        {
+                            value = new THREE.Color(args);
+                        }
+                        else
+                        {
+                            throw new Error("Cannot create THREE.Color with " + (typeof args) + " (length " + args.length + ")");
+                        }
+                        break;
+
+                    case "THREE.Vector2":
+                        value = new THREE.Vector2(args[0], args[1]);
+                        break;
+
+                    case "THREE.Vector3":
+                        value = new THREE.Vector3(args[0], args[1], args[2]);
+                        break;
+                }
+            }
+
+            pass.uniforms[param].value = value;
+        }
+    }
+
+    return pass;
+};
+
+/**
+ * Parse shader config
+ * @method FORGE.PostProcessing#_parsePassConfig
+ * @param {FX} passConfig - a pass configuration
+ * @return {THREE.Pass} pass to be added to the render pipeline
+ */
+FORGE.PostProcessing.prototype._parsePassConfig = function(passConfig)
+{
+    var constructor = THREE[passConfig.type];
+
+    var args = [];
+    if (typeof passConfig.args !== "undefined")
+    {
+        // If args is an array, feed constructor with it, else create array from values if it's an object
+        if (passConfig.args instanceof Array)
+        {
+            args = [null].concat(passConfig.args);
+        }
+        else
+        {
+            args = [null];
+            for (var prop in passConfig.args)
+            {
+                args.push(passConfig.args[prop]);
+            }
+        }
+    }
+
+    var pass = new (Function.prototype.bind.apply(constructor, args));
+    pass.uid = passConfig.uid;
+
+    if (typeof passConfig.params !== "undefined")
+    {
+        for (var param in passConfig.params)
+        {
+            pass[param] = passConfig.params[param];    
+        }        
+    }
+
+    return pass;
+};
+
+/**
  * Parse shader passes from FX configuration object
  * @method FORGE.PostProcessing#parseShaderPasses
  * @param {Array<FX>} fxConfig - a set of FX
@@ -87,13 +185,11 @@ FORGE.PostProcessing.prototype.parseShaderPasses = function(fxConfig)
         return [];
     }
 
-    var shaderPasses = [];
+    var passes = [];
 
     for (var j = 0, jj = fxConfig.length; j < jj; j++)
     {
         var fx = /** type {FX} */ (fxConfig[j]);
-
-        var pass = null;
 
         if (!THREE.hasOwnProperty(fx.type))
         {
@@ -101,55 +197,23 @@ FORGE.PostProcessing.prototype.parseShaderPasses = function(fxConfig)
             continue;
         }
 
-        var shader = THREE[fx.type];
-        pass = new FORGE.ShaderPass(fx.uid, fx.type, shader);
-
-        if (typeof pass.uniforms !== "undefined")
+        var pass = null;
+        if (fx.type.indexOf("Shader") != -1)
         {
-            for (var param in fx.params)
-            {
-                var paramValue = fx.params[param];
-                var value = paramValue;
-
-                // Check if param is an object to build
-                if (typeof paramValue === "object" && paramValue.hasOwnProperty("type") && paramValue.hasOwnProperty("args"))
-                {
-                    var args = paramValue.args;
-                    switch (paramValue.type)
-                    {
-                        case "THREE.Color":
-                            if (args.length === 3)
-                            {
-                                value = new THREE.Color(args[0], args[1], args[2]);
-                            }
-                            else if (typeof args === "string" || typeof args === "number")
-                            {
-                                value = new THREE.Color(args);
-                            }
-                            else
-                            {
-                                throw new Error("Cannot create THREE.Color with " + (typeof args) + " (length " + args.length + ")");
-                            }
-                            break;
-
-                        case "THREE.Vector2":
-                            value = new THREE.Vector2(args[0], args[1]);
-                            break;
-
-                        case "THREE.Vector3":
-                            value = new THREE.Vector3(args[0], args[1], args[2]);
-                            break;
-                    }
-                }
-
-                pass.uniforms[param].value = value;
-            }
+            pass = this._parseShaderConfig(fx);
+        }
+        else if (fx.type.indexOf("Pass") != -1)
+        {
+            pass = this._parsePassConfig(fx);
         }
 
-        shaderPasses.push(pass);
+        if (pass !== null)
+        {
+            passes.push(pass);
+        }
     }
 
-    return shaderPasses;
+    return passes;
 };
 
 /**

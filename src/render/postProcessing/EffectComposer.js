@@ -43,6 +43,14 @@ FORGE.EffectComposer = function(type, renderer, renderTarget)
      */
     this._enabled = true;
 
+    /**
+     * Sum of clock deltas.
+     * @name FORGE.ShaderPass#_deltaSum
+     * @type {number}
+     * @private
+     */
+    this._deltaSum = 0;
+
     THREE.EffectComposer.call(this, renderer, renderTarget);
 
     this._boot();
@@ -59,6 +67,37 @@ FORGE.EffectComposer.prototype.constructor = FORGE.EffectComposer;
 FORGE.EffectComposer.prototype._boot = function()
 {
     this._name = FORGE.EffectComposer.getUniqueName(this._type);
+};
+
+/**
+ * Render
+ * Set time for all passes
+ * @method FORGE.EffectComposer#render
+ */
+FORGE.EffectComposer.prototype.render = function(delta)
+{
+    this._deltaSum += delta;
+    var time = this._deltaSum;
+
+    for (var i=0, ii=this.passes.length; i<ii; i++)
+    {
+        var pass = this.passes[i];
+
+        if (typeof pass.uniforms !== "undefined")
+        {
+            if (typeof pass.uniforms.time !== "undefined")
+            {
+                pass.uniforms.time.value = time;
+            }
+        }
+
+        if (typeof pass.time !== "undefined")
+        {
+            pass.time = time;
+        }
+    }
+    
+    THREE.EffectComposer.prototype.render.call(this, delta);
 };
 
 /**
