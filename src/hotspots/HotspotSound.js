@@ -6,7 +6,7 @@
  * @param {FORGE.Viewer} viewer - The viewer reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.HotspotSound = function(viewer)
+FORGE.HotspotSound = function(viewer, hotspotUid)
 {
     /**
      * Viewer reference.
@@ -17,20 +17,12 @@ FORGE.HotspotSound = function(viewer)
     this._viewer = viewer;
 
     /**
-     * The onReady event dispatcher.
-     * @name  FORGE.HotspotSound#_onReady
-     * @type {FORGE.EventDispatcher}
+     * The hotspot uid
+     * @name FORGE.HotspotMaterial#_hotspotUid
+     * @type {string}
      * @private
      */
-    this._onReady = null;
-
-    /**
-     * World position
-     * @name FORGE.HotspotSound#_positionWorld
-     * @type {THREE.Vector3}
-     * @private
-     */
-    this._positionWorld = null;
+    this._hotspotUid = hotspotUid;
 
     /**
      * The FORGE.Sound object
@@ -39,6 +31,14 @@ FORGE.HotspotSound = function(viewer)
      * @private
      */
     this._sound = null;
+
+    /**
+     * World position
+     * @name FORGE.HotspotSound#_positionWorld
+     * @type {THREE.Vector3}
+     * @private
+     */
+    this._positionWorld = null;
 
     /**
      * The minimum volume when you are out of range
@@ -98,6 +98,14 @@ FORGE.HotspotSound = function(viewer)
      * @private
      */
     this._range = 360;
+
+    /**
+     * The onReady event dispatcher.
+     * @name  FORGE.HotspotSound#_onReady
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onReady = null;
 
     FORGE.BaseObject.call(this, "HotspotSound");
 };
