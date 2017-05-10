@@ -199,7 +199,7 @@ FORGE.BackgroundRenderer.prototype.render = function(camera)
  */
 FORGE.BackgroundRenderer.prototype.update = function()
 {
-    if (!(this._mesh.material instanceof THREE.ShaderMaterial))
+    if (this._mesh === null || !(this._mesh.material instanceof THREE.ShaderMaterial))
     {
         return;
     }
