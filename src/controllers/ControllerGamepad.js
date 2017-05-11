@@ -216,7 +216,7 @@ FORGE.ControllerGamepad.prototype._addDefaultBindings = function()
 
     var bindingYaw = new FORGE.AxisBinding(this._viewer,
         0,
-        this._yawMoveHandler,
+        this._yawChangeHandler,
         this,
         "yaw"
     );
@@ -224,7 +224,7 @@ FORGE.ControllerGamepad.prototype._addDefaultBindings = function()
 
     var bindingPitch = new FORGE.AxisBinding(this._viewer,
         1,
-        this._pitchMoveHandler,
+        this._pitchChangeHandler,
         this,
         "pitch"
     );
@@ -285,19 +285,19 @@ FORGE.ControllerGamepad.prototype._addAxisBinding = function(binding)
         return;
     }
 
-    var axisBinding = new FORGE.AxisBinding(this._viewer, axis, events.onMove, this, name);
+    var axisBinding = new FORGE.AxisBinding(this._viewer, axis, events.onChange, this, name);
 
     this._axisBindings.push(axisBinding);
 };
 
 /**
- * Event handler for yaw movement.
- * @method FORGE.ControllerGamepad#_yawMoveHandler
+ * Event handler for yaw changement.
+ * @method FORGE.ControllerGamepad#_yawChangeHandler
  * @param {FORGE.AxisBinding} binding - the reference to the binding
- * @param {number} value - the value of the move of the yaw
+ * @param {number} value - the value of the change of the yaw
  * @private
  */
-FORGE.ControllerGamepad.prototype._yawMoveHandler = function(binding, value)
+FORGE.ControllerGamepad.prototype._yawChangeHandler = function(binding, value)
 {
     // Check the delta, as the value isn't exactly 0 at rest
     if (Math.abs(value) < 0.1)
@@ -311,13 +311,13 @@ FORGE.ControllerGamepad.prototype._yawMoveHandler = function(binding, value)
 };
 
 /**
- * Event handler for pitch movement.
- * @method FORGE.ControllerGamepad#_pitchMoveHandler
+ * Event handler for pitch changement.
+ * @method FORGE.ControllerGamepad#_pitchChangeHandler
  * @param {FORGE.AxisBinding} binding - the reference to the binding
- * @param {number} value - the value of the move of the pitch
+ * @param {number} value - the value of the change of the pitch
  * @private
  */
-FORGE.ControllerGamepad.prototype._pitchMoveHandler = function(binding, value)
+FORGE.ControllerGamepad.prototype._pitchChangeHandler = function(binding, value)
 {
     // Check the delta, as the value isn't exactly 0 at rest
     if (Math.abs(value) < 0.1)
@@ -409,8 +409,8 @@ FORGE.ControllerGamepad.prototype._zoomProcessBinding = function(binding)
 };
 
 /**
- * Add a gamepad to this controller.
- * @method FORGE.ControllerGamepad#addGamepad
+ * When a gamepad is connected, add bindings to it.
+ * @method FORGE.ControllerGamepad#_onGamepadConnectedHandler
  * @param {FORGE.Gamepad} gamepad - the gamepad to add
  */
 FORGE.ControllerGamepad.prototype._onGamepadConnectedHandler = function(gamepad)
@@ -438,8 +438,8 @@ FORGE.ControllerGamepad.prototype._onGamepadConnectedHandler = function(gamepad)
 };
 
 /**
- * Remove a gamepad to this controller.
- * @method FORGE.ControllerGamepad#removeGamepad
+ * When a gamepad is disconnected, remove bindings to it.
+ * @method FORGE.ControllerGamepad#_onGamepadDisconnectedHandler
  * @param {string} name - the name of the gamepad to remove
  */
 FORGE.ControllerGamepad.prototype._onGamepadDisconnectedHandler = function(name)

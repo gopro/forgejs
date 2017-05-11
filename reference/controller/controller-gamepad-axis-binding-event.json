@@ -6,12 +6,12 @@
     "type": "object",
 
     "properties": {
-        "onMove":{
+        "onChange":{
             "anyOf":[
                 {"type": "string"},
                 {"type": "array", "items": "string"}
             ],
-            "title": "onMove",
+            "title": "onChange",
             "description": "The action or array of actions uid to trigger on axis down event"
         }
     }

@@ -5,12 +5,12 @@
  * @constructor FORGE.AxisBinding
  * @param {FORGE.Viewer} viewer - the viewer reference
  * @param {number} axis - the axis code associated to this binding
- * @param {?(Function|string|Array<string>)=} move - the callback function that will be called on an axis movement
+ * @param {?(Function|string|Array<string>)=} change - the callback function that will be called on an axis changement
  * @param {Object=} context - the context in which you want the callbacks to be executed
  * @param {string=} name - the name of the binding
  * @extends {FORGE.BaseBinding}
  */
-FORGE.AxisBinding = function(viewer, axis, move, context, name)
+FORGE.AxisBinding = function(viewer, axis, change, context, name)
 {
     /**
      * The axis code associated to this AxisBinding
@@ -21,20 +21,20 @@ FORGE.AxisBinding = function(viewer, axis, move, context, name)
     this._axis = axis;
 
     /**
-     * The callback function that will be called on an axis movement
-     * @name FORGE.AxisBinding#_move
+     * The callback function that will be called on an axis changement
+     * @name FORGE.AxisBinding#_change
      * @type {?(Function|string|Array<string>)}
      * @private
      */
-    this._move = move || null;
+    this._change = change || null;
 
     /**
-     * Action event dispatcher for move action
-     * @name FORGE.AxisBinding#_moveActionEventDispatcher
+     * Action event dispatcher for change action
+     * @name FORGE.AxisBinding#_changeActionEventDispatcher
      * @type {?FORGE.ActionEventDispatcher}
      * @private
      */
-    this._moveActionEventDispatcher = null;
+    this._changeActionEventDispatcher = null;
 
     FORGE.BaseBinding.call(this, viewer, "AxisBinding", context, name);
 
@@ -50,33 +50,33 @@ FORGE.AxisBinding.prototype.constructor = FORGE.AxisBinding;
  */
 FORGE.AxisBinding.prototype._boot = function()
 {
-    if (FORGE.Utils.isTypeOf(this._move, "string") === true || FORGE.Utils.isArrayOf(this._move, "string"))
+    if (FORGE.Utils.isTypeOf(this._change, "string") === true || FORGE.Utils.isArrayOf(this._change, "string"))
     {
-        this._moveActionEventDispatcher = new FORGE.ActionEventDispatcher(this._viewer, "onMove");
-        this._moveActionEventDispatcher.addActions( /** @type {(string|Array<string>)} */ (this._move));
+        this._changeActionEventDispatcher = new FORGE.ActionEventDispatcher(this._viewer, "onChange");
+        this._changeActionEventDispatcher.addActions( /** @type {(string|Array<string>)} */ (this._change));
     }
 };
 
 /**
- * This method is called by the input associated when an axis is moved. This triggers the move
+ * This method is called by the input associated when an axis is changed. This triggers the change
  * callbacks associated to this binding.
- * @method FORGE.AxisBinding#move
- * @param {number} value - the value of the button
+ * @method FORGE.AxisBinding#change
+ * @param {number} value - the value of the axis
  */
-FORGE.AxisBinding.prototype.move = function(value)
+FORGE.AxisBinding.prototype.change = function(value)
 {
-    this.log("move");
+    this.log("change");
 
     this._pressed = true;
 
-    if (typeof this._move === "function")
+    if (typeof this._change === "function")
     {
         // Call the callback with a reference to this binding + the original event.
-        this._move.call(this._context, this, value);
+        this._change.call(this._context, this, value);
     }
-    else if (this._moveActionEventDispatcher !== null)
+    else if (this._changeActionEventDispatcher !== null)
     {
-        this._moveActionEventDispatcher.dispatch();
+        this._changeActionEventDispatcher.dispatch();
     }
 };
 
@@ -86,12 +86,12 @@ FORGE.AxisBinding.prototype.move = function(value)
  */
 FORGE.AxisBinding.prototype.destroy = function()
 {
-    this._move = null;
+    this._change = null;
 
-    if (this._moveActionEventDispatcher !== null)
+    if (this._changeActionEventDispatcher !== null)
     {
-        this._moveActionEventDispatcher.destroy();
-        this._moveActionEventDispatcher = null;
+        this._changeActionEventDispatcher.destroy();
+        this._changeActionEventDispatcher = null;
     }
 
     FORGE.BaseBinding.prototype.destroy.call(this);

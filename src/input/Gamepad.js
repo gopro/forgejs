@@ -266,19 +266,9 @@ FORGE.Gamepad.prototype._processAxes = function(axes)
 
         for (var j = 0, jj = bindings.length; j < jj; j++)
         {
-            bindings[j].move(axes[i]);
+            bindings[j].change(axes[i]);
         }
     }
-};
-
-/**
- * Process the pose of the gamepad.
- * @method FORGE.Gamepad#_processPose
- * @param {GamepadPose} pose - the pose object
- * @private
- */
-FORGE.Gamepad.prototype._processPose = function(pose)
-{
 };
 
 /**
@@ -303,12 +293,6 @@ FORGE.Gamepad.prototype.update = function()
             if (typeof this._gamepad.axes !== "undefined")
             {
                 this._processAxes(this._gamepad.axes);
-            }
-
-            // Process pose
-            if (typeof this._gamepad.pose !== "undefined")
-            {
-                this._processPose(this._gamepad.pose);
             }
         }
 
