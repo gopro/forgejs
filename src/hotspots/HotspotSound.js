@@ -33,14 +33,6 @@ FORGE.HotspotSound = function(viewer, hotspotUid)
     this._sound = null;
 
     /**
-     * World position
-     * @name FORGE.HotspotSound#_positionWorld
-     * @type {THREE.Vector3}
-     * @private
-     */
-    this._positionWorld = null;
-
-    /**
      * The minimum volume when you are out of range
      * @name FORGE.HotspotSound#_volumeMin
      * @type {number}
@@ -116,30 +108,29 @@ FORGE.HotspotSound.prototype.constructor = FORGE.HotspotSound;
 /**
  * Parse the configuration object.
  * @method FORGE.HotspotSound#_parseConfig
- * @param {SoundConfig} configSound - The configuration object of the sound.
- * @param {HotspotTransformConfig} configTransform - The transform configuration object.
+ * @param {SoundConfig} config - The configuration object of the sound.
  * @private
  */
-FORGE.HotspotSound.prototype._parseConfig = function(configSound, configTransform)
+FORGE.HotspotSound.prototype._parseConfig = function(config)
 {
-    if (typeof configSound.source === "undefined" || typeof configSound.source !== "object")
+    if (typeof config.source === "undefined" || typeof config.source !== "object")
     {
         return;
     }
 
     // Warning : UID is not registered and applied to the FORGE.Sound for registration
-    this._uid = configSound.uid;
+    this._uid = config.uid;
 
     // Is it a source url
-    if (typeof configSound.source.url !== "undefined" && typeof configSound.source.url === "string" && configSound.source.url !== "")
+    if (typeof config.source.url !== "undefined" && typeof config.source.url === "string" && config.source.url !== "")
     {
-        this._url = configSound.source.url;
+        this._url = config.source.url;
     }
     // or a source UID?
-    else if (typeof configSound.source.target !== "undefined" && FORGE.UID.exists(configSound.source.target) === true)
+    else if (typeof config.source.target !== "undefined" && FORGE.UID.exists(config.source.target) === true)
     {
         //@todo
-        var object = FORGE.UID.get(configSound.source.target);
+        var object = FORGE.UID.get(config.source.target);
         //this._url = "";
         return;
     }
@@ -148,31 +139,31 @@ FORGE.HotspotSound.prototype._parseConfig = function(configSound, configTransfor
         return;
     }
 
-    if (typeof configSound.options !== "undefined" && typeof configSound.options === "object")
+    if (typeof config.options !== "undefined" && typeof config.options === "object")
     {
-        if(typeof configSound.options.volume === "number")
+        if(typeof config.options.volume === "number")
         {
-            this._volumeMax = configSound.options.volume;
+            this._volumeMax = config.options.volume;
         }
-        else if (typeof configSound.options.volume === "object")
+        else if (typeof config.options.volume === "object")
         {
-            var volume = /** @type {SoundVolumeConfig} */ (configSound.options.volume);
+            var volume = /** @type {SoundVolumeConfig} */ (config.options.volume);
             this._volumeMin = (typeof volume.min === "number") ? FORGE.Math.clamp(volume.min, 0, 1) : 0;
             this._volumeMax = (typeof volume.max === "number") ? FORGE.Math.clamp(volume.max, 0, 1) : 1;
         }
 
-        this._loop = (typeof configSound.options.loop === "boolean") ? configSound.options.loop : false;
-        this._startTime = (typeof configSound.options.startTime === "number") ? configSound.options.startTime : 0; //in ms
-        this._autoPlay = (typeof configSound.options.autoPlay === "boolean") ? configSound.options.autoPlay : false;
-        this._range = (typeof configSound.options.range === "number") ? FORGE.Math.clamp(configSound.options.range, 1, 360) : 360;
+        this._loop = (typeof config.options.loop === "boolean") ? config.options.loop : false;
+        this._startTime = (typeof config.options.startTime === "number") ? config.options.startTime : 0; //in ms
+        this._autoPlay = (typeof config.options.autoPlay === "boolean") ? config.options.autoPlay : false;
+        this._range = (typeof config.options.range === "number") ? FORGE.Math.clamp(config.options.range, 1, 360) : 360;
     }
 
-    if (typeof configTransform !== "undefined" && typeof configTransform.position !== "undefined")
-    {
-        this._position.theta = (typeof configTransform.position.theta === "number") ? FORGE.Math.clamp(configTransform.position.theta, -180, 180) : 0;
-        this._position.phi = (typeof configTransform.position.phi === "number") ? FORGE.Math.clamp(configTransform.position.phi, -90, 90) : 0;
-        //@todo manage radius
-    }
+    var hotspot = FORGE.UID.get(this._hotspotUid);
+    var position = hotspot.config.transform.position
+
+    this._position.theta = (typeof position.theta === "number") ? FORGE.Math.clamp(position.theta, -180, 180) : 0;
+    this._position.phi = (typeof position.phi === "number") ? FORGE.Math.clamp(position.phi, -90, 90) : 0;
+    //@todo manage radius
 
     this._setupSound();
 };
@@ -192,12 +183,12 @@ FORGE.HotspotSound.prototype._setupSound = function()
     {
         // Create world position from inversed theta angle and phi angle
         var sphericalPt = FORGE.Utils.toTHREESpherical(1, FORGE.Math.degToRad(-this._position.theta), FORGE.Math.degToRad(this._position.phi)); //@todo manage radius here
-        this._positionWorld = new THREE.Vector3().setFromSpherical(sphericalPt);
+        var positionWorld = new THREE.Vector3().setFromSpherical(sphericalPt);
 
         this._sound.spatialized = this._isSpatialized();
-        this._sound.x = this._positionWorld.x;
-        this._sound.y = this._positionWorld.y;
-        this._sound.z = this._positionWorld.z;
+        this._sound.x = positionWorld.x;
+        this._sound.y = positionWorld.y;
+        this._sound.z = positionWorld.z;
     }
 
     // sound options
@@ -274,10 +265,14 @@ FORGE.HotspotSound.prototype._applyRange = function()
         if (distance < radius)
         {
             var amplitude = this._volumeMax - this._volumeMin;
-            this._sound.volume = this._volumeMin + (amplitude * (1 - distance / radius));
+            var volume = this._volumeMin + (amplitude * (1 - distance / radius));
+            this.log("in range | volume: "+volume);
+
+            this._sound.volume = volume;
         }
         else
         {
+            this.log("out range");
             this._sound.volume = this._volumeMin;
         }
     }
@@ -286,12 +281,11 @@ FORGE.HotspotSound.prototype._applyRange = function()
 /**
  * Load a sound configuration
  * @method FORGE.HotspotSound#load
- * @param  {SoundConfig} configSound - The hotspot sound configuration object.
- * @param  {HotspotTransformConfig} configTransform - The hotspot transform configuration object.
+ * @param  {SoundConfig} config - The hotspot sound configuration object.
  */
-FORGE.HotspotSound.prototype.load = function(configSound, configTransform)
+FORGE.HotspotSound.prototype.load = function(config)
 {
-    this._parseConfig(configSound, configTransform);
+    this._parseConfig(config);
 };
 
 /**
@@ -328,9 +322,7 @@ FORGE.HotspotSound.prototype.destroy = function()
         this._sound = null;
     }
 
-    this._positionWorld = null;
-
-    this._position = null;
+    //this._position = null;
 
     if(this._onReady !== null)
     {

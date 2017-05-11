@@ -6,8 +6,6 @@
  * @param {FORGE.Viewer} viewer - viewer reference
  * @param {HotspotConfig} config - hostspot configuration
  * @extends {FORGE.Object3D}
- *
- * @todo Review/refactor all the raycasting and click part
  */
 FORGE.Hotspot3D = function(viewer, config)
 {
@@ -158,6 +156,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
 
     this._material = new FORGE.HotspotMaterial(this._viewer, this._uid);
+    this._sound = new FORGE.HotspotSound(this._viewer, this._uid);
     this._states = new FORGE.HotspotStates(this._viewer, this._uid);
 
     if (typeof config.states === "object" && config.states !== null)
@@ -195,11 +194,11 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     //     materialConfig = /** @type {HotspotMaterialConfig} */ (FORGE.Utils.extendMultipleObjects(materialConfig, FORGE.HotspotMaterial.presets.DEBUG));
     // }
 
-    if (typeof config.sound === "object" && config.sound !== null)
-    {
-        this._sound = new FORGE.HotspotSound(this._viewer);
-        this._sound.load(config.sound, config.transform);
-    }
+    // if (typeof config.sound === "object" && config.sound !== null)
+    // {
+    //     this._sound = new FORGE.HotspotSound(this._viewer);
+    //     this._sound.load(config.sound, config.transform);
+    // }
 
     if (typeof config.fx === "string" && config.fx !== "")
     {
@@ -545,6 +544,21 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "material",
     get: function()
     {
         return this._material;
+    }
+});
+
+/**
+ * Hotspot sound accessor
+ * @name FORGE.Hotspot3D#sound
+ * @readonly
+ * @type {FORGE.HotspotSound}
+ */
+Object.defineProperty(FORGE.Hotspot3D.prototype, "sound",
+{
+    /** @this {FORGE.Hotspot3D} */
+    get: function()
+    {
+        return this._sound;
     }
 });
 
