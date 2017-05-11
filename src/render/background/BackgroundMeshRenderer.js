@@ -132,7 +132,7 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
 
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
 
-    this._subdivision = 32;
+    this._subdivision = 1;
 };
 
 /**
@@ -177,9 +177,9 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
     this._texture.format = THREE.RGBAFormat;
     this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
 
-    if (typeof this._mesh.material.uniforms.tTextureRatio !== "undefined")
+    if (typeof this._mesh.material[0].uniforms.tTextureRatio !== "undefined")
     {
-        this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+        this._mesh.material[0].uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
     }
 
     this._texture.generateMipmaps = false;
@@ -226,7 +226,7 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
 
     this._texture.needsUpdate = true;
 
-    this._mesh.material.wireframe = false;
+    this._mesh.material[0].wireframe = false;
 
     if (this._texture.image !== null)
     {
@@ -250,19 +250,19 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
  */
 FORGE.BackgroundMeshRenderer.prototype._onBeforeRender = function()
 {
-    if (typeof this._mesh.material.uniforms === "undefined")
+    if (typeof this._mesh.material[0].uniforms === "undefined")
     {
         return;
     }
 
-    if (this._mesh.material.uniforms.hasOwnProperty("tTexture"))
+    if (this._mesh.material[0].uniforms.hasOwnProperty("tTexture"))
     {
-        this._mesh.material.uniforms.tTexture.value = this._texture;
+        this._mesh.material[0].uniforms.tTexture.value = this._texture;
     }
 
-    if (this._mesh.material.uniforms.hasOwnProperty("tOpacity"))
+    if (this._mesh.material[0].uniforms.hasOwnProperty("tOpacity"))
     {
-        this._mesh.material.uniforms.tOpacity.value = 1.0;
+        this._mesh.material[0].uniforms.tOpacity.value = 1.0;
     }
 };
 
@@ -531,13 +531,13 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
 
     if (this._texture !== null)
     {
-        if (this._mesh.material.uniforms.hasOwnProperty("tTexture"))
+        if (this._mesh.material[0].uniforms.hasOwnProperty("tTexture"))
         {
             material.uniforms.tTexture.value = this._texture;
 
         }
 
-        if (this._mesh.material.uniforms.hasOwnProperty("tTextureRatio"))
+        if (this._mesh.material[0].uniforms.hasOwnProperty("tTextureRatio"))
         {
             material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
         }
@@ -582,7 +582,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         if (this._mediaFormat === FORGE.MediaFormat.FLAT)
         {
             this._mesh.position.set(0, 0, -this._size * 0.5);
-            this._mesh.material.side = THREE.FrontSide;
+            this._mesh.material[0].side = THREE.FrontSide;
         }
 
         // Equirectangular mapping on a sphere needs a yaw shift of PI/2 to set front at center of the texture
@@ -596,10 +596,10 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
     else
     {
         this._mesh = /** @type {THREE.Mesh} */ (this._scene.children[0]);
-        this._mesh.material.dispose();
+        this._mesh.material[0].dispose();
     }
 
-    this._mesh.material = material;
+    this._mesh.material = [material, material, material, material, material, material];
     material.needsUpdate = true;
 };
 
@@ -611,9 +611,9 @@ FORGE.BackgroundMeshRenderer.prototype.updateAfterViewChange = function()
 {
     this._updateInternals();
 
-    if (typeof this._mesh.material.uniforms.tTextureRatio !== "undefined")
+    if (typeof this._mesh.material[0].uniforms.tTextureRatio !== "undefined")
     {
-        this._mesh.material.uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+        this._mesh.material[0].uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
     }
 };
 
@@ -656,7 +656,7 @@ FORGE.BackgroundMeshRenderer.prototype.destroy = function()
 
         if (this._mesh.material !== null)
         {
-            this._mesh.material.dispose();
+            this._mesh.material[0].dispose();
             this._mesh.material = null;
         }
 
