@@ -59,7 +59,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * Flag to know if we have to wait to consider a down event as a holded one.
      * @name FORGE.KeyBinding#_waitToHold
      * @type {boolean}
-     * @default
      * @private
      */
     this._waitToHold = false;
@@ -69,7 +68,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * It should be pressed if any of keysIn are pressed.
      * @name FORGE.KeyBinding#_pressed
      * @type {boolean}
-     * @default
      * @private
      */
     this._pressed = false;
@@ -78,7 +76,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * When a key binding have to wait to be considered as holded this flag is check to know if down action is complete.
      * @name FORGE.KeyBinding#_downComplete
      * @type {boolean}
-     * @default
      * @private
      */
     this._downComplete = false;
@@ -87,7 +84,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * Count of down.
      * @name FORGE.KeyBinding#_downCount
      * @type {number}
-     * @default
      * @private
      */
     this._downCount = 0;
@@ -96,7 +92,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * Count of hold.
      * @name FORGE.KeyBinding#_holdCount
      * @type {number}
-     * @default
      * @private
      */
     this._holdCount = 0;
@@ -105,7 +100,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * Count of up.
      * @name FORGE.KeyBinding#_upCount
      * @type {number}
-     * @default
      * @private
      */
     this._upCount = 0;

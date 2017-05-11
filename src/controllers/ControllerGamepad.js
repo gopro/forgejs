@@ -97,7 +97,10 @@ FORGE.ControllerGamepad.DEFAULT_OPTIONS = {
         hardness: 0.6, //Hardness factor impatcing controller response to some instant force.
         damping: 0.15, //Damping factor controlling inertia.
         velocityMax: 300,
-        invert: false
+        invert: {
+            x: false,
+            y: false
+        }
     },
 
     zoom:
@@ -149,8 +152,7 @@ FORGE.ControllerGamepad.prototype._parseConfig = function(config)
     this._uid = config.uid;
     this._register();
 
-    var options = config.options ||
-    {};
+    var options = config.options || {};
 
     this._orientation = /** @type {ControllerOrientationConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.ControllerGamepad.DEFAULT_OPTIONS.orientation, options.orientation));
     this._zoom = /** @type {ControllerZoomConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.ControllerGamepad.DEFAULT_OPTIONS.zoom, options.zoom));
@@ -191,29 +193,29 @@ FORGE.ControllerGamepad.prototype._parseConfig = function(config)
 FORGE.ControllerGamepad.prototype._addDefaultBindings = function()
 {
     var bindingPlus = new FORGE.ButtonBinding(this._viewer,
-        6,
+        7,
         this._zoomDownHandler,
         this._zoomUpHandler,
         this._zoomHoldHandler,
-        7,
+        6,
         this,
         "plus"
     );
     this._buttonBindings.push(bindingPlus);
 
     var bindingMinus = new FORGE.ButtonBinding(this._viewer,
-        7,
+        6,
         this._zoomDownHandler,
         this._zoomUpHandler,
         this._zoomHoldHandler,
-        6,
+        7,
         this,
         "minus"
     );
     this._buttonBindings.push(bindingMinus);
 
     var bindingYaw = new FORGE.AxisBinding(this._viewer,
-        2,
+        0,
         this._yawMoveHandler,
         this,
         "yaw"
@@ -221,7 +223,7 @@ FORGE.ControllerGamepad.prototype._addDefaultBindings = function()
     this._axisBindings.push(bindingYaw);
 
     var bindingPitch = new FORGE.AxisBinding(this._viewer,
-        3,
+        1,
         this._pitchMoveHandler,
         this,
         "pitch"
@@ -549,9 +551,12 @@ FORGE.ControllerGamepad.prototype.update = function()
         return;
     }
 
-    var invert = this._orientation.invert ? -1 : 1;
-    this._camera.yaw += invert * dx;
-    this._camera.pitch -= invert * dy;
+    var invert = this._orientation.invert;
+    var invertX = (invert === true) ? -1 : (typeof invert === "object" && invert.x === true) ? -1 : 1;
+    var invertY = (invert === true) ? -1 : (typeof invert === "object" && invert.y === true) ? -1 : 1;
+
+    this._camera.yaw += invertX * dx;
+    this._camera.pitch -= invertY * dy;
 
     // Damping 1 -> stops instantly, 0 infinite rebounds
     this._inertia.add(this._velocity).multiplyScalar(FORGE.Math.clamp(1 - this._orientation.damping, 0, 1));
@@ -565,6 +570,27 @@ FORGE.ControllerGamepad.prototype.destroy = function()
 {
     this._viewer.gamepad.onGamepadConnected.remove(this._onGamepadConnectedHandler, this);
     this._viewer.gamepad.onGamepadDisconnected.remove(this._onGamepadDisconnectedHandler, this);
+
+    this._positionStart = null;
+    this._positionCurrent = null;
+    this._velocity = null;
+    this._inertia = null;
+
+    var binding;
+
+    while (this._buttonBindings.length > 0)
+    {
+        binding = this._buttonBindings.pop();
+        binding.destroy();
+    }
+    this._buttonBindings = null;
+
+    while (this._axisBindings.length > 0)
+    {
+        binding = this._axisBindings.pop();
+        binding.destroy();
+    }
+    this._axisBindings = null;
 
     FORGE.ControllerBase.prototype.destroy.call(this);
 };

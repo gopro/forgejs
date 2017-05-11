@@ -300,6 +300,7 @@
                 "controller",
                 "controller-instance",
                 "controller-pointer",
+                "controller-options-orientation",
                 "controller-options-orientation-invert",
                 "controller-options-zoom",
                 "controller-keyboard",

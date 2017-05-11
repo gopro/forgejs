@@ -427,6 +427,51 @@ Object.defineProperty(FORGE.Gamepad.prototype, "name",
 });
 
 /**
+ * Gets the mapping of the gamepad.
+ * @name FORGE.Gamepad#mapping
+ * @type {string}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Gamepad.prototype, "mapping",
+{
+    /** @this {FORGE.Gamepad} */
+    get: function()
+    {
+        return this._gamepad.mapping;
+    }
+});
+
+/**
+ * Gets the hand of the gamepad if any.
+ * @name FORGE.Gamepad#hand
+ * @type {string}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Gamepad.prototype, "hand",
+{
+    /** @this {FORGE.Gamepad} */
+    get: function()
+    {
+        return this._gamepad.hand;
+    }
+});
+
+/**
+ * Gets the position of the gamepad, relative to the camera.
+ * @name FORGE.Gamepad#position
+ * @type {GamepadPose}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Gamepad.prototype, "position",
+{
+    /** @this {FORGE.Gamepad} */
+    get: function()
+    {
+        return this._gamepad.pose;
+    }
+});
+
+/**
  * Gets or sets the enabled status of the gamepad.
  * @name FORGE.Gamepad#enabled
  * @type {boolean}
