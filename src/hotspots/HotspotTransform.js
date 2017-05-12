@@ -60,28 +60,6 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
     {
         var position = FORGE.Utils.extendSimpleObject(this._position.dump(), this._parsePosition(config.position));
 
-        // // Try with xyz first
-        // if (typeof config.position.x === "number" || typeof config.position.y === "number" || typeof config.position.z === "number")
-        // {
-        //     position.x = (typeof config.position.x === "number") ? config.position.x : 0;
-        //     position.y = (typeof config.position.y === "number") ? config.position.y : 0;
-        //     position.z = (typeof config.position.z === "number") ? config.position.z : -200;
-        // }
-        // else
-        // {
-        //     var radius = (typeof config.position.radius === "number") ? config.position.radius : 200;
-        //     var theta = (typeof config.position.theta === "number") ? FORGE.Math.degToRad(config.position.theta) : 0;
-        //     var phi = (typeof config.position.phi === "number") ? FORGE.Math.degToRad(config.position.phi) : 0;
-
-        //     theta = FORGE.Math.wrap(Math.PI - theta, -Math.PI, Math.PI);
-
-        //     var cartesian = new THREE.Vector3().setFromSpherical(FORGE.Utils.toTHREESpherical(radius, theta, phi));
-
-        //     position.x = cartesian.x;
-        //     position.y = cartesian.y;
-        //     position.z = cartesian.z;
-        // }
-
         if(FORGE.Utils.compareObjects(this._position.dump(), position) === false)
         {
             this._position.load(position, false);
