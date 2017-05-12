@@ -7,15 +7,15 @@
  * @param {number} z - The scale of a 3D object (x, y, z).
  * @extends {FORGE.BaseObject}
  */
-FORGE.HotspotTransformValues = function(transform, x, y, z)
+FORGE.HotspotTransformValues = function(transformUid, x, y, z)
 {
     /**
      * The transformation related to this values.
-     * @name FORGE.HotspotTransformValues#_transform
-     * @type {FORGE.HotspotTransform}
+     * @name FORGE.HotspotTransformValues#_transformUid
+     * @type {string}
      * @private
      */
-    this._transform = transform;
+    this._transformUid = transformUid;
 
     /**
      * The x.
@@ -90,7 +90,8 @@ FORGE.HotspotTransformValues.prototype.load = function(values, notify)
             this._onChange.dispatch();
         }
 
-        this._transform.notifyChange();
+        var transform = FORGE.UID.get(this._transformUid);
+        transform.notifyChange();
     }
 };
 
@@ -117,8 +118,6 @@ FORGE.HotspotTransformValues.prototype.dump = function()
  */
 FORGE.HotspotTransformValues.prototype.destroy = function()
 {
-    this._transform = null;
-
     if(this._onChange !== null)
     {
         this._onChange.destroy();
@@ -156,7 +155,8 @@ Object.defineProperty(FORGE.HotspotTransformValues.prototype, "x",
             this._onChange.dispatch();
         }
 
-        this._transform.notifyChange();
+        var transform = FORGE.UID.get(this._transformUid);
+        transform.notifyChange();
     }
 });
 
@@ -188,7 +188,8 @@ Object.defineProperty(FORGE.HotspotTransformValues.prototype, "y",
             this._onChange.dispatch();
         }
 
-        this._transform.notifyChange();
+        var transform = FORGE.UID.get(this._transformUid);
+        transform.notifyChange();
     }
 });
 
@@ -220,7 +221,8 @@ Object.defineProperty(FORGE.HotspotTransformValues.prototype, "z",
             this._onChange.dispatch();
         }
 
-        this._transform.notifyChange();
+        var transform = FORGE.UID.get(this._transformUid);
+        transform.notifyChange();
     }
 });
 

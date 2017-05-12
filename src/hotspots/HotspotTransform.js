@@ -12,7 +12,7 @@ FORGE.HotspotTransform = function()
      * @type {FORGE.HotspotTransformValues}
      * @private
      */
-    this._position = new FORGE.HotspotTransformValues(this, 0, 0, -200);
+    this._position = null;
 
     /**
      * The rotation of a 3D object (x, y, z).
@@ -20,7 +20,7 @@ FORGE.HotspotTransform = function()
      * @type {FORGE.HotspotTransformValues}
      * @private
      */
-    this._rotation = new FORGE.HotspotTransformValues(this, 0, 0, 0);
+    this._rotation = null;
 
     /**
      * The scale of a 3D object.<br>
@@ -29,7 +29,7 @@ FORGE.HotspotTransform = function()
      * @type {FORGE.HotspotTransformValues}
      * @private
      */
-    this._scale = new FORGE.HotspotTransformValues(this, 1, 1, 1);
+    this._scale = null;
 
     /**
      * onChange event dispatcher for transform change.
@@ -40,10 +40,21 @@ FORGE.HotspotTransform = function()
     this._onChange = null;
 
     FORGE.BaseObject.call(this, "HotspotTransform");
+
+    this._boot();
 };
 
 FORGE.HotspotTransform.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.HotspotTransform.prototype.constructor = FORGE.HotspotTransform;
+
+FORGE.HotspotTransform.prototype._boot = function()
+{
+    this._register();
+
+    this._position = new FORGE.HotspotTransformValues(this._uid, 0, 0, -200);
+    this._rotation = new FORGE.HotspotTransformValues(this._uid, 0, 0, 0);
+    this._scale = new FORGE.HotspotTransformValues(this._uid, 1, 1, 1);
+};
 
 /**
  * Parse the config object, set default values where values are undefined.
