@@ -486,6 +486,12 @@ FORGE.Sound.prototype._boot = function()
  */
 FORGE.Sound.prototype._loadComplete = function(file)
 {
+    // In some case, the sound is destroyed before the loading
+    if(this._alive === false)
+    {
+        return;
+    }
+
     this._soundFile = file;
 
     this._ready = true;
