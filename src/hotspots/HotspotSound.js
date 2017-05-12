@@ -161,8 +161,8 @@ FORGE.HotspotSound.prototype._parseConfig = function(config)
     var hotspot = FORGE.UID.get(this._hotspotUid);
     var position = hotspot.config.transform.position
 
-    this._position.theta = (typeof position.theta === "number") ? FORGE.Math.clamp(position.theta, -180, 180) : 0;
-    this._position.phi = (typeof position.phi === "number") ? FORGE.Math.clamp(position.phi, -90, 90) : 0;
+    this._position.theta = (typeof position.theta === "number") ? FORGE.Math.clamp(/** @type {number} */ (position.theta), -180, 180) : 0;
+    this._position.phi = (typeof position.phi === "number") ? FORGE.Math.clamp(/** @type {number} */ (position.phi), -90, 90) : 0;
     //@todo manage radius
 
     this._setupSound();
@@ -182,7 +182,7 @@ FORGE.HotspotSound.prototype._setupSound = function()
     if(this._isSpatialized() === true)
     {
         // Create world position from inversed theta angle and phi angle
-        var sphericalPt = FORGE.Utils.toTHREESpherical(1, FORGE.Math.degToRad(-this._position.theta), FORGE.Math.degToRad(this._position.phi)); //@todo manage radius here
+        var sphericalPt = FORGE.Utils.toTHREESpherical(1, FORGE.Math.degToRad(/** @type {number} */ (-this._position.theta)), FORGE.Math.degToRad(/** @type {number} */ (this._position.phi))); //@todo manage radius here
         var positionWorld = new THREE.Vector3().setFromSpherical(sphericalPt);
 
         this._sound.spatialized = this._isSpatialized();
@@ -257,7 +257,7 @@ FORGE.HotspotSound.prototype._applyRange = function()
     {
         var camera = this._viewer.renderer.camera;
         var qCamera = FORGE.Quaternion.fromEuler(FORGE.Math.degToRad(camera.yaw), FORGE.Math.degToRad(camera.pitch), 0);
-        var qSound = FORGE.Quaternion.fromEuler(FORGE.Math.degToRad(this._position.theta), FORGE.Math.degToRad(this._position.phi), 0);
+        var qSound = FORGE.Quaternion.fromEuler(FORGE.Math.degToRad(/** @type {number} */ (this._position.theta)), FORGE.Math.degToRad(/** @type {number} */ (this._position.phi)), 0);
         var distance = FORGE.Quaternion.angularDistance(qSound, qCamera);
         var radius = FORGE.Math.degToRad(this._range / 2); //from range to radius in radians
 

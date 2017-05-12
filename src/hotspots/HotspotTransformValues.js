@@ -59,7 +59,7 @@ FORGE.HotspotTransformValues.prototype.constructor = FORGE.HotspotTransformValue
  * Load values.
  * @method FORGE.HotspotTransformValues#load
  * @param {HotspotTransformValuesConfig} values
- * @param {bollean} notify - Do we notify the transform object after the load ?
+ * @param {boolean} notify - Do we notify the transform object after the load ?
  */
 FORGE.HotspotTransformValues.prototype.load = function(values, notify)
 {
@@ -97,7 +97,7 @@ FORGE.HotspotTransformValues.prototype.load = function(values, notify)
 /**
  * Dump values.
  * @method FORGE.HotspotTransformValues#dump
- * @return {Object}
+ * @return {HotspotTransformValuesConfig}
  */
 FORGE.HotspotTransformValues.prototype.dump = function()
 {
@@ -141,6 +141,7 @@ Object.defineProperty(FORGE.HotspotTransformValues.prototype, "x",
         return this._x;
     },
 
+    /** @this {FORGE.HotspotTransformValues} */
     set: function(value)
     {
         if(typeof value !== "number" || isNaN(value) === true || this._x === value)
@@ -172,6 +173,7 @@ Object.defineProperty(FORGE.HotspotTransformValues.prototype, "y",
         return this._y;
     },
 
+    /** @this {FORGE.HotspotTransformValues} */
     set: function(value)
     {
         if(typeof value !== "number" || isNaN(value) === true || this._y === value)
@@ -203,6 +205,7 @@ Object.defineProperty(FORGE.HotspotTransformValues.prototype, "z",
         return this._z;
     },
 
+    /** @this {FORGE.HotspotTransformValues} */
     set: function(value)
     {
         if(typeof value !== "number" || isNaN(value) === true || this._z === value)

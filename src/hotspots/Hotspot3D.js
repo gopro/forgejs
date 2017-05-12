@@ -326,7 +326,8 @@ FORGE.Hotspot3D.prototype._stateLoadCompleteHandler = function()
 
 /**
  * transform change handler
- * @return {[type]} [description]
+ * @method FORGE.Hotspot3D#_onTransformChangeHandler
+ * @private
  */
 FORGE.Hotspot3D.prototype._onTransformChangeHandler = function()
 {

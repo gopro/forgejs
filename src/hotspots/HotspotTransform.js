@@ -9,7 +9,7 @@ FORGE.HotspotTransform = function()
     /**
      * The cartesian coordinates of a 3D object (x, y, z).
      * @name FORGE.HotspotTransform#_position
-     * @type {HotspotTransformValues}
+     * @type {FORGE.HotspotTransformValues}
      * @private
      */
     this._position = new FORGE.HotspotTransformValues(this, 0, 0, -200);
@@ -17,7 +17,7 @@ FORGE.HotspotTransform = function()
     /**
      * The rotation of a 3D object (x, y, z).
      * @name FORGE.HotspotTransform#_rotation
-     * @type {HotspotTransformValues}
+     * @type {FORGE.HotspotTransformValues}
      * @private
      */
     this._rotation = new FORGE.HotspotTransformValues(this, 0, 0, 0);
@@ -26,7 +26,7 @@ FORGE.HotspotTransform = function()
      * The scale of a 3D object.<br>
      * Is expressed in world units (x, y, z).
      * @name FORGE.HotspotTransform#_scale
-     * @type {HotspotTransformValues}
+     * @type {FORGE.HotspotTransformValues}
      * @private
      */
     this._scale = new FORGE.HotspotTransformValues(this, 1, 1, 1);
@@ -62,7 +62,7 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
 
         if(FORGE.Utils.compareObjects(this._position.dump(), position) === false)
         {
-            this._position.load(position, false);
+            this._position.load(/** @type {HotspotTransformValuesConfig} */ (position), false);
             changed = true;
         }
     }
@@ -77,7 +77,7 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
 
         if(FORGE.Utils.compareObjects(this._rotation.dump(), rotation) === false)
         {
-            this._rotation.load(rotation, false);
+            this._rotation.load(/** @type {HotspotTransformValuesConfig} */ (rotation), false);
             changed = true;
         }
     }
@@ -92,7 +92,7 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
 
         if(FORGE.Utils.compareObjects(this._scale.dump(), scale) === false)
         {
-            this._scale.load(scale, false);
+            this._scale.load(/** @type {HotspotTransformValuesConfig} */ (scale), false);
             changed = true;
         }
     }
@@ -157,6 +157,7 @@ FORGE.HotspotTransform.prototype.notifyChange = function()
  * Load a transform configuration.
  * @method FORGE.HotspotTransform#load
  * @param {HotspotTransformConfig} config - The transform config to load.
+ * @param {boolean} [notify=true]
  */
 FORGE.HotspotTransform.prototype.load = function(config, notify)
 {
@@ -190,6 +191,7 @@ Object.defineProperty(FORGE.HotspotTransform.prototype, "position",
         return this._position;
     },
 
+    /** @this {FORGE.HotspotTransform} */
     set: function(value)
     {
         var config = { position: value };
@@ -210,6 +212,7 @@ Object.defineProperty(FORGE.HotspotTransform.prototype, "rotation",
         return this._rotation;
     },
 
+    /** @this {FORGE.HotspotTransform} */
     set: function(value)
     {
         var config = { rotation: value };
@@ -230,6 +233,7 @@ Object.defineProperty(FORGE.HotspotTransform.prototype, "scale",
         return this._scale;
     },
 
+    /** @this {FORGE.HotspotTransform} */
     set: function(value)
     {
         var config = { scale: value };

@@ -236,7 +236,7 @@ FORGE.HotspotStates.prototype._soundReadyHandler = function()
 /**
  * Update the transform for the current state
  * @method FORGE.HotspotStates#_updateTransform
- * @param  {HotspotMaterialConfig} config - The hotspot transform configuration object.
+ * @param  {HotspotTransformConfig} config - The hotspot transform configuration object.
  * @private
  */
 FORGE.HotspotStates.prototype._updateTransform = function(config)
@@ -340,7 +340,7 @@ FORGE.HotspotStates.prototype.load = function(name)
 
     if(this._loading.transform === true)
     {
-        var transformConfig = /** @type {!HotspotTransformConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.transform, this._config[name].transform));
+        var transformConfig = /** @type {HotspotTransformConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.transform, this._config[name].transform));
         this._updateTransform(transformConfig);
     }
 

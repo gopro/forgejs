@@ -118,7 +118,7 @@ FORGE.Utils.compareObjects = function(objectA, objectB)
 
     if (typeof(objectA) === "function")
     {
-        return objectA.toString() === y.toString();
+        return objectA.toString() === objectB.toString();
     }
 
     if (objectA instanceof Object && objectB instanceof Object)
@@ -128,7 +128,7 @@ FORGE.Utils.compareObjects = function(objectA, objectB)
             return false;
         }
 
-        for (prop in objectA)
+        for (var prop in objectA)
         {
             if(FORGE.Utils.compareObjects(objectA[prop], objectB[prop]) === false)
             {
@@ -154,7 +154,7 @@ FORGE.Utils.countProperties = function(object)
 {
     var count = 0;
 
-    for (i in object)
+    for (var i in object)
     {
         if (object.hasOwnProperty(i))
         {
