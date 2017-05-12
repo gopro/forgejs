@@ -292,6 +292,11 @@ FORGE.HotspotSound.prototype.load = function(config)
             this._onReady.dispatch();
         }
 
+        if(this._autoPlay === true && this._sound !== null)
+        {
+            this._sound.play(this._startTime, this._loop, true);
+        }
+
         return;
     }
 

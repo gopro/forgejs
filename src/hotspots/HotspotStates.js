@@ -321,10 +321,8 @@ FORGE.HotspotStates.prototype.load = function(name)
         this._loading.sound = true;
     }
 
-    if(typeof this._config[name].transform === "object")
-    {
-        this._loading.transform = true;
-    }
+    // There is always a transform
+    this._loading.transform = true;
 
     if(this._loading.material === true)
     {
