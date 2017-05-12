@@ -164,11 +164,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         this._states.addConfig(config.states);
     }
 
-    // if (typeof config.transform === "object" && config.transform !== null)
-    // {
-    //     this._transform.load(config.transform);
-    // }
-
     if (typeof config.animation === "object" && config.animation !== null)
     {
         this._animation.load(config.animation);
@@ -176,29 +171,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     }
 
     this._createGeometry(config.geometry);
-
-    /** @type {HotspotMaterialConfig} */
-    // var materialConfig;
-
-    // if (typeof config.material === "object" && config.material !== null)
-    // {
-    //     materialConfig = config.material;
-    // }
-    // else
-    // {
-    //     materialConfig = FORGE.HotspotMaterial.presets.TRANSPARENT;
-    // }
-
-    // if (this._debug === true)
-    // {
-    //     materialConfig = /** @type {HotspotMaterialConfig} */ (FORGE.Utils.extendMultipleObjects(materialConfig, FORGE.HotspotMaterial.presets.DEBUG));
-    // }
-
-    // if (typeof config.sound === "object" && config.sound !== null)
-    // {
-    //     this._sound = new FORGE.HotspotSound(this._viewer);
-    //     this._sound.load(config.sound, config.transform);
-    // }
 
     if (typeof config.fx === "string" && config.fx !== "")
     {
@@ -209,8 +181,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     {
         this._createEvents(config.events);
     }
-
-    // this._updatePosition();
 
     this._states.onLoadComplete.add(this._stateLoadCompleteHandler, this);
     this._states.load();
