@@ -285,6 +285,24 @@ FORGE.HotspotSound.prototype._applyRange = function()
  */
 FORGE.HotspotSound.prototype.load = function(config)
 {
+    if(FORGE.Utils.compareObjects(this._config, config) === true)
+    {
+        if(this._onReady !== null)
+        {
+            this._onReady.dispatch();
+        }
+
+        return;
+    }
+
+    this._config = config;
+
+    if (this._sound !== null)
+    {
+        this._sound.destroy();
+        this._sound = null;
+    }
+
     this._parseConfig(config);
 };
 
