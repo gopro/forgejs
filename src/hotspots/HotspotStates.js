@@ -314,26 +314,36 @@ FORGE.HotspotStates.prototype.load = function(name)
     if(typeof this._config[name].material === "object")
     {
         this._loading.material = true;
-
-        var materialConfig = /** @type {!HotspotMaterialConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.material, this._config[name].material));
-        this._updateMaterial(materialConfig);
-    }
-
-    if(typeof this._config[name].transform === "object")
-    {
-        this._loading.transform = true;
-
-        var transformConfig = /** @type {!HotspotTransformConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.transform, this._config[name].transform));
-        this._updateTransform(transformConfig);
     }
 
     if(typeof this._config[name].sound === "object")
     {
         this._loading.sound = true;
+    }
 
-        var soundConfig = /** @type {!HotspotTransformConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.sound, this._config[name].sound));
+    if(typeof this._config[name].transform === "object")
+    {
+        this._loading.transform = true;
+    }
+
+    if(this._loading.material === true)
+    {
+        var materialConfig = /** @type {!HotspotMaterialConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.material, this._config[name].material));
+        this._updateMaterial(materialConfig);
+    }
+
+    if(this._loading.sound === true)
+    {
+        var soundConfig = /** @type {!SoundConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.sound, this._config[name].sound));
         this._updateSound(soundConfig);
     }
+
+    if(this._loading.transform === true)
+    {
+        var transformConfig = /** @type {!HotspotTransformConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.transform, this._config[name].transform));
+        this._updateTransform(transformConfig);
+    }
+
 };
 
 /**
