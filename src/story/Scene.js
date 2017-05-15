@@ -448,7 +448,6 @@ FORGE.Scene.prototype.hasSoundSource = function()
     {
         return true;
     }
-
     return false;
 };
 
@@ -500,6 +499,9 @@ FORGE.Scene.prototype.destroy = function()
 
     this._description.destroy();
     this._description = null;
+
+    this._media.destroy();
+    this._media = null;
 
     if (this._onLoadStart !== null)
     {
