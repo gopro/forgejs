@@ -67,7 +67,7 @@ FORGE.MediaStore.prototype.constructor = FORGE.MediaStore;
  * The maximum size of texture at once. It is set at 30Mb, as we assume the
  * median size of a cache is 32Mb, and we keep 2Mb for other texture.
  * @name FORGE.MediaStore.MAX_SIZE
- * @type {string}
+ * @type {number}
  * @const
  */
 FORGE.MediaStore.MAX_SIZE = 31457280;
@@ -121,7 +121,7 @@ FORGE.MediaStore.prototype._createKey = function(face, level, x, y)
 {
     var key = "";
     key += typeof face !== "undefined" ? face + "-" : "";
-    key += typeof level !== "undefined" ? level  + "-" : "";
+    key += typeof level !== "undefined" ? level + "-" : "";
     key += typeof x !== "undefined" ? x + "-" : "";
     key += typeof y !== "undefined" ? y : "";
 
@@ -201,11 +201,11 @@ FORGE.MediaStore.prototype._checkSize = function()
     }
 
     var entries = this._textures.entries(),
-        time = window.performance.now();
+        time = window.performance.now(),
+        force = false,
+        texture;
 
     entries = FORGE.Utils.sortArrayByProperty(entries, "1.lastTime");
-
-    var force = false;
 
     while (this._size > FORGE.MediaStore.MAX_SIZE)
     {
