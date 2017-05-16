@@ -1548,20 +1548,26 @@ FORGE.VideoHTML5.prototype._clearRequestedVideo = function()
     {
         //Remove all listeners used for the requested video
         var element = video.element;
-        element.removeEventListener("loadstart", this._onRequestLoadStartBind, false);
-        element.removeEventListener("loadedmetadata", this._onRequestLoadedMetaDataBind, false);
-        element.removeEventListener("loadeddata", this._onRequestLoadedDataBind, false);
-        element.removeEventListener("play", this._onRequestCanPlayBeforeSeekBind, false);
-        element.removeEventListener("seeked", this._onRequestSeekedBind, false);
-        if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+
+        if (typeof element !== "undefined" && element !== null)
         {
-            element.removeEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+            element.removeEventListener("loadstart", this._onRequestLoadStartBind, false);
+            element.removeEventListener("loadedmetadata", this._onRequestLoadedMetaDataBind, false);
+            element.removeEventListener("loadeddata", this._onRequestLoadedDataBind, false);
+            element.removeEventListener("play", this._onRequestCanPlayBeforeSeekBind, false);
+            element.removeEventListener("seeked", this._onRequestSeekedBind, false);
+
+            if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+            {
+                element.removeEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+            }
+            else
+            {
+                element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+            }
+
+            element.removeEventListener("error", this._onRequestErrorBind, false);
         }
-        else
-        {
-            element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
-        }
-        element.removeEventListener("error", this._onRequestErrorBind, false);
 
         //Destroy the requested video
         this._destroyVideo(video);
