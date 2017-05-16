@@ -14,8 +14,34 @@ FORGE.HotspotGeometry.SHAPE = function(options)
 {
     options = options || {};
 
+    // clean the points given to remove any duplicate when points are following each other
+    if (Array.isArray(options.points))
+    {
+        options.points.push(options.points[0]);
+
+        var a, b, res = [];
+        for (var i = 0, ii = options.points.length - 1; i < ii; i++)
+        {
+            a = options.points[i];
+            b = options.points[i + 1];
+
+            if (a[0] !== b[0] || a[1] !== b[1])
+            {
+                res.push(a);
+            }
+        }
+
+        options.points = res;
+    }
+
+    if (options.points.length < 3)
+    {
+        console.warn("FORGE.HotspotGeometry.SHAPE: the points given to draw the shape should be a least 3");
+        options.points = null;
+    }
+
     //Default points array that is a square
-    if(Array.isArray(options.points) === false)
+    if (Array.isArray(options.points) === false)
     {
         options.points =
         [
