@@ -11,10 +11,10 @@ FORGE.HotspotAnimation = function(viewer, hotspotTransform)
     /**
      * The UID of the selected track.
      * @name FORGE.HotspotAnimation#_track
-     * @type {?string}
+     * @type {string}
      * @private
      */
-    this._track = null;
+    this._track = "";
 
     /**
      * The list of the tracks composing the animation

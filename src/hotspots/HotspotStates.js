@@ -74,7 +74,8 @@ FORGE.HotspotStates = function(viewer, hotspotUid)
     {
         transform: false,
         material: false,
-        sound: false
+        sound: false,
+        animation: false
     };
 
     /**
@@ -234,6 +235,23 @@ FORGE.HotspotStates.prototype._soundReadyHandler = function()
 };
 
 /**
+ * Update the animation for the current state
+ * @method FORGE.HotspotStates#_updateAnimation
+ * @param  {HotspotTrackConfig} config - The hotspot animation configuration object.
+ * @private
+ */
+FORGE.HotspotStates.prototype._updateAnimation = function(config)
+{
+    this.log("update animation");
+
+    var hotspot = FORGE.UID.get(this._hotspotUid);
+    hotspot.animation.load(config, false);
+
+    this._loading.animation = false;
+    this._checkLoading();
+};
+
+/**
  * Update the transform for the current state
  * @method FORGE.HotspotStates#_updateTransform
  * @param  {HotspotTransformConfig} config - The hotspot transform configuration object.
@@ -321,6 +339,11 @@ FORGE.HotspotStates.prototype.load = function(name)
         this._loading.sound = true;
     }
 
+    if(typeof this._config[name].animation === "object")
+    {
+        this._loading.animation = true;
+    }
+
     // There is always a transform
     this._loading.transform = true;
 
@@ -334,6 +357,12 @@ FORGE.HotspotStates.prototype.load = function(name)
     {
         var soundConfig = /** @type {!SoundConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.sound, this._config[name].sound));
         this._updateSound(soundConfig);
+    }
+
+    if(this._loading.animation === true)
+    {
+        var animationConfig = /** @type {HotspotTrackConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.animation, this._config[name].animation));
+        this._updateAnimation(animationConfig);
     }
 
     if(this._loading.transform === true)
