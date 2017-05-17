@@ -129,7 +129,7 @@ FORGE.GamepadsManager.prototype.update = function()
     {
         gamepad = gamepads[i];
 
-        if (gamepad !== null)
+        if (typeof gamepad !== "undefined" && gamepad !== null)
         {
             if (this._isConnected(gamepad) === false)
             {
