@@ -40,6 +40,14 @@ FORGE.MediaStore = function(viewer, config)
     this._textures = null;
 
     /**
+     * The list of currently being loaded textures
+     * @name FORGE.MediaStore#_loadingTextures
+     * @type {?Array<string>}
+     * @private
+     */
+    this._loadingTextures = null;
+
+    /**
      * The current size of all loaded textures.
      * @name FORGE.MediaStore#_size
      * @type {number}
@@ -83,6 +91,7 @@ FORGE.MediaStore.prototype._boot = function()
     this._register();
 
     this._textures = new FORGE.Map();
+    this._loadingTextures = [];
 
     this._parseConfig(this._config);
 };
@@ -141,6 +150,13 @@ FORGE.MediaStore.prototype._createKey = function(face, level, x, y)
  */
 FORGE.MediaStore.prototype._load = function(key, face, level, x, y)
 {
+    if (this._loadingTextures.indexOf(key) !== -1)
+    {
+        return;
+    }
+
+    this._loadingTextures.push(key);
+
     var url = this._pattern;
     url = url.replace(/\{face\}/, face);
     url = url.replace(/\{level\}/, level.toString());
@@ -182,6 +198,7 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
     this._textures.set(image.data.key, mediaTexture);
 
     // destroy the image, it is no longer needed
+    this._loadingTextures.splice(this._loadingTextures.indexOf(image.data.key));
     image.destroy();
 
     this._checkSize();
@@ -212,7 +229,7 @@ FORGE.MediaStore.prototype._checkSize = function()
         // oldest are first
         texture = entries.shift();
 
-        // if no  more entries (aka all texture are level 0) remove it anyway
+        // if no more entries (aka all texture are level 0) remove it anyway
         if (typeof texture === "undefined")
         {
             entries = this._textures.entries();
@@ -221,7 +238,7 @@ FORGE.MediaStore.prototype._checkSize = function()
         }
 
         // but don't delete if it is locked
-        if (texture[1].locked !== true || force === true)
+        if (force === true || texture[1].locked !== true)
         {
             this._size -= texture[1].size;
             texture[1].destroy();
@@ -273,6 +290,7 @@ FORGE.MediaStore.prototype.destroy = function()
     this._unregister();
 
     this._viewer = null;
+    this._loadingTextures = null;
 
     this._textures.clear();
     this._textures = null;
