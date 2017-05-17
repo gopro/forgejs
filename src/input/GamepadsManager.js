@@ -54,6 +54,11 @@ FORGE.GamepadsManager.prototype.constructor = FORGE.GamepadsManager;
  */
 FORGE.GamepadsManager.prototype._boot = function()
 {
+    if (FORGE.Device.ie === false)
+    {
+        return;
+    }
+
     this._gamepads = [];
 };
 
