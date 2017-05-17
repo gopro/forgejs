@@ -66,7 +66,7 @@ FORGE.MediaTexture.prototype.destroy = function()
 /**
  * Get the texture.
  * @name  FORGE.MediaTexture#texture
- * @type {string}
+ * @type {THREE.Texture}
  * @readonly
  */
 Object.defineProperty(FORGE.MediaTexture.prototype, "texture",
