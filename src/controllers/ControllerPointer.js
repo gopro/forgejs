@@ -296,6 +296,8 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
     var delta = invert / this._zoom.hardness;
     var factorDeltaY = 1;
 
+    var hardness = (this._camera.fov / 90);
+
     if (event.data.deltaMode)
     {
         switch(event.data.deltaMode)
@@ -315,6 +317,8 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
     {
         delta *= (event.data.deltaY * factorDeltaY) / 5;
     }
+
+    delta *= hardness;
 
     this._camera.fov = this._camera.fov - delta;
     this.log("_wheelHandler (fov:" + this._camera.fov + ")");
@@ -381,6 +385,8 @@ FORGE.ControllerPointer.prototype.update = function()
 {
     var size = this._viewer.renderer.displayResolution;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
+
+    hardness *= (this._camera.fov / 90);
 
     this._velocity.subVectors(this._positionCurrent, this._positionStart);
 
