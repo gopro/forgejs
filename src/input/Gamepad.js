@@ -170,8 +170,6 @@ FORGE.Gamepad.prototype._applyHoldButtons = function()
                 continue;
             }
 
-            this.log("button hold " + i);
-
             binding.hold();
         }
     }

@@ -21,7 +21,7 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * @type {?(Array<number>|number)}
      * @private
      */
-    this._keysIn = keysIn || [];
+    this._keysIn = keysIn;
 
     /**
      * The callback function that will be called on a keydown event.
@@ -50,10 +50,10 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
     /**
      * The key code or array of key codes that will be rejected if this KeyBinding is pressed.
      * @name FORGE.KeyBinding#_keysOut
-     * @type {?(Array<number>|number)}
+     * @type {?(Array<number>|number|undefined)}
      * @private
      */
-    this._keysOut = keysOut || null;
+    this._keysOut = keysOut;
 
     /**
      * Flag to know if we have to wait to consider a down event as a holded one.
@@ -142,6 +142,16 @@ FORGE.KeyBinding.prototype.constructor = FORGE.KeyBinding;
  */
 FORGE.KeyBinding.prototype._boot = function()
 {
+    if (typeof this._keysIn === "undefined" || this._keysIn === null)
+    {
+        this._keysIn = [];
+    }
+
+    if (typeof this._keysOut === "undefined")
+    {
+        this._keysOut = null;
+    }
+
     if (FORGE.Utils.isTypeOf(this._down, "string") === true || FORGE.Utils.isArrayOf(this._down, "string"))
     {
         this._downActionEventDispatcher = new FORGE.ActionEventDispatcher(this._viewer, "onDown");

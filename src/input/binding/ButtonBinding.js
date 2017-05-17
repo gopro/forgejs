@@ -21,7 +21,7 @@ FORGE.ButtonBinding = function(viewer, buttonsIn, down, up, hold, buttonsOut, co
      * @type {?(Array<number>|number)}
      * @private
      */
-    this._buttonsIn = buttonsIn || [];
+    this._buttonsIn = buttonsIn;
 
     /**
      * The callback function that will be called on a button down event.
@@ -50,10 +50,10 @@ FORGE.ButtonBinding = function(viewer, buttonsIn, down, up, hold, buttonsOut, co
     /**
      * The button code or array of button codes that will be rejected if this ButtonBinding is down.
      * @name FORGE.ButtonBinding#_buttonsOut
-     * @type {?(Array<number>|number)}
+     * @type {?(Array<number>|number|undefined)}
      * @private
      */
-    this._buttonsOut = buttonsOut || null;
+    this._buttonsOut = buttonsOut;
 
     /**
      * Flag to know if we have to wait to consider a down event as a hold one.
@@ -142,6 +142,16 @@ FORGE.ButtonBinding.prototype.constructor = FORGE.ButtonBinding;
  */
 FORGE.ButtonBinding.prototype._boot = function()
 {
+    if (typeof this._buttonsIn === "undefined" || this._buttonsIn === null)
+    {
+        this._buttonsIn = [];
+    }
+
+    if (typeof this._buttonsOut === "undefined")
+    {
+        this._buttonsOut = null;
+    }
+
     if (FORGE.Utils.isTypeOf(this._down, "string") === true || FORGE.Utils.isArrayOf(this._down, "string"))
     {
         this._downActionEventDispatcher = new FORGE.ActionEventDispatcher(this._viewer, "onPressed");
