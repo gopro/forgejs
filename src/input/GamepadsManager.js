@@ -54,7 +54,7 @@ FORGE.GamepadsManager.prototype.constructor = FORGE.GamepadsManager;
  */
 FORGE.GamepadsManager.prototype._boot = function()
 {
-    if (FORGE.Device.ie === false)
+    if (FORGE.Device.ie === true)
     {
         return;
     }
@@ -139,6 +139,14 @@ FORGE.GamepadsManager.prototype.update = function()
             if (this._isConnected(gamepad) === false)
             {
                 this._connect(gamepad);
+            }
+            // curious behavior in edge, the pad isn't kept as a reference
+            // so it isn't updated: the solution for now is to refresh the
+            // gamepad each time
+            else if (FORGE.Device.edge === true)
+            {
+                var pad = this._gamepads[gamepad.index];
+                pad.gamepad = gamepad;
             }
 
             this._gamepads[i].update();

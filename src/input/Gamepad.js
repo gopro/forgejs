@@ -477,7 +477,6 @@ Object.defineProperty(FORGE.Gamepad.prototype, "enabled",
  * Gets the raw data of the gamepad (the Gamepad object, not the FORGE one).
  * @name FORGE.Gamepad#gamepad
  * @type {Gamepad}
- * @readonly
  */
 Object.defineProperty(FORGE.Gamepad.prototype, "gamepad",
 {
@@ -485,5 +484,14 @@ Object.defineProperty(FORGE.Gamepad.prototype, "gamepad",
     get: function()
     {
         return this._gamepad;
+    },
+
+    /** @this {FORGE.Gamepad} */
+    set: function(value)
+    {
+        if (value !== null)
+        {
+            this._gamepad = value;
+        }
     }
 });
