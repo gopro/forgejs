@@ -164,12 +164,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         this._states.addConfig(config.states);
     }
 
-    // if (typeof config.animation === "object" && config.animation !== null)
-    // {
-    //     this._animation.load(config.animation);
-    //     this._animation.onProgress.add(this._updatePosition, this);
-    // }
-
     this._createGeometry(config.geometry);
 
     if (typeof config.fx === "string" && config.fx !== "")

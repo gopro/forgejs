@@ -345,8 +345,6 @@ FORGE.HotspotSound.prototype.destroy = function()
         this._sound = null;
     }
 
-    //this._position = null;
-
     if(this._onReady !== null)
     {
         this._onReady.destroy();
