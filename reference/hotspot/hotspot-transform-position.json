@@ -9,7 +9,7 @@
         "radius": {
             "type": "number",
             "title": "Radius",
-            "description": "The radius, ie the distance between the camera and the hotspot (soon to be deprecated)",
+            "description": "The radius, ie the distance between the camera and the hotspot",
             "minimum": 0,
             "maximum": 1000,
             "example": 200
@@ -18,7 +18,7 @@
         "theta": {
             "type": "number",
             "title": "Theta",
-            "description": "The position on the horizontal axis in degrees (soon to be deprecated)",
+            "description": "The position on the horizontal axis in degrees",
             "minimum": 0,
             "maximum": 360,
             "example": 90
@@ -27,7 +27,7 @@
         "phi": {
             "type": "number",
             "title": "Phi",
-            "description": "The position on the vertical axis in degrees (soon to be deprecated)",
+            "description": "The position on the vertical axis in degrees",
             "minimum": -90,
             "maximum": 90,
             "example": 30
