@@ -159,7 +159,7 @@ FORGE.HotspotSound.prototype._parseConfig = function(config)
     }
 
     var hotspot = FORGE.UID.get(this._hotspotUid);
-    var position = hotspot.config.transform.position
+    var position = hotspot.config.transform.position;
 
     this._position.theta = (typeof position.theta === "number") ? FORGE.Math.clamp(/** @type {number} */ (position.theta), -180, 180) : 0;
     this._position.phi = (typeof position.phi === "number") ? FORGE.Math.clamp(/** @type {number} */ (position.phi), -90, 90) : 0;
