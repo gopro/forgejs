@@ -168,7 +168,7 @@ FORGE.HotspotTransform.prototype.notifyChange = function()
  * Load a transform configuration.
  * @method FORGE.HotspotTransform#load
  * @param {HotspotTransformConfig} config - The transform config to load.
- * @param {boolean} [notify=true]
+ * @param {boolean} [notify=true] - Do we have to notify the change of the transform after the config loading
  */
 FORGE.HotspotTransform.prototype.load = function(config, notify)
 {

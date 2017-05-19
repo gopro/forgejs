@@ -245,7 +245,7 @@ FORGE.MetaAnimation.prototype.destroy = function()
 
 /**
  * Accessors to timeline
- * @name FORGE.MetaAnimation#timeline
+ * @name FORGE.MetaAnimation#running
  * @readonly
  * @type {boolean}
  */
