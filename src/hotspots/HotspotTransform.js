@@ -82,9 +82,9 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
     {
         var rotation = FORGE.Utils.extendSimpleObject({}, this._rotation.dump());
 
-        this.rotation.x = (typeof config.rotation.x === "number") ? config.rotation.x : 0;
-        this.rotation.y = (typeof config.rotation.y === "number") ? config.rotation.y : 0;
-        this.rotation.z = (typeof config.rotation.z === "number") ? config.rotation.z : 0;
+        rotation.x = (typeof config.rotation.x === "number") ? config.rotation.x : 0;
+        rotation.y = (typeof config.rotation.y === "number") ? config.rotation.y : 0;
+        rotation.z = (typeof config.rotation.z === "number") ? config.rotation.z : 0;
 
         if(FORGE.Utils.compareObjects(this._rotation.dump(), rotation) === false)
         {
@@ -97,9 +97,9 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
     {
         var scale = FORGE.Utils.extendSimpleObject({}, this._scale.dump());
 
-        this.scale.x = (typeof config.scale.x === "number") ? FORGE.Math.clamp(config.scale.x, 0.000001, 100000) : 1;
-        this.scale.y = (typeof config.scale.y === "number") ? FORGE.Math.clamp(config.scale.y, 0.000001, 100000) : 1;
-        this.scale.z = (typeof config.scale.z === "number") ? FORGE.Math.clamp(config.scale.z, 0.000001, 100000) : 1;
+        scale.x = (typeof config.scale.x === "number") ? FORGE.Math.clamp(config.scale.x, 0.000001, 100000) : 1;
+        scale.y = (typeof config.scale.y === "number") ? FORGE.Math.clamp(config.scale.y, 0.000001, 100000) : 1;
+        scale.z = (typeof config.scale.z === "number") ? FORGE.Math.clamp(config.scale.z, 0.000001, 100000) : 1;
 
         if(FORGE.Utils.compareObjects(this._scale.dump(), scale) === false)
         {
@@ -132,7 +132,7 @@ FORGE.HotspotTransform.prototype._parsePosition = function(config)
         position.y = (typeof config.y === "number") ? config.y : 0;
         position.z = (typeof config.z === "number") ? config.z : -200;
 
-        if(typeof config.radius === "number" && typeof config.theta === "number" && typeof config.phi === "number")
+        if(typeof config.radius === "number" || typeof config.theta === "number" || typeof config.phi === "number")
         {
             var radius = (typeof config.radius === "number") ? config.radius : 200;
             var theta = (typeof config.theta === "number") ? FORGE.Math.degToRad(config.theta) : 0;
