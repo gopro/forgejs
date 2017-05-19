@@ -5,7 +5,6 @@
  * @param {number} x - The spherical coordinates of a 3D object (radius, theta, phi)
  * @param {number} y - The rotation of a 3D object (x, y, z).
  * @param {number} z - The scale of a 3D object (x, y, z).
- * @extends {FORGE.BaseObject}
  */
 FORGE.HotspotTransformValues = function(transformUid, x, y, z)
 {
@@ -48,12 +47,7 @@ FORGE.HotspotTransformValues = function(transformUid, x, y, z)
      * @private
      */
     this._onChange = null;
-
-    FORGE.BaseObject.call(this, "HotspotTransform");
 };
-
-FORGE.HotspotTransformValues.prototype = Object.create(FORGE.BaseObject.prototype);
-FORGE.HotspotTransformValues.prototype.constructor = FORGE.HotspotTransformValues;
 
 /**
  * Load values.
@@ -123,8 +117,6 @@ FORGE.HotspotTransformValues.prototype.destroy = function()
         this._onChange.destroy();
         this._onChange = null;
     }
-
-    FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**
