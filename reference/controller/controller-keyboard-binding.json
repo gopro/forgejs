@@ -26,7 +26,7 @@
                 {"type": "number"},
                 {"type": "array", "items": "number"}
             ],
-            "title": "In",
+            "title": "Out",
             "description": "The key code or array of keycodes that are associated to this key binding. Corresponds to a <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode\">KeyboardEvent.keyCode</a>"
         },
 

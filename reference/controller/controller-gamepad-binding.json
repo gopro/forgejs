@@ -1,0 +1,27 @@
+{
+    "id": "controller-gamepad-binding",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerGamepadBindingConfig",
+    "description": "An instance of <a href=\"#controller-gamepad-binding\">a controller gamepad binding config.</a>",
+    "type": "object",
+
+    "properties": {
+        "buttons": {
+            "type": "array",
+            "title": "Buttons",
+            "description": "Array of <a href=\"#controller-gamepad-button-binding\">custom gamepad button binding.</a>.",
+            "items": {
+                "$ref": "controller-gamepad-button-binding"
+            }
+        },
+
+        "axes": {
+            "type": "array",
+            "title": "Axes",
+            "description": "Array of <a href=\"#controller-gamepad-axis-binding\">custom gamepad axis binding.</a>.",
+            "items": {
+                "$ref": "controller-gamepad-axis-binding"
+            }
+        }
+    }
+}

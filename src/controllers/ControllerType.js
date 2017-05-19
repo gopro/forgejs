@@ -32,3 +32,9 @@ FORGE.ControllerType.KEYBOARD = "keyboard";
  */
 FORGE.ControllerType.GYROSCOPE = "gyroscope";
 
+/**
+ * @name FORGE.ControllerType.GAMEPAD
+ * @type {string}
+ * @const
+ */
+FORGE.ControllerType.GAMEPAD = "gamepad";

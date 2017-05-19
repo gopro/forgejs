@@ -1,4 +1,3 @@
-
 /**
  * Key Binding object that handles keyboard event handlers for a list of keycodes.
  * To use a Key Binding you have to add it to the {@link FORGE.Keyboard}.
@@ -12,25 +11,17 @@
  * @param {?(Array<number>|number)=} keysOut - The key code or array of key codes that will be rejected if this KeyBinding is pressed.
  * @param {Object=} context - The context in which you want your "down", "hold" & up callbacks to execute
  * @param {string=} name - The name of the binding, can be use as an identifier.
- * @extends {FORGE.BaseObject}
+ * @extends {FORGE.BaseBinding}
  */
 FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, name)
 {
-    /**
-     * Viewer reference
-     * @name  FORGE.KeyBinding#_viewer
-     * @type {FORGE.Viewer}
-     * @private
-     */
-    this._viewer = viewer;
-
     /**
      * The key code or array of key codes associated to this KeyBinding.
      * @name FORGE.KeyBinding#_keysIn
      * @type {?(Array<number>|number)}
      * @private
      */
-    this._keysIn = keysIn || [];
+    this._keysIn = keysIn;
 
     /**
      * The callback function that will be called on a keydown event.
@@ -59,32 +50,15 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
     /**
      * The key code or array of key codes that will be rejected if this KeyBinding is pressed.
      * @name FORGE.KeyBinding#_keysOut
-     * @type {?(Array<number>|number)}
+     * @type {?(Array<number>|number|undefined)}
      * @private
      */
-    this._keysOut = keysOut || null;
-
-    /**
-     * The context in which we execute down, up and hold callback.
-     * @name  FORGE.KeyBinding#_context
-     * @type {Object}
-     * @private
-     */
-    this._context = context || this;
-
-    /**
-     * The name of the binding, can be usefull if multiple keycodes react for this binding.
-     * @name FORGE.KeyBinding#_name
-     * @type {string}
-     * @private
-     */
-    this._name = name || "";
+    this._keysOut = keysOut;
 
     /**
      * Flag to know if we have to wait to consider a down event as a holded one.
      * @name FORGE.KeyBinding#_waitToHold
      * @type {boolean}
-     * @default
      * @private
      */
     this._waitToHold = false;
@@ -94,7 +68,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * It should be pressed if any of keysIn are pressed.
      * @name FORGE.KeyBinding#_pressed
      * @type {boolean}
-     * @default
      * @private
      */
     this._pressed = false;
@@ -103,7 +76,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * When a key binding have to wait to be considered as holded this flag is check to know if down action is complete.
      * @name FORGE.KeyBinding#_downComplete
      * @type {boolean}
-     * @default
      * @private
      */
     this._downComplete = false;
@@ -112,7 +84,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * Count of down.
      * @name FORGE.KeyBinding#_downCount
      * @type {number}
-     * @default
      * @private
      */
     this._downCount = 0;
@@ -121,7 +92,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * Count of hold.
      * @name FORGE.KeyBinding#_holdCount
      * @type {number}
-     * @default
      * @private
      */
     this._holdCount = 0;
@@ -130,7 +100,6 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      * Count of up.
      * @name FORGE.KeyBinding#_upCount
      * @type {number}
-     * @default
      * @private
      */
     this._upCount = 0;
@@ -159,12 +128,12 @@ FORGE.KeyBinding = function(viewer, keysIn, down, up, hold, keysOut, context, na
      */
     this._upActionEventDispatcher = null;
 
-    FORGE.BaseObject.call(this, "KeyBinding");
+    FORGE.BaseBinding.call(this, viewer, "KeyBinding", context, name);
 
     this._boot();
 };
 
-FORGE.KeyBinding.prototype = Object.create(FORGE.BaseObject.prototype);
+FORGE.KeyBinding.prototype = Object.create(FORGE.BaseBinding.prototype);
 FORGE.KeyBinding.prototype.constructor = FORGE.KeyBinding;
 
 /**
@@ -173,22 +142,32 @@ FORGE.KeyBinding.prototype.constructor = FORGE.KeyBinding;
  */
 FORGE.KeyBinding.prototype._boot = function()
 {
-    if(FORGE.Utils.isTypeOf(this._down, "string") === true || FORGE.Utils.isArrayOf(this._down, "string"))
+    if (typeof this._keysIn === "undefined" || this._keysIn === null)
+    {
+        this._keysIn = [];
+    }
+
+    if (typeof this._keysOut === "undefined")
+    {
+        this._keysOut = null;
+    }
+
+    if (FORGE.Utils.isTypeOf(this._down, "string") === true || FORGE.Utils.isArrayOf(this._down, "string"))
     {
         this._downActionEventDispatcher = new FORGE.ActionEventDispatcher(this._viewer, "onDown");
-        this._downActionEventDispatcher.addActions(/** @type {(string|Array<string>)} */ (this._down));
+        this._downActionEventDispatcher.addActions( /** @type {(string|Array<string>)} */ (this._down));
     }
 
-    if(FORGE.Utils.isTypeOf(this._hold, "string") === true || FORGE.Utils.isArrayOf(this._hold, "string"))
+    if (FORGE.Utils.isTypeOf(this._hold, "string") === true || FORGE.Utils.isArrayOf(this._hold, "string"))
     {
         this._holdActionEventDispatcher = new FORGE.ActionEventDispatcher(this._viewer, "onHold");
-        this._holdActionEventDispatcher.addActions(/** @type {(string|Array<string>)} */ (this._hold));
+        this._holdActionEventDispatcher.addActions( /** @type {(string|Array<string>)} */ (this._hold));
     }
 
-    if(FORGE.Utils.isTypeOf(this._up, "string") === true || FORGE.Utils.isArrayOf(this._up, "string"))
+    if (FORGE.Utils.isTypeOf(this._up, "string") === true || FORGE.Utils.isArrayOf(this._up, "string"))
     {
         this._upActionEventDispatcher = new FORGE.ActionEventDispatcher(this._viewer, "onUp");
-        this._upActionEventDispatcher.addActions(/** @type {(string|Array<string>)} */ (this._up));
+        this._upActionEventDispatcher.addActions( /** @type {(string|Array<string>)} */ (this._up));
     }
 };
 
@@ -200,7 +179,7 @@ FORGE.KeyBinding.prototype._boot = function()
  */
 FORGE.KeyBinding.prototype.hasKeyIn = function(keyCode)
 {
-    if(typeof this._keysIn === "number" && this._keysIn === keyCode)
+    if (typeof this._keysIn === "number" && this._keysIn === keyCode)
     {
         return true;
     }
@@ -220,11 +199,11 @@ FORGE.KeyBinding.prototype.hasKeyIn = function(keyCode)
  */
 FORGE.KeyBinding.prototype.hasKeyOut = function(keyCode)
 {
-    if(this._keysOut === null)
+    if (this._keysOut === null)
     {
         return false;
     }
-    else if(typeof this._keysOut === "number" && this._keysOut === keyCode)
+    else if (typeof this._keysOut === "number" && this._keysOut === keyCode)
     {
         return true;
     }
@@ -249,12 +228,12 @@ FORGE.KeyBinding.prototype.down = function(event)
     this._downCount++;
     this._pressed = true;
 
-    if(typeof this._down === "function")
+    if (typeof this._down === "function")
     {
         //Call the callback with a reference to this binding + the original event.
         this._down.call(this._context, this, event);
     }
-    else if(this._downActionEventDispatcher !== null)
+    else if (this._downActionEventDispatcher !== null)
     {
         this._downActionEventDispatcher.dispatch();
     }
@@ -274,9 +253,9 @@ FORGE.KeyBinding.prototype.waitToHold = function()
 
     var downCompleteCallback = function()
     {
-        this.log("downCompleteCallback "+_downCount+" "+this._downCount);
+        this.log("downCompleteCallback " + _downCount + " " + this._downCount);
 
-        if(_downCount === this._downCount)
+        if (_downCount === this._downCount)
         {
             this._downComplete = true;
         }
@@ -299,12 +278,12 @@ FORGE.KeyBinding.prototype.up = function(event)
     this._pressed = false;
     this._downComplete = false;
 
-    if(typeof this._up === "function")
+    if (typeof this._up === "function")
     {
         //Call the callback with a reference to this binding + the original event.
         this._up.call(this._context, this, event);
     }
-    else if(this._upActionEventDispatcher !== null)
+    else if (this._upActionEventDispatcher !== null)
     {
         this._upActionEventDispatcher.dispatch();
     }
@@ -321,11 +300,11 @@ FORGE.KeyBinding.prototype.hold = function()
 
     this._holdCount++;
 
-    if(typeof this._hold === "function")
+    if (typeof this._hold === "function")
     {
         this._hold.call(this._context, this);
     }
-    else if(this._holdActionEventDispatcher !== null)
+    else if (this._holdActionEventDispatcher !== null)
     {
         this._holdActionEventDispatcher.dispatch();
     }
@@ -342,50 +321,34 @@ FORGE.KeyBinding.prototype.destroy = function()
     this._up = null;
     this._hold = null;
     this._keysOut = null;
-    this._context = null;
 
-    if(this._downActionEventDispatcher !== null)
+    if (this._downActionEventDispatcher !== null)
     {
         this._downActionEventDispatcher.destroy();
         this._downActionEventDispatcher = null;
     }
 
-    if(this._holdActionEventDispatcher !== null)
+    if (this._holdActionEventDispatcher !== null)
     {
         this._holdActionEventDispatcher.destroy();
         this._holdActionEventDispatcher = null;
     }
 
-    if(this._upActionEventDispatcher !== null)
+    if (this._upActionEventDispatcher !== null)
     {
         this._upActionEventDispatcher.destroy();
         this._upActionEventDispatcher = null;
     }
 
-    FORGE.BaseObject.prototype.destroy.call(this);
+    FORGE.BaseBinding.prototype.destroy.call(this);
 };
 
 /**
-* Gets the name of this KeyBinding.
-* @name FORGE.KeyBinding#name
-* @readonly
-* @type {string}
-*/
-Object.defineProperty(FORGE.KeyBinding.prototype, "name",
-{
-    /** @this {FORGE.KeyBinding} */
-    get: function()
-    {
-        return this._name;
-    }
-});
-
-/**
-* Gets the pressed status of this KeyBinding.
-* @name FORGE.KeyBinding#pressed
-* @readonly
-* @type {boolean}
-*/
+ * Gets the pressed status of this KeyBinding.
+ * @name FORGE.KeyBinding#pressed
+ * @readonly
+ * @type {boolean}
+ */
 Object.defineProperty(FORGE.KeyBinding.prototype, "pressed",
 {
     /** @this {FORGE.KeyBinding} */
@@ -396,11 +359,11 @@ Object.defineProperty(FORGE.KeyBinding.prototype, "pressed",
 });
 
 /**
-* Gets the down count value.
-* @name FORGE.KeyBinding#downCount
-* @readonly
-* @type {number}
-*/
+ * Gets the down count value.
+ * @name FORGE.KeyBinding#downCount
+ * @readonly
+ * @type {number}
+ */
 Object.defineProperty(FORGE.KeyBinding.prototype, "downCount",
 {
     /** @this {FORGE.KeyBinding} */
@@ -411,11 +374,11 @@ Object.defineProperty(FORGE.KeyBinding.prototype, "downCount",
 });
 
 /**
-* Gets the up count value.
-* @name FORGE.KeyBinding#upCount
-* @readonly
-* @type {number}
-*/
+ * Gets the up count value.
+ * @name FORGE.KeyBinding#upCount
+ * @readonly
+ * @type {number}
+ */
 Object.defineProperty(FORGE.KeyBinding.prototype, "upCount",
 {
     /** @this {FORGE.KeyBinding} */
@@ -426,11 +389,11 @@ Object.defineProperty(FORGE.KeyBinding.prototype, "upCount",
 });
 
 /**
-* Gets the hold count value.
-* @name FORGE.KeyBinding#holdCount
-* @readonly
-* @type {number}
-*/
+ * Gets the hold count value.
+ * @name FORGE.KeyBinding#holdCount
+ * @readonly
+ * @type {number}
+ */
 Object.defineProperty(FORGE.KeyBinding.prototype, "holdCount",
 {
     /** @this {FORGE.KeyBinding} */
@@ -441,11 +404,11 @@ Object.defineProperty(FORGE.KeyBinding.prototype, "holdCount",
 });
 
 /**
-* Gets the hasToWaitToHold value.
-* @name FORGE.KeyBinding#hasToWaitToHold
-* @readonly
-* @type {boolean}
-*/
+ * Gets the hasToWaitToHold value.
+ * @name FORGE.KeyBinding#hasToWaitToHold
+ * @readonly
+ * @type {boolean}
+ */
 Object.defineProperty(FORGE.KeyBinding.prototype, "hasToWaitToHold",
 {
     /** @this {FORGE.KeyBinding} */
@@ -456,11 +419,11 @@ Object.defineProperty(FORGE.KeyBinding.prototype, "hasToWaitToHold",
 });
 
 /**
-* Gets the downComplete value.
-* @name FORGE.KeyBinding#downComplete
-* @readonly
-* @type {boolean}
-*/
+ * Gets the downComplete value.
+ * @name FORGE.KeyBinding#downComplete
+ * @readonly
+ * @type {boolean}
+ */
 Object.defineProperty(FORGE.KeyBinding.prototype, "downComplete",
 {
     /** @this {FORGE.KeyBinding} */

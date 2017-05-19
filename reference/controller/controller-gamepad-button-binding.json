@@ -1,0 +1,39 @@
+{
+    "id": "controller-gamepad-button-binding",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ControllerGamepadButtonBindingConfig",
+    "description": "A custom <a href=\"#controller-gamepad-binding\">controller gamepad</a> button binding.",
+    "type": "object",
+
+    "properties": {
+        "name":{
+            "type": "string",
+            "title": "Name",
+            "description": "The name of this button binding"
+        },
+
+        "in":{
+            "anyOf":[
+                {"type": "number"},
+                {"type": "array", "items": "number"}
+            ],
+            "title": "In",
+            "description": "The button code or array of button codes that are associated to this button binding."
+        },
+
+        "out":{
+            "anyOf":[
+                {"type": "number"},
+                {"type": "array", "items": "number"}
+            ],
+            "title": "Out",
+            "description": "The button code or array of button codes that are associated to this button binding."
+        },
+
+        "events":{
+            "$ref": "controller-gamepad-button-binding-events"
+        }
+    },
+
+    "required": ["in", "events"]
+}

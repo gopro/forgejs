@@ -65,7 +65,13 @@
                 "controller-options-zoom",
                 "controller-keyboard",
                 "controller-keyboard-binding",
-                "controller-keyboard-binding-events"
+                "controller-keyboard-binding-events",
+                "controller-gamepad",
+                "controller-gamepad-binding",
+                "controller-gamepad-button-binding",
+                "controller-gamepad-button-binding-events",
+                "controller-gamepad-axis-binding",
+                "controller-gamepad-axis-binding-events"
             ]
         },
         {
@@ -294,11 +300,18 @@
                 "controller",
                 "controller-instance",
                 "controller-pointer",
+                "controller-options-orientation",
                 "controller-options-orientation-invert",
                 "controller-options-zoom",
                 "controller-keyboard",
                 "controller-keyboard-binding",
-                "controller-keyboard-binding-events"
+                "controller-keyboard-binding-events",
+                "controller-gamepad",
+                "controller-gamepad-binding",
+                "controller-gamepad-button-binding",
+                "controller-gamepad-button-binding-events",
+                "controller-gamepad-axis-binding",
+                "controller-gamepad-axis-binding-events"
             ]
         }]
     },

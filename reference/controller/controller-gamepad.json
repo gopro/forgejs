@@ -1,7 +1,7 @@
 {
-    "id": "controller-keyboard",
+    "id": "controller-gamepad",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "ControllerKeyboardConfig",
+    "title": "ControllerGamepadConfig",
     "description": "An instance of <a href=\"#controller-gamepad\">a controller gamepad.</a>",
     "type": "object",
 
@@ -10,7 +10,7 @@
             "$ref": "controller-options-orientation"
         },
 
-        "zoom":{
+        "zoom": {
             "$ref": "controller-options-zoom"
         },
 
@@ -22,12 +22,7 @@
         },
 
         "bindings": {
-            "type": "array",
-            "title": "Bindings",
-            "description": "Array of <a href=\"#controller-keyboard-binding\">custom keyboard key bindings</a>.",
-            "items": {
-                "$ref": "controller-keyboard-binding"
-            }
+            "$ref": "controller-gamepad-binding"
         }
     }
 }

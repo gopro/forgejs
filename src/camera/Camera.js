@@ -244,7 +244,7 @@ FORGE.Camera.DEFAULT_CONFIG = {
     {
         min: -Infinity,
         max: Infinity,
-        default: 0,
+        default: 0
     },
     pitch:
     {
