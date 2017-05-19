@@ -49,6 +49,14 @@ FORGE.HotspotAnimation = function(viewer, hotspotTransform)
     this._autoPlay = false;
 
     /**
+     * Enabled flag
+     * @name FORGE.HotspotAnimation#_autoPlay
+     * @type {boolean}
+     * @private
+     */
+    this._enabled = true;
+
+    /**
      * On animation progress event dispatcher.
      * @name FORGE.HotspotAnimation#_onProgress
      * @type {FORGE.EventDispatcher}
@@ -97,11 +105,9 @@ FORGE.HotspotAnimation.prototype._boot = function()
  */
 FORGE.HotspotAnimation.prototype.load = function(config)
 {
-    if (config.enabled !== true)
-    {
-        return;
-    }
+    this.stop(); // Stop current aimation if any in all cases.
 
+    this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
     this._loop = (typeof config.loop === "boolean") ? config.loop : false;
     this._random = (typeof config.random === "boolean") ? config.random : false;
     this._autoPlay = (typeof config.autoPlay === "boolean") ? config.autoPlay : false;
@@ -172,6 +178,11 @@ FORGE.HotspotAnimation.prototype._onTweenProgressHandler = function()
  */
 FORGE.HotspotAnimation.prototype.play = function(track)
 {
+    if(this._enabled === false)
+    {
+        return;
+    }
+
     if (typeof track === "number")
     {
         this._track = this._tracks[track];
@@ -371,6 +382,21 @@ FORGE.HotspotAnimation.prototype.destroy = function()
 
     FORGE.MetaAnimation.prototype.destroy.call(this);
 };
+
+/**
+ * Enabled flag.
+ * @name FORGE.HotspotAnimation#enabled
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.HotspotAnimation.prototype, "enabled",
+{
+    /** @this {FORGE.HotspotAnimation} */
+    get: function()
+    {
+        return this._enabled;
+    }
+});
 
 /**
  * Does the animation auto play.
