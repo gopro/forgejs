@@ -244,6 +244,29 @@ FORGE.MetaAnimation.prototype.destroy = function()
 };
 
 /**
+ * Accessors to timeline
+ * @name FORGE.MetaAnimation#running
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.MetaAnimation.prototype, "running",
+{
+    /** @this {FORGE.MetaAnimation} */
+    get: function()
+    {
+        for(var i = 0, ii = this._animations.length; i < ii; i++)
+        {
+            if(this._animations[i].running === true)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+});
+
+/**
  * Get the "onComplete" {@link FORGE.EventDispatcher} of the target.
  * @name FORGE.MetaAnimation#onComplete
  * @readonly

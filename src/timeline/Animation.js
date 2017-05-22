@@ -531,6 +531,21 @@ FORGE.Animation.prototype.destroy = function()
 };
 
 /**
+ * Accessors to the running flag
+ * @name FORGE.Animation#running
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.Animation.prototype, "running",
+{
+    /** @this {FORGE.Animation} */
+    get: function()
+    {
+        return this._running;
+    }
+});
+
+/**
  * Accessors to timeline
  * @name FORGE.Animation#timeline
  * @readonly

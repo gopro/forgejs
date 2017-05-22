@@ -3,18 +3,18 @@
  *
  * @constructor FORGE.HotspotAnimation
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.HotspotTransform} hotspot - {@link FORGE.Hotspot3D} reference
+ * @param {FORGE.HotspotTransform} hotspotTransform - {@link FORGE.HotspotTransform} reference
  * @extends {FORGE.MetaAnimation}
  */
-FORGE.HotspotAnimation = function(viewer, hotspot)
+FORGE.HotspotAnimation = function(viewer, hotspotTransform)
 {
     /**
      * The UID of the selected track.
      * @name FORGE.HotspotAnimation#_track
-     * @type {?string}
+     * @type {string}
      * @private
      */
-    this._track = null;
+    this._track = "";
 
     /**
      * The list of the tracks composing the animation
@@ -49,6 +49,14 @@ FORGE.HotspotAnimation = function(viewer, hotspot)
     this._autoPlay = false;
 
     /**
+     * Enabled flag
+     * @name FORGE.HotspotAnimation#_autoPlay
+     * @type {boolean}
+     * @private
+     */
+    this._enabled = true;
+
+    /**
      * On animation progress event dispatcher.
      * @name FORGE.HotspotAnimation#_onProgress
      * @type {FORGE.EventDispatcher}
@@ -56,7 +64,7 @@ FORGE.HotspotAnimation = function(viewer, hotspot)
      */
     this._onProgress = null;
 
-    FORGE.MetaAnimation.call(this, viewer, hotspot, "HotspotAnimation");
+    FORGE.MetaAnimation.call(this, viewer, hotspotTransform, "HotspotAnimation");
     this._boot();
 };
 
@@ -71,20 +79,22 @@ FORGE.HotspotAnimation.prototype.constructor = FORGE.HotspotAnimation;
  */
 FORGE.HotspotAnimation.prototype._boot = function()
 {
-    this._instructions = [
-    {
-        prop: [ "rotation.x", "rotation.y", "rotation.z" ],
-        wrap: [ [-180, 180], [-180, 180], [-180, 180] ],
-        smooth: false
-    },
-    {
-        prop: [ "position.x", "position.y", "position.z" ],
-        smooth: false
-    },
-    {
-        prop: [ "scale.x", "scale.y", "scale.z" ],
-        smooth: false
-    }];
+    this._instructions =
+    [
+        {
+            prop: [ "rotation.x", "rotation.y", "rotation.z" ],
+            wrap: [ [-180, 180], [-180, 180], [-180, 180] ],
+            smooth: false
+        },
+        {
+            prop: [ "position.x", "position.y", "position.z" ],
+            smooth: false
+        },
+        {
+            prop: [ "scale.x", "scale.y", "scale.z" ],
+            smooth: false
+        }
+    ];
 };
 
 /**
@@ -95,11 +105,9 @@ FORGE.HotspotAnimation.prototype._boot = function()
  */
 FORGE.HotspotAnimation.prototype.load = function(config)
 {
-    if (config.enabled !== true)
-    {
-        return;
-    }
+    this.stop(); // Stop current aimation if any in all cases.
 
+    this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
     this._loop = (typeof config.loop === "boolean") ? config.loop : false;
     this._random = (typeof config.random === "boolean") ? config.random : false;
     this._autoPlay = (typeof config.autoPlay === "boolean") ? config.autoPlay : false;
@@ -170,6 +178,11 @@ FORGE.HotspotAnimation.prototype._onTweenProgressHandler = function()
  */
 FORGE.HotspotAnimation.prototype.play = function(track)
 {
+    if(this._enabled === false)
+    {
+        return;
+    }
+
     if (typeof track === "number")
     {
         this._track = this._tracks[track];
@@ -369,6 +382,21 @@ FORGE.HotspotAnimation.prototype.destroy = function()
 
     FORGE.MetaAnimation.prototype.destroy.call(this);
 };
+
+/**
+ * Enabled flag.
+ * @name FORGE.HotspotAnimation#enabled
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.HotspotAnimation.prototype, "enabled",
+{
+    /** @this {FORGE.HotspotAnimation} */
+    get: function()
+    {
+        return this._enabled;
+    }
+});
 
 /**
  * Does the animation auto play.

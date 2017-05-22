@@ -86,6 +86,7 @@ module.exports = function(grunt)
         "src/hotspots/HotspotGeometry.js",
         "src/hotspots/HotspotGeometryType.js",
         "src/hotspots/HotspotTransform.js",
+        "src/hotspots/HotspotTransformValues.js",
         "src/hotspots/HotspotAnimation.js",
         "src/hotspots/HotspotAnimationTrack.js",
         "src/hotspots/HotspotStates.js",

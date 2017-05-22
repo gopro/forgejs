@@ -1,6 +1,6 @@
 
 /**
- * @typedef {{x:number, y:number, z:number}}
+ * @typedef {{x:(number|undefined), y:(number|undefined), z:(number|undefined), radius:(number|undefined), theta:(number|undefined), phi:(number|undefined)}}
  */
 var HotspotTransformPosition;
 
@@ -13,6 +13,11 @@ var HotspotTransformRotation;
  * @typedef {{x:number, y:number, z:number}}
  */
 var HotspotTransformScale;
+
+/**
+ * @typedef {{x:number, y:number, z:number}}
+ */
+var HotspotTransformValuesConfig;
 
 /**
  * @typedef {{points:(Array<THREE.Vector2>|undefined)}}

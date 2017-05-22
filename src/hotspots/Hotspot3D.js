@@ -6,8 +6,6 @@
  * @param {FORGE.Viewer} viewer - viewer reference
  * @param {HotspotConfig} config - hostspot configuration
  * @extends {FORGE.Object3D}
- *
- * @todo Review/refactor all the raycasting and click part
  */
 FORGE.Hotspot3D = function(viewer, config)
 {
@@ -116,6 +114,8 @@ FORGE.Hotspot3D.prototype._boot = function()
     FORGE.Object3D.prototype._boot.call(this);
 
     this._transform = new FORGE.HotspotTransform();
+    this._transform.onChange.add(this._onTransformChangeHandler, this);
+
     this._animation = new FORGE.HotspotAnimation(this._viewer, this._transform);
 
     this._onBeforeRenderBound = this._onBeforeRender.bind(this);
@@ -156,6 +156,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
 
     this._material = new FORGE.HotspotMaterial(this._viewer, this._uid);
+    this._sound = new FORGE.HotspotSound(this._viewer, this._uid);
     this._states = new FORGE.HotspotStates(this._viewer, this._uid);
 
     if (typeof config.states === "object" && config.states !== null)
@@ -163,41 +164,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         this._states.addConfig(config.states);
     }
 
-    if (typeof config.transform === "object" && config.transform !== null)
-    {
-        this._transform.load(config.transform);
-    }
-
-    if (typeof config.animation === "object" && config.animation !== null)
-    {
-        this._animation.load(config.animation);
-        this._animation.onProgress.add(this._updatePosition, this);
-    }
-
     this._createGeometry(config.geometry);
-
-    /** @type {HotspotMaterialConfig} */
-    var materialConfig;
-
-    if (typeof config.material === "object" && config.material !== null)
-    {
-        materialConfig = config.material;
-    }
-    else
-    {
-        materialConfig = FORGE.HotspotMaterial.presets.TRANSPARENT;
-    }
-
-    if (this._debug === true)
-    {
-        materialConfig = /** @type {HotspotMaterialConfig} */ (FORGE.Utils.extendMultipleObjects(materialConfig, FORGE.HotspotMaterial.presets.DEBUG));
-    }
-
-    if (typeof config.sound === "object" && config.sound !== null)
-    {
-        this._sound = new FORGE.HotspotSound(this._viewer);
-        this._sound.load(config.sound, config.transform);
-    }
 
     if (typeof config.fx === "string" && config.fx !== "")
     {
@@ -209,9 +176,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         this._createEvents(config.events);
     }
 
-    this._updatePosition();
-
-    this._states.onLoadComplete.add(this._stateLoadComplete, this);
+    this._states.onLoadComplete.add(this._stateLoadCompleteHandler, this);
     this._states.load();
 };
 
@@ -300,15 +265,17 @@ FORGE.Hotspot3D.prototype._onAfterRender = function()
 
 /**
  * Event handler for material ready. Triggers the creation of the hotspot3D.
- * @method FORGE.Hotspot3D#_stateLoadComplete
+ * @method FORGE.Hotspot3D#_stateLoadCompleteHandler
  * @private
  */
-FORGE.Hotspot3D.prototype._stateLoadComplete = function()
+FORGE.Hotspot3D.prototype._stateLoadCompleteHandler = function()
 {
-    this.log("material ready handler");
+    this.log("state load complete handler");
 
     this._mesh.material = this._material.material;
     this._mesh.visible = this._visible;
+
+    this._updatePosition();
 
     if (this._animation.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
     {
@@ -319,6 +286,17 @@ FORGE.Hotspot3D.prototype._stateLoadComplete = function()
     {
         this._onReady.dispatch();
     }
+};
+
+/**
+ * transform change handler
+ * @method FORGE.Hotspot3D#_onTransformChangeHandler
+ * @private
+ */
+FORGE.Hotspot3D.prototype._onTransformChangeHandler = function()
+{
+    this.log("transform change handler");
+    this._updatePosition();
 };
 
 /**
@@ -531,6 +509,21 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "material",
     get: function()
     {
         return this._material;
+    }
+});
+
+/**
+ * Hotspot sound accessor
+ * @name FORGE.Hotspot3D#sound
+ * @readonly
+ * @type {FORGE.HotspotSound}
+ */
+Object.defineProperty(FORGE.Hotspot3D.prototype, "sound",
+{
+    /** @this {FORGE.Hotspot3D} */
+    get: function()
+    {
+        return this._sound;
     }
 });
 

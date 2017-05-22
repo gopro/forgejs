@@ -2,116 +2,182 @@
  * HotspotTransform handle the parsing of the position, rotation and scale of a 3d Hotspot.
  *
  * @constructor FORGE.HotspotTransform
- * @param {HotspotTransformPosition=} position - The spherical coordinates of a 3D object (radius, theta, phi)
- * @param {HotspotTransformRotation=} rotation - The rotation of a 3D object (x, y, z).
- * @param {HotspotTransformScale=} scale - The scale of a 3D object (x, y, z).
  * @extends {FORGE.BaseObject}
- *
- * @todo Add an option to keep the ratio of a texture or not.
  */
-FORGE.HotspotTransform = function(position, rotation, scale)
+FORGE.HotspotTransform = function()
 {
     /**
      * The cartesian coordinates of a 3D object (x, y, z).
      * @name FORGE.HotspotTransform#_position
-     * @type {HotspotTransformPosition}
+     * @type {FORGE.HotspotTransformValues}
      * @private
      */
-    this._position = position ||
+    this._position = null;
+
+    /**
+     * The rotation of a 3D object (x, y, z).
+     * @name FORGE.HotspotTransform#_rotation
+     * @type {FORGE.HotspotTransformValues}
+     * @private
+     */
+    this._rotation = null;
+
+    /**
+     * The scale of a 3D object.<br>
+     * Is expressed in world units (x, y, z).
+     * @name FORGE.HotspotTransform#_scale
+     * @type {FORGE.HotspotTransformValues}
+     * @private
+     */
+    this._scale = null;
+
+    /**
+     * onChange event dispatcher for transform change.
+     * @name  FORGE.HotspotTransform#_onChange
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onChange = null;
+
+    FORGE.BaseObject.call(this, "HotspotTransform");
+
+    this._boot();
+};
+
+FORGE.HotspotTransform.prototype = Object.create(FORGE.BaseObject.prototype);
+FORGE.HotspotTransform.prototype.constructor = FORGE.HotspotTransform;
+
+FORGE.HotspotTransform.prototype._boot = function()
+{
+    this._register();
+
+    this._position = new FORGE.HotspotTransformValues(this._uid, 0, 0, -200);
+    this._rotation = new FORGE.HotspotTransformValues(this._uid, 0, 0, 0);
+    this._scale = new FORGE.HotspotTransformValues(this._uid, 1, 1, 1);
+};
+
+/**
+ * Parse the config object, set default values where values are undefined.
+ * @method FORGE.HotspotTransform#_parseConfig
+ * @param {HotspotTransformConfig} config - The transform config to parse.
+ * @return {boolean} return true if one of the values has changed
+ * @private
+ */
+FORGE.HotspotTransform.prototype._parseConfig = function(config)
+{
+    var changed = false;
+
+    if (typeof config.position !== "undefined")
+    {
+        var position = FORGE.Utils.extendSimpleObject(this._position.dump(), this._parsePosition(config.position));
+
+        if(FORGE.Utils.compareObjects(this._position.dump(), position) === false)
+        {
+            this._position.load(/** @type {HotspotTransformValuesConfig} */ (position), false);
+            changed = true;
+        }
+    }
+
+    if (typeof config.rotation !== "undefined")
+    {
+        var rotation = FORGE.Utils.extendSimpleObject({}, this._rotation.dump());
+
+        rotation.x = (typeof config.rotation.x === "number") ? config.rotation.x : 0;
+        rotation.y = (typeof config.rotation.y === "number") ? config.rotation.y : 0;
+        rotation.z = (typeof config.rotation.z === "number") ? config.rotation.z : 0;
+
+        if(FORGE.Utils.compareObjects(this._rotation.dump(), rotation) === false)
+        {
+            this._rotation.load(/** @type {HotspotTransformValuesConfig} */ (rotation), false);
+            changed = true;
+        }
+    }
+
+    if (typeof config.scale !== "undefined")
+    {
+        var scale = FORGE.Utils.extendSimpleObject({}, this._scale.dump());
+
+        scale.x = (typeof config.scale.x === "number") ? FORGE.Math.clamp(config.scale.x, 0.000001, 100000) : 1;
+        scale.y = (typeof config.scale.y === "number") ? FORGE.Math.clamp(config.scale.y, 0.000001, 100000) : 1;
+        scale.z = (typeof config.scale.z === "number") ? FORGE.Math.clamp(config.scale.z, 0.000001, 100000) : 1;
+
+        if(FORGE.Utils.compareObjects(this._scale.dump(), scale) === false)
+        {
+            this._scale.load(/** @type {HotspotTransformValuesConfig} */ (scale), false);
+            changed = true;
+        }
+    }
+
+    return changed;
+};
+
+/**
+ * Parse the position object.
+ * @method FORGE.HotspotTransform#_parsePosition
+ * @param {HotspotTransformPosition} config - The transform position config to parse.
+ * @private
+ */
+FORGE.HotspotTransform.prototype._parsePosition = function(config)
+{
+    var position =
     {
         x: 0,
         y: 0,
         z: -200
     };
 
-    /**
-     * The rotation of a 3D object (x, y, z).
-     * @name FORGE.HotspotTransform#_rotation
-     * @type {HotspotTransformRotation}
-     * @private
-     */
-    this._rotation = rotation ||
+    if (typeof config !== "undefined" && config !== null)
     {
-        x: 0,
-        y: 0,
-        z: 0
-    };
+        position.x = (typeof config.x === "number") ? config.x : 0;
+        position.y = (typeof config.y === "number") ? config.y : 0;
+        position.z = (typeof config.z === "number") ? config.z : -200;
 
-    /**
-     * The scale of a 3D object.<br>
-     * Is expressed in world units (x, y, z).
-     * @name FORGE.HotspotTransform#_scale
-     * @type {HotspotTransformScale}
-     * @private
-     */
-    this._scale = scale || {
-        x: 1,
-        y: 1,
-        z: 1
-    };
-
-    FORGE.BaseObject.call(this, "HotspotTransform");
-};
-
-FORGE.HotspotTransform.prototype = Object.create(FORGE.BaseObject.prototype);
-FORGE.HotspotTransform.prototype.constructor = FORGE.HotspotTransform;
-
-/**
- * Parse the config object, set default values where values are undefined.
- * @method FORGE.HotspotTransform#_parseConfig
- * @param {HotspotTransformConfig} config - The transform config to parse.
- * @private
- */
-FORGE.HotspotTransform.prototype._parseConfig = function(config)
-{
-    if (typeof config.position !== "undefined")
-    {
-        // Try with xyz first
-        if (typeof config.position.x === "number" || typeof config.position.y === "number" || typeof config.position.z === "number")
+        if(typeof config.radius === "number" || typeof config.theta === "number" || typeof config.phi === "number")
         {
-            this._position.x = (typeof config.position.x === "number") ? config.position.x : 0;
-            this._position.y = (typeof config.position.y === "number") ? config.position.y : 0;
-            this._position.z = (typeof config.position.z === "number") ? config.position.z : -200;
-        }
-        else
-        {
-            var radius = (typeof config.position.radius === "number") ? config.position.radius : 200;
-            var theta = (typeof config.position.theta === "number") ? FORGE.Math.degToRad(config.position.theta) : 0;
-            var phi = (typeof config.position.phi === "number") ? FORGE.Math.degToRad(config.position.phi) : 0;
+            var radius = (typeof config.radius === "number") ? config.radius : 200;
+            var theta = (typeof config.theta === "number") ? FORGE.Math.degToRad(config.theta) : 0;
+            var phi = (typeof config.phi === "number") ? FORGE.Math.degToRad(config.phi) : 0;
 
             theta = FORGE.Math.wrap(Math.PI - theta, -Math.PI, Math.PI);
 
             var cartesian = new THREE.Vector3().setFromSpherical(FORGE.Utils.toTHREESpherical(radius, theta, phi));
 
-            this._position.x = cartesian.x;
-            this._position.y = cartesian.y;
-            this._position.z = cartesian.z;
+            position.x = cartesian.x;
+            position.y = cartesian.y;
+            position.z = cartesian.z;
         }
     }
 
-    if (typeof config.rotation !== "undefined")
-    {
-        this._rotation.x = (typeof config.rotation.x === "number") ? config.rotation.x : 0;
-        this._rotation.y = (typeof config.rotation.y === "number") ? config.rotation.y : 0;
-        this._rotation.z = (typeof config.rotation.z === "number") ? config.rotation.z : 0;
-    }
+    return position;
+};
 
-    if (typeof config.scale !== "undefined")
+/**
+ * Notify the transform that a value has changed.
+ * @method FORGE.HotspotTransform#notifyChange
+ */
+FORGE.HotspotTransform.prototype.notifyChange = function()
+{
+    if(this._onChange !== null)
     {
-        this._scale.x = (typeof config.scale.x === "number") ? FORGE.Math.clamp(config.scale.x, 0.000001, 100000) : 1;
-        this._scale.y = (typeof config.scale.y === "number") ? FORGE.Math.clamp(config.scale.y, 0.000001, 100000) : 1;
-        this._scale.z = (typeof config.scale.z === "number") ? FORGE.Math.clamp(config.scale.z, 0.000001, 100000) : 1;
+        this._onChange.dispatch();
     }
 };
+
 
 /**
  * Load a transform configuration.
  * @method FORGE.HotspotTransform#load
  * @param {HotspotTransformConfig} config - The transform config to load.
+ * @param {boolean} [notify=true] - Do we have to notify the change of the transform after the config loading
  */
-FORGE.HotspotTransform.prototype.load = function(config)
+FORGE.HotspotTransform.prototype.load = function(config, notify)
 {
-    this._parseConfig(config);
+    var changed = this._parseConfig(config);
+
+    if(notify !== false && changed === true)
+    {
+        this.notifyChange();
+    }
 };
 
 /**
@@ -134,6 +200,13 @@ Object.defineProperty(FORGE.HotspotTransform.prototype, "position",
     get: function()
     {
         return this._position;
+    },
+
+    /** @this {FORGE.HotspotTransform} */
+    set: function(value)
+    {
+        var config = { position: value };
+        this._parseConfig(config);
     }
 });
 
@@ -148,6 +221,13 @@ Object.defineProperty(FORGE.HotspotTransform.prototype, "rotation",
     get: function()
     {
         return this._rotation;
+    },
+
+    /** @this {FORGE.HotspotTransform} */
+    set: function(value)
+    {
+        var config = { rotation: value };
+        this._parseConfig(config);
     }
 });
 
@@ -162,5 +242,32 @@ Object.defineProperty(FORGE.HotspotTransform.prototype, "scale",
     get: function()
     {
         return this._scale;
+    },
+
+    /** @this {FORGE.HotspotTransform} */
+    set: function(value)
+    {
+        var config = { scale: value };
+        this._parseConfig(config);
+    }
+});
+
+/**
+ * Get the onChange {@link FORGE.EventDispatcher}.
+ * @name FORGE.HotspotTransform#onChange
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.HotspotTransform.prototype, "onChange",
+{
+    /** @this {FORGE.HotspotTransform} */
+    get: function()
+    {
+        if (this._onChange === null)
+        {
+            this._onChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onChange;
     }
 });
