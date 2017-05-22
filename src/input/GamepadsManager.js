@@ -54,8 +54,9 @@ FORGE.GamepadsManager.prototype.constructor = FORGE.GamepadsManager;
  */
 FORGE.GamepadsManager.prototype._boot = function()
 {
-    if (FORGE.Device.ie === true)
+    if (FORGE.Device.gamepad === false)
     {
+        this.warn("Gamepads are not available with your browser");
         return;
     }
 
@@ -128,6 +129,11 @@ FORGE.GamepadsManager.prototype._disconnect = function(index)
  */
 FORGE.GamepadsManager.prototype.update = function()
 {
+    if(this._gamepads === null)
+    {
+        return;
+    }
+
     var gamepad, gamepads = navigator.getGamepads();
 
     for (var i = 0, ii = gamepads.length; i < ii; i++)
