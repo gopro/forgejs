@@ -286,6 +286,14 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._onVolumeChange = null;
 
     /**
+     * On seeking event dispatcher.
+     * @name  FORGE.VideoHTML5#_onSeeking
+     * @type {?FORGE.EventDispatcher}
+     * @private
+     */
+    this._onSeeking = null;
+
+    /**
      * On seeked event dispatcher.
      * @name  FORGE.VideoHTML5#_onSeeked
      * @type {?FORGE.EventDispatcher}
@@ -1623,6 +1631,7 @@ FORGE.VideoHTML5.prototype._installEvents = function(element)
     element.addEventListener("pause", this._onEventBind, false);
     element.addEventListener("timeupdate", this._onEventBind, false);
     element.addEventListener("volumechange", this._onEventBind, false);
+    element.addEventListener("seeking", this._onEventBind, false);
     element.addEventListener("seeked", this._onEventBind, false);
     element.addEventListener("ended", this._onEventBind, false);
     element.addEventListener("error", this._onEventBind, false);
@@ -1650,6 +1659,7 @@ FORGE.VideoHTML5.prototype._uninstallEvents = function(element)
     element.removeEventListener("pause", this._onEventBind, false);
     element.removeEventListener("timeupdate", this._onEventBind, false);
     element.removeEventListener("volumechange", this._onEventBind, false);
+    element.removeEventListener("seeking", this._onEventBind, false);
     element.removeEventListener("seeked", this._onEventBind, false);
     element.removeEventListener("ended", this._onEventBind, false);
     element.removeEventListener("error", this._onEventBind, false);
@@ -1771,6 +1781,16 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             if (this._onVolumeChange !== null && element.readyState !== HTMLMediaElement.HAVE_NOTHING)
             {
                 this._onVolumeChange.dispatch(event);
+            }
+
+            break;
+
+        case "seeking":
+            this._canPlay = false;
+
+            if (this._onSeeking !== null)
+            {
+                this._onSeeking.dispatch(event);
             }
 
             break;
@@ -2106,6 +2126,12 @@ FORGE.VideoHTML5.prototype.destroy = function()
     {
         this._onVolumeChange.destroy();
         this._onVolumeChange = null;
+    }
+
+    if (this._onSeeking !== null)
+    {
+        this._onSeeking.destroy();
+        this._onSeeking = null;
     }
 
     if (this._onSeeked !== null)
@@ -2883,6 +2909,26 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "onVolumeChange",
         }
 
         return this._onVolumeChange;
+    }
+});
+
+/**
+ * Get the "onSeeking" event {@link FORGE.EventDispatcher} of the video.
+ * @name FORGE.VideoHTML5#onSeeking
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.VideoHTML5.prototype, "onSeeking",
+{
+    /** @this {FORGE.VideoHTML5} */
+    get: function()
+    {
+        if (this._onSeeking === null)
+        {
+            this._onSeeking = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onSeeking;
     }
 });
 
