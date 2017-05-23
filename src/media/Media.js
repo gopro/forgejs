@@ -50,14 +50,6 @@ FORGE.Media = function(viewer, config)
     this._displayObject = null;
 
     /**
-     * Media store reference, if it is a multi resolution image.
-     * @name FORGE.Media#_store
-     * @type {FORGE.MediaStore}
-     * @private
-     */
-    this._store = null;
-
-    /**
      * Loaded flag
      * @name FORGE.Media#_loaded
      * @type {boolean}
@@ -142,10 +134,19 @@ FORGE.Media.prototype._parseConfig = function(config)
         // If there isn't an URL set, it means that this is a multi resolution image.
         if (!source.url)
         {
-            this._store = new FORGE.MediaStore(this._viewer, source);
+            throw "Multi resolution not implemented yet !";
         }
-        else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
-            source.format === FORGE.MediaFormat.CUBE ||
+
+        if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
+        {
+            imageConfig = {
+                key: this._uid,
+                url: source.url
+            };
+
+            this._displayObject = new FORGE.Image(this._viewer, imageConfig);
+        }
+        else if (source.format === FORGE.MediaFormat.CUBE ||
             source.format === FORGE.MediaFormat.FLAT)
         {
             imageConfig = {
@@ -154,13 +155,14 @@ FORGE.Media.prototype._parseConfig = function(config)
             };
 
             this._displayObject = new FORGE.Image(this._viewer, imageConfig);
-            this._displayObject.onLoadComplete.addOnce(this._onImageLoadComplete, this);
         }
+
         else
         {
             throw "Media format not supported";
         }
 
+        this._displayObject.onLoadComplete.addOnce(this._onImageLoadComplete, this);
         return;
     }
 
@@ -268,12 +270,6 @@ FORGE.Media.prototype.destroy = function()
         this._displayObject = null;
     }
 
-    if (this._store !== null)
-    {
-        this._store.destroy();
-        this._store = null;
-    }
-
     if (this._onLoadComplete !== null)
     {
         this._onLoadComplete.destroy();
@@ -325,21 +321,6 @@ Object.defineProperty(FORGE.Media.prototype, "displayObject",
     get: function()
     {
         return this._displayObject;
-    }
-});
-
-/**
- * Get the media store, if this is a multi resolution media.
- * @name FORGE.Media#store
- * @type {FORGE.MediaStore}
- * @readonly
- */
-Object.defineProperty(FORGE.Media.prototype, "store",
-{
-    /** @this {FORGE.Media} */
-    get: function()
-    {
-        return this._store;
     }
 });
 
