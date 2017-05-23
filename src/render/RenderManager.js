@@ -596,40 +596,46 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     var config = {};
     var media = this._viewer.story.scene.media;
     var mediaConfig = media.config;
+
     if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
     {
         config.type = mediaConfig.type;
 
         if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
         {
-            config.mediaFormat = mediaConfig.source.format;
-            var ratio = media.displayObject.element.width / media.displayObject.element.height;
+            var source = mediaConfig.source;
 
-            if (typeof mediaConfig.source.fov !== "undefined")
+            if (typeof source.levels === "undefined")
             {
-                var vFov;
-                if (typeof mediaConfig.source.fov === "number")
-                {
-                    vFov = mediaConfig.source.fov.vertical;
-                }
-                else if (typeof mediaConfig.source.fov.vertical === "number")
-                {
-                    vFov = mediaConfig.source.fov.vertical;
-                }
-                else if (typeof mediaConfig.source.fov.horizontal === "number")
-                {
-                    vFov = mediaConfig.source.fov.horizontal / ratio;
-                }
-                else if (typeof mediaConfig.source.fov.diagonal === "number")
-                {
-                    vFov = mediaConfig.source.fov.diagonal / Math.sqrt(1 + ratio * ratio);
-                }
-                else
-                {
-                    vFov = 90;
-                }
+                config.mediaFormat = mediaConfig.source.format;
+                var ratio = media.displayObject.element.width / media.displayObject.element.height;
 
-                config.verticalFov = FORGE.Math.degToRad(vFov);
+                if (typeof source.fov !== "undefined")
+                {
+                    var vFov;
+                    if (typeof source.fov === "number")
+                    {
+                        vFov = source.fov.vertical;
+                    }
+                    else if (typeof source.fov.vertical === "number")
+                    {
+                        vFov = source.fov.vertical;
+                    }
+                    else if (typeof source.fov.horizontal === "number")
+                    {
+                        vFov = source.fov.horizontal / ratio;
+                    }
+                    else if (typeof source.fov.diagonal === "number")
+                    {
+                        vFov = source.fov.diagonal / Math.sqrt(1 + ratio * ratio);
+                    }
+                    else
+                    {
+                        vFov = 90;
+                    }
+
+                    config.verticalFov = FORGE.Math.degToRad(vFov);
+                }
             }
         }
 
@@ -649,6 +655,11 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
         var size = this._webGLRenderer.getSize();
         this._setRendererSize(new FORGE.Size(size.width, size.height));
+    }
+    else if (type === FORGE.BackgroundType.PYRAMID)
+    {
+        this.log("Create background pyramid renderer (multiresolution image)");
+        this._backgroundRenderer = new FORGE.BackgroundPyramidRenderer(this._viewer, renderTarget, config);
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
@@ -735,13 +746,20 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         typeof mediaConfig.source === "undefined" ||
         typeof mediaConfig.source.format === "undefined")
     {
-        if (this._viewManager.current.type === FORGE.ViewType.FLAT)
+        if (typeof mediaConfig.source.levels !== "undefined")
         {
-            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+            this._backgroundRendererType = FORGE.BackgroundType.PYRAMID;
         }
         else
         {
-            this._backgroundRendererType = FORGE.BackgroundType.MESH;
+            if (this._viewManager.current.type === FORGE.ViewType.FLAT)
+            {
+                this._backgroundRendererType = FORGE.BackgroundType.SHADER;
+            }
+            else
+            {
+                this._backgroundRendererType = FORGE.BackgroundType.MESH;
+            }
         }
     }
     else
