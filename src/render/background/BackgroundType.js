@@ -1,3 +1,5 @@
+
+
 /**
  * @namespace {Object} FORGE.BackgroundType
  */
@@ -23,10 +25,3 @@ FORGE.BackgroundType.SHADER = "shader";
  * @const
  */
 FORGE.BackgroundType.MESH = "mesh";
-
-/**
- * @name FORGE.BackgroundType.PYRAMID
- * @type {string}
- * @const
- */
-FORGE.BackgroundType.PYRAMID = "pyramid";
