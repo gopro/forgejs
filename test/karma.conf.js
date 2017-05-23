@@ -19,7 +19,7 @@ module.exports = function(config) {
         "lib/omnitone/omnitone.min.js",
         "build/forge.min.js",
 
-        "test/core/*.spec.js"
+        "test/**/*.spec.js"
     ],
 
     // list of files to exclude
