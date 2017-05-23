@@ -143,6 +143,7 @@ FORGE.Media.prototype._parseConfig = function(config)
         if (!source.url)
         {
             this._store = new FORGE.MediaStore(this._viewer, source);
+            this._notifyLoadComplete();
         }
         else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
             source.format === FORGE.MediaFormat.CUBE ||
