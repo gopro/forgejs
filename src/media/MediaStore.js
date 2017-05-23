@@ -1,7 +1,7 @@
 /**
  * This object stores a number of tiles used for multi resolution cases with
  * tiles. It acts as a LRU map, as we can't store infinite amount of tiles.
- * The number of tiles to store is Σ(6 * 4^n), with n being the number of levels.
+ * The number of tiles to store is (6 * 4^n)!, with n being the number of levels.
  *
  * There is an exception though: the level 0 of a multi resolution is always
  * kept in the cache.
@@ -270,8 +270,6 @@ FORGE.MediaStore.prototype.get = function(face, level, x, y)
  */
 FORGE.MediaStore.prototype.destroy = function()
 {
-    this._unregister();
-
     this._viewer = null;
 
     this._textures.clear();
