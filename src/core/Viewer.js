@@ -669,7 +669,7 @@ FORGE.Viewer.prototype.pause = function(internal)
     this._paused = true;
 
     // Pause all media if autoPause is true
-    if (internal !== true || this._config.autoPause === true)
+    if (internal !== true || (this._config !== null && this._config.autoPause === true))
     {
         this._audio.pauseAll();
     }
@@ -697,7 +697,7 @@ FORGE.Viewer.prototype.resume = function(internal)
     this._paused = false;
 
     // Resume all media if autoResume is true
-    if (internal !== true || this._config.autoResume === true)
+    if (internal !== true || (this._config !== null && this._config.autoResume === true))
     {
         this._audio.resumeAll();
     }
