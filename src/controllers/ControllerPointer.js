@@ -284,6 +284,8 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
     var delta = invert / this._zoom.hardness;
     var factorDeltaY = 1;
 
+    var hardness = (this._camera.fov / 90);
+
     if (event.data.deltaMode)
     {
         switch(event.data.deltaMode)
@@ -304,8 +306,9 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         delta *= (event.data.deltaY * factorDeltaY) / 5;
     }
 
-    var logZoomFactor = this._camera.fov / (Math.LN2 * 90);
-    this._camera.fov -= delta * logZoomFactor;
+    delta *= hardness;
+
+    this._camera.fov = this._camera.fov - delta;
     this.log("_wheelHandler (fov:" + this._camera.fov + ")");
 };
 
@@ -371,7 +374,7 @@ FORGE.ControllerPointer.prototype.update = function()
     var size = this._viewer.renderer.displayResolution;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
 
-    var logZoomFactor = this._camera.fov / (Math.LN2 * 90);
+    hardness *= (this._camera.fov / 90);
 
     this._velocity.subVectors(this._positionCurrent, this._positionStart);
 
@@ -381,7 +384,6 @@ FORGE.ControllerPointer.prototype.update = function()
     }
 
     this._velocity.multiplyScalar(hardness);
-    this._velocity.multiplyScalar(logZoomFactor);
 
     // this.log("Current velocity: " + this._velocity.x + ", " + this._velocity.y);
 
@@ -398,10 +400,8 @@ FORGE.ControllerPointer.prototype.update = function()
     }
 
     var yaw = invertX * dx;
-
-    var threshold = logZoomFactor * 0.05;
     //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
-    if(Math.abs(yaw) > threshold)
+    if(Math.abs(yaw) > 0.05)
     {
         this._camera.yaw += yaw;
         this._camera.flat.position.x += dx;
@@ -409,7 +409,7 @@ FORGE.ControllerPointer.prototype.update = function()
 
     var pitch = invertY * dy;
     //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
-    if(Math.abs(pitch) > threshold)
+    if(Math.abs(pitch) > 0.05)
     {
         this._camera.pitch -= pitch;
         this._camera.flat.position.y -= dy;
