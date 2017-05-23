@@ -9,7 +9,7 @@
         "name": {
             "type": "string",
             "title": "Name",
-            "description": "If set, specifies the <code>{level}</code> pattern for this level. If not, the value will be the index of the level in the levels array.",
+            "description": "If set, specifies the <code>{z}</code> pattern for this level. If not, the value will be the index of the level in the levels array.",
             "example": "4K"
         },
 

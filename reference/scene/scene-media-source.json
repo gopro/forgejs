@@ -36,8 +36,8 @@
         "pattern": {
             "type": "string",
             "title": "Pattern",
-            "description": "The pattern to respect in case of a multi tiles media. Four parameters are authorized:<ul><li><code>{face}</code> is for the face, in case of a cubemap media</li><li><code>{level}</code> is for the level of quality of the tile, in case of a multi resolution media</li><li><code>{x}</code> if for the <b>x</b> coordinates of the tile</li><li><code>{y}</code> if for the <b>y</b> coordinates of the tile</li>",
-            "example": "multi/equi/{level}/{y}/{x}.jpg"
+            "description": "The pattern to respect in case of a multi tiles media. Four parameters are authorized:<ul><li><code>{f}</code> is for the face, in case of a cubemap media</li><li><code>{z}</code> is for the quality of the tile, in case of a multi resolution media</li><li><code>{x}</code> if for the <b>x</b> coordinates of the tile</li><li><code>{y}</code> if for the <b>y</b> coordinates of the tile</li>",
+            "example": "multi/equi/{z}/{y}/{x}.jpg"
         },
 
         "levels": {
