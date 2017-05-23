@@ -40,13 +40,6 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, options)
     this._size = 0;
 
     /**
-     * Texture store
-     * @type {FORGE.MediaStore}
-     * @private
-     */
-    this._textureStore = null;
-
-    /**
      * Cache of tiles
      * @type {}
      * @private
@@ -70,35 +63,16 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this.log("boot");
 
-    this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
-    // this._size = 100;
+    // this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
+    this._size = 100;
 
     this._tileCache = {};
-
-    this._textureStore = this._viewer.story.scene.media.store;
 
     this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
 
     this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
-    var tpa = this.nbTilesPerAxis(this._level);
-
-    var faces = new Set(["f", "l", "b", "r", "u", "d"]);
-
-    faces.forEach(function(face)
-    {
-        for (var y=0; y<tpa; y++)
-        {
-            for (var x=0; x<tpa; x++)
-            {
-                var name = face + "-0";
-                var tile = this.getTile(null, this._level, face, x, y, name);
-                this._scene.add(tile);
-            }        
-        }
-    }.bind(this));
-
-    window.scene = this._scene;
+    // window.scene = this._scene;
 };
 
 /**
@@ -110,7 +84,6 @@ FORGE.BackgroundPyramidRenderer.prototype._clear = function()
 {
     // ...
 };
-
 
 /**
  * Update after view change
@@ -190,7 +163,7 @@ FORGE.BackgroundPyramidRenderer.prototype._getTileKey = function(level, face, x,
  * Lookup in cache first or create it if not already in cache
  * @method FORGE.BackgroundPyramidRenderer#visibleTiles
  */
-FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face, x, y, name)
+FORGE.BackgroundPyramidRenderer.prototype.getTile = function(level, face, x, y)
 {
     var key = this._getTileKey(level, face, x, y);
 
@@ -203,9 +176,8 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
     
     if (tile === undefined)
     {
-        tile = new FORGE.Tile(parent, this, x, y, level, face, name);
+        tile = new FORGE.Tile(this, x, y, level, face);
         this._tileCache[level].set(key, tile);
-        this._scene.add(tile);
     }
 
     return tile;
@@ -263,6 +235,51 @@ FORGE.BackgroundPyramidRenderer.prototype.visibleTiles = function()
 FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 {
     this.log("Select new level: " + level);
+
+    // Clear current level
+
+    // var parent = tile.getParent();
+    // if (parent !== null)
+    // {
+    //     this._scene.remove(parent);
+    // }
+    
+    // var children = tile.getChildren();
+    // if (children !== null)
+    // {
+    //     children.forEach(function(child)
+    //     {
+    //         if (child !== null)
+    //         {
+    //             this._scene.remove(child);
+    //         }
+    //     }.bind(this));
+    // }
+
+    if (typeof this._tileCache[this._level] !== "undefined")
+    {
+        this._tileCache[this._level].forEach(function(tile)
+        {
+            this._scene.remove(tile);
+        }.bind(this));    
+    }
+    
+    var tpa = this.nbTilesPerAxis(level);
+
+    var faces = new Set(["f", "l", "b", "r", "u", "d"]);
+
+    faces.forEach(function(face)
+    {
+        for (var y=0; y<tpa; y++)
+        {
+            for (var x=0; x<tpa; x++)
+            {
+                var tile = this.getTile(level, face, x, y);
+                this._scene.add(tile);
+            }        
+        }
+    }.bind(this));
+
     this._level = level;
 };
 
@@ -284,7 +301,6 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
     var parentTiles = [];
 
     FORGE.BackgroundRenderer.prototype.render.call(this, this._viewer.camera.main);
-    // console.log("tiles: " + window.scene.children.length);
 };
 
 /**
@@ -293,25 +309,10 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
  */
 FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
-    this._textureStore = null;
-    this._tileCache = null;
+    // ...
 
     FORGE.BackgroundRenderer.prototype.destroy.call(this);
 };
-
-/**
- * Get texture store.
- * @name FORGE.BackgroundPyramidRenderer#textureStore
- * @type {FORGE.MediaStore}
- */
-Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "textureStore",
-{
-    /** @this {FORGE.BackgroundPyramidRenderer} */
-    get: function()
-    {
-        return this._textureStore;
-    }
-});
 
 /**
  * Get pyramid current level.
@@ -352,20 +353,6 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "levelMax",
     get: function()
     {
         return this._levelMax;
-    }
-});
-
-/**
- * Get camera reference.
- * @name FORGE.BackgroundPyramidRenderer#camera
- * @type {FORGE.Camera}
- */
-Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "camera",
-{
-    /** @this {FORGE.BackgroundPyramidRenderer} */
-    get: function()
-    {
-        return this._viewer.camera;
     }
 });
 
