@@ -305,6 +305,14 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
     this._onVolumeChange = null;
 
     /**
+     * On seeking event dispatcher.
+     * @name  FORGE.VideoDash#_onSeeking
+     * @type {?FORGE.EventDispatcher}
+     * @private
+     */
+    this._onSeeking = null;
+
+    /**
      * On seeked event dispatcher.
      * @name  FORGE.VideoDash#_onSeeked
      * @type {?FORGE.EventDispatcher}
@@ -497,6 +505,14 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
     this._onVolumeChangeBind = null;
 
     /**
+     * Event handler for current video seeking binded to this.
+     * @name FORGE.VideoDash#_onSeekingBind
+     * @type {Function}
+     * @private
+     */
+    this._onSeekingBind = null;
+
+    /**
      * Event handler for current video seeked binded to this.
      * @name FORGE.VideoDash#_onSeekedBind
      * @type {Function}
@@ -633,6 +649,7 @@ FORGE.VideoDash.prototype._boot = function()
     this._onPauseBind = this._onPauseHandler.bind(this);
     this._onTimeUpdateBind = this._onTimeUpdateHandler.bind(this);
     this._onVolumeChangeBind = this._onVolumeChangeHandler.bind(this);
+    this._onSeekingBind = this._onSeekingHandler.bind(this);
     this._onSeekedBind = this._onSeekedHandler.bind(this);
     this._onEndedBind = this._onEndedHandler.bind(this);
     this._onErrorBind = this._onErrorHandler.bind(this);
@@ -848,6 +865,7 @@ FORGE.VideoDash.prototype._installEvents = function()
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_METADATA_LOADED"], this._onLoadedMetaDataBind);
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_PAUSED"], this._onPauseBind);
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_PROGRESS"], this._onProgressBind);
+    this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_SEEKING"], this._onSeekingBind);
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_SEEKED"], this._onSeekedBind);
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_STARTED"], this._onPlayBind);
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_TIME_UPDATED"], this._onTimeUpdateBind);
@@ -880,6 +898,7 @@ FORGE.VideoDash.prototype._uninstallEvents = function()
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_METADATA_LOADED"], this._onLoadedMetaDataBind);
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_PAUSED"], this._onPauseBind);
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_PROGRESS"], this._onProgressBind);
+    this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_SEEKING"], this._onSeekingBind);
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_SEEKED"], this._onSeekedBind);
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_STARTED"], this._onPlayBind);
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_TIME_UPDATED"], this._onTimeUpdateBind);
@@ -1433,6 +1452,25 @@ FORGE.VideoDash.prototype._onVolumeChangeHandler = function(event)
 };
 
 /**
+ * Private event handler for seeking.
+ * @method  FORGE.VideoDash#_onSeekingHandler
+ * @private
+ * @param  {Event} event - The native video event.
+ */
+FORGE.VideoDash.prototype._onSeekingHandler = function(event)
+{
+    var element = this._video.element;
+    this.log("onSeeking [readyState: " + element.readyState + "]");
+
+    this._canPlay = false;
+
+    if (this._onSeeking !== null)
+    {
+        this._onSeeking.dispatch(event);
+    }
+};
+
+/**
  * Private event handler for seeked.
  * @method  FORGE.VideoDash#_onSeekedHandler
  * @private
@@ -1934,6 +1972,12 @@ FORGE.VideoDash.prototype.destroy = function()
         this._onVolumeChange = null;
     }
 
+    if (this._onSeeking !== null)
+    {
+        this._onSeeking.destroy();
+        this._onSeeking = null;
+    }
+
     if (this._onSeeked !== null)
     {
         this._onSeeked.destroy();
@@ -2011,6 +2055,7 @@ FORGE.VideoDash.prototype.destroy = function()
     this._onPauseBind = null;
     this._onTimeUpdateBind = null;
     this._onVolumeChangeBind = null;
+    this._onSeekingBind = null;
     this._onSeekedBind = null;
     this._onEndedBind = null;
     this._onErrorBind = null;
@@ -2699,6 +2744,26 @@ Object.defineProperty(FORGE.VideoDash.prototype, "onVolumeChange",
         }
 
         return this._onVolumeChange;
+    }
+});
+
+/**
+ * Get the "onSeeking" event {@link FORGE.EventDispatcher} of the video.
+ * @name FORGE.VideoDash#onSeeking
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.VideoDash.prototype, "onSeeking",
+{
+    /** @this {FORGE.VideoDash} */
+    get: function()
+    {
+        if (this._onSeeking === null)
+        {
+            this._onSeeking = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onSeeking;
     }
 });
 
