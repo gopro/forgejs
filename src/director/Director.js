@@ -194,7 +194,7 @@ FORGE.Director.prototype._sceneLoadCompleteHandler = function()
             // React on loading/buffering event
             this._viewer.story.scene.media.displayObject.onWaiting.add(this._waitingHandler, this);
             this._viewer.story.scene.media.displayObject.onStalled.add(this._waitingHandler, this);
-            this._viewer.story.scene.media.displayObject.onSeeked.add(this._waitingHandler, this);
+            this._viewer.story.scene.media.displayObject.onSeeking.add(this._waitingHandler, this);
 
             // The director's cut begin again if video is looping
             this._viewer.story.scene.media.displayObject.onEnded.add(this._endedHandler, this);
@@ -285,8 +285,9 @@ FORGE.Director.prototype._waitingHandler = function()
     {
         this._viewer.story.scene.media.displayObject.onWaiting.remove(this._waitingHandler, this);
         this._viewer.story.scene.media.displayObject.onStalled.remove(this._waitingHandler, this);
-        this._viewer.story.scene.media.displayObject.onSeeked.remove(this._waitingHandler, this);
+        this._viewer.story.scene.media.displayObject.onSeeking.remove(this._waitingHandler, this);
         this._viewer.story.scene.media.displayObject.onPlaying.add(this._playingHandler, this);
+        this._viewer.story.scene.media.displayObject.onSeeked.add(this._playingHandler, this);
     }
     // for controllers
     this._viewer.controllers.onControlStart.remove(this._controlStartHandler, this);
@@ -316,9 +317,10 @@ FORGE.Director.prototype._playingHandler = function()
     if (this._viewer.story.scene.media.type === FORGE.MediaType.VIDEO)
     {
         this._viewer.story.scene.media.displayObject.onPlaying.remove(this._playingHandler, this);
+        this._viewer.story.scene.media.displayObject.onSeeked.remove(this._playingHandler, this);
         this._viewer.story.scene.media.displayObject.onWaiting.add(this._waitingHandler, this);
         this._viewer.story.scene.media.displayObject.onStalled.add(this._waitingHandler, this);
-        this._viewer.story.scene.media.displayObject.onSeeked.add(this._waitingHandler, this);
+        this._viewer.story.scene.media.displayObject.onSeeking.add(this._waitingHandler, this);
     }
     // for controllers
     this._viewer.controllers.onControlStart.add(this._controlStartHandler, this);
