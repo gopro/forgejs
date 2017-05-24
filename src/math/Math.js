@@ -210,3 +210,33 @@ FORGE.Math.eulerToRotationMatrix = function(yaw, pitch, roll, orderYPR)
      );
     //jscs:enable
 };
+
+/**
+ * Converts spherical coordinates to cartesian, respecting the FORGE
+ * coordinates system.
+ *
+ * @method FORGE.Math.sphericalToCartesian
+ * @param {number} radius - radius
+ * @param {number} theta - theta angle [rad]
+ * @param {number} phi - phi angle [rad]
+ * @return {CartesianCoordinates} the resulting cartesian coordinates
+ */
+FORGE.Math.sphericalToCartesian = function(radius, theta, phi)
+{
+    var res = {};
+
+    // wrap phi in [0; π]
+    phi = FORGE.Math.wrap(phi, -Math.PI / 2, Math.PI / 2);
+    // invert theta if radius is negative
+    theta += radius < 0 ? Math.PI : 0;
+    // wrap theta in [0; 2π)
+    theta = FORGE.Math.wrap(theta, 0, 2 * Math.PI);
+    // abs so the radius is positive
+    radius = Math.abs(radius);
+
+    res.x = radius * Math.cos(phi) * Math.sin(theta);
+    res.y = radius * Math.sin(phi);
+    res.z = -radius * Math.cos(phi) * Math.cos(theta);
+
+    return res;
+};

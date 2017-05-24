@@ -182,8 +182,7 @@ FORGE.HotspotSound.prototype._setupSound = function()
     if(this._isSpatialized() === true)
     {
         // Create world position from inversed theta angle and phi angle
-        var sphericalPt = FORGE.Utils.toTHREESpherical(1, FORGE.Math.degToRad(/** @type {number} */ (-this._position.theta)), FORGE.Math.degToRad(/** @type {number} */ (this._position.phi))); //@todo manage radius here
-        var positionWorld = new THREE.Vector3().setFromSpherical(sphericalPt);
+        var positionWorld = FORGE.Math.sphericalToCartesian(1, /** @type {number} */ (this._position.theta), /** @type {number} */ (this._position.phi));
 
         this._sound.spatialized = this._isSpatialized();
         this._sound.x = positionWorld.x;
