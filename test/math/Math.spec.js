@@ -1,10 +1,17 @@
 describe("Math", function() {
+    var pi = Math.PI,
+        pi2 = pi / 2,
+        pi3 = pi / 3,
+        pi4 = pi / 4,
+        sqrt2 = Math.sqrt(2),
+        sqrt3 = Math.sqrt(3);
+
     describe("#degToRad()", function() {
         var tests = [
-            { value: 180, expected: Math.PI },
-            { value: 360, expected: 2 * Math.PI },
-            { value: 90, expected: Math.PI / 2 },
-            { value: -90, expected: -Math.PI / 2 },
+            { value: 180, expected: pi },
+            { value: 360, expected: 2 * pi },
+            { value: 90, expected: pi2 },
+            { value: -90, expected: -pi2 },
         ];
 
         tests.forEach(function(test) {
@@ -16,10 +23,10 @@ describe("Math", function() {
 
     describe("#radToDeg()", function() {
         var tests = [
-            { value: Math.PI, expected: 180 },
-            { value: 2 * Math.PI, expected: 360 },
-            { value: Math.PI / 2, expected: 90 },
-            { value: -Math.PI / 2, expected: -90 },
+            { value: pi, expected: 180 },
+            { value: 2 * pi, expected: 360 },
+            { value: pi2, expected: 90 },
+            { value: -pi2, expected: -90 },
         ];
 
         tests.forEach(function(test) {
@@ -32,7 +39,7 @@ describe("Math", function() {
     describe("round10()", function() {
         var tests = [
             { value: 10.1203, expected: 10.1 },
-            { value: Math.PI, expected: 3.1 },
+            { value: pi, expected: 3.1 },
             { value: -34.2112390, expected: -34.2 },
             { value: 3.85123098, expected: 3.9 },
         ];
@@ -65,13 +72,14 @@ describe("Math", function() {
             { value: 1, min: 2, max: 3, expected: 2 },
             { value: 4, min: 1, max: 3, expected: 2 },
             { value: -1, min: 1, max: 3, expected: 1 },
-            { value: 3.5 * Math.PI, min: -Math.PI, max: Math.PI, expected: -Math.PI / 2 },
-            { value: 2, min: 3, max: 3, expected: 3 }
+            { value: 3.5 * pi, min: -pi, max: pi, expected: -pi2 },
+            { value: 2, min: 3, max: 3, expected: 3 },
+            { value: -8 * pi + pi3, min: -pi2, max: pi2, expected: pi3 }
         ];
 
         tests.forEach(function(test) {
             it("should return " + test.expected, function() {
-                expect(FORGE.Math.wrap(test.value, test.min, test.max)).toBe(test.expected);
+                expect(FORGE.Math.wrap(test.value, test.min, test.max)).toBeCloseTo(test.expected, 10);
             });
         });
     });
@@ -127,8 +135,6 @@ describe("Math", function() {
     });
 
     describe("rotationMatrixToEuler", function() {
-        var pi2 = Math.PI / 2;
-
         // don't forget it is roll, -pitch, yaw
         var tests = [
             { mat: new THREE.Matrix4(), euler: { yaw: 0, pitch: 0, roll: 0 } },
@@ -161,8 +167,6 @@ describe("Math", function() {
     });
 
     describe("eulerToRotationMatrix", function() {
-        var pi2 = Math.PI / 2;
-
         // don't forget it is roll, -pitch, yaw
         var tests = [
             { mat: new THREE.Matrix4(), euler: { yaw: 0, pitch: 0, roll: 0 } },
@@ -200,6 +204,29 @@ describe("Math", function() {
 
                 for (var i = 0; i < a.length; i++)
                     expect(a[i]).toBeCloseTo(b[i], 10);
+            });
+        });
+    });
+
+    describe("#sphericalToCartesian", function() {
+        var tests = [
+            { spherical: { r: 10, t: 0, p: 0 }, cartesian: { x: 0, y: 0, z: -10 } },
+            { spherical: { r: 10, t: pi, p: 0 }, cartesian: { x: 0, y: 0, z: 10 } },
+            { spherical: { r: 10, t: 0, p: pi2 }, cartesian: { x: 0, y: 10, z: 0 } },
+            { spherical: { r: 10, t: 632.534, p: pi2 }, cartesian: { x: 0, y: 10, z: 0 } },
+            { spherical: { r: 10, t: pi4, p: pi4 }, cartesian: { x: 5, y: 5 * sqrt2, z: -5 } },
+            { spherical: { r: 10, t: -5 * pi + pi4, p: 8 * pi + pi3 }, cartesian: { x: -5 / sqrt2, y: 5 * sqrt3, z: 5 / sqrt2 } },
+            { spherical: { r: -10, t: 0, p: 0 }, cartesian: { x: 0, y: 0, z: 10 } },
+            { spherical: { r: 0, t: 0, p: 0 }, cartesian: { x: 0, y: 0, z: 0 } }
+        ];
+
+        tests.forEach(function(test) {
+            it("should return " + test.cartesian.toString(), function() {
+                var res = FORGE.Math.sphericalToCartesian(test.spherical.r, test.spherical.t, test.spherical.p);
+
+                expect(res.x).toBeCloseTo(test.cartesian.x, 10);
+                expect(res.y).toBeCloseTo(test.cartesian.y, 10);
+                expect(res.z).toBeCloseTo(test.cartesian.z, 10);
             });
         });
     });

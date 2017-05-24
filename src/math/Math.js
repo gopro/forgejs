@@ -105,9 +105,19 @@ FORGE.Math.clamp = function(value, min, max)
  */
 FORGE.Math.wrap = function(value, min, max)
 {
+    if (value === max)
+    {
+        return max;
+    }
+
     var range = max - min;
 
-    return range === 0 ? min : (((value - min) % range) + range) % (range) + min;
+    if (range === 0)
+    {
+        return min;
+    }
+
+    return ((value - min) % range + range) % range + min;
 };
 
 /**
@@ -225,7 +235,7 @@ FORGE.Math.sphericalToCartesian = function(radius, theta, phi)
 {
     var res = {};
 
-    // wrap phi in [0; π]
+    // wrap phi in [-π/2; π/2]
     phi = FORGE.Math.wrap(phi, -Math.PI / 2, Math.PI / 2);
     // invert theta if radius is negative
     theta += radius < 0 ? Math.PI : 0;
