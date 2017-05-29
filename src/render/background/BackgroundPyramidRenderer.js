@@ -23,14 +23,14 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, options)
      * @type {Number}
      * @private
      */
-    this._levelMax = 10;
+    this._levelMax = Infinity;
 
     /**
      * Current level of the pyramid
      * @type {Number}
      * @private
      */
-    this._level = 1;
+    this._level = 0;
 
     /**
      * The size of the cube.
@@ -48,10 +48,32 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, options)
 
     /**
      * Cache of tiles
-     * @type {}
+     * @type {Map}
      * @private
      */
     this._tileCache = null;
+
+    /**
+     * Size of tiles
+     * @TODO to be changed
+     * @type {number}
+     * @private
+     */
+    this._tileSize = 512;
+
+    /**
+     * Number of pixels at current level
+     * @type {number}
+     * @private
+     */
+    this._levelPixels = 0;
+
+    /**
+     * Number of pixels at current level presented in human readable format
+     * @type {string}
+     * @private
+     */
+    this._levelPixelsHumanReadable = "";
 
     FORGE.BackgroundRenderer.call(this, viewer, target, options, "BackgroundPyramidRenderer");
 };
@@ -79,6 +101,8 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
 
+    this._levelMax = 20;
+
     this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
     var tpa = this.nbTilesPerAxis(this._level);
@@ -91,8 +115,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
         {
             for (var x=0; x<tpa; x++)
             {
-                var name = face + "-0";
-                var tile = this.getTile(null, this._level, face, x, y, name);
+                var tile = this.getTile(null, this._level, face, x, y);
                 this._scene.add(tile);
             }        
         }
@@ -190,7 +213,7 @@ FORGE.BackgroundPyramidRenderer.prototype._getTileKey = function(level, face, x,
  * Lookup in cache first or create it if not already in cache
  * @method FORGE.BackgroundPyramidRenderer#visibleTiles
  */
-FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face, x, y, name)
+FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face, x, y)
 {
     var key = this._getTileKey(level, face, x, y);
 
@@ -203,7 +226,8 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
     
     if (tile === undefined)
     {
-        tile = new FORGE.Tile(parent, this, x, y, level, face, name);
+        tile = new FORGE.Tile(parent, this, x, y, level, face);
+        this.log("Create tile " + tile.name + " (parent: " + (parent ? parent.name : "none") + ")");
         this._tileCache[level].set(key, tile);
         this._scene.add(tile);
     }
@@ -227,7 +251,7 @@ FORGE.BackgroundPyramidRenderer.prototype.nbTilesPerAxis = function(level)
 FORGE.BackgroundPyramidRenderer.prototype.nbTiles = function(level)
 {
     var tpa = this.nbTilesPerAxis(level);
-    return tpa * tpa;
+    return 6 * tpa * tpa;
 };
 
 /**
@@ -240,30 +264,41 @@ FORGE.BackgroundPyramidRenderer.prototype.tileSize = function(level)
 };
 
 /**
- * Get all visible tiles at current level
- * @method FORGE.BackgroundPyramidRenderer#visibleTiles
- */
-FORGE.BackgroundPyramidRenderer.prototype.visibleTiles = function()
-{
-    var visibleTiles = [];
-
-    // ...
-
-    // Tile in frustum
-    // Tile has a texture loaded (store)
-    // If yes add to scene, otherwise try children or parent
-};
-
-
-/**
  * Select current level for the pyramid
  * @method FORGE.BackgroundPyramidRenderer#selectLevel
  * @param {Number} level pyramid level
  */
 FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 {
-    this.log("Select new level: " + level);
     this._level = level;
+    this._levelPixels = this.nbTiles(this._level) * this._tileSize * this._tileSize;
+
+    var prefixes = {
+        3: "kilo",
+        6: "mega",
+        9: "giga",
+        12: "tera",
+        15: "peta",
+        18: "exa",
+        21: "zetta",
+        24: "yotta"
+    };
+
+    var rank = Math.floor(Math.log(this._levelPixels) / (Math.LN10 * 3)) * 3;
+    var humanPixels = this._levelPixels / Math.pow(10, rank);
+
+    var prefix = "";
+    if (rank >= 27)
+    {
+        prefix = " too many "
+    }
+    else if (rank >= 3)
+    {
+        prefix = " " + prefixes[rank];
+    }
+
+    this._levelPixelsHumanReadable = humanPixels.toFixed(1) + prefix + "pixels";
+    this.log("Select new level: " + level + ", " + this._levelPixelsHumanReadable  + " (" + this._levelPixels + ")");
 };
 
 
@@ -352,6 +387,34 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "levelMax",
     get: function()
     {
         return this._levelMax;
+    }
+});
+
+/**
+ * Get number of pixels at current level.
+ * @name FORGE.BackgroundPyramidRenderer#pixelsAtCurrentLevel
+ * @type {number}
+ */
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "pixelsAtCurrentLevel",
+{
+    /** @this {FORGE.BackgroundPyramidRenderer} */
+    get: function()
+    {
+        return this._levelPixels;
+    }
+});
+
+/**
+ * Get number of pixels at current level presented as human readable string.
+ * @name FORGE.BackgroundPyramidRenderer#pixelsAtCurrentLevelHumanReadable
+ * @type {string}
+ */
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "pixelsAtCurrentLevelHumanReadable",
+{
+    /** @this {FORGE.BackgroundPyramidRenderer} */
+    get: function()
+    {
+        return this._levelPixelsHumanReadable;
     }
 });
 
