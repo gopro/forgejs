@@ -106,7 +106,8 @@ FORGE.Math.clamp = function(value, min, max)
 FORGE.Math.wrap = function(value, min, max)
 {
     var range = max - min;
-    return (((value - min) % range) + range) % (range) + min;
+
+    return range === 0 ? min : (((value - min) % range) + range) % (range) + min;
 };
 
 /**
@@ -143,7 +144,7 @@ FORGE.Math.smoothStep = function(value, edge0, edge1)
  * @method FORGE.Math.isPowerOfTwo
  * @param  {number} value - value to check
  */
-FORGE.Math.isPowerOfTwo = function(value) 
+FORGE.Math.isPowerOfTwo = function(value)
 {
     return ((value != 0) && !(value & (value - 1)));
 };

@@ -319,20 +319,6 @@ module.exports = function(grunt)
                 ]
             },
 
-            karma:
-            {
-                files:
-                [
-                    {
-                        expand: true,
-                        flatten: false,
-                        cwd: "tools/karma/fixtures/json/",
-                        src: "*.json",
-                        dest: "tools/karma/fixtures/json/min/"
-                    }
-                ]
-            },
-
             doc:
             {
                 files:
@@ -445,14 +431,6 @@ module.exports = function(grunt)
             }
         },
 
-        "json-minify":
-        {
-            karma:
-            {
-                files: "tools/karma/fixtures/json/min/*.json"
-            }
-        },
-
         jshint:
         {
             beforeconcat: sourceFilesForJSHint,
@@ -524,16 +502,17 @@ module.exports = function(grunt)
 
         karma:
         {
-            watch:
+            run:
             {
-                configFile: "tools/karma/karma.conf.js",
+                configFile: "test/karma.conf.js",
                 autoWatch: false,
-                background: true
+                background: false,
+                singleRun: true
             },
 
-            standalone:
+            watch:
             {
-                configFile: "tools/karma/karma.conf.js",
+                configFile: "test/karma.conf.js",
                 autoWatch: true,
                 background: false
             }
@@ -541,19 +520,6 @@ module.exports = function(grunt)
 
         watch:
         {
-            karma:
-            {
-                files:
-                [
-                    "src/**/*.js",
-                    "tools/karma/tests/*.js",
-                    "tools/karma/fixtures/html/*.html",
-                    "tools/karma/fixtures/json/*.json"
-                ],
-
-                tasks: ["clear", "clean:karma", "copy:karma", "json-minify:karma", "karma:watch:run"],
-            },
-
             build:
             {
                 files:
@@ -685,13 +651,12 @@ module.exports = function(grunt)
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-text-replace");
-    grunt.loadNpmTasks("grunt-json-minify");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-jscs");
     grunt.loadNpmTasks("grunt-jsdoc");
     grunt.loadNpmTasks("grunt-clear");
-    // grunt.loadNpmTasks("grunt-karma");
+    grunt.loadNpmTasks("grunt-karma");
 
     // Only build the documentation
     grunt.registerTask("doc", ["clean:docCurrent", "clean:docTmp", "referenceConcat", "referenceGeneration", "jsdoc", "copy:doc", "replace:doc", "clean:docTmp"]);
@@ -700,7 +665,7 @@ module.exports = function(grunt)
     grunt.registerTask("lint", ["jshint:beforeconcat", "jscs"]);
 
     // Run a watcher for karma testing
-    // grunt.registerTask("test", ["karma:watch:start", "watch"]);
+    grunt.registerTask("test", ["karma:run"]);
 
     // Main build task
     grunt.registerTask("build",
@@ -745,7 +710,8 @@ module.exports = function(grunt)
             "concat:customThreeMin",
             "concat:customThreeMinWithoutVersion",
             "clean:glsl",
-            "clean:buildTmp"
+            "clean:buildTmp",
+            "karma:run"
         ];
 
         //grunt.option("force", true);
