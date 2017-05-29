@@ -710,7 +710,8 @@ module.exports = function(grunt)
             "concat:customThreeMin",
             "concat:customThreeMinWithoutVersion",
             "clean:glsl",
-            "clean:buildTmp"
+            "clean:buildTmp",
+            "karma:run"
         ];
 
         //grunt.option("force", true);
