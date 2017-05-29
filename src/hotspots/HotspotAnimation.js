@@ -273,9 +273,7 @@ FORGE.HotspotAnimation.prototype.play = function(track)
                 var theta = (typeof pos.theta === "number") ? FORGE.Math.degToRad(pos.theta) : FORGE.Math.degToRad(this._computeIntermediateValue(time, track.keyframes, "theta", posAnimation.tween.easing, "position"));
                 var phi = (typeof pos.phi === "number") ? FORGE.Math.degToRad(pos.phi) : FORGE.Math.degToRad(this._computeIntermediateValue(time, track.keyframes, "phi", posAnimation.tween.easing, "position"));
 
-                theta = FORGE.Math.wrap(Math.PI - theta, -Math.PI, Math.PI);
-
-                var cartesian = new THREE.Vector3().setFromSpherical(FORGE.Utils.toTHREESpherical(radius, theta, phi));
+                var cartesian = FORGE.Math.sphericalToCartesian(radius, theta, phi);
 
                 x = cartesian.x;
                 y = cartesian.y;

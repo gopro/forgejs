@@ -71,7 +71,7 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
     {
         var position = FORGE.Utils.extendSimpleObject(this._position.dump(), this._parsePosition(config.position));
 
-        if(FORGE.Utils.compareObjects(this._position.dump(), position) === false)
+        if (FORGE.Utils.compareObjects(this._position.dump(), position) === false)
         {
             this._position.load(/** @type {HotspotTransformValuesConfig} */ (position), false);
             changed = true;
@@ -86,7 +86,7 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
         rotation.y = (typeof config.rotation.y === "number") ? config.rotation.y : 0;
         rotation.z = (typeof config.rotation.z === "number") ? config.rotation.z : 0;
 
-        if(FORGE.Utils.compareObjects(this._rotation.dump(), rotation) === false)
+        if (FORGE.Utils.compareObjects(this._rotation.dump(), rotation) === false)
         {
             this._rotation.load(/** @type {HotspotTransformValuesConfig} */ (rotation), false);
             changed = true;
@@ -101,7 +101,7 @@ FORGE.HotspotTransform.prototype._parseConfig = function(config)
         scale.y = (typeof config.scale.y === "number") ? FORGE.Math.clamp(config.scale.y, 0.000001, 100000) : 1;
         scale.z = (typeof config.scale.z === "number") ? FORGE.Math.clamp(config.scale.z, 0.000001, 100000) : 1;
 
-        if(FORGE.Utils.compareObjects(this._scale.dump(), scale) === false)
+        if (FORGE.Utils.compareObjects(this._scale.dump(), scale) === false)
         {
             this._scale.load(/** @type {HotspotTransformValuesConfig} */ (scale), false);
             changed = true;
@@ -132,19 +132,13 @@ FORGE.HotspotTransform.prototype._parsePosition = function(config)
         position.y = (typeof config.y === "number") ? config.y : 0;
         position.z = (typeof config.z === "number") ? config.z : -200;
 
-        if(typeof config.radius === "number" || typeof config.theta === "number" || typeof config.phi === "number")
+        if (typeof config.radius === "number" || typeof config.theta === "number" || typeof config.phi === "number")
         {
             var radius = (typeof config.radius === "number") ? config.radius : 200;
             var theta = (typeof config.theta === "number") ? FORGE.Math.degToRad(config.theta) : 0;
             var phi = (typeof config.phi === "number") ? FORGE.Math.degToRad(config.phi) : 0;
 
-            theta = FORGE.Math.wrap(Math.PI - theta, -Math.PI, Math.PI);
-
-            var cartesian = new THREE.Vector3().setFromSpherical(FORGE.Utils.toTHREESpherical(radius, theta, phi));
-
-            position.x = cartesian.x;
-            position.y = cartesian.y;
-            position.z = cartesian.z;
+            position = FORGE.Math.sphericalToCartesian(radius, theta, phi);
         }
     }
 
@@ -174,7 +168,7 @@ FORGE.HotspotTransform.prototype.load = function(config, notify)
 {
     var changed = this._parseConfig(config);
 
-    if(notify !== false && changed === true)
+    if (notify !== false && changed === true)
     {
         this.notifyChange();
     }

@@ -6,3 +6,13 @@
  * @property {number} roll - roll euler angle (z axis) [radians]
  */
 var TEuler;
+
+/**
+ * @typedef {{x:number, y:number, z:number}}
+ */
+var CartesianCoordinates;
+
+/**
+ * @typedef {{radius:number, theta:number, phi:number}}
+ */
+var SphericalCoordinates;

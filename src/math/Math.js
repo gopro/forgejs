@@ -105,9 +105,19 @@ FORGE.Math.clamp = function(value, min, max)
  */
 FORGE.Math.wrap = function(value, min, max)
 {
+    if (value === max)
+    {
+        return max;
+    }
+
     var range = max - min;
 
-    return range === 0 ? min : (((value - min) % range) + range) % (range) + min;
+    if (range === 0)
+    {
+        return min;
+    }
+
+    return ((value - min) % range + range) % range + min;
 };
 
 /**
@@ -209,4 +219,61 @@ FORGE.Math.eulerToRotationMatrix = function(yaw, pitch, roll, orderYPR)
                              0,        0,                      0, 1
      );
     //jscs:enable
+};
+
+/**
+ * Converts spherical coordinates to cartesian, respecting the FORGE
+ * coordinates system.
+ *
+ * @method FORGE.Math.sphericalToCartesian
+ * @param {number} radius - radius
+ * @param {number} theta - theta angle [rad]
+ * @param {number} phi - phi angle [rad]
+ * @return {CartesianCoordinates} the resulting cartesian coordinates
+ */
+FORGE.Math.sphericalToCartesian = function(radius, theta, phi)
+{
+    var res = {};
+
+    // wrap phi in [-π/2; π/2]
+    phi = FORGE.Math.wrap(phi, -Math.PI / 2, Math.PI / 2);
+    // invert theta if radius is negative
+    theta += radius < 0 ? Math.PI : 0;
+    // wrap theta in [0; 2π)
+    theta = FORGE.Math.wrap(theta, 0, 2 * Math.PI);
+    // abs so the radius is positive
+    radius = Math.abs(radius);
+
+    res.x = radius * Math.cos(phi) * Math.sin(theta);
+    res.y = radius * Math.sin(phi);
+    res.z = -radius * Math.cos(phi) * Math.cos(theta);
+
+    return res;
+};
+
+/**
+ * Converts cartesian coordinates to spherical, respecting the FORGE
+ * coordinates system.
+ *
+ * @method FORGE.Math.cartesianToSpherical
+ * @param {number} x - x
+ * @param {number} y - y
+ * @param {number} z - z
+ * @return {SphericalCoordinates}
+ */
+FORGE.Math.cartesianToSpherical = function(x, y, z)
+{
+    var res = {};
+
+    res.radius = Math.sqrt(x*x + y*y + z*z);
+
+    if (res.radius === 0)
+    {
+        return { radius: 0, theta: 0, phi: 0 }
+    }
+
+    res.phi = Math.asin(y / res.radius);
+    res.theta = Math.atan2(x, -z || 0); // we want to avoid -z = -0
+
+    return res;
 };

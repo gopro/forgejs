@@ -506,36 +506,6 @@ FORGE.Utils.formatTime = function(time, format)
 };
 
 /**
- * Get THREE.Spherical object from euler angles.
- * @method FORGE.Utils.toTHREESpherical
- * @param {number} radius radius
- * @param {number} theta theta angle
- * @param {number} phi phi angle
- * @return {THREE.Spherical} spherical object
- */
-FORGE.Utils.toTHREESpherical = function(radius, theta, phi)
-{
-    return new THREE.Spherical(radius, Math.PI / 2 - phi, theta);
-};
-
-/**
- * Get object with euler angles from a THREE.Spherical object.
- * @method FORGE.Utils.fromTHREESpherical
- * @param {THREE.Spherical} spherical spherical object
- * @return {Object} spherical object
- */
-FORGE.Utils.fromTHREESpherical = function(spherical)
-{
-    var result = {
-        "radius": spherical.radius,
-        "theta": spherical.theta,
-        "phi": Math.PI / 2 - spherical.phi
-    };
-
-    return result;
-};
-
-/**
  * Get an array by difference with another array
  * @method FORGE.Utils.arrayByDifference
  * @param  {Array} array input array to be filtered
