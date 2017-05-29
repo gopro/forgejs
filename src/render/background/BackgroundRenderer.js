@@ -76,6 +76,7 @@ FORGE.BackgroundRenderer.prototype.constructor = FORGE.BackgroundRenderer;
 FORGE.BackgroundRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
+    this._scene.name = "Background scene";
 
     if (this._renderTarget === null)
     {
