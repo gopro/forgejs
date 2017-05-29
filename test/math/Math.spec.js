@@ -230,4 +230,25 @@ describe("Math", function() {
             });
         });
     });
+
+    describe("#cartesianToSpherical", function() {
+        var tests = [
+            { spherical: { radius: 10, theta: 0, phi: 0 }, cartesian: { x: 0, y: 0, z: -10 } },
+            { spherical: { radius: 10, theta: pi, phi: 0 }, cartesian: { x: 0, y: 0, z: 10 } },
+            { spherical: { radius: 10, theta: 0, phi: pi2 }, cartesian: { x: 0, y: 10, z: 0 } },
+            { spherical: { radius: 10, theta: pi4, phi: pi4 }, cartesian: { x: 5, y: 5 * sqrt2, z: -5 } },
+            { spherical: { radius: 10, theta: -pi + pi4, phi: pi3 }, cartesian: { x: -5 / sqrt2, y: 5 * sqrt3, z: 5 / sqrt2 } },
+            { spherical: { radius: 0, theta: 0, phi: 0 }, cartesian: { x: 0, y: 0, z: 0 } }
+        ];
+
+        tests.forEach(function(test) {
+            it("should return " + test.spherical.radius + ", " + test.spherical.theta + ", " + test.spherical.phi, function() {
+                var res = FORGE.Math.cartesianToSpherical(test.cartesian.x, test.cartesian.y, test.cartesian.z);
+
+                expect(res.radius).toBeCloseTo(test.spherical.radius, 10);
+                expect(res.theta).toBeCloseTo(test.spherical.theta, 10);
+                expect(res.phi).toBeCloseTo(test.spherical.phi, 10);
+            });
+        });
+    });
 });

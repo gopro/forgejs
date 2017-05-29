@@ -250,3 +250,30 @@ FORGE.Math.sphericalToCartesian = function(radius, theta, phi)
 
     return res;
 };
+
+/**
+ * Converts cartesian coordinates to spherical, respecting the FORGE
+ * coordinates system.
+ *
+ * @method FORGE.Math.cartesianToSpherical
+ * @param {number} x - x
+ * @param {number} y - y
+ * @param {number} z - z
+ * @return {SphericalCoordinates}
+ */
+FORGE.Math.cartesianToSpherical = function(x, y, z)
+{
+    var res = {};
+
+    res.radius = Math.sqrt(x*x + y*y + z*z);
+
+    if (res.radius === 0)
+    {
+        return { radius: 0, theta: 0, phi: 0 }
+    }
+
+    res.phi = Math.asin(y / res.radius);
+    res.theta = Math.atan2(x, -z || 0); // we want to avoid -z = -0
+
+    return res;
+};
