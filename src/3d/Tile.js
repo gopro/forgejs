@@ -41,6 +41,8 @@ FORGE.Tile = function(parent, renderer, x, y, level, face)
 
     this._opacity = 0;
 
+    this._texturePending = false;
+
     THREE.Mesh.call(this);
 
     this._boot();
@@ -159,7 +161,7 @@ FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometr
 
     if (this._renderer.level !== this._level)
     {
-        if (this._level > 0 && this._opacity > 0)
+        if (this._opacity > 0)
         {
             this._setOpacity(this._opacity - FORGE.Tile.OPACITY_INCREMENT);
         }
@@ -173,7 +175,7 @@ FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometr
     }
     else
     {
-        if (this._level > 0 && this._opacity < 1)
+        if (this._opacity < 1 && this._texturePending === true)
         {
             this._setOpacity(this._opacity + FORGE.Tile.OPACITY_INCREMENT);
         }        
@@ -183,19 +185,31 @@ FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometr
     this._checkNeighbours();
 
     // Enable texture mapping
-    if (this.material.map === null)
+    if (this._texturePending === false)
     {
         var tpa = this._renderer.nbTilesPerAxis(this._level);
-        var texture = this._renderer.textureStore.get(this._face, this._level, this._position.x, tpa - 1 - this._position.y);
-        if (texture !== null)
-        {
-            texture.generateMipmaps = false;
-            texture.minFilter = THREE.LinearFilter;
-            texture.needsUpdate = true;
+        var texPromise = this._renderer.textureStore.get(this);
 
-            this.material.color = new THREE.Color(0xffffff);
-            this.material.map = texture;
-            this.material.needsUpdate = true;
+        if (texPromise !== null)
+        {
+            texPromise.then(function(texture) {
+                if (texture !== null && texture instanceof THREE.Texture)
+                {
+                    texture.generateMipmaps = false;
+                    texture.minFilter = THREE.LinearFilter;
+                    texture.needsUpdate = true;
+
+                    this.material.color = new THREE.Color(0xffffff);
+                    this.material.map = texture;
+                    this.material.needsUpdate = true;
+            
+                    this._texturePending = true;
+                }
+            }.bind(this));
+
+            texPromise.catch(function(error) {
+                // ...
+            }.bind(this));
         }
     }
 
@@ -289,7 +303,10 @@ FORGE.Tile.prototype._setOpacity = function(opacity, storeValue)
         if (node !== null && node.material !== null &&
             typeof node.material.opacity !== "undefined")
         {
-            node.material.opacity = opacity;
+            if (node.material.transparent === true)
+            {
+                node.material.opacity = opacity;
+            }
         }
 
         for (var i=0,ii=node.children.length; i<ii; i++)
@@ -315,8 +332,6 @@ FORGE.Tile.prototype._setPosition = function(rotation)
     // Offset is: on the left of half of the cube size, half the tile size on the right (center anchor)
     // Add tilesize number of x,y coordinates
     var offset = 0.5 * tileSize * (1 - tpa);
-
-    // this._position.y = tpa - 1 - this._position.y;
 
     var vec = this._position.clone().multiplyScalar(tileSize).addScalar(offset);
     vec.z = -0.5 * tpa * tileSize;
@@ -495,6 +510,62 @@ FORGE.Tile.prototype.destroy = function()
 
     this._renderer = null;
 };
+
+/**
+ * Get face.
+ * @name FORGE.Tile#face
+ * @type {string}
+ */
+Object.defineProperty(FORGE.Tile.prototype, "face",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        return this._face;
+    }
+});
+
+/**
+ * Get level.
+ * @name FORGE.Tile#level
+ * @type {string}
+ */
+Object.defineProperty(FORGE.Tile.prototype, "level",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        return this._level;
+    }
+});
+
+/**
+ * Get x coordinate.
+ * @name FORGE.Tile#x
+ * @type {string}
+ */
+Object.defineProperty(FORGE.Tile.prototype, "x",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        return this._x;
+    }
+});
+
+/**
+ * Get y coordinate.
+ * @name FORGE.Tile#y
+ * @type {string}
+ */
+Object.defineProperty(FORGE.Tile.prototype, "y",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        return this._renderer.nbTilesPerAxis(this._level) - 1 - this._y;
+    }
+});
 
 /**
  * Get QuadTree ID.
