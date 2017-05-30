@@ -81,6 +81,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, options)
 FORGE.BackgroundPyramidRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
 FORGE.BackgroundPyramidRenderer.prototype.constructor = FORGE.BackgroundPyramidRenderer;
 
+
 /**
  * Boot routine.
  * @method FORGE.BackgroundPyramidRenderer#_boot
@@ -93,15 +94,12 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     this.log("boot");
 
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
-    // this._size = 100;
 
     this._tileCache = {};
 
     this._textureStore = this._viewer.story.scene.media.store;
 
     this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
-
-    this._levelMax = 20;
 
     this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
@@ -310,14 +308,6 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
  */
 FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
 {
-    // Get all visible tiles for current level
-    // Select tiles from current level with a loaded texture
-    // For tiles without texture, iterate through children and parent
-    
-    var visibleTiles = [];
-    var childrenTiles = [];
-    var parentTiles = [];
-
     FORGE.BackgroundRenderer.prototype.render.call(this, this._viewer.camera.main);
     // console.log("tiles: " + window.scene.children.length);
 };
