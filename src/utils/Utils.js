@@ -579,3 +579,23 @@ FORGE.Utils.arrayKeys = function(array)
 
     return array.keys();
 };
+
+/**
+ * Make a new promise
+ * Returned promise has accessors on resolve and reject to call them out of definition scope
+ * @return {Promise} extended promise
+ */
+FORGE.Utils.makePromise = function() {
+    var resolveFn, rejectFn;
+
+    var promise = new Promise(function(resolve, reject) {
+        resolveFn = resolve;
+        rejectFn = reject;
+    });
+
+    promise.resolve = resolveFn;
+    promise.reject = rejectFn;
+
+    return promise;
+}
+
