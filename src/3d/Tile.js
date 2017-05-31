@@ -205,10 +205,10 @@ FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometr
             
                     this._texturePending = true;
                 }
-            }.bind(this));
+            }.bind(this),
 
-            texPromise.catch(function(error) {
-                // ...
+            function(error) {
+                console.log("Tile texture loading error: " + error);
             }.bind(this));
         }
     }
