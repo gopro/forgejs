@@ -13,7 +13,6 @@ FORGE.ShaderLib = {
             /** @type {FORGEUniform} */
             uniforms:
             {
-                tOpacity: { type: "f", value: 1.0 },
                 tTexture: { type: "t", value: null },
                 tViewportResolution: { type: "v2", value: new THREE.Vector2() },
                 tViewportResolutionRatio: { type: "f", value: 1.0 },
@@ -31,7 +30,6 @@ FORGE.ShaderLib = {
             uniforms:
             {
                 tTexture: { type: "t", value: null },
-                tTextureSize: { type: "v2", value: new THREE.Vector2() },
                 tTextureRatio: { type: "f", value: 1.0 },
                 tViewportResolution: { type: "v2", value: new THREE.Vector2() },
                 tViewportResolutionRatio: { type: "f", value: 1.0 },
@@ -51,7 +49,6 @@ FORGE.ShaderLib = {
             /** @type {FORGEUniform} */
             uniforms:
             {
-                tOpacity: { type: "f", value: 1.0 },
                 tTexture: { type: "t", value: null },
                 tViewportResolution: { type: "v2", value: new THREE.Vector2() },
                 tViewportResolutionRatio: { type: "f", value: 1.0 },
@@ -75,8 +72,7 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tOpacity: { type: "f", value: 1.0 },
-                    tTexture: { type: "t", value: null },
-                    tModelViewMatrixInverse: { type: "m4", value: null }
+                    tTexture: { type: "t", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
                 fragmentShader: FORGE.ShaderChunk.wts_frag
@@ -88,26 +84,10 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tColor: { type: "c", value: null },
-                    tProjectionScale: { type: "f", value: 1 },
                     tModelViewMatrixInverse: { type: "m4", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear_wireframe,
                 fragmentShader: FORGE.ShaderChunk.wts_frag_wireframe
-            },
-
-            equirectangular:
-            {
-                /** @type {FORGEUniform} */
-                uniforms:
-                {
-                    tOpacity: { type: "f", value: 1.0 },
-                    tTexture: { type: "t", value: null },
-                    tProjectionScale: { type: "f", value: 1 },
-                    tViewportResolutionRatio: { type: "f", value: 1.0 },
-                    tModelViewMatrixInverse: { type: "m4", value: null }
-                },
-                vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear_equirectangular,
-                fragmentShader: FORGE.ShaderChunk.wts_frag_equirectangular
             }
         },
 
@@ -119,8 +99,7 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tOpacity: { type: "f", value: 1.0 },
-                    tTexture: { type: "t", value: null },
-                    tModelViewMatrixInverse: { type: "m4", value: null }
+                    tTexture: { type: "t", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
                 fragmentShader: FORGE.ShaderChunk.wts_frag
@@ -132,29 +111,10 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tColor: { type: "c", value: null },
-                    tProjectionScale: { type: "f", value: 1 },
                     tModelViewMatrixInverse: { type: "m4", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear_wireframe,
                 fragmentShader: FORGE.ShaderChunk.wts_frag_wireframe
-            }
-        },
-
-        littlePlanet:
-        {
-            equirectangular:
-            {
-                /** @type {FORGEUniform} */
-                uniforms:
-                {
-                    tOpacity: { type: "f", value: 1.0 },
-                    tTexture: { type: "t", value: null },
-                    tProjectionScale: { type: "f", value: 1 },
-                    tViewportResolutionRatio: { type: "f", value: 1.0 },
-                    tModelViewMatrixInverse: { type: "m4", value: null }
-                },
-                vertexShader: FORGE.ShaderChunk.wts_vert_littleplanet_equirectangular,
-                fragmentShader: FORGE.ShaderChunk.wts_frag_equirectangular
             }
         },
 
@@ -167,9 +127,7 @@ FORGE.ShaderLib = {
                 {
                     tOpacity: { type: "f", value: 1.0 },
                     tTexture: { type: "t", value: null },
-                    tProjectionScale: { type: "f", value: 1 },
-                    tProjectionDistance: { type: "f", value: 1 },
-                    tModelViewMatrixInverse: { type: "m4", value: null }
+                    tProjectionDistance: { type: "f", value: 1 }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_gopro,
                 fragmentShader: FORGE.ShaderChunk.wts_frag
@@ -181,28 +139,10 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tColor: { type: "c", value: null },
-                    tProjectionScale: { type: "f", value: 1 },
-                    tProjectionDistance: { type: "f", value: 1 },
-                    tModelViewMatrixInverse: { type: "m4", value: null }
+                    tProjectionDistance: { type: "f", value: 1 }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_gopro_wireframe,
                 fragmentShader: FORGE.ShaderChunk.wts_frag_wireframe
-            },
-
-            equirectangular:
-            {
-                /** @type {FORGEUniform} */
-                uniforms:
-                {
-                    tOpacity: { type: "f", value: 1.0 },
-                    tTexture: { type: "t", value: null },
-                    tProjectionScale: { type: "f", value: 1 },
-                    tProjectionDistance: { type: "f", value: 1 },
-                    tViewportResolutionRatio: { type: "f", value: 1.0 },
-                    tModelViewMatrixInverse: { type: "m4", value: null }
-                },
-                vertexShader: FORGE.ShaderChunk.wts_vert_gopro_equirectangular,
-                fragmentShader: FORGE.ShaderChunk.wts_frag_equirectangular
             }
         }
     }

@@ -13,9 +13,7 @@
 
 uniform vec3 tColor;
 
-varying vec2 vUv;
 varying vec2 vQuadrilateralCoords;
-
 
 void main() {
     // Wireframe should be drawn when barycentric coords of

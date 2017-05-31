@@ -14,10 +14,7 @@
 #include <uniforms>
 
 uniform float tProjectionDistance;
-uniform float tProjectionScale;
-uniform float tViewportResolutionRatio;
 
-varying vec2 vUv;
 varying vec2 vQuadrilateralCoords;
 
 void main() {
@@ -28,6 +25,6 @@ void main() {
     spherePt.z += offset;
 
     gl_Position = projectionMatrix * spherePt;
-    vUv = uv;
+
     vQuadrilateralCoords = quadrilateralCoords;
 }
