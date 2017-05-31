@@ -14,8 +14,6 @@
 #include <uniforms>
 
 uniform float tProjectionDistance;
-uniform float tProjectionScale;
-uniform float tViewportResolutionRatio;
 
 varying vec2 vUv;
 

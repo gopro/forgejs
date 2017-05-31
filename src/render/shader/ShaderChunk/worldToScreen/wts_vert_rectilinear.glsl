@@ -7,8 +7,6 @@
 #include <vert_attributes>
 #include <uniforms>
 
-uniform float tViewportResolutionRatio;
-
 varying vec2 vUv;
 
 void main() {

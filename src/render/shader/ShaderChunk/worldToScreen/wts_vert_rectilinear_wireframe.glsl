@@ -7,9 +7,6 @@
 #include <vert_attributes_wireframe>
 #include <uniforms>
 
-uniform float tViewportResolutionRatio;
-
-varying vec2 vUv;
 varying vec2 vQuadrilateralCoords;
 
 void main() {
@@ -17,6 +14,5 @@ void main() {
 
     gl_Position = projectionMatrix * camPt;
 
-    vUv = uv;
     vQuadrilateralCoords = quadrilateralCoords;
 }
