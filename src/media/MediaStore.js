@@ -92,7 +92,8 @@ FORGE.MediaStore = function(viewer, config)
 FORGE.MediaStore.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.MediaStore.prototype.constructor = FORGE.MediaStore;
 
-FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS = 127;
+FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS = 250;
+FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE = 20;
 
 /**
  * The maximum size of texture at once. It is set at 30Mb, as we assume the
@@ -187,11 +188,11 @@ FORGE.MediaStore.prototype._load = function(tile)
         url: url
     };
 
-    var entry = this._texturePromises.get(tile);
+    var entry = this._texturePromises.get(key);
     if (entry.cancelled)
     {
         entry.load.reject("Tile cancelled");
-        this._texturePromises.delete(tile);
+        this._texturePromises.delete(key);
         return;
     }
 
@@ -229,9 +230,9 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
     // destroy the image, it is no longer needed
     this._loadingTextures.splice(this._loadingTextures.indexOf(image.data.key));
 
-    var entry = this._texturePromises.get(tile);
+    var entry = this._texturePromises.get(key);
     entry.load.resolve(mediaTexture.texture);
-    this._texturePromises.delete(tile);
+    this._texturePromises.delete(key);
 
     image.destroy();
 
@@ -298,9 +299,18 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
 
     this._textureStack.push(tile);
 
-    console.log("Texture stack length (+++): " + this._textureStack.length + " (" + tile.name + ")");
+    this.log("Texture stack length (+++): " + this._textureStack.length + " (" + tile.name + ")");
 
-    this._textureStackInterval = window.setTimeout(this._textureStackPop.bind(this), this.TEXTURE_STACK_INTERVAL_MS);
+    if (this._textureStack.length > FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE)
+    {
+        var key = this._createKey(tile)
+        var tile = this._textureStack.shift();
+        var entry = this._texturePromises.get(key);
+        entry.load.reject("Tile load abort (stack size exceeded).");
+        this._texturePromises.delete(key);
+    }
+
+    this._textureStackInterval = window.setTimeout(this._textureStackPop.bind(this), FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS);
 };
 
 /**
@@ -315,7 +325,7 @@ FORGE.MediaStore.prototype._textureStackPop = function()
     while (this._textureStack.length > 0) 
     {
         var tile = this._textureStack.pop();
-        console.log("Texture stack length (---): " + this._textureStack.length + " (" + tile.name + ")");
+        this.log("Texture stack length (---): " + this._textureStack.length + " (" + tile.name + ")");
 
         this._load(tile);
     }
@@ -341,7 +351,7 @@ FORGE.MediaStore.prototype.get = function(tile)
 
     // First check if texture is already loading (pending promise)
     // Return null, and client should do nothing but wait
-    var entry = this._texturePromises.get(tile);
+    var entry = this._texturePromises.get(key);
     if (entry !== undefined)
     {
         return null;
@@ -363,7 +373,7 @@ FORGE.MediaStore.prototype.get = function(tile)
         cancelled: false
     };
 
-    this._texturePromises.set(tile, entry);
+    this._texturePromises.set(key, entry);
 
     this._textureStackPush(tile);
 
