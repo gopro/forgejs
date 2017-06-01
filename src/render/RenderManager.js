@@ -666,7 +666,7 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     else if (type === FORGE.BackgroundType.PYRAMID)
     {
         this.log("Create background pyramid renderer (multiresolution image)");
-        this._backgroundRenderer = new FORGE.BackgroundPyramidRenderer(this._viewer, renderTarget, config);
+        this._backgroundRenderer = new FORGE.BackgroundPyramidRenderer(this._viewer, renderTarget, mediaConfig);
     }
     else if (type === FORGE.BackgroundType.MESH)
     {

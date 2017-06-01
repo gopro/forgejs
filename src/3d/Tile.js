@@ -19,11 +19,11 @@ FORGE.Tile = function(parent, renderer, x, y, level, face)
 
     this._level = level;
 
-    this._face = face.toLowerCase();
+    this._face = typeof face === "number" ? FORGE.Tile.FACES[face] : face.toLowerCase();
 
     this._rotation = null;
 
-    this._createTS = new Date();
+    this._createTS = null;
     
     this._displayTS = null;
 
@@ -51,14 +51,7 @@ FORGE.Tile = function(parent, renderer, x, y, level, face)
 FORGE.Tile.prototype = Object.create(THREE.Mesh.prototype);
 FORGE.Tile.prototype.constructor = FORGE.Tile;
 
-FORGE.Tile.FACES = {
-    "f": "front",
-    "b": "back",
-    "l": "left",
-    "r": "right",
-    "u": "up",
-    "d": "down"
-};
+FORGE.Tile.FACES = ["f", "b", "l", "r", "u", "d"];
 
 FORGE.Tile.FACES_COLOR = {
     "f": { "h": 239, "s": 0.47 },
@@ -72,20 +65,35 @@ FORGE.Tile.FACES_COLOR = {
 FORGE.Tile.OPACITY_INCREMENT = 0.04;
 
 // Cache geometry for each level to increase performances
-FORGE.Tile.Geometry = new Map();
+// FORGE.Tile.Geometry = new Map();
+FORGE.Tile.Geometry = null;
 
 FORGE.Tile.prototype._geometry = function()
 {
-    if (FORGE.Tile.Geometry.has(this._level) === true)
+    if (FORGE.Tile.Geometry === null)
     {
-        return FORGE.Tile.Geometry.get(this._level);
+        FORGE.Tile.Geometry = new THREE.PlaneBufferGeometry(1,1,1,1);
     }
 
-    var tileSize = this._renderer.tileSize(this._level);
-    var geometry = new THREE.PlaneBufferGeometry(tileSize, tileSize, 1, 1);
-    FORGE.Tile.Geometry.set(this._level, geometry);
-    return FORGE.Tile.Geometry.get(this._level);
+    return FORGE.Tile.Geometry;    
+    // var tileSize = this._renderer.tileSize(this._level);
+    // var geometry = new THREE.PlaneBufferGeometry(tileSize.width, tileSize.height, 1, 1);
+    // FORGE.Tile.Geometry.set(this._level, geometry);
+    // return FORGE.Tile.Geometry.get(this._level);
 };
+
+// FORGE.Tile.prototype._geometry = function()
+// {
+//     if (FORGE.Tile.Geometry.has(this._level) === true)
+//     {
+//         return FORGE.Tile.Geometry.get(this._level);
+//     }
+
+//     var tileSize = this._renderer.tileSize(this._level);
+//     var geometry = new THREE.PlaneBufferGeometry(tileSize.width, tileSize.height, 1, 1);
+//     FORGE.Tile.Geometry.set(this._level, geometry);
+//     return FORGE.Tile.Geometry.get(this._level);
+// };
 
 
 /**
@@ -107,14 +115,13 @@ FORGE.Tile.prototype._boot = function()
         this._quadTreeID = this._face;        
     }
 
-    this.name = FORGE.Tile.FACES[this._face] + "-" + this._level + "-" + this._position.y + "-" + this._position.x;
-    // this.name = this._name;
+    this.name = this._face + "-" + this._level + "-" + this._position.y + "-" + this._position.x;
 
     this.onBeforeRender = this._onBeforeRender.bind(this);
     this.onAfterRender = this._onAfterRender.bind(this);
 
-    var tileSize = this._renderer.tileSize(this._level);
     this.geometry = this._geometry();
+    // this.scale = this._getScale();
 
     var rotation = this._getRotation();
     this.rotation.copy(rotation);
@@ -148,6 +155,8 @@ FORGE.Tile.prototype._boot = function()
     if (this._level > 0 && this._parent === null) {
         this._checkParent();
     }
+
+    this._createTS = new Date();
 };
 
 /**
@@ -326,19 +335,31 @@ FORGE.Tile.prototype._setOpacity = function(opacity, storeValue)
  */
 FORGE.Tile.prototype._setPosition = function(rotation)
 {
-    var tileSize = this._renderer.tileSize(this._level);
-    var tpa = this._renderer.nbTilesPerAxis(this._level);
-    
-    // Offset is: on the left of half of the cube size, half the tile size on the right (center anchor)
-    // Add tilesize number of x,y coordinates
-    var offset = 0.5 * tileSize * (1 - tpa);
+    var tx = this._renderer.nbTilesPerAxis(this._level, "x");
+    var ty = this._renderer.nbTilesPerAxis(this._level, "y");
 
-    var vec = this._position.clone().multiplyScalar(tileSize).addScalar(offset);
-    vec.z = -0.5 * tpa * tileSize;
+    var fullTileWidth = this._renderer.cubeSize / tx;
+    var fullTileHeight = this._renderer.cubeSize / ty;
 
-    vec.applyEuler(rotation);
+    var scaleX = this._position.x < Math.floor(tx) ? 1 : tx - Math.floor(tx);
+    var scaleY = this._position.y < Math.floor(ty) ? 1 : ty - Math.floor(ty);
 
-    this.position.copy(vec);
+    this.geometry = new THREE.PlaneBufferGeometry(scaleX * fullTileWidth, scaleY * fullTileHeight);
+
+    var tileSize = new THREE.Vector3(
+        this._renderer.cubeSize * scaleX / tx,
+        this._renderer.cubeSize * scaleY / ty,
+        1);
+
+    // position = tile offset in XY plane - half cube size + half tile size
+    var position = new THREE.Vector3(
+        -this._renderer.cubeSize * 0.5 + fullTileWidth * this._position.x + 0.5 * tileSize.x,
+        -this._renderer.cubeSize * 0.5 + fullTileHeight * (ty - 1 - this._position.y) + 0.5 * tileSize.y,
+        -this._renderer.cubeSize * 0.5);
+
+    position.applyEuler(rotation);
+
+    this.position.copy(position);
 };
 
 /**
@@ -391,10 +412,28 @@ FORGE.Tile.prototype._subdivide = function()
     var y0 = 2 * this._position.y;
     var y1 = 2 * this._position.y + 1;
 
-    this._northWest = this._renderer.getTile(this, level, this._face, x0, y1);
-    this._northEast = this._renderer.getTile(this, level, this._face, x1, y1);
     this._southWest = this._renderer.getTile(this, level, this._face, x0, y0);
-    this._southEast = this._renderer.getTile(this, level, this._face, x1, y0);
+
+    var tx = this._renderer.nbTilesPerAxis(this._level + 1, "x");
+    var ty = this._renderer.nbTilesPerAxis(this._level + 1, "y");
+
+    var x1_in = x1 < tx;
+    var y1_in = y1 < ty;
+
+    if (x1_in)
+    {
+        this._southEast = this._renderer.getTile(this, level, this._face, x1, y0);
+    }
+
+    if (y1_in)
+    {
+        this._northWest = this._renderer.getTile(this, level, this._face, x0, y1);
+    }
+
+    if (x1_in && y1_in)
+    {
+        this._northEast = this._renderer.getTile(this, level, this._face, x1, y1);
+    }
 };
 
 /**
@@ -404,7 +443,7 @@ FORGE.Tile.prototype._subdivide = function()
  */
 FORGE.Tile.prototype._checkParent = function()
 {
-    if (this._level <= this._renderer.levelMin) {
+    if (this._level === 0) {
         return null;
     }
 
@@ -435,13 +474,14 @@ FORGE.Tile.prototype._checkNeighbours = function()
 
     var sequence = Promise.resolve();
     
-    var tpa = this._renderer.nbTilesPerAxis(this._level);
+    var tx = this._renderer.nbTilesPerAxis(this._level, "x");
+    var ty = this._renderer.nbTilesPerAxis(this._level, "y");
 
     var xmin = Math.max(0, this._position.x - 1);
-    var xmax = Math.min(tpa - 1, this._position.x + 1);
+    var xmax = Math.min(tx - 1, this._position.x + 1);
 
     var ymin = Math.max(0, this._position.y - 1);
-    var ymax = Math.min(tpa - 1, this._position.y + 1);
+    var ymax = Math.min(ty - 1, this._position.y + 1);
     
     // and do the job for the current face
     for (var y=ymin; y<=ymax; y++)
@@ -521,7 +561,7 @@ Object.defineProperty(FORGE.Tile.prototype, "face",
     /** @this {FORGE.Tile} */
     get: function()
     {
-        return this._face;
+        return FORGE.Tile.FACES.indexOf(this._face);
     }
 });
 
@@ -563,7 +603,8 @@ Object.defineProperty(FORGE.Tile.prototype, "y",
     /** @this {FORGE.Tile} */
     get: function()
     {
-        return this._renderer.nbTilesPerAxis(this._level) - 1 - this._y;
+        return this._y;
+        // return this._renderer.nbTilesPerAxis(this._level) - 1 - this._y;
     }
 });
 

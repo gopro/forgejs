@@ -93,7 +93,7 @@ FORGE.MediaStore.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.MediaStore.prototype.constructor = FORGE.MediaStore;
 
 FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS = 250;
-FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE = 20;
+FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE = 50;
 
 /**
  * The maximum size of texture at once. It is set at 30Mb, as we assume the
