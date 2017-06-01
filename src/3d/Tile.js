@@ -65,7 +65,6 @@ FORGE.Tile.FACES_COLOR = {
 FORGE.Tile.OPACITY_INCREMENT = 0.04;
 
 // Cache geometry for each level to increase performances
-// FORGE.Tile.Geometry = new Map();
 FORGE.Tile.Geometry = null;
 
 FORGE.Tile.prototype._geometry = function()
@@ -76,25 +75,7 @@ FORGE.Tile.prototype._geometry = function()
     }
 
     return FORGE.Tile.Geometry;    
-    // var tileSize = this._renderer.tileSize(this._level);
-    // var geometry = new THREE.PlaneBufferGeometry(tileSize.width, tileSize.height, 1, 1);
-    // FORGE.Tile.Geometry.set(this._level, geometry);
-    // return FORGE.Tile.Geometry.get(this._level);
 };
-
-// FORGE.Tile.prototype._geometry = function()
-// {
-//     if (FORGE.Tile.Geometry.has(this._level) === true)
-//     {
-//         return FORGE.Tile.Geometry.get(this._level);
-//     }
-
-//     var tileSize = this._renderer.tileSize(this._level);
-//     var geometry = new THREE.PlaneBufferGeometry(tileSize.width, tileSize.height, 1, 1);
-//     FORGE.Tile.Geometry.set(this._level, geometry);
-//     return FORGE.Tile.Geometry.get(this._level);
-// };
-
 
 /**
  * Boot sequence
@@ -121,7 +102,6 @@ FORGE.Tile.prototype._boot = function()
     this.onAfterRender = this._onAfterRender.bind(this);
 
     this.geometry = this._geometry();
-    // this.scale = this._getScale();
 
     var rotation = this._getRotation();
     this.rotation.copy(rotation);
@@ -604,7 +584,6 @@ Object.defineProperty(FORGE.Tile.prototype, "y",
     get: function()
     {
         return this._y;
-        // return this._renderer.nbTilesPerAxis(this._level) - 1 - this._y;
     }
 });
 
