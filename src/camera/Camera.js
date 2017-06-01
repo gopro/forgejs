@@ -297,7 +297,8 @@ FORGE.Camera.prototype._boot = function()
 
     this._gaze = new FORGE.CameraGaze(this._viewer, FORGE.Camera.DEFAULT_CONFIG.gaze);
 
-    this._viewer.renderer.view.onChange.add(this._onViewChange, this);
+    this._viewer.renderer.view.onChange.add(this._updateInternals, this);
+    this._viewer.renderer.onBackgroundReady.add(this._updateInternals, this);
 
     this._createMainCamera();
     this._createFlatCamera();
@@ -950,7 +951,11 @@ FORGE.Camera.prototype._getFovBoundaries = function()
     // if JSON specifies a fov min (not default 0 value), use it
     // useful for multiresolution where fov limit will be computed depending
     // on max level of resolution available and stored in JSON
-    if (this._fovMin !== 0)
+    if (this._viewer.renderer.backgroundRenderer !== null && "fovMin" in this._viewer.renderer.backgroundRenderer)
+    {
+        min = this._viewer.renderer.backgroundRenderer.fovMin;
+    }
+    else if (this._fovMin !== 0)
     {
         min = this._fovMin;
     }
@@ -988,14 +993,22 @@ FORGE.Camera.prototype._setAll = function(yaw, pitch, roll, fov, unit)
 };
 
 /**
- * On view change handler
- * @method FORGE.Camera#_onViewChange
+ * Update internals after a remote component has changed something
+ * @method FORGE.Camera#_updateInternals
  * @private
  */
-FORGE.Camera.prototype._onViewChange = function()
+FORGE.Camera.prototype._updateInternals = function()
 {
     // Force camera to update its values to bound it in new boundaries after view change
     var changed = this._setAll(this._yaw, this._pitch, this._roll, this._fov);
+
+    // Check config to allow default to be set if they were depending
+    // on some parameter external to the camera. For example: multiresolution fovMin set
+    // by the background renderer
+    if (this._config !== null)
+    {
+        this._parseConfig(this._config);
+    }
 
     if (changed === true)
     {
@@ -1096,6 +1109,9 @@ FORGE.Camera.prototype.destroy = function()
 
     this._gaze.destroy();
     this._gaze = null;
+
+    this._viewer.renderer.view.onChange.remove(this._updateInternals, this);
+    this._viewer.renderer.onBackgroundReady.remove(this._updateInternals, this);
 
     if (this._onCameraChange !== null)
     {
