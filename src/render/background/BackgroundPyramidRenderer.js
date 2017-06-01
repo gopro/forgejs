@@ -7,23 +7,17 @@
  *
  * @param {FORGE.Viewer} viewer - viewer reference
  * @param {THREE.WebGLRenderTarget} target - render target
- * @param {SceneMediaOptionsConfig} options - the options for the cubemap
+ * @param {SceneMediaConfig} config - media config
  */
-FORGE.BackgroundPyramidRenderer = function(viewer, target, options)
+FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
 {
     /**
-     * Minimum level of the pyramid
-     * @type {Number}
+     * Input scene and media config
+     * @name FORGE.Media#_config
+     * @type {SceneMediaConfig}
      * @private
      */
-    this._levelMin = 0;
-
-    /**
-     * Maximum level of the pyramid
-     * @type {Number}
-     * @private
-     */
-    this._levelMax = Infinity;
+    this._config = config;
 
     /**
      * Current level of the pyramid
@@ -54,19 +48,19 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, options)
     this._tileCache = null;
 
     /**
-     * Size of tiles
-     * @TODO to be changed
-     * @type {number}
-     * @private
-     */
-    this._tileSize = 512;
-
-    /**
      * Number of pixels at current level
      * @type {number}
      * @private
      */
     this._levelPixels = 0;
+
+    /**
+     * Minimum fov computed with max level
+     * @type {number}
+     * @private
+     */
+    this._fovMin = 0;
+
 
     /**
      * Number of pixels at current level presented in human readable format
@@ -75,12 +69,11 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, options)
      */
     this._levelPixelsHumanReadable = "";
 
-    FORGE.BackgroundRenderer.call(this, viewer, target, options, "BackgroundPyramidRenderer");
+    FORGE.BackgroundRenderer.call(this, viewer, target, config, "BackgroundPyramidRenderer");
 };
 
 FORGE.BackgroundPyramidRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
 FORGE.BackgroundPyramidRenderer.prototype.constructor = FORGE.BackgroundPyramidRenderer;
-
 
 /**
  * Boot routine.
@@ -93,6 +86,8 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this.log("boot");
 
+    this._parseConfig(this._config);
+
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
 
     this._tileCache = {};
@@ -103,23 +98,30 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
-    var tpa = this.nbTilesPerAxis(this._level);
-
-    var faces = new Set(["f", "l", "b", "r", "u", "d"]);
-
-    faces.forEach(function(face)
+    for (var face=0; face<6; face++)
     {
-        for (var y=0; y<tpa; y++)
+        for (var y=0, ty = this.nbTilesPerAxis(this._level, "y"); y<ty; y++)
         {
-            for (var x=0; x<tpa; x++)
+            for (var x=0, tx = this.nbTilesPerAxis(this._level, "x"); x<tx; x++)
             {
                 var tile = this.getTile(null, this._level, face, x, y);
                 this._scene.add(tile);
             }        
         }
-    }.bind(this));
+    }
 
     window.scene = this._scene;
+};
+
+/**
+ * Parse configuration.
+ * @method FORGE.BackgroundPyramidRenderer#_parseConfig
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype._parseConfig = function(config)
+{
+    // Set min fov to be used to reach max level of resolution
+    this._fovMin = 1.01 * FORGE.Math.degToRad(this._pyramidLevelToCameraFov(this._config.source.levels.length - 1));
 };
 
 /**
@@ -225,7 +227,7 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
     if (tile === undefined)
     {
         tile = new FORGE.Tile(parent, this, x, y, level, face);
-        this.log("Create tile " + tile.name + " (parent: " + (parent ? parent.name : "none") + ")");
+        // this.log("Create tile " + tile.name + " (parent: " + (parent ? parent.name : "none") + ")");
         this._tileCache[level].set(key, tile);
         this._scene.add(tile);
     }
@@ -235,10 +237,29 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
 
 /**
  * Get number of tiles per axis for a given level
+ * @param {number} level - pyramid level
+ * @param {string} axis - axis ("x" or "y")
  * @method FORGE.BackgroundPyramidRenderer#nbTilesPerAxis
  */
-FORGE.BackgroundPyramidRenderer.prototype.nbTilesPerAxis = function(level)
+FORGE.BackgroundPyramidRenderer.prototype.nbTilesPerAxis = function(level, axis)
 {
+    if (typeof this._config.source.levels === "undefined" || typeof axis === "undefined")
+    {
+        return Math.pow(2, level);
+    }
+
+    var level = this._config.source.levels[level];
+
+    if (axis === "x")
+    {
+        return level.width / level.tile;        
+    }
+
+    else if (axis === "y")
+    {
+        return level.height / level.tile;
+    }
+
     return Math.pow(2, level);
 };
 
@@ -248,17 +269,17 @@ FORGE.BackgroundPyramidRenderer.prototype.nbTilesPerAxis = function(level)
  */
 FORGE.BackgroundPyramidRenderer.prototype.nbTiles = function(level)
 {
-    var tpa = this.nbTilesPerAxis(level);
-    return 6 * tpa * tpa;
+    return 6 * this.nbTilesPerAxis(level, "x") * this.nbTilesPerAxis(level, "y");
 };
 
 /**
- * Get tile size at a given level
+ * Get tile size at a given level (world units)
  * @method FORGE.BackgroundPyramidRenderer#tileSize
+ * @return {FORGE.Size} size of a tile in world units
  */
 FORGE.BackgroundPyramidRenderer.prototype.tileSize = function(level)
 {
-    return this._size / this.nbTilesPerAxis(level);
+    return new FORGE.Size(this._size / this.nbTilesPerAxis(level, "x"), this._size / this.nbTilesPerAxis(level, "y"));
 };
 
 /**
@@ -269,7 +290,11 @@ FORGE.BackgroundPyramidRenderer.prototype.tileSize = function(level)
 FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 {
     this._level = level;
-    this._levelPixels = this.nbTiles(this._level) * this._tileSize * this._tileSize;
+
+    var levelConfig = this._config.source.levels[level];
+    var tilePixels = levelConfig.width * levelConfig.height;
+
+    this._levelPixels = this.nbTiles(this._level) * tilePixels;
 
     var prefixes = {
         3: "kilo",
@@ -325,6 +350,20 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 };
 
 /**
+ * Get cube size in world units.
+ * @name FORGE.BackgroundPyramidRenderer#cubeSize
+ * @type {FORGE.MediaStore}
+ */
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "cubeSize",
+{
+    /** @this {FORGE.BackgroundPyramidRenderer} */
+    get: function()
+    {
+        return this._size;
+    }
+});
+
+/**
  * Get texture store.
  * @name FORGE.BackgroundPyramidRenderer#textureStore
  * @type {FORGE.MediaStore}
@@ -349,34 +388,6 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "level",
     get: function()
     {
         return this._level;
-    }
-});
-
-/**
- * Get pyramid minimum level.
- * @name FORGE.BackgroundPyramidRenderer#levelMin
- * @type {string}
- */
-Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "levelMin",
-{
-    /** @this {FORGE.BackgroundPyramidRenderer} */
-    get: function()
-    {
-        return this._levelMin;
-    }
-});
-
-/**
- * Get pyramid maximum level.
- * @name FORGE.BackgroundPyramidRenderer#levelMax
- * @type {string}
- */
-Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "levelMax",
-{
-    /** @this {FORGE.BackgroundPyramidRenderer} */
-    get: function()
-    {
-        return this._levelMax;
     }
 });
 
@@ -409,16 +420,16 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "pixelsAtCurren
 });
 
 /**
- * Get camera reference.
- * @name FORGE.BackgroundPyramidRenderer#camera
- * @type {FORGE.Camera}
+ * Get fov min.
+ * @name FORGE.BackgroundPyramidRenderer#fovMin
+ * @type {number}
  */
-Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "camera",
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "fovMin",
 {
     /** @this {FORGE.BackgroundPyramidRenderer} */
     get: function()
     {
-        return this._viewer.camera;
+        return this._fovMin;
     }
 });
 
