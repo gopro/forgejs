@@ -48,17 +48,17 @@ FORGE.HotspotManager.prototype._parseConfig = function(config)
 {
     for (var i = 0, ii = config.length; i < ii; i++)
     {
-        this._createHotspot(config[i]);
+        this.create(config[i]);
     }
 };
 
 /**
  * Create a hotspot from a hotpsot config object.
- * @method FORGE.HotspotManager#_createHotspot
- * @private
+ * @method FORGE.HotspotManager#create
  * @param {HotspotConfig} config - The config of the hotspot you want to create.
+ * @return {boolean} Returns true if the hotspot is created, false if not.
  */
-FORGE.HotspotManager.prototype._createHotspot = function(config)
+FORGE.HotspotManager.prototype.create = function(config)
 {
     var hotspot = null;
     var type = config.type || FORGE.HotspotType.THREE_DIMENSIONAL; //3d is the default type
@@ -73,7 +73,10 @@ FORGE.HotspotManager.prototype._createHotspot = function(config)
     if (hotspot !== null)
     {
         this._hotspots.push(hotspot);
+        return true;
     }
+
+    return false;
 };
 
 /**
