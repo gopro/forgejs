@@ -238,6 +238,23 @@ FORGE.HotspotManager.prototype.clear = function()
 };
 
 /**
+ * Dump the array of hotspot configurations.
+ * @method FORGE.HotspotManager#dump
+ * @return {Array<HotspotConfig>} Return an array of hotspot configurations of the current scene.
+ */
+FORGE.HotspotManager.prototype.dump = function()
+{
+    var dump = [];
+
+    for(var i = 0, ii = this._hotspots.length; i < ii; i++)
+    {
+        dump.push(this._hotspots[i].dump());
+    }
+
+    return dump;
+};
+
+/**
  * Destroy sequence
  * @method FORGE.HotspotManager#destroy
  */

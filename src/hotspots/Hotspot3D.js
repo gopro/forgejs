@@ -376,6 +376,29 @@ FORGE.Hotspot3D.prototype.update = function()
 };
 
 /**
+ * Dump the hotspot actual configuration
+ * @method FORGE.Hotspot3D#dump
+ * @return {HotspotConfig} Return the hotspot actual configuration object
+ */
+FORGE.Hotspot3D.prototype.dump = function()
+{
+    var dump =
+    {
+        uid: this._uid,
+        tags: this._tags,
+        visible: this._visible,
+        interactive: this._interactive,
+        cursor: this._cursor,
+        fx: this._fx,
+        facingCenter: this._facingCenter,
+        geometry: this._geometry.dump(),
+        transform: this._transform.dump(),
+    };
+
+    return dump;
+};
+
+/**
  * Destroy routine
  * @method FORGE.Hotspot3D#destroy
  */

@@ -175,6 +175,23 @@ FORGE.HotspotTransform.prototype.load = function(config, notify)
 };
 
 /**
+ * Dump the transform actual configuration
+ * @method FORGE.HotspotTransform#dump
+ * @return {HotspotTransformConfig} Return the hotspot transform configuration
+ */
+FORGE.HotspotTransform.prototype.dump = function()
+{
+    var dump =
+    {
+        position: this._position.dump(),
+        rotation: this._rotation.dump(),
+        scale: this._scale.dump()
+    };
+
+    return dump;
+};
+
+/**
  * Destroy sequence.
  * @method FORGE.HotspotTransform#destroy
  */
