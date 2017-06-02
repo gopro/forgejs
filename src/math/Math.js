@@ -259,9 +259,10 @@ FORGE.Math.sphericalToCartesian = function(radius, theta, phi)
  * @param {number} x - x
  * @param {number} y - y
  * @param {number} z - z
+ * @param {string} [unit=radian] - The unit used to return spherical
  * @return {SphericalCoordinates}
  */
-FORGE.Math.cartesianToSpherical = function(x, y, z)
+FORGE.Math.cartesianToSpherical = function(x, y, z, unit)
 {
     var res = {};
 
@@ -274,6 +275,12 @@ FORGE.Math.cartesianToSpherical = function(x, y, z)
 
     res.phi = Math.asin(y / res.radius);
     res.theta = Math.atan2(x, -z || 0); // we want to avoid -z = -0
+
+    if(typeof unit === "string" && unit.toLowerCase().substring(0,3) === "deg")
+    {
+        res.phi = FORGE.Math.radToDeg(res.phi);
+        res.theta = FORGE.Math.radToDeg(res.theta);
+    }
 
     return res;
 };
