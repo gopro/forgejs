@@ -1,16 +1,188 @@
 /**
- * Namespace to store all geometry methods.
- * @name FORGE.HotspotGeometry
- * @type {Object}
+ * @constructor FORGE.HotspotGeometry
+ * @type {FORGE.HotspotGeometry}
  */
-FORGE.HotspotGeometry = {};
+FORGE.HotspotGeometry = function()
+{
+    /**
+     * Geometry configuration
+     * @name FORGE.HotspotGeometry#_config
+     * @type {HotspotGeometryConfig}
+     * @private
+     */
+    this._config = null;
+
+    /**
+     * The geometry type
+     * @name FORGE.HotspotGeometry#_type
+     * @type {string}
+     * @private
+     */
+    this._type = "";
+
+    /**
+     * The THREE geometry object
+     * @name FORGE.HotspotGeometry#_geometry
+     * @type {THREE.Geometry}
+     * @private
+     */
+    this._geometry = null;
+
+    /**
+     * Event dispatcher for the onLoadComplete
+     * @name FORGE.HotspotGeometry#_onLoadComplete
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onLoadComplete = null;
+};
 
 /**
- * @method FORGE.HotspotGeometry.SHAPE
+ * @name FORGE.HotspotGeometry.DEFAULT_CONFIG
+ * @type {HotspotGeometryConfig}
+ * @const
+ */
+FORGE.HotspotGeometry.DEFAULT_CONFIG =
+{
+    type: "plane",
+
+    options:
+    {
+        width: 20,
+        height: 20,
+        widthSegments: 8,
+        heightSegments: 8
+    }
+};
+
+/**
+ * Parse the hotspot geometry config
+ * @method FORGE.HotspotGeometry#_parseConfig
+ * @param {HotspotGeometryConfig} config
+ * @return {THREE.Geometry}
+ */
+FORGE.HotspotGeometry.prototype._parseConfig = function(config)
+{
+    this._type = config.type;
+
+    var options = config.options;
+
+    switch (this._type)
+    {
+        case FORGE.HotspotGeometryType.PLANE:
+            this._geometry = this._createPlane(options);
+            break;
+
+        case FORGE.HotspotGeometryType.BOX:
+            this._geometry = this._createBox(options);
+            break;
+
+        case FORGE.HotspotGeometryType.SPHERE:
+            this._geometry = this._createSphere(options);
+            break;
+
+        case FORGE.HotspotGeometryType.CYLINDER:
+            this._geometry = this._createCylinder(options);
+            break;
+
+        case FORGE.HotspotGeometryType.SHAPE:
+            this._geometry = this._createShape(options);
+            break;
+
+        default:
+            this._geometry = this._createPlane(options);
+            break;
+    }
+};
+
+/**
+ * @method FORGE.HotspotGeometry#_createPlane
+ * @param {HotspotGeometryPlane=} options
+ * @return {THREE.PlaneBufferGeometry}
+ * @private
+ */
+FORGE.HotspotGeometry.prototype._createPlane = function(options)
+{
+    options = options || {};
+
+    var width = options.width || 20;
+    var height = options.height || 20;
+    var widthSegments = options.widthSegments || 8;
+    var heightSegments = options.heightSegments || 8;
+
+    return new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+};
+
+/**
+ * @method FORGE.HotspotGeometry#_createBox
+ * @param {HotspotGeometryBox=} options
+ * @return {THREE.BoxBufferGeometry}
+ * @private
+ */
+FORGE.HotspotGeometry.prototype._createBox = function(options)
+{
+    options = options || {};
+
+    var width = options.width || 20;
+    var height = options.height || 20;
+    var depth = options.depth || 20;
+    var widthSegments = options.widthSegments || 8;
+    var heightSegments = options.heightSegments || 8;
+    var depthSegments = options.depthSegments || 8;
+
+    return new THREE.BoxBufferGeometry(width, height, depth, widthSegments, heightSegments, depthSegments);
+};
+
+/**
+ * @method FORGE.HotspotGeometry#_createSphere
+ * @param {HotspotGeometrySphere=} options
+ * @return {THREE.SphereBufferGeometry}
+ * @private
+ */
+FORGE.HotspotGeometry.prototype._createSphere = function(options)
+{
+    options = options || {};
+
+    var radius = options.radius || 10;
+    var widthSegments = options.widthSegments || 64;
+    var heightSegments = options.heightSegments || 64;
+    var phiStart = options.phiStart || 0;
+    var phiLength = options.phiLength || 2 * Math.PI;
+    var thetaStart = options.thetaStart || 0;
+    var thetaLength = options.thetaLength || 2 * Math.PI;
+
+    return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength);
+};
+
+/**
+ * @method FORGE.HotspotGeometry#_createCylinder
+ * @param {HotspotGeometryCylinder=} options
+ * @return {THREE.CylinderBufferGeometry}
+ * @private
+ */
+FORGE.HotspotGeometry.prototype._createCylinder = function(options)
+{
+    options = options || {};
+
+    var radiusTop = options.radiusTop || 10;
+    var radiusBottom = options.radiusBottom || 10;
+    var height = options.height || 20;
+    var radiusSegments = options.radiusSegments || 32;
+    var heightSegments = options.heightSegments || 1;
+    var openEnded = options.openEnded || false;
+    var thetaStart = options.thetaStart || 0;
+    var thetaLength = options.thetaLength || 2 * Math.PI;
+
+    return new THREE.CylinderBufferGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength);
+};
+
+/**
+ * @method FORGE.HotspotGeometry#_createShape
  * @param {HotspotGeometryShape=} options
  * @return {THREE.ShapeBufferGeometry}
+ * @private
  */
-FORGE.HotspotGeometry.SHAPE = function(options)
+FORGE.HotspotGeometry.prototype._createShape = function(options)
 {
     options = options || {};
 
@@ -70,78 +242,128 @@ FORGE.HotspotGeometry.SHAPE = function(options)
 };
 
 /**
- * @method FORGE.HotspotGeometry.PLANE
- * @param {HotspotGeometryPlane=} options
- * @return {THREE.PlaneBufferGeometry}
+ * Load a hotspot geometry config
+ * @method FORGE.HotspotGeometry#load
+ * @param {HotspotGeometryConfig} config
+ * @return {THREE.Geometry}
  */
-FORGE.HotspotGeometry.PLANE = function(options)
+FORGE.HotspotGeometry.prototype.load = function(config)
 {
-    options = options || {};
+    if (typeof config !== "undefined" && typeof config.type === "string")
+    {
+        this._config = config;
+    }
+    else
+    {
+        this._config = FORGE.Utils.extendSimpleObject({}, FORGE.HotspotGeometry.DEFAULT_CONFIG);
+    }
 
-    var width = options.width || 20;
-    var height = options.height || 20;
-    var widthSegments = options.widthSegments || 8;
-    var heightSegments = options.heightSegments || 8;
+    this._parseConfig(this._config);
 
-    return new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+    if(this._onLoadComplete !== null)
+    {
+        this._onLoadComplete.dispatch();
+    }
 };
 
 /**
- * @method FORGE.HotspotGeometry.BOX
- * @param {HotspotGeometryBox=} options
- * @return {THREE.BoxBufferGeometry}
+ * Dump the geometry configuration
+ * @method FORGE.HotspotGeometry#dump
+ * @return {HotspotGeometryConfig} Return the actual hotspot geometry config
  */
-FORGE.HotspotGeometry.BOX = function(options)
+FORGE.HotspotGeometry.prototype.dump = function()
 {
-    options = options || {};
+    var dump =
+    {
+        type: this._type
+    };
 
-    var width = options.width || 20;
-    var height = options.height || 20;
-    var depth = options.depth || 20;
-    var widthSegments = options.widthSegments || 8;
-    var heightSegments = options.heightSegments || 8;
-    var depthSegments = options.depthSegments || 8;
+    var options = {};
 
-    return new THREE.BoxBufferGeometry(width, height, depth, widthSegments, heightSegments, depthSegments);
+    switch(this._type)
+    {
+        case FORGE.HotspotGeometryType.PLANE:
+        case FORGE.HotspotGeometryType.BOX:
+        case FORGE.HotspotGeometryType.SPHERE:
+        case FORGE.HotspotGeometryType.CYLINDER:
+            options = this._geometry.parameters;
+            break;
+
+        case FORGE.HotspotGeometryType.SHAPE:
+
+            var points = [];
+            if(Array.isArray(this._geometry.parameters.shapes.curves) === true)
+            {
+                var c = this._geometry.parameters.shapes.curves;
+
+                for(var i = 0, ii = c.length; i < ii; i++)
+                {
+                    points.push(c[i].v1);
+                }
+
+                points.push(points[0]);
+            }
+            else
+            {
+                points = this._config.options.points;
+            }
+
+            options = { points: points };
+
+            break;
+    }
+
+    dump.options = options;
+
+    return dump;
 };
 
 /**
- * @method FORGE.HotspotGeometry.SPHERE
- * @param {HotspotGeometrySphere=} options
- * @return {THREE.SphereBufferGeometry}
+ * Geometry type accessor
+ * @name FORGE.HotspotGeometry#type
+ * @readonly
+ * @type {string}
  */
-FORGE.HotspotGeometry.SPHERE = function(options)
+Object.defineProperty(FORGE.HotspotGeometry.prototype, "type",
 {
-    options = options || {};
-
-    var radius = options.radius || 10;
-    var widthSegments = options.widthSegments || 64;
-    var heightSegments = options.heightSegments || 64;
-    var phiStart = options.phiStart || 0;
-    var phiLength = options.phiLength || 2 * Math.PI;
-    var thetaStart = options.thetaStart || 0;
-    var thetaLength = options.thetaLength || 2 * Math.PI;
-
-    return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength);
-};
+    /** @this {FORGE.HotspotGeometry} */
+    get: function()
+    {
+        return this._type;
+    }
+});
 
 /**
- * @method FORGE.HotspotGeometry.CYLINDER
- * @param {HotspotGeometryCylinder=} options
- * @return {THREE.CylinderBufferGeometry}
+ * Geometry accessor
+ * @name FORGE.HotspotGeometry#geometry
+ * @readonly
+ * @type {THREE.Geometry}
  */
-FORGE.HotspotGeometry.CYLINDER = function(options)
+Object.defineProperty(FORGE.HotspotGeometry.prototype, "geometry",
 {
-    options = options || {};
+    /** @this {FORGE.HotspotGeometry} */
+    get: function()
+    {
+        return this._geometry;
+    }
+});
 
-    var radiusTop = options.radiusTop || 10;
-    var radiusBottom = options.radiusBottom || 10;
-    var height = options.height || 20;
-    var radiusSegments = options.radiusSegments || 32;
-    var heightSegments = options.heightSegments || 1;
-    var openEnded = options.openEnded || false;
-    var thetaStart = options.thetaStart || 0;
-    var thetaLength = options.thetaLength || 2 * Math.PI;
+/**
+ * Get the onLoadComplete {@link FORGE.EventDispatcher}.
+ * @name  FORGE.HotspotGeometry#onLoadComplete
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.HotspotGeometry.prototype, "onLoadComplete",
+{
+    /** @this {FORGE.HotspotGeometry} */
+    get: function()
+    {
+        if (this._onLoadComplete === null)
+        {
+            this._onLoadComplete = new FORGE.EventDispatcher(this);
+        }
 
-    return new THREE.CylinderBufferGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength);
-};
+        return this._onLoadComplete;
+    }
+});
