@@ -72,6 +72,7 @@ FORGE.HotspotStates = function(viewer, hotspotUid)
      */
     this._loading =
     {
+        geometry: false,
         transform: false,
         material: false,
         sound: false,
@@ -180,6 +181,32 @@ FORGE.HotspotStates.prototype._getStatesNames = function()
     }
 
     return keys;
+};
+
+/**
+ * Update the geometry for the current state
+ * @method FORGE.HotspotStates#_updateGeometry
+ * @param  {HotspotGeometryConfig} config - The hotspot geometry configuration object.
+ * @private
+ */
+FORGE.HotspotStates.prototype._updateGeometry = function(config)
+{
+    this.log("update geometry");
+
+    var hotspot = FORGE.UID.get(this._hotspotUid);
+    hotspot.geometry.onLoadComplete.addOnce(this._geometryLoadCompleteHandler, this);
+    hotspot.geometry.load(config);
+};
+
+/**
+ * Geometry load complete event handler
+ * @method FORGE.HotspotStates#_geometryLoadCompleteHandler
+ * @private
+ */
+FORGE.HotspotStates.prototype._geometryLoadCompleteHandler = function()
+{
+    this._loading.geometry = false;
+    this._checkLoading();
 };
 
 /**
@@ -344,6 +371,9 @@ FORGE.HotspotStates.prototype.load = function(name)
         this._loading.animation = true;
     }
 
+    //There is always a geometry
+    this._loading.geometry = true;
+
     // There is always a transform
     this._loading.transform = true;
 
@@ -365,12 +395,17 @@ FORGE.HotspotStates.prototype.load = function(name)
         this._updateAnimation(animationConfig);
     }
 
+    if(this._loading.geometry === true)
+    {
+        var geometryConfig = /** @type {HotspotGeometryConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.geometry, this._config[name].geometry));
+        this._updateGeometry(geometryConfig);
+    }
+
     if(this._loading.transform === true)
     {
         var transformConfig = /** @type {HotspotTransformConfig} */ (FORGE.Utils.extendSimpleObject(hotspot.config.transform, this._config[name].transform));
         this._updateTransform(transformConfig);
     }
-
 };
 
 /**

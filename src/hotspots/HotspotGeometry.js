@@ -319,6 +319,25 @@ FORGE.HotspotGeometry.prototype.dump = function()
 };
 
 /**
+ * Destroy sequence
+ * @method FORGE.HotspotGeometry#destroy
+ */
+FORGE.HotspotGeometry.prototype.destroy = function()
+{
+    if(this._geometry !== null)
+    {
+        this._geometry.dispose();
+        this._geometry = null;
+    }
+
+    if(this._onLoadComplete !== null)
+    {
+        this._onLoadComplete.destroy();
+        this._onLoadComplete = null;
+    }
+};
+
+/**
  * Geometry type accessor
  * @name FORGE.HotspotGeometry#type
  * @readonly
