@@ -80,6 +80,26 @@ FORGE.HotspotManager.prototype.create = function(config)
 };
 
 /**
+ * Remove a hotspot from the manager
+ * @method FORGE.HotspotManager#remove
+ * @param  {(string|FORGE.Hotspot3D} hotspot - the hotspot or its uid to remove
+ */
+FORGE.HotspotManager.prototype.remove = function(hotspot)
+{
+    if(FORGE.Utils.isTypeOf(hotspot, "string") === true)
+    {
+        hotspot = FORGE.UID.get(hotspot);
+    }
+
+    if(FORGE.Utils.isTypeOf(hotspot, "Hotspot3D") === true)
+    {
+        var index = this._hotspots.indexOf(hotspot);
+        this._hotspots.splice(index, 1);
+        hotspot.destroy();
+    }
+}
+
+/**
  * Parse a list of tracks for hotspots movement.
  * @method FORGE.HotspotManager#_parseTracks
  * @param {Array<HotspotTrackConfig>} tracks - The array of tracks to add.
