@@ -703,7 +703,7 @@ FORGE.RenderPipeline.prototype.render = function(camera)
             // Addition pass will blend readbuffer content unless last pass needs swap (ShaderPass for example)
             var texture = composer.readBuffer.texture;
 
-            if (lastPass.needsSwap === true)
+            if (typeof lastPass !== "undefined" && lastPass.needsSwap === true)
             {
                 texture = composer.writeBuffer.texture;
             }
