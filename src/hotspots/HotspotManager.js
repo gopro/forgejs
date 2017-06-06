@@ -284,6 +284,28 @@ Object.defineProperty(FORGE.HotspotManager.prototype, "all",
 });
 
 /**
+ * Get all the hotspots uids.
+ * @name FORGE.HotspotManager#uids
+ * @readonly
+ * @type {Array<string>}
+ */
+Object.defineProperty(FORGE.HotspotManager.prototype, "uids",
+{
+    /** @this {FORGE.HotspotManager} */
+    get: function()
+    {
+        var uids = [];
+
+        for(var i = 0, ii = this._hotspots.length; i < ii; i++)
+        {
+            uids.push(this._hotspots[i].uid);
+        }
+
+        return uids;
+    }
+});
+
+/**
  * Get the hotspots count.
  * @name FORGE.HotspotManager#count
  * @readonly
