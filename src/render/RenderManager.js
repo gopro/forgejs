@@ -131,16 +131,28 @@ FORGE.RenderManager = function(viewer)
     this._renderPipelineReady = false;
 
     /**
-     * @private
-     */
-
-    /**
      * Event dispatcher for background renderer ready.
      * @name FORGE.RenderManager#_onBackgroundReady
      * @type {FORGE.EventDispatcher}
      * @private
      */
     this._onBackgroundReady = null;
+
+    /**
+     * Event dispatcher for on before render.
+     * @name FORGE.RenderManager#_onBeforeRender
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onBeforeRender = null;
+
+    /**
+     * Event dispatcher for on after render.
+     * @name FORGE.RenderManager#_onAfterRender
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onAfterRender = null;
 
     FORGE.BaseObject.call(this, "RenderManager");
 
@@ -796,6 +808,11 @@ FORGE.RenderManager.prototype.render = function()
         return;
     }
 
+    if(this._onBeforeRender !== null)
+    {
+        this._onBeforeRender.dispatch();
+    }
+
     if (this._backgroundRenderer !== null)
     {
         this._backgroundRenderer.update();
@@ -832,6 +849,11 @@ FORGE.RenderManager.prototype.render = function()
     if (this._renderDisplay.presentingVR === true)
     {
         this._renderDisplay.submitFrame();
+    }
+
+    if(this._onAfterRender !== null)
+    {
+        this._onAfterRender.dispatch();
     }
 
     // @todo implement event for render stats (fps, objects count...)
@@ -967,6 +989,18 @@ FORGE.RenderManager.prototype.destroy = function()
     {
         this._renderPipeline.destroy();
         this._renderPipeline = null;
+    }
+
+    if(this._onBeforeRender !== null)
+    {
+        this._onBeforeRender.destroy();
+        this._onBeforeRender = null;
+    }
+
+    if(this._onAfterRender !== null)
+    {
+        this._onAfterRender.destroy();
+        this._onAfterRender = null;
     }
 
     this._clock = null;
@@ -1204,21 +1238,41 @@ Object.defineProperty(FORGE.RenderManager.prototype, "onBackgroundReady",
 });
 
 /**
+ * Get the onBeforeRender {@link FORGE.EventDispatcher}.
+ * @name FORGE.RenderManager#onBeforeRender
+ * @type {FORGE.EventDispatcher}
  * @readonly
  */
+Object.defineProperty(FORGE.RenderManager.prototype, "onBeforeRender",
 {
     /** @this {FORGE.RenderManager} */
     get: function()
     {
+        if (this._onBeforeRender === null)
+        {
+            this._onBeforeRender = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onBeforeRender;
     }
 });
 
 /**
+ * Get the onAfterRender {@link FORGE.EventDispatcher}.
+ * @name FORGE.RenderManager#onAfterRender
+ * @type {FORGE.EventDispatcher}
  * @readonly
  */
+Object.defineProperty(FORGE.RenderManager.prototype, "onAfterRender",
 {
     /** @this {FORGE.RenderManager} */
     get: function()
     {
+        if (this._onAfterRender === null)
+        {
+            this._onAfterRender = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onAfterRender;
     }
 });
