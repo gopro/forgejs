@@ -1174,6 +1174,21 @@ Object.defineProperty(FORGE.RenderManager.prototype, "backgroundReady",
 });
 
 /**
+ * Get the objects
+ * @name FORGE.RenderManager#objects
+ * @type {FORGE.ObjectRenderer}
+ * @readonly
+ */
+Object.defineProperty(FORGE.RenderManager.prototype, "objects",
+{
+    /** @this {FORGE.RenderManager} */
+    get: function()
+    {
+        return this._objectRenderer;
+    }
+});
+
+/**
  * Get the onBackgroundReady {@link FORGE.EventDispatcher}.
  * @name FORGE.RenderManager#onBackgroundReady
  * @type {FORGE.EventDispatcher}
@@ -1194,17 +1209,12 @@ Object.defineProperty(FORGE.RenderManager.prototype, "onBackgroundReady",
 });
 
 /**
- * Get the objects
- * @name FORGE.RenderManager#objects
- * @type {FORGE.ObjectRenderer}
  * @readonly
  */
-Object.defineProperty(FORGE.RenderManager.prototype, "objects",
 {
     /** @this {FORGE.RenderManager} */
     get: function()
     {
-        return this._objectRenderer;
     }
 });
 
