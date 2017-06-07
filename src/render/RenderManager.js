@@ -131,12 +131,8 @@ FORGE.RenderManager = function(viewer)
     this._renderPipelineReady = false;
 
     /**
-     * Hotspot renderer ready flag
-     * @name FORGE.RenderManager#_hotspotsReady
-     * @type boolean
      * @private
      */
-    this._hotspotsReady = false;
 
     /**
      * Event dispatcher for background renderer ready.
@@ -287,7 +283,6 @@ FORGE.RenderManager.prototype._setupMedia = function()
  */
 FORGE.RenderManager.prototype._onSceneUnloadStartHandler = function()
 {
-    this._hotspotsReady = false;
     this._renderPipelineReady = false;
 
     this._clearBackgroundRenderer();
@@ -1219,16 +1214,11 @@ Object.defineProperty(FORGE.RenderManager.prototype, "onBackgroundReady",
 });
 
 /**
- * Get the hotspotsReady flag
- * @name FORGE.RenderManager#hotspotsReady
- * @type {boolean}
  * @readonly
  */
-Object.defineProperty(FORGE.RenderManager.prototype, "hotspotsReady",
 {
     /** @this {FORGE.RenderManager} */
     get: function()
     {
-        return this._hotspotsReady;
     }
 });
