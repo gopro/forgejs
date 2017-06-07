@@ -641,6 +641,47 @@ FORGE.HotspotMaterial.prototype.setTextureFrame = function(frame)
 };
 
 /**
+ * Dump the material configuration
+ * @method FORGE.HotspotMaterial#dump
+ * @return {HotspotMaterialConfig}
+ */
+FORGE.HotspotMaterial.prototype.dump = function()
+{
+    var dump =
+    {
+        color: this._color,
+        opacity: this._opacity,
+        transparent: this._transparent,
+        update: this._update
+    };
+
+    switch(this._type)
+    {
+        case FORGE.HotspotMaterial.types.IMAGE:
+            dump.image = this._config.image;
+            break;
+
+        case FORGE.HotspotMaterial.types.SPRITE:
+            dump.sprite = this._config.sprite;
+            break;
+
+        case FORGE.HotspotMaterial.types.VIDEO:
+            dump.video = this._config.video;
+            break;
+
+        case FORGE.HotspotMaterial.types.PLUGIN:
+            dump.plugin = this._config.plugin;
+            break;
+
+        case FORGE.HotspotMaterial.types.GRAPHICS:
+            dump.graphics = this._config.graphics;
+            break;
+    }
+
+    return dump;
+};
+
+/**
  * Destroy sequence.
  * @method FORGE.HotspotMaterial#destroy
  */

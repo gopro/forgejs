@@ -393,6 +393,7 @@ FORGE.Hotspot3D.prototype.dump = function()
         facingCenter: this._facingCenter,
         geometry: this._geometry.dump(),
         transform: this._transform.dump(),
+        material: this._material.dump()
     };
 
     return dump;
