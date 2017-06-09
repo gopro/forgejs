@@ -356,11 +356,6 @@ FORGE.HotspotStates.prototype.load = function(name)
     // Set the state name
     this._state = name;
 
-    if(typeof this._config[name].material === "object")
-    {
-        this._loading.material = true;
-    }
-
     if(typeof this._config[name].sound === "object")
     {
         this._loading.sound = true;
@@ -371,10 +366,8 @@ FORGE.HotspotStates.prototype.load = function(name)
         this._loading.animation = true;
     }
 
-    //There is always a geometry
+    this._loading.material = true;
     this._loading.geometry = true;
-
-    // There is always a transform
     this._loading.transform = true;
 
     if(this._loading.material === true)
