@@ -385,6 +385,7 @@ FORGE.Hotspot3D.prototype.dump = function()
     var dump =
     {
         uid: this._uid,
+        name: this._name,
         tags: this._tags,
         visible: this._visible,
         interactive: this._interactive,
@@ -467,7 +468,6 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "config",
 /**
  * Hotspot name accessor
  * @name FORGE.Hotspot3D#name
- * @readonly
  * @type {string}
  */
 Object.defineProperty(FORGE.Hotspot3D.prototype, "name",
@@ -476,6 +476,15 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "name",
     get: function()
     {
         return this._name;
+    },
+
+    /** @this {FORGE.Hotspot3D} */
+    set: function(value)
+    {
+        if(typeof value === "string")
+        {
+            this._name = value;
+        }
     }
 });
 
