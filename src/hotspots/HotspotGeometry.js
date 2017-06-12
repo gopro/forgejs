@@ -296,12 +296,13 @@ FORGE.HotspotGeometry.prototype.dump = function()
             {
                 var c = this._geometry.parameters.shapes.curves;
 
-                for(var i = 0, ii = c.length; i < ii; i++)
-                {
-                    points.push(c[i].v1);
-                }
+                points.push([c[0].v1.x, c[0].v1.y]);
+                points.push([c[0].v2.x, c[0].v2.y]);
 
-                points.push(points[0]);
+                for(var i = 1, ii = c.length; i < ii; i++)
+                {
+                    points.push([c[i].v2.x, c[i].v2.y]);
+                }
             }
             else
             {
