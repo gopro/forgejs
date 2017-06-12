@@ -1,7 +1,7 @@
 {
     "id": "hotspot-geometry",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "HotspotGeometryConfigurationConfig",
+    "title": "HotspotGeometryConfig",
     "description": "An instance of <a href=\"#hotspot-geometry\">a hotspot geometry configuration</a>.",
     "type": "object",
 

@@ -824,10 +824,6 @@ THREE.Euler.prototype.set = function(arg1, arg2, arg3, arg4) {};
 THREE.Line = function(arg1, arg2) {};
 
 /**
- */
-THREE.Geometry.prototype.dispose = function() {};
-
-/**
  * @constructor
  * @param {number} arg1
  * @param {number} arg2
@@ -1228,6 +1224,10 @@ THREE.Geometry = function() {};
 THREE.Geometry.prototype.vertices;
 
 /**
+ */
+THREE.Geometry.prototype.dispose = function() {};
+
+/**
  * @constructor
  * @return {!THREE.BufferGeometry}
  */
@@ -1253,7 +1253,36 @@ THREE.WireframeGeometry = function(arg1) {};
 
 /**
  * @constructor
+ * @return {THREE.Curve}
+ */
+THREE.Curve = function() {};
+
+/**
+ * @constructor
+ * @return {THREE.LineCurve}
+ * @extends {THREE.Curve}
+ */
+THREE.LineCurve = function() {};
+
+/** @type {THREE.Vector2} */
+THREE.LineCurve.prototype.v1;
+
+/** @type {THREE.Vector2} */
+THREE.LineCurve.prototype.v2;
+
+/**
+ * @constructor
+ * @return {THREE.CurvePath}
+ */
+THREE.CurvePath = function() {};
+
+/** @type {Array<THREE.Curve>} */
+THREE.CurvePath.prototype.curves;
+
+/**
+ * @constructor
  * @param  {Array<THREE.Vector2>} points
+ * @extends {THREE.CurvePath}
  * @return {!THREE.Shape}
  */
 THREE.Path = function(points) {};
@@ -1265,6 +1294,9 @@ THREE.Path = function(points) {};
  * @return {!THREE.Shape}
  */
 THREE.Shape = function(arg1) {};
+
+/** @type {THREE.LineCurve} */
+THREE.Shape.prototype.curves;
 
 /**
  * @constructor
@@ -1307,6 +1339,9 @@ THREE.BufferAttribute.prototype.set = function(arg1) {};
  */
 THREE.ShapeBufferGeometry = function(arg1, arg2) {};
 
+/** @typedef {{shapes: (THREE.Shape|Array<THREE.Shape>)}} */
+THREE.ShapeBufferGeometry.prototype.parameters;
+
 /**
  * @constructor
  * @param {number=} arg1
@@ -1320,6 +1355,9 @@ THREE.ShapeBufferGeometry = function(arg1, arg2) {};
  * @return {!THREE.SphereBufferGeometry}
  */
 THREE.SphereBufferGeometry = function(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {};
+
+/** @typedef {{radius:number, widthSegments:number, heightSegments:number, phiStart:number, phiLength:number, thetaStart:number, thetaLength:number}} */
+THREE.SphereBufferGeometry.prototype.parameters;
 
 /**
  * @constructor
@@ -1336,6 +1374,9 @@ THREE.SphereBufferGeometry = function(arg1, arg2, arg3, arg4, arg5, arg6, arg7) 
  */
 THREE.CylinderBufferGeometry = function(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {};
 
+/** @typedef {{radiusTop:number, radiusBottom:number, height:number, radiusSegments:number, heightSegments:number, openEnded:boolean, thetaStart:number, thetaLength:number}} */
+THREE.CylinderBufferGeometry.prototype.parameters;
+
 /**
  * @constructor
  * @param {number=} arg1
@@ -1346,6 +1387,9 @@ THREE.CylinderBufferGeometry = function(arg1, arg2, arg3, arg4, arg5, arg6, arg7
  * @return {!THREE.PlaneBufferGeometry}
  */
 THREE.PlaneBufferGeometry = function(arg1, arg2, arg3, arg4) {};
+
+/** @typedef {{width: number, height:number, widthSegments:number, heightSegments:number}} */
+THREE.PlaneBufferGeometry.prototype.parameters;
 
 /**
  * @constructor
@@ -1360,8 +1404,11 @@ THREE.PlaneBufferGeometry = function(arg1, arg2, arg3, arg4) {};
  */
 THREE.BoxBufferGeometry = function(arg1, arg2, arg3, arg4, arg5, arg6) {};
 
-/** @type {{position:(THREE.BufferAttribute|undefined), normal:(THREE.BufferAttribute|undefined), color:(THREE.BufferAttribute|undefined), index:(THREE.BufferAttribute|undefined), uv:(THREE.BufferAttribute|undefined)}} */
+/** @typedef {{position:(THREE.BufferAttribute|undefined), normal:(THREE.BufferAttribute|undefined), color:(THREE.BufferAttribute|undefined), index:(THREE.BufferAttribute|undefined), uv:(THREE.BufferAttribute|undefined)}} */
 THREE.BoxBufferGeometry.prototype.attributes;
+
+/** @typedef {{width: number, height:number, depth:number, widthSegments:number, heightSegments:number, depthSegments:number}} */
+THREE.BoxBufferGeometry.prototype.parameters;
 
 /**
  * @param {string} name

@@ -672,10 +672,6 @@ FORGE.HotspotMaterial.prototype.dump = function()
         case FORGE.HotspotMaterial.types.PLUGIN:
             dump.plugin = this._config.plugin;
             break;
-
-        case FORGE.HotspotMaterial.types.GRAPHICS:
-            dump.graphics = this._config.graphics;
-            break;
     }
 
     return dump;

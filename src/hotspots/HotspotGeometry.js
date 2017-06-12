@@ -1,6 +1,6 @@
 /**
+ * Forge Hotspot Geometry
  * @constructor FORGE.HotspotGeometry
- * @type {FORGE.HotspotGeometry}
  */
 FORGE.HotspotGeometry = function()
 {
@@ -10,7 +10,7 @@ FORGE.HotspotGeometry = function()
      * @type {HotspotGeometryConfig}
      * @private
      */
-    this._config = null;
+    this._config = FORGE.HotspotGeometry.DEFAULT_CONFIG;
 
     /**
      * The geometry type
@@ -23,7 +23,7 @@ FORGE.HotspotGeometry = function()
     /**
      * The THREE geometry object
      * @name FORGE.HotspotGeometry#_geometry
-     * @type {THREE.Geometry}
+     * @type {(THREE.Geometry|THREE.PlaneBufferGeometry|THREE.BoxBufferGeometry|THREE.SphereBufferGeometry|THREE.CylinderBufferGeometry|THREE.ShapeBufferGeometry)}
      * @private
      */
     this._geometry = null;
@@ -59,7 +59,6 @@ FORGE.HotspotGeometry.DEFAULT_CONFIG =
  * Parse the hotspot geometry config
  * @method FORGE.HotspotGeometry#_parseConfig
  * @param {HotspotGeometryConfig} config
- * @return {THREE.Geometry}
  */
 FORGE.HotspotGeometry.prototype._parseConfig = function(config)
 {
@@ -245,7 +244,6 @@ FORGE.HotspotGeometry.prototype._createShape = function(options)
  * Load a hotspot geometry config
  * @method FORGE.HotspotGeometry#load
  * @param {HotspotGeometryConfig} config
- * @return {THREE.Geometry}
  */
 FORGE.HotspotGeometry.prototype.load = function(config)
 {
@@ -255,7 +253,7 @@ FORGE.HotspotGeometry.prototype.load = function(config)
     }
     else
     {
-        this._config = FORGE.Utils.extendSimpleObject({}, FORGE.HotspotGeometry.DEFAULT_CONFIG);
+        this._config = /** @type {HotspotGeometryConfig} */ (FORGE.Utils.extendSimpleObject({}, FORGE.HotspotGeometry.DEFAULT_CONFIG));
     }
 
     this._parseConfig(this._config);

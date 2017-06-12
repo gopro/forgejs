@@ -82,7 +82,7 @@ FORGE.HotspotManager.prototype.create = function(config)
 /**
  * Remove a hotspot from the manager
  * @method FORGE.HotspotManager#remove
- * @param  {(string|FORGE.Hotspot3D} hotspot - the hotspot or its uid to remove
+ * @param  {(string|FORGE.Hotspot3D)} hotspot - the hotspot or its uid to remove
  */
 FORGE.HotspotManager.prototype.remove = function(hotspot)
 {

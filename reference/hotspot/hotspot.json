@@ -94,7 +94,5 @@
         "states": {
             "$ref": "hotspot-states"
         }
-    },
-
-    "required": [ "uid", "tags", "type", "visible", "transform" ]
+    }
 }
