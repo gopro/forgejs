@@ -97,7 +97,7 @@ FORGE.HotspotManager.prototype.remove = function(hotspot)
         this._hotspots.splice(index, 1);
         hotspot.destroy();
     }
-}
+};
 
 /**
  * Parse a list of tracks for hotspots movement.
