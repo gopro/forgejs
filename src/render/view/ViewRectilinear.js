@@ -78,6 +78,7 @@ FORGE.ViewRectilinear.prototype.updateUniforms = function(uniforms)
  */
 FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor)
 {
+    worldPt = worldPt || new THREE.Vector3();
     parallaxFactor = parallaxFactor || 0;
 
     // Get point projected on unit sphere and apply camera rotation
@@ -115,6 +116,8 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
  */
 FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
 {
+    screenPt = screenPt || new THREE.Vector2(this._viewer.renderer.displayResolution.width / 2, this._viewer.renderer.displayResolution.height / 2);
+
     var fragment = this._screenToFragment(screenPt);
     fragment.multiplyScalar(this._projectionScale);
 
