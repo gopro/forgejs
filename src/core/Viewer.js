@@ -762,6 +762,12 @@ FORGE.Viewer.prototype.destroy = function()
         this._clock = null;
     }
 
+    if (this._controllers !== null)
+    {
+        this._controllers.destroy();
+        this._controllers = null;
+    }
+
     if(this._keyboard !== null)
     {
         this._keyboard.destroy();
@@ -880,12 +886,6 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._i18n.destroy();
         this._i18n = null;
-    }
-
-    if(this._controllers !== null)
-    {
-        this._controllers.destroy();
-        this._controllers = null;
     }
 
     this._parent = null;

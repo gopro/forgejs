@@ -26,7 +26,7 @@ FORGE.HotspotManager = function(viewer)
     /**
      * Hotspots array
      * @name  FORGE.HotspotManager#_hotspots
-     * @type {Array<FORGE.Hotspot3D>}
+     * @type {Array<(FORGE.Hotspot3D|FORGE.HotspotDOM)>}
      * @private
      */
     this._hotspots = [];
@@ -67,6 +67,10 @@ FORGE.HotspotManager.prototype.create = function(config)
     {
         case FORGE.HotspotType.THREE_DIMENSIONAL:
             hotspot = new FORGE.Hotspot3D(this._viewer, config);
+            break;
+
+        case FORGE.HotspotType.DOM:
+            hotspot = new FORGE.HotspotDOM(this._viewer, config);
             break;
     }
 
@@ -176,7 +180,7 @@ FORGE.HotspotManager.prototype.boot = function()
  * Get hotspots by type
  * @method  FORGE.HotspotManager#getByType
  * @param  {string} type - The type of hotspots you want to get.
- * @return {Array<FORGE.Hotspot3D>}
+ * @return {Array<(FORGE.Hotspot3D|FORGE.HotspotDOM)>}
  */
 FORGE.HotspotManager.prototype.getByType = function(type)
 {
@@ -226,15 +230,21 @@ FORGE.HotspotManager.prototype.update = function()
 /**
  * Clear all hotspots from the manager
  * @method FORGE.HotspotManager#clear
+ * @param {string=} type - the type of hotspots to clear, nothing for all
  */
-FORGE.HotspotManager.prototype.clear = function()
+FORGE.HotspotManager.prototype.clear = function(type)
 {
-    var count = this._hotspots.length;
-    while (count--)
+    this._hotspots = this._hotspots.filter(function(hs)
     {
-        var hs = this._hotspots.pop();
-        hs.destroy();
-    }
+        var keep = (typeof type === "string" && hs.type !== type);
+
+        if (keep === false)
+        {
+            hs.destroy();
+        }
+
+        return keep;
+    });
 };
 
 /**
@@ -272,7 +282,7 @@ FORGE.HotspotManager.prototype.destroy = function()
  * Get all the hotspots.
  * @name FORGE.HotspotManager#all
  * @readonly
- * @type {Array<FORGE.Hotspot3D>}
+ * @type {Array<(FORGE.Hotspot3D|FORGE.HotspotDOM)>}
  */
 Object.defineProperty(FORGE.HotspotManager.prototype, "all",
 {

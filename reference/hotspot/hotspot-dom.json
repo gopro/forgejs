@@ -1,0 +1,52 @@
+{
+    "id": "hotspot-dom",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotDomConfig",
+    "description": "An instance of <a href='#hotspot-dom'>a hotspot dom.</a>",
+    "type": "object",
+
+    "properties": {
+        "id": {
+            "type": "string",
+            "title": "ID",
+            "description": "The HTML ID to append to this DOM hotspot. This ID is different than the UID one",
+            "example": "hotspot-dom-billboard"
+        },
+
+        "width": {
+            "anyOf": [
+                { "type": "number" },
+                { "type": "string" }
+            ],
+            "title": "Width",
+            "description": "The width (in HTML referential) of the hotspot. It is used for placing the hotspot according to its center.",
+            "example": 320
+        },
+
+        "height": {
+            "anyOf": [
+                { "type": "number" },
+                { "type": "string" }
+            ],
+            "title": "Height",
+            "description": "The height (in HTML referential) of the hotspot. It is used for placing the hotspot according to its center.",
+            "example": 240
+        },
+
+        "color": {
+            "type": "string",
+            "title": "Color",
+            "description": "The default background color of the hotspot, in any valide CSS value.",
+            "example": "#ff5e9d"
+        },
+
+        "index": {
+            "type": "number",
+            "title": "Index",
+            "description": "The index of the hotspot, will be used to order hotspots in the z axis.",
+            "example": 20
+        }
+    },
+
+    "required": [ "id" ]
+}

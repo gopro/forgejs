@@ -142,6 +142,7 @@
                 "hotspot-geometry",
                 "hotspot-animation",
                 "hotspot-material",
+                "hotspot-dom",
                 "hotspot-events",
                 "hotspot-anim",
                 "hotspot-track",
@@ -424,6 +425,7 @@
                 "hotspot-geometry",
                 "hotspot-animation",
                 "hotspot-material",
+                "hotspot-dom",
                 "hotspot-events"
             ]
         },

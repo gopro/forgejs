@@ -222,10 +222,15 @@ FORGE.ControllerManager.prototype.getByType = function(type)
 FORGE.ControllerManager.prototype.destroy = function()
 {
     var count = this._controllers.length - 1;
+    var ctrl;
     while(count--)
     {
-        this._controllers[count].destroy();
-        this._controllers[count] = null;
+        ctrl = this._controllers[count];
+        if (ctrl !== null && typeof ctrl !== "undefined")
+        {
+            ctrl.destroy();
+            this._controllers[count] = null;
+        }
     }
     this._controllers = null;
 
