@@ -227,13 +227,20 @@ FORGE.Math.eulerToRotationMatrix = function(yaw, pitch, roll, orderYPR)
  *
  * @method FORGE.Math.sphericalToCartesian
  * @param {number} radius - radius
- * @param {number} theta - theta angle [rad]
- * @param {number} phi - phi angle [rad]
+ * @param {number} theta - theta angle
+ * @param {number} phi - phi angle
+ * @param {string} [unit=radian] - The unit used for theta and phi arguments
  * @return {CartesianCoordinates} the resulting cartesian coordinates
  */
-FORGE.Math.sphericalToCartesian = function(radius, theta, phi)
+FORGE.Math.sphericalToCartesian = function(radius, theta, phi, unit)
 {
     var res = {};
+
+    if (unit === FORGE.Math.DEGREES)
+    {
+        theta = FORGE.Math.degToRad(theta);
+        phi = FORGE.Math.degToRad(phi);
+    }
 
     // wrap phi in [-π/2; π/2]
     phi = FORGE.Math.wrap(phi, -Math.PI / 2, Math.PI / 2);
