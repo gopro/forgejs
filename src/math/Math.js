@@ -276,7 +276,7 @@ FORGE.Math.cartesianToSpherical = function(x, y, z, unit)
     res.phi = Math.asin(y / res.radius);
     res.theta = Math.atan2(x, -z || 0); // we want to avoid -z = -0
 
-    if(typeof unit === "string" && unit.toLowerCase().substring(0, 3) === "deg")
+    if(unit === FORGE.Math.DEGREES)
     {
         res.phi = FORGE.Math.radToDeg(res.phi);
         res.theta = FORGE.Math.radToDeg(res.theta);
