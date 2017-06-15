@@ -227,13 +227,20 @@ FORGE.Math.eulerToRotationMatrix = function(yaw, pitch, roll, orderYPR)
  *
  * @method FORGE.Math.sphericalToCartesian
  * @param {number} radius - radius
- * @param {number} theta - theta angle [rad]
- * @param {number} phi - phi angle [rad]
+ * @param {number} theta - theta angle
+ * @param {number} phi - phi angle
+ * @param {string} [unit=radian] - The unit used for theta and phi arguments
  * @return {CartesianCoordinates} the resulting cartesian coordinates
  */
-FORGE.Math.sphericalToCartesian = function(radius, theta, phi)
+FORGE.Math.sphericalToCartesian = function(radius, theta, phi, unit)
 {
     var res = {};
+
+    if (unit === FORGE.Math.DEGREES)
+    {
+        theta = FORGE.Math.degToRad(theta);
+        phi = FORGE.Math.degToRad(phi);
+    }
 
     // wrap phi in [-π/2; π/2]
     phi = FORGE.Math.wrap(phi, -Math.PI / 2, Math.PI / 2);
@@ -259,9 +266,10 @@ FORGE.Math.sphericalToCartesian = function(radius, theta, phi)
  * @param {number} x - x
  * @param {number} y - y
  * @param {number} z - z
+ * @param {string} [unit=radian] - The unit used to return spherical
  * @return {SphericalCoordinates}
  */
-FORGE.Math.cartesianToSpherical = function(x, y, z)
+FORGE.Math.cartesianToSpherical = function(x, y, z, unit)
 {
     var res = {};
 
@@ -269,11 +277,17 @@ FORGE.Math.cartesianToSpherical = function(x, y, z)
 
     if (res.radius === 0)
     {
-        return { radius: 0, theta: 0, phi: 0 }
+        return { radius: 0, theta: 0, phi: 0 };
     }
 
     res.phi = Math.asin(y / res.radius);
     res.theta = Math.atan2(x, -z || 0); // we want to avoid -z = -0
+
+    if(unit === FORGE.Math.DEGREES)
+    {
+        res.phi = FORGE.Math.radToDeg(res.phi);
+        res.theta = FORGE.Math.radToDeg(res.theta);
+    }
 
     return res;
 };

@@ -48,17 +48,17 @@ FORGE.HotspotManager.prototype._parseConfig = function(config)
 {
     for (var i = 0, ii = config.length; i < ii; i++)
     {
-        this._createHotspot(config[i]);
+        this.create(config[i]);
     }
 };
 
 /**
  * Create a hotspot from a hotpsot config object.
- * @method FORGE.HotspotManager#_createHotspot
- * @private
+ * @method FORGE.HotspotManager#create
  * @param {HotspotConfig} config - The config of the hotspot you want to create.
+ * @return {(FORGE.Hotspot3D|boolean)} Returns the hotspot if the hotspot is created, false if not.
  */
-FORGE.HotspotManager.prototype._createHotspot = function(config)
+FORGE.HotspotManager.prototype.create = function(config)
 {
     var hotspot = null;
     var type = config.type || FORGE.HotspotType.THREE_DIMENSIONAL; //3d is the default type
@@ -73,6 +73,29 @@ FORGE.HotspotManager.prototype._createHotspot = function(config)
     if (hotspot !== null)
     {
         this._hotspots.push(hotspot);
+        return hotspot;
+    }
+
+    return false;
+};
+
+/**
+ * Remove a hotspot from the manager
+ * @method FORGE.HotspotManager#remove
+ * @param  {(string|FORGE.Hotspot3D)} hotspot - the hotspot or its uid to remove
+ */
+FORGE.HotspotManager.prototype.remove = function(hotspot)
+{
+    if(FORGE.Utils.isTypeOf(hotspot, "string") === true)
+    {
+        hotspot = FORGE.UID.get(hotspot);
+    }
+
+    if(FORGE.Utils.isTypeOf(hotspot, "Hotspot3D") === true)
+    {
+        var index = this._hotspots.indexOf(hotspot);
+        this._hotspots.splice(index, 1);
+        hotspot.destroy();
     }
 };
 
@@ -215,6 +238,23 @@ FORGE.HotspotManager.prototype.clear = function()
 };
 
 /**
+ * Dump the array of hotspot configurations.
+ * @method FORGE.HotspotManager#dump
+ * @return {Array<HotspotConfig>} Return an array of hotspot configurations of the current scene.
+ */
+FORGE.HotspotManager.prototype.dump = function()
+{
+    var dump = [];
+
+    for(var i = 0, ii = this._hotspots.length; i < ii; i++)
+    {
+        dump.push(this._hotspots[i].dump());
+    }
+
+    return dump;
+};
+
+/**
  * Destroy sequence
  * @method FORGE.HotspotManager#destroy
  */
@@ -240,6 +280,28 @@ Object.defineProperty(FORGE.HotspotManager.prototype, "all",
     get: function()
     {
         return this._hotspots;
+    }
+});
+
+/**
+ * Get all the hotspots uids.
+ * @name FORGE.HotspotManager#uids
+ * @readonly
+ * @type {Array<string>}
+ */
+Object.defineProperty(FORGE.HotspotManager.prototype, "uids",
+{
+    /** @this {FORGE.HotspotManager} */
+    get: function()
+    {
+        var uids = [];
+
+        for(var i = 0, ii = this._hotspots.length; i < ii; i++)
+        {
+            uids.push(this._hotspots[i].uid);
+        }
+
+        return uids;
     }
 });
 

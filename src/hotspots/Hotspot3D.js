@@ -34,6 +34,14 @@ FORGE.Hotspot3D = function(viewer, config)
     this._transform = null;
 
     /**
+     * HotspotGeometry object.
+     * @name FORGE.Hotspot3D#_geometry
+     * @type {FORGE.HotspotGeometry}
+     * @private
+     */
+    this._geometry = null;
+
+    /**
      * Material object for the 3D object.
      * @name  FORGE.Hotspot3D#_material
      * @type {FORGE.HotspotMaterial}
@@ -155,6 +163,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
     this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
 
+    this._geometry = new FORGE.HotspotGeometry();
     this._material = new FORGE.HotspotMaterial(this._viewer, this._uid);
     this._sound = new FORGE.HotspotSound(this._viewer, this._uid);
     this._states = new FORGE.HotspotStates(this._viewer, this._uid);
@@ -163,8 +172,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     {
         this._states.addConfig(config.states);
     }
-
-    this._createGeometry(config.geometry);
 
     if (typeof config.fx === "string" && config.fx !== "")
     {
@@ -178,47 +185,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
 
     this._states.onLoadComplete.add(this._stateLoadCompleteHandler, this);
     this._states.load();
-};
-
-FORGE.Hotspot3D.prototype._createGeometry = function(config)
-{
-    this.log("create geometry");
-
-    if (typeof config !== "undefined" && typeof config.type === "string")
-    {
-        var options = config.options;
-
-        switch (config.type)
-        {
-            case FORGE.HotspotGeometryType.BOX:
-                this._mesh.geometry = FORGE.HotspotGeometry.BOX(options);
-                break;
-
-            case FORGE.HotspotGeometryType.SPHERE:
-                this._mesh.geometry = FORGE.HotspotGeometry.SPHERE(options);
-                break;
-
-            case FORGE.HotspotGeometryType.CYLINDER:
-                this._mesh.geometry = FORGE.HotspotGeometry.CYLINDER(options);
-                break;
-
-            case FORGE.HotspotGeometryType.PLANE:
-                this._mesh.geometry = FORGE.HotspotGeometry.PLANE(options);
-                break;
-
-            case FORGE.HotspotGeometryType.SHAPE:
-                this._mesh.geometry = FORGE.HotspotGeometry.SHAPE(options);
-                break;
-
-            default:
-                this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
-                break;
-        }
-    }
-    else
-    {
-        this._mesh.geometry = FORGE.HotspotGeometry.PLANE();
-    }
 };
 
 /**
@@ -272,6 +238,7 @@ FORGE.Hotspot3D.prototype._stateLoadCompleteHandler = function()
 {
     this.log("state load complete handler");
 
+    this._mesh.geometry = this._geometry.geometry;
     this._mesh.material = this._material.material;
     this._mesh.visible = this._visible;
 
@@ -409,6 +376,31 @@ FORGE.Hotspot3D.prototype.update = function()
 };
 
 /**
+ * Dump the hotspot actual configuration
+ * @method FORGE.Hotspot3D#dump
+ * @return {HotspotConfig} Return the hotspot actual configuration object
+ */
+FORGE.Hotspot3D.prototype.dump = function()
+{
+    var dump =
+    {
+        uid: this._uid,
+        name: this._name,
+        tags: this._tags,
+        visible: this._visible,
+        interactive: this._interactive,
+        cursor: this._cursor,
+        fx: this._fx,
+        facingCenter: this._facingCenter,
+        geometry: this._geometry.dump(),
+        transform: this._transform.dump(),
+        material: this._material.dump()
+    };
+
+    return dump;
+};
+
+/**
  * Destroy routine
  * @method FORGE.Hotspot3D#destroy
  */
@@ -429,6 +421,12 @@ FORGE.Hotspot3D.prototype.destroy = function()
     {
         this._transform.destroy();
         this._transform = null;
+    }
+
+    if(this._geometry !== null)
+    {
+        this._geometry.destroy();
+        this._geometry = null;
     }
 
     if (this._animation !== null)
@@ -470,7 +468,6 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "config",
 /**
  * Hotspot name accessor
  * @name FORGE.Hotspot3D#name
- * @readonly
  * @type {string}
  */
 Object.defineProperty(FORGE.Hotspot3D.prototype, "name",
@@ -479,6 +476,15 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "name",
     get: function()
     {
         return this._name;
+    },
+
+    /** @this {FORGE.Hotspot3D} */
+    set: function(value)
+    {
+        if(typeof value === "string")
+        {
+            this._name = value;
+        }
     }
 });
 
@@ -539,6 +545,21 @@ Object.defineProperty(FORGE.Hotspot3D.prototype, "transform",
     get: function()
     {
         return this._transform;
+    }
+});
+
+/**
+ * Hotspot geometry accessor
+ * @name FORGE.Hotspot3D#geometry
+ * @readonly
+ * @type {FORGE.HotspotGeometry}
+ */
+Object.defineProperty(FORGE.Hotspot3D.prototype, "geometry",
+{
+    /** @this {FORGE.Hotspot3D} */
+    get: function()
+    {
+        return this._geometry;
     }
 });
 
