@@ -563,21 +563,21 @@ FORGE.HotspotMaterial.prototype._createShaderMaterial = function()
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
 
+    // side is FrontSide, except if the geometry is a PLANE
+    var type = FORGE.UID.get(this._hotspotUid).geometry.type;
+    var side = (type === FORGE.HotspotGeometryType.PLANE) ? THREE.DoubleSide : THREE.FrontSide;
+
     this._material = new THREE.RawShaderMaterial(
     {
         fragmentShader: fragmentShader,
         vertexShader: vertexShader,
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
-        side: THREE.DoubleSide,
+        side: side,
         name: "HotspotMaterial"
     });
 
-    if (this._texture !== null)
-    {
-        //Apply transparent parameter only if we have a texture.
-        this._material.transparent = this._transparent;
-        this._material.needsUpdate = true;
-    }
+    this._material.transparent = this._transparent;
+    this._material.needsUpdate = true;
 };
 
 FORGE.HotspotMaterial.prototype.updateShader = function()
