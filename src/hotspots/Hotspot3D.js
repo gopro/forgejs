@@ -35,7 +35,7 @@ FORGE.Hotspot3D = function(viewer, config)
 
     /**
      * HotspotGeometry object.
-     * @name FORGE.Hotspot3D._geometry
+     * @name FORGE.Hotspot3D#_geometry
      * @type {FORGE.HotspotGeometry}
      * @private
      */

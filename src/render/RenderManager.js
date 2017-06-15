@@ -1203,7 +1203,7 @@ Object.defineProperty(FORGE.RenderManager.prototype, "backgroundReady",
 });
 
 /**
- * Get the objects
+ * Get the FORGE.ObjectRenderer instance
  * @name FORGE.RenderManager#objects
  * @type {FORGE.ObjectRenderer}
  * @readonly
