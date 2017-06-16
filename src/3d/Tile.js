@@ -5,43 +5,149 @@
  * @param {FORGE.BackgroundPyramidRenderer} renderer - renderer reference
  * @extends {THREE.Mesh}
  */
-FORGE.Tile = function(parent, renderer, x, y, level, face)
+FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
 {
+    /**
+     * Reference on parent tile
+     * @name FORGE.Tile#_parent
+     * @type {FORGE.Tile}
+     * @private
+     */
     this._parent = parent;
 
+    /**
+     * String describing what created the tile
+     * @type {FORGE.Tile}
+     */
+    this._creator = creator;
+
+    /**
+     * Reference on background renderer
+     * @name FORGE.Tile#_renderer
+     * @type {FORGE.BackgroundPyramidRenderer}
+     * @private
+     */
     this._renderer = renderer;
 
-    this._position = null;
-
+    /**
+     * X axis value on face coordinate system
+     * @name FORGE.Tile#_x
+     * @type {number}
+     * @private
+     */
     this._x = x;
 
+    /**
+     * Y axis value on face coordinate system
+     * @name FORGE.Tile#_y
+     * @type {number}
+     * @private
+     */
     this._y = y;
 
+    /**
+     * Resolution level
+     * @name FORGE.Tile#_level
+     * @type {number}
+     * @private
+     */
     this._level = level;
 
+    /**
+     * Cube face
+     * @name FORGE.Tile#_face
+     * @type {string}
+     * @private
+     */
     this._face = typeof face === "number" ? FORGE.Tile.FACES[face] : face.toLowerCase();
 
-    this._rotation = null;
-
+    /**
+     * Creation timestamp
+     * @name FORGE.Tile#_createTS
+     * @type {Date}
+     * @private
+     */
     this._createTS = null;
-    
+
+    /**
+     * Last display timestamp
+     * @name FORGE.Tile#_displayTS
+     * @type {Date}
+     * @private
+     */
     this._displayTS = null;
 
-    this._quadTreeID = "";
-
+    /**
+     * Reference on north west tile
+     * @name FORGE.Tile#_northWest
+     * @type {FORGE.Tile}
+     * @private
+     */
     this._northWest = null;
 
+    /**
+     * Reference on north east tile
+     * @name FORGE.Tile#_northEast
+     * @type {FORGE.Tile}
+     * @private
+     */
     this._northEast = null;   
 
+    /**
+     * Reference on south east tile
+     * @name FORGE.Tile#_southEast
+     * @type {FORGE.Tile}
+     * @private
+     */
     this._southEast = null;   
 
+    /**
+     * Reference on south west tile
+     * @name FORGE.Tile#_southWest
+     * @type {FORGE.Tile}
+     * @private
+     */
     this._southWest = null;
 
-    this._debug = false;
+    /**
+     * Flag to know if parent has been checked
+     * @name FORGE.MediaStore#_parentCheckDone
+     * @type {boolean}
+     * @private
+     */
+    this._parentCheckDone = false;
 
-    this._opacity = 0;
+    /**
+     * Flag to know if neighbourhood has been checked
+     * @name FORGE.MediaStore#_neighbourhoodCheckDone
+     * @type {boolean}
+     * @private
+     */
+    this._neighbourhoodCheckDone = false;
 
+    /**
+     * Global opacity value
+     * @name FORGE.Tile#_opacity
+     * @type {number}
+     * @private
+     */
+    this._opacity = 0.001;
+
+    /**
+     * Texture load pending flag
+     * @name FORGE.Tile#_texturePending
+     * @type {boolean}
+     * @private
+     */
     this._texturePending = false;
+
+    /**
+     * Event dispatcher for destroy.
+     * @name FORGE.Tile#_onDestroy
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onDestroy = null;
 
     THREE.Mesh.call(this);
 
@@ -51,7 +157,7 @@ FORGE.Tile = function(parent, renderer, x, y, level, face)
 FORGE.Tile.prototype = Object.create(THREE.Mesh.prototype);
 FORGE.Tile.prototype.constructor = FORGE.Tile;
 
-FORGE.Tile.FACES = ["f", "b", "l", "r", "u", "d"];
+FORGE.Tile.FACES = ["f", "r", "b", "l", "u", "d"];
 
 FORGE.Tile.FACES_COLOR = {
     "f": { "h": 239, "s": 0.47 },
@@ -62,7 +168,11 @@ FORGE.Tile.FACES_COLOR = {
     "d": { "h": 263, "s": 0.56 }
 };
 
+
 FORGE.Tile.OPACITY_INCREMENT = 0.04;
+
+FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS = 200;
+
 
 // Cache geometry for each level to increase performances
 FORGE.Tile.Geometry = null;
@@ -74,7 +184,21 @@ FORGE.Tile.prototype._geometry = function()
         FORGE.Tile.Geometry = new THREE.PlaneBufferGeometry(1,1,1,1);
     }
 
-    return FORGE.Tile.Geometry;    
+    return FORGE.Tile.Geometry;
+};
+
+FORGE.Tile.createName = function(face, level, x, y)
+{
+    face = typeof face === "number" ? FORGE.Tile.FACES[face] : face.toLowerCase();
+    return face.toUpperCase() + "-" + level + "-" + y + "-" + x;
+};
+
+FORGE.Tile.getParentTileCoordinates = function(tile)
+{
+    var px = Math.floor(tile.x / 2),
+        py = Math.floor(tile.y / 2);
+
+    return new THREE.Vector2(px, py);
 };
 
 /**
@@ -84,38 +208,30 @@ FORGE.Tile.prototype._geometry = function()
  */
 FORGE.Tile.prototype._boot = function()
 {
-    this._position = new THREE.Vector3(this._x, this._y, 0);
-
-    if (this._parent !== null)
-    {
-        var quadTreeIndex = (this._x & 1) + 2 * (this._y & 1);
-        this._quadTreeID = this._parent.quadTreeID + quadTreeIndex;        
-    }
-    else
-    {
-        this._quadTreeID = this._face;        
+    // Always ensure a new tile has a parent tile
+    // This will prevent from zomming out into some empty area
+    if (this._level > 0 && this._parent === null) {
+        this._checkParent();
     }
 
-    this.name = this._face + "-" + this._level + "-" + this._position.y + "-" + this._position.x;
+    this.name = FORGE.Tile.createName(this._face, this._level, this._x, this._y);
 
     this.onBeforeRender = this._onBeforeRender.bind(this);
     this.onAfterRender = this._onAfterRender.bind(this);
 
-    this.geometry = this._geometry();
-
-    var rotation = this._getRotation();
-    this.rotation.copy(rotation);
-    this._setPosition(rotation);
+    this._setGeometry();
 
     // Create checkboard colors as default material
     var hs = FORGE.Tile.FACES_COLOR[this._face];
-    var l = (this._position.x & 1) ^ (this._position.y & 1) ? 0.25 : 0.50;
+    var l = (this._x & 1) ^ (this._y & 1) ? 0.25 : 0.50;
     var hsl = new THREE.Color().setHSL(hs.h / 360, hs.s, l);
-    hsl = new THREE.Color(0xffffff);
+    hsl = new THREE.Color(0x000000);
 
     // Level 0 objects are opaque to be rendered first
     var transparent = this._level > 0;
     this._opacity = transparent ? 0.0 : 1.0;
+
+    // this.renderOrder = this._level;
 
     this.material = new THREE.MeshBasicMaterial({
         color:hsl,
@@ -130,13 +246,7 @@ FORGE.Tile.prototype._boot = function()
         this._addDebugLayer();
     }
 
-    // Always ensure a new tile has a parent tile
-    // This will prevent from zomming out into some empty area
-    if (this._level > 0 && this._parent === null) {
-        this._checkParent();
-    }
-
-    this._createTS = new Date();
+    this._createTS = Date.now();
 };
 
 /**
@@ -146,7 +256,7 @@ FORGE.Tile.prototype._boot = function()
  */
 FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometry, material, group)
 {
-    this._setOpacity(this._opacity);
+    // this._setOpacity(this._opacity);
 
     if (this._renderer.level !== this._level)
     {
@@ -155,28 +265,29 @@ FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometr
             this._setOpacity(this._opacity - FORGE.Tile.OPACITY_INCREMENT);
         }
 
-        if (this._renderer.level > this._level)
-        {
-            this._subdivide();
-        }
-
         return;
     }
     else
     {
-        if (this._opacity < 1 && this._texturePending === true)
+        if (this._opacity < 1 && this.material.map !== null)
         {
             this._setOpacity(this._opacity + FORGE.Tile.OPACITY_INCREMENT);
-        }        
+        }
     }
+
+    // Add to renderer render list
+    this._renderer.addToRenderList(this);
 
     // Get neighbour tiles to ensure there is no hole near the frustum
     this._checkNeighbours();
 
+    // Update last display timestamp
+    this._displayTS = Date.now();
+
     // Enable texture mapping
-    if (this._texturePending === false)
+    if (this._texturePending === false &&
+        this._displayTS - this._createTS > FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS)
     {
-        var tpa = this._renderer.nbTilesPerAxis(this._level);
         var texPromise = this._renderer.textureStore.get(this);
 
         if (texPromise !== null)
@@ -184,6 +295,8 @@ FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometr
             texPromise.then(function(texture) {
                 if (texture !== null && texture instanceof THREE.Texture)
                 {
+                    this._texturePending = true;
+
                     texture.generateMipmaps = false;
                     texture.minFilter = THREE.LinearFilter;
                     texture.needsUpdate = true;
@@ -191,19 +304,15 @@ FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometr
                     this.material.color = new THREE.Color(0xffffff);
                     this.material.map = texture;
                     this.material.needsUpdate = true;
-            
-                    this._texturePending = true;
                 }
             }.bind(this),
 
             function(error) {
-                console.log("Tile texture loading error: " + error);
+                //console.log("Tile texture loading error: " + error);
             }.bind(this));
         }
     }
 
-    // Update last display timestamp
-    this._displayTS = new Date();
 };
 
 /**
@@ -213,6 +322,52 @@ FORGE.Tile.prototype._onBeforeRender = function(renderer, scene, camera, geometr
  */
 FORGE.Tile.prototype._onAfterRender = function(renderer, scene, camera, geometry, material, group)
 {
+    if (this._renderer.level > this._level)
+    {
+        this.subdivide();
+    }
+
+    return;
+
+    // // if background renderer is currently displaying lower level (parent)
+    // // check if parent tile is opaque and retire from the scene
+    // if (this._renderer.level < this._level && this._parent.material.opacity === 1)
+    // {
+    //     this._renderer.scene.remove(this);
+    //     //console.log("Purge " + this.name);
+    //     return;
+    // }
+
+    // // if background renderer is currently displaying higher level (subdiv tiles)
+    // // check if all subdiv tils are opaque and retire from the scene
+    // // note: level 0 zero always remains in the scene and does not run through this test
+    // else if (this._renderer.level > this._level && this._level > 0)
+    // {
+    //     // Check if all children are fully visible, hide itself and return
+    //     var subs = new Set([this._northWest, this._northEast, this._southWest, this._southEast]);
+    //     var hide = true;
+    //     var nChildrenTiles = 0;
+
+    //     subs.forEach(function(tile)
+    //     {
+    //         if (tile !== null)
+    //         {
+    //             ++nChildrenTiles;            
+    //             if (tile.material.opacity < 1)
+    //             {
+    //                 hide = false;
+    //             }
+    //         }
+    //     });
+
+    //     // if (nChildrenTiles > 0 && hide === true)
+    //     if (hide === true)
+    //     {
+    //         this._renderer.scene.remove(this);
+    //         //console.log("Purge " + this.name);
+    //         return;
+    //     }
+    // }
 
 };
 
@@ -248,15 +403,6 @@ FORGE.Tile.prototype._addDebugLayer = function()
     var fontSize = 12;
     ctx.font = fontSize + "px Courier";
     var ceiling = canvas.width - 20;
-
-    var quadtTreeText = "Quadtree\n" + this._quadTreeID;
-    while (--fontSize > 0 && ctx.measureText(quadtTreeText).width > ceiling)
-    {
-        ctx.font = fontSize + "px Courier";   
-    }
-
-    ctx.fillText(quadtTreeText, x, y);
-    y += 25;
     
     ctx.textAlign = 'left';
     ctx.font = "10px Courier";
@@ -308,12 +454,12 @@ FORGE.Tile.prototype._setOpacity = function(opacity, storeValue)
 };
 
 /**
- * Set position of the tile
- * @method FORGE.Tile#_setPosition
+ * Set geometry position of the tile in world coordinates
+ * @method FORGE.Tile#_setGeometry
  * @param {THREE.Euler} rotation face rotation
  * @private
- */
-FORGE.Tile.prototype._setPosition = function(rotation)
+world */
+FORGE.Tile.prototype._setGeometry = function(rotation)
 {
     var tx = this._renderer.nbTilesPerAxis(this._level, "x");
     var ty = this._renderer.nbTilesPerAxis(this._level, "y");
@@ -321,25 +467,51 @@ FORGE.Tile.prototype._setPosition = function(rotation)
     var fullTileWidth = this._renderer.cubeSize / tx;
     var fullTileHeight = this._renderer.cubeSize / ty;
 
-    var scaleX = this._position.x < Math.floor(tx) ? 1 : tx - Math.floor(tx);
-    var scaleY = this._position.y < Math.floor(ty) ? 1 : ty - Math.floor(ty);
+    var scaleX = this._x < Math.floor(tx) ? 1 : tx - Math.floor(tx);
+    var scaleY = this._y < Math.floor(ty) ? 1 : ty - Math.floor(ty);
 
-    this.geometry = new THREE.PlaneBufferGeometry(scaleX * fullTileWidth, scaleY * fullTileHeight);
+    var tileSize = new FORGE.Size(scaleX * fullTileWidth, scaleY * fullTileHeight);
 
-    var tileSize = new THREE.Vector3(
-        this._renderer.cubeSize * scaleX / tx,
-        this._renderer.cubeSize * scaleY / ty,
-        1);
+    this.geometry = new THREE.PlaneBufferGeometry(tileSize.width, tileSize.height);
+    this.geometry.computeBoundingBox();
+
+    var baseOffset = -this._renderer.cubeSize * 0.5;
 
     // position = tile offset in XY plane - half cube size + half tile size
     var position = new THREE.Vector3(
-        -this._renderer.cubeSize * 0.5 + fullTileWidth * this._position.x + 0.5 * tileSize.x,
-        -this._renderer.cubeSize * 0.5 + fullTileHeight * (ty - 1 - this._position.y) + 0.5 * tileSize.y,
-        -this._renderer.cubeSize * 0.5);
+        baseOffset + fullTileWidth * this._x + 0.5 * tileSize.width,
+        -(baseOffset + fullTileHeight * this._y + 0.5 * tileSize.height),
+        baseOffset);
 
+    // var position = new THREE.Vector3(0, 0, -0.5 * this._renderer.cubeSize);
+
+    // //console.log("tile height: " + tileSize.height + ", full tile height: " + fullTileHeight);
+    // console.log(this.name + " - position: " + position.x + ", " + position.y);
+
+    var rotation = this._getRotation();
+    this.rotation.copy(rotation);
+    
     position.applyEuler(rotation);
 
     this.position.copy(position);
+};
+
+FORGE.Tile.FACE_PREVIOUS = {
+    "f": "l",
+    "r": "f",
+    "b": "r",
+    "l": "b",
+    "u": "u",
+    "d": "d"
+};
+
+FORGE.Tile.FACE_NEXT = {
+    "f": "r",
+    "r": "b",
+    "b": "l",
+    "l": "f",
+    "u": "u",
+    "d": "d"
 };
 
 /**
@@ -349,6 +521,11 @@ FORGE.Tile.prototype._setPosition = function(rotation)
  */
 FORGE.Tile.prototype._getRotation = function()
 {
+    if (this._parent !== null)
+    {
+        return this._parent.rotation;
+    }
+
     switch (this._face)
     {
         case "f":
@@ -378,21 +555,25 @@ FORGE.Tile.prototype._getRotation = function()
  * Subdivide tile into 4 tiles
  * @method FORGE.Tile#subdivide
  */
-FORGE.Tile.prototype._subdivide = function()
+FORGE.Tile.prototype.subdivide = function()
 {
     if (this._northWest !== null)
     {
         return;
     }
 
+    var halfSize = this.geometry.boundingBox.getSize().multiplyScalar(0.5);
+
     var level = this._level + 1;
 
-    var x0 = 2 * this._position.x;
-    var x1 = 2 * this._position.x + 1;
-    var y0 = 2 * this._position.y;
-    var y1 = 2 * this._position.y + 1;
+    var x0 = 2 * this._x;
+    var x1 = 2 * this._x + 1;
+    var y0 = 2 * this._y;
+    var y1 = 2 * this._y + 1;
 
-    this._southWest = this._renderer.getTile(this, level, this._face, x0, y0);
+    this._northWest = this._renderer.getTile(this, level, this._face, x0, y0, "quarter NW of " + this.name);
+    // this._northWest.position.set(-halfSize.x, halfSize.y);
+    // this.add(this._northWest);
 
     var tx = this._renderer.nbTilesPerAxis(this._level + 1, "x");
     var ty = this._renderer.nbTilesPerAxis(this._level + 1, "y");
@@ -400,19 +581,25 @@ FORGE.Tile.prototype._subdivide = function()
     var x1_in = x1 < tx;
     var y1_in = y1 < ty;
 
-    if (x1_in)
+    if (x1_in === true)
     {
-        this._southEast = this._renderer.getTile(this, level, this._face, x1, y0);
+        this._northEast = this._renderer.getTile(this, level, this._face, x1, y0, "quarter NE of " + this.name);
+        // this._northEast.position.set(halfSize.x, halfSize.y);
+        // this.add(this._northEast);
     }
 
-    if (y1_in)
+    if (y1_in === true)
     {
-        this._northWest = this._renderer.getTile(this, level, this._face, x0, y1);
+        this._southWest = this._renderer.getTile(this, level, this._face, x0, y1, "quarter SW of " + this.name);
+        // this._southWest.position.set(-halfSize.x, -halfSize.y);
+        // this.add(this._southWest);
     }
 
-    if (x1_in && y1_in)
+    if (x1_in === true && y1_in === true)
     {
-        this._northEast = this._renderer.getTile(this, level, this._face, x1, y1);
+        this._southEast = this._renderer.getTile(this, level, this._face, x1, y1, "quarter SE of " + this.name);
+        // this._southEast.position.set(halfSize.x, -halfSize.y);
+        // this.add(this._southEast);
     }
 };
 
@@ -423,15 +610,24 @@ FORGE.Tile.prototype._subdivide = function()
  */
 FORGE.Tile.prototype._checkParent = function()
 {
-    if (this._level === 0) {
-        return null;
+    if (this._parent !== null ||
+        this._parentCheckDone === true ||
+        this._level === 0 ||
+        this._level !== this._renderer.level) {
+        return;
     }
 
-    var position = this._position.clone().divideScalar(2).floor();
+    this._parentCheckDone = true;
 
     var sequence = Promise.resolve();
     sequence.then(function() {
-        this._renderer.getTile(null, this._level - 1, this._face, position.x, position.y);
+        this._parent = this._renderer.getParentTile(this);
+
+        // if (this._parent.children.indexOf(this) === -1)
+        // {
+        //     this._parent.add(this);   
+        // }
+        //console.log("Parent tile created (" + parent.name + ")");
     }.bind(this));
 };
 
@@ -443,39 +639,197 @@ FORGE.Tile.prototype._checkParent = function()
  */
 FORGE.Tile.prototype._checkNeighbours = function()
 {
-    var x = this._position.x;
-    var y = this._position.y;
-    var neighbours = [];
-
-    var getTile = function(x, y)
+    if (this._neighbourhoodCheckDone === true || this._level !== this._renderer.level)
     {
-        this._renderer.getTile(null, this._level, this._face, x, y);
-    }.bind(this);
+        return;
+    }
+    
+    this._neighbourhoodCheckDone = true;
 
+    var tx = Math.ceil(this._renderer.nbTilesPerAxis(this._level, "x"));
+    var ty = Math.ceil(this._renderer.nbTilesPerAxis(this._level, "y"));
+
+    var name = this.name;
+    
     var sequence = Promise.resolve();
     
-    var tx = this._renderer.nbTilesPerAxis(this._level, "x");
-    var ty = this._renderer.nbTilesPerAxis(this._level, "y");
+    // Check tile neighbors in current face
+    var xmin = Math.max(0, this._x - 1);
+    var xmax = Math.min(tx - 1, this._x + 1);
 
-    var xmin = Math.max(0, this._position.x - 1);
-    var xmax = Math.min(tx - 1, this._position.x + 1);
+    var ymin = Math.max(0, this._y - 1);
+    var ymax = Math.min(ty - 1, this._y + 1);
 
-    var ymin = Math.max(0, this._position.y - 1);
-    var ymax = Math.min(ty - 1, this._position.y + 1);
-    
     // and do the job for the current face
     for (var y=ymin; y<=ymax; y++)
     {
         for (var x=xmin; x<=xmax; x++)
         {
-            if (x === this._position.x && y === this._position.y)
+            if (x === this._x && y === this._y)
             {
                 continue;
             }
 
-            sequence.then(getTile(this._position.x, this._position.y));
+            (function (prenderer, plevel, pface, px, py) {
+                sequence.then(function()
+                {
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour of " + name) ;
+                });
+            })(this._renderer, this._level, this._face, x, y);
         }
     }
+
+    // When tile per axis is under 3, all tiles are on the edge
+    if (tx > 2 || ty > 2)
+    {
+        var tileX = this._x;
+        var tileY = this._y;
+
+        // Check if tile is on a left edge of the cube face
+        if (tileX === 0)
+        {
+            sequence.then(function()
+            {
+                (function (prenderer, plevel, pface, px, py) {
+                    sequence.then(function()
+                    {
+                        var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.left-edge of " + name);
+                    });
+                })(this._renderer, this._level, FORGE.Tile.FACE_PREVIOUS[this._face], tx - 1, tileY);
+
+            }.bind(this));
+        }
+
+        // Check if tile is on a right edge of the cube face
+        if (tileX === tx - 1)
+        {
+            sequence.then(function()
+            {
+                (function (prenderer, plevel, pface, px, py) {
+                    sequence.then(function()
+                    {
+                        var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.right-edge of " + name);
+                    });
+                })(this._renderer, this._level, FORGE.Tile.FACE_NEXT[this._face], 0, tileY);
+
+            }.bind(this));
+        }
+
+        // Check if tile is on a bottom edge of the cube face
+        if (tileY === ty - 1)
+        {
+            var fx, fy, face = "d";
+
+            if (this._face === "f")
+            {
+                fx = tileX;
+                fy = 0;
+            }
+            else if (this._face === "b")
+            {
+                fx = tx - 1 - tileX;
+                fy = ty - 1;
+            }
+            else if (this._face === "r")
+            {
+                fx = ty - 1;
+                fy = tileX;
+            }
+            else if (this._face === "l")
+            {
+                fx = 0;
+                fy = tx - 1 - tileX;
+            }
+            else if (this._face === "u")
+            {
+                fx = tileX;
+                fy = 0;
+                face = "f";
+            }
+            else if (this._face === "d")
+            {
+                fx = tx - 1 - tileX;
+                fy = ty - 1;
+                face = "b";
+            }
+
+            sequence.then(function()
+            {
+                (function (prenderer, plevel, pface, px, py) {
+                    sequence.then(function()
+                    {
+                        var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.bottom-edge of " + name);
+                    });
+                })(this._renderer, this._level, face, fx, fy);
+
+            }.bind(this));
+        }
+
+        // Check if tile is on a top edge of the cube face
+        if (tileY === 0)
+        {
+            var fx, fy, face = "u";
+
+            if (this._face === "f")
+            {
+                fx = tileX;
+                fy = ty - 1;
+            }
+            else if (this._face === "b")
+            {
+                fx = tx - 1 - tileX;
+                fy = 0;
+            }
+            else if (this._face === "r")
+            {
+                fx = tx - 1;
+                fy = tx - 1 - tileX;
+            }
+            else if (this._face === "l")
+            {
+                fx = 0;
+                fy = tileX;
+            }
+            else if (this._face === "u")
+            {
+                fx = tx - 1 - tileX;
+                fy = 0;
+                face = "b";
+            }
+            else if (this._face === "d")
+            {
+                fx = tileX;
+                fy = tx - 1;
+                face = "f";
+            }
+
+            sequence.then(function()
+            {
+                (function (prenderer, plevel, pface, px, py) {
+                    sequence.then(function()
+                    {
+                        var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.top-edge of " + name);
+                    });
+                })(this._renderer, this._level, face, fx, fy);
+
+            }.bind(this));
+        }
+    }
+};
+
+/**
+ * Get name of the parent tile
+ * @method FORGE.Tile#getParentName
+ */
+FORGE.Tile.prototype.getParentName = function()
+{
+    if (this._level === 0)
+    {
+        return null;
+    }
+
+    var coords = FORGE.Tile.getParentTileCoordinates(this);
+    return FORGE.Tile.createName(this._face, this._level - 1, coords.x, coords.y);
 };
 
 /**
@@ -528,8 +882,37 @@ FORGE.Tile.prototype.destroy = function()
         this._southWest = null;   
     }
 
+    this._parent = null;
+
     this._renderer = null;
+
+    if (this._onDestroy !== null)
+    {
+        this._onDestroy.dispatch();
+        this._onDestroy.destroy();
+        this._onDestroy = null;
+    }
 };
+
+/**
+ * Get the onDestroy {@link FORGE.EventDispatcher}.
+ * @name FORGE.Tile#onDestroy
+ * @type {FORGE.EventDispatcher}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Tile.prototype, "onDestroy",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        if (this._onDestroy === null)
+        {
+            this._onDestroy = new FORGE.EventDispatcher(this, true);
+        }
+
+        return this._onDestroy;
+    }
+});
 
 /**
  * Get face.
@@ -588,17 +971,30 @@ Object.defineProperty(FORGE.Tile.prototype, "y",
 });
 
 /**
- * Get QuadTree ID.
- * @name FORGE.Tile#quadTreeID
- * @type {string}
+ * Get opacity.
+ * @name FORGE.Tile#opacity
+ * @type {number}
  */
-Object.defineProperty(FORGE.Tile.prototype, "quadTreeID",
+Object.defineProperty(FORGE.Tile.prototype, "opacity",
 {
     /** @this {FORGE.Tile} */
     get: function()
     {
-        return this._quadTreeID;
+        return this._opacity;
     }
 });
 
+/**
+ * Last display timestamp.
+ * @name FORGE.Tile#displayTS
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Tile.prototype, "displayTS",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        return this._displayTS;
+    }
+});
 

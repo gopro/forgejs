@@ -61,6 +61,28 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
      */
     this._fovMin = 0;
 
+    /**
+     * Tiles on axis X for current level
+     * @type {number}
+     * @private
+     */
+    this._tilesOnAxisX = 0;
+
+    /**
+     * Tiles on axis Y for current level
+     * @type {number}
+     * @private
+     */
+    this._tilesOnAxisY = 0;
+
+    /**
+     * Internal raycaster. Used to refresh where neighborhood is unknown
+     * @type {THREE.Raycaster}
+     * @private
+     */
+    this._raycaster = null;
+    this._raycastChain = null;
+    this._renderList = null;
 
     /**
      * Number of pixels at current level presented in human readable format
@@ -88,6 +110,9 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this._parseConfig(this._config);
 
+    this._raycaster = new THREE.Raycaster();
+    this._raycastChain = [];
+
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
 
     this._tileCache = {};
@@ -104,8 +129,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
         {
             for (var x=0, tx = this.nbTilesPerAxis(this._level, "x"); x<tx; x++)
             {
-                var tile = this.getTile(null, this._level, face, x, y);
-                this._scene.add(tile);
+                this.getTile(null, this._level, face, x, y, "pyramid init");
             }        
         }
     }
@@ -152,7 +176,8 @@ FORGE.BackgroundPyramidRenderer.prototype.updateAfterViewChange = function()
  */
 FORGE.BackgroundPyramidRenderer.prototype._cameraFovToPyramidLevel = function(fov)
 {
-    return Math.max(0, Math.floor(1 - Math.log(fov / 90) / Math.LN2));
+    var fovReference = 90 / this.nbTilesPerAxis(0, "y");
+    return Math.max(0, Math.floor(1 - Math.log(fov / fovReference) / Math.LN2));
 };
 
 /**
@@ -164,7 +189,8 @@ FORGE.BackgroundPyramidRenderer.prototype._cameraFovToPyramidLevel = function(fo
  */
 FORGE.BackgroundPyramidRenderer.prototype._pyramidLevelToCameraFov = function(level)
 {
-    return 90 / Math.pow(2, level);
+    var fovReference = 90 / this.nbTilesPerAxis(0, "y");
+    return fovReference / Math.pow(2, level);
 };
 
 /**
@@ -199,37 +225,195 @@ FORGE.BackgroundPyramidRenderer.prototype._isTileInFrustum = function(tile)
 };
 
 /**
- * Get tile unique key based on its attribute.
- * @method FORGE.BackgroundPyramidRenderer#_getTileKey
+ * Tile destroyed event handler
+ * @param {FORGE.Event} event - event
+ * @method FORGE.BackgroundPyramidRenderer#_onTileDestroyed
  * @private
  */
-FORGE.BackgroundPyramidRenderer.prototype._getTileKey = function(level, face, x, y)
+FORGE.BackgroundPyramidRenderer.prototype._onTileDestroyed = function(event)
 {
-    return "tile_l" + level + "_f" + face + "_y" + y + "_x" + x;
+    var tile = event.emitter;
+    tile.onDestroy.remove(this._onTileDestroyed, this);
+    this._tileCache(tile.level).delete(tile.name);
+    this._scene.remove(tile);
+};
+
+/**
+ * Internal raycast used to refresh textures
+ * @method FORGE.BackgroundPyramidRenderer#_raycast
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype._raycast = function()
+{
+    this._raycastChain = [];
+
+    // TODO: add a grid of points
+    var screenPoint = new THREE.Vector2(0.5, 0.5).multiplyScalar(2).addScalar(-1);
+    // var screenPoint = new THREE.Vector2(this._viewer.canvas.dom.width, this._viewer.canvas.dom.height).divideScalar(2).floor();
+    this._raycaster.setFromCamera(screenPoint, viewer.renderer.camera.main);
+    
+    var intersects = this._raycaster.intersectObjects(this._scene.children, true);
+
+    var count=0;
+    intersects.forEach(function(intersect, idx, array) {
+        if (intersect.object.level === this._level)
+        {
+            ++count;
+        }
+    }.bind(this));
+
+    if (count > 1)
+    {
+        return;
+    }
+
+    intersects = intersects.filter(function(intersect, idx, array) {
+        // return intersect.object instanceof FORGE.Tile && intersect.faceIndex === 0 && array.indexOf(intersect) === idx;
+        var isTile = intersect.object instanceof FORGE.Tile;
+        var isUnique = array.indexOf(intersect) === idx;
+        
+        // var name = intersect.object.name;
+
+        // var isFirstWithThisName = array.find(function(element) {
+        //     element.object.name === name;
+        // }) === idx;
+
+        // return isTile && isUnique && isFirstWithThisName;
+        return isTile && isUnique;
+    });
+
+    intersects.sort(function(a, b) {
+        if (a.object.level > b.object.level) {
+            return -1;
+        }
+        else {
+            return 1;
+        }
+    });
+
+    this._raycastChain = intersects.map(function(intersect, idx, array) {
+        return intersect.object;
+    });  
+
+    // console.log(intersects.length);
+};
+
+// Compute tile that should be displayed (and its parents) using camera yaw, pitch and fov
+// Useful for debugging refresh holes
+FORGE.BackgroundPyramidRenderer.prototype._getTileStackAtCurrentPoint = function()
+{
+    var camera = this._viewer.camera;
+    alert('_getTileStackAtCurrentPoint');
+};
+
+/**
+ * Get XnYn normalized tile coords at a given level
+ * @method FORGE.BackgroundPyramidRenderer#_levelXYToXnYn
+ * @param {number} level - pyramid level
+ * @param {THREE.Vector2} XY - coordinates
+ * @return {THREE.Vector2} normalized tile coordinates vector
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype._levelXYToXnYn = function(level, XY)
+{
+    var tx = this.nbTilesPerAxis(level, "x"),
+        ty = this.nbTilesPerAxis(level, "y");
+
+    return XY.divide(new THREE.Vector2(tx, ty));
+};
+
+/**
+ * Get XY tile coords at a given level depending on normalized coordinates
+ * @method FORGE.BackgroundPyramidRenderer#_levelXnYnToXY
+ * @param {number} level - pyramid level
+ * @param {THREE.Vector2} xnyn - normalized coordinates
+ * @return {THREE.Vector2} tile coordinates vector
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype._levelXnYnToXY = function(level, xnyn)
+{
+    var tx = this.nbTilesPerAxis(level, "x"),
+        ty = this.nbTilesPerAxis(level, "y");
+
+    var x = Math.min(Math.floor(tx * xnyn.x), Math.ceil(tx) - 1);
+    var y = Math.min(Math.floor(ty * xnyn.y), Math.ceil(ty) - 1);
+
+    return new THREE.Vector2(x, y);
+};
+
+/**
+ * Get parent tile reference and create it if does not exist
+ * @method FORGE.BackgroundPyramidRenderer#getParentTile
+ * @param {FORGE.Tile} tile - tile
+ * @return {FORGE.Tile} parent tile or null if it has no parent (level 0)
+ */
+FORGE.BackgroundPyramidRenderer.prototype.getParentTile = function(tile)
+{
+    if (tile.level === 0)
+    {
+        return null;
+    }
+
+    var xnyn = this._levelXYToXnYn(tile.level, new THREE.Vector2(tile.x, tile.y));
+
+    var parentLevel = tile.level - 1;
+    var parentCoords = this._levelXnYnToXY(parentLevel, xnyn);
+
+    return this.getTile(null, parentLevel, tile.face, parentCoords.x, parentCoords.y, "parent of " + tile.name);
+};
+
+/**
+ * Get tile by name
+ * Look for a tile in the scene
+ * @method FORGE.BackgroundPyramidRenderer#getTileByName
+ * @return {FORGE.Tile=} the tile or undefined if not found
+ */
+FORGE.BackgroundPyramidRenderer.prototype.getTileByName = function(name)
+{
+    return this.scene.children.find (function(item) { return item.name === name });
 };
 
 /**
  * Get tile
  * Lookup in cache first or create it if not already in cache
- * @method FORGE.BackgroundPyramidRenderer#visibleTiles
+ * @method FORGE.BackgroundPyramidRenderer#getTile
  */
-FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face, x, y)
+FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face, x, y, creator)
 {
-    var key = this._getTileKey(level, face, x, y);
-
     if (typeof this._tileCache[level] === "undefined")
     {
         this._tileCache[level] = new Map();
     }
 
-    var tile = this._tileCache[level].get(key);
-    
+    var name = FORGE.Tile.createName(face, level, x, y);
+
+    var tile = this._tileCache[level].get(name);
+
+    // // CHECK HOW TO GET THE PARENT TILE
+    // parent = parent || tile.parent;
+
+    // if (level > 0)
+    // {
+    //     var parentXY = FORGE.Tile.getParentTileCoordinates(tile);
+    //     parent = this.getTile(parent, level - 1, face, parentXY.x, parentXY.y);
+    // }
+
     if (tile === undefined)
     {
-        tile = new FORGE.Tile(parent, this, x, y, level, face);
-        // this.log("Create tile " + tile.name + " (parent: " + (parent ? parent.name : "none") + ")");
-        this._tileCache[level].set(key, tile);
-        this._scene.add(tile);
+        tile = new FORGE.Tile(null, this, x, y, level, face, creator);
+        // tile = new FORGE.Tile(parent, this, x, y, level, face, creator);
+
+        tile.onDestroy.add(this._onTileDestroyed, this);
+        this.log("Create tile " + tile.name + " (" + creator + ")");
+        this._tileCache[level].set(name, tile);
+    }
+
+    if (this._scene.children.indexOf(tile) === -1)
+    {
+        // if (tile.level === 0)
+        // {
+            this._scene.add(tile);
+        // }
     }
 
     return tile;
@@ -248,16 +432,16 @@ FORGE.BackgroundPyramidRenderer.prototype.nbTilesPerAxis = function(level, axis)
         return Math.pow(2, level);
     }
 
-    var level = this._config.source.levels[level];
+    var levelConfig = this._config.source.levels[level];
 
     if (axis === "x")
     {
-        return level.width / level.tile;        
+        return levelConfig.width / levelConfig.tile;        
     }
 
     else if (axis === "y")
     {
-        return level.height / level.tile;
+        return levelConfig.height / levelConfig.tile;
     }
 
     return Math.pow(2, level);
@@ -283,6 +467,16 @@ FORGE.BackgroundPyramidRenderer.prototype.tileSize = function(level)
 };
 
 /**
+ * Remove tile from the scene
+ * @method FORGE.BackgroundPyramidRenderer#removeFromScene
+ * @param {FORGE.Tile} tile
+ */
+FORGE.BackgroundPyramidRenderer.prototype.removeFromScene = function(tile)
+{
+    this._scene.remove(tile);
+};
+
+/**
  * Select current level for the pyramid
  * @method FORGE.BackgroundPyramidRenderer#selectLevel
  * @param {Number} level pyramid level
@@ -291,6 +485,45 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 {
     this._level = level;
 
+    // Restore all tiles visibility for this level and add them to the scene
+    if (typeof this._tileCache[level] !== "undefined")
+    {
+        this._tileCache[level].forEach(function(tile)
+        {
+            tile.visible = true;
+            // this.scene.add(tile);
+        });
+    }
+
+    // Update internals
+    this._tilesOnAxisX = this.nbTilesPerAxis(this._level, "x");
+    this._tilesOnAxisY = this.nbTilesPerAxis(this._level, "y");
+
+    this.log("Tiles per axis - X: " + this._tilesOnAxisX + ", Y: " + this._tilesOnAxisY);
+
+    // // Clear every tile at level -2/+1 and add every tile at level -1/current
+    // if (typeof this._tileCache[this._level - 2] !== "undefined")
+    // {
+    //     this._tileCache[this._level - 2].forEach(function(element, index, array) {
+    //         this._scene.remove(element);
+    //     }.bind(this));
+    // }
+
+    // if (typeof this._tileCache[this._level + 1] !== "undefined")
+    // {
+    //     this._tileCache[this._level + 1].forEach(function(element, index, array) {
+    //         this._scene.remove(element);
+    //     }.bind(this));
+    // }
+
+    if (typeof (this._tileCache[this._level]) !== "undefined")
+    {
+        this._tileCache[this._level].forEach(function(tile) {
+            this._scene.add(tile);
+        }.bind(this));
+    }
+    
+    // Compute pixels count
     var levelConfig = this._config.source.levels[level];
     var tilePixels = levelConfig.width * levelConfig.height;
 
@@ -326,6 +559,16 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 
 
 /**
+ * Add tile to render list
+ * @method FORGE.BackgroundPyramidRenderer#addToRenderList
+ * @param {FORGE.Tile} tile - tile
+ */
+FORGE.BackgroundPyramidRenderer.prototype.addToRenderList = function(tile)
+{
+    this._renderList.push(tile);
+};
+
+/**
  * Render routine.
  * Do preliminary job of specific background renderer, then summon superclass method
  * @method FORGE.BackgroundPyramidRenderer#render
@@ -333,8 +576,71 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
  */
 FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
 {
+    // Renderer should find if some tile at current level are currently rendered
+    this._renderList = [];
+
+    // this._raycast();
+
+    // if (this._raycastChain.length > 0)
+    // {
+    //     var topTile = this._raycastChain[0];
+    //     var topLevelDisplayed = topTile.name.split("-")[1];
+    //     if (parseInt(topLevelDisplayed) < this._level)
+    //     {
+    //         this.log("Raycast force tile subdivision (" + topTile.name + ")");
+    //         topTile.subdivide();
+    //         // this._refreshLocalTiles();
+    //     }
+    // }
+
     FORGE.BackgroundRenderer.prototype.render.call(this, this._viewer.camera.main);
-    // console.log("tiles: " + window.scene.children.length);
+    
+    // Lookup render list to find if we need to subdivide something
+    if (this._level <= this.levelMax - 1)
+    {
+        var needSubdivide = !this._renderList.some(function(tile, index, array) {
+            return tile.level === this._level;
+        }, this);
+
+        if (needSubdivide === true)
+        {
+            console.log("need subdivide");
+            // Pick center tile with own raycaster and ask for subdivision
+
+            var screenPoint = new THREE.Vector2();
+            this._raycaster.setFromCamera(screenPoint, this._viewer.camera.main);
+
+            var intersects = this._raycaster.intersectObjects(this._scene.children, true);
+            if (intersects.length > 0)
+            {
+                intersects.reverse();
+
+                // Pick first tile
+                var tile = intersects[0].object;
+                if (tile instanceof FORGE.Tile)
+                {
+                    console.log("subdivide tile " + tile.name);
+                    tile.subdivide();
+                    tile._setOpacity(1);
+                } 
+            }
+        }          
+    } 
+    
+    // Cleanup scene
+    this._scene.children.forEach(function(tile) {
+        // Only remove tile upper than level zeror and not at current level
+        if (tile.level === 0 || tile.level === this._level)
+        {
+            return;
+        }
+
+        // Remove tiles with zero opacity
+        if (tile.opacity === 0)
+        {
+            this._scene.remove(tile);
+        }
+    }.bind(this));
 };
 
 /**
@@ -345,6 +651,12 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
     this._textureStore = null;
     this._tileCache = null;
+    this._renderList.length = 0;
+    this._renderList = [];
+    this._raycastChain.length = 0;
+    this._raycastChain = null;
+    this._raycaster = null;
+    this._config = null;
 
     FORGE.BackgroundRenderer.prototype.destroy.call(this);
 };
@@ -352,7 +664,7 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 /**
  * Get cube size in world units.
  * @name FORGE.BackgroundPyramidRenderer#cubeSize
- * @type {FORGE.MediaStore}
+ * @type {number}
  */
 Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "cubeSize",
 {
@@ -374,6 +686,20 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "textureStore",
     get: function()
     {
         return this._textureStore;
+    }
+});
+
+/**
+ * Get pyramid max level.
+ * @name FORGE.BackgroundPyramidRenderer#levelMax
+ * @type {string}
+ */
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "levelMax",
+{
+    /** @this {FORGE.BackgroundPyramidRenderer} */
+    get: function()
+    {
+        return this._config.source.levels.length - 1;
     }
 });
 
@@ -430,6 +756,48 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "fovMin",
     get: function()
     {
         return this._fovMin;
+    }
+});
+
+/**
+ * Get number of tiles on axis X for current level.
+ * @name FORGE.BackgroundPyramidRenderer#tilesOnAxisX
+ * @type {number}
+ */
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "tilesOnAxisX",
+{
+    /** @this {FORGE.BackgroundPyramidRenderer} */
+    get: function()
+    {
+        return this._tilesOnAxisX;
+    }
+});
+
+/**
+ * Get number of tiles on axis Y for current level.
+ * @name FORGE.BackgroundPyramidRenderer#tilesOnAxisY
+ * @type {number}
+ */
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "tilesOnAxisY",
+{
+    /** @this {FORGE.BackgroundPyramidRenderer} */
+    get: function()
+    {
+        return this._tilesOnAxisY;
+    }
+});
+
+/**
+ * Get raycasted tiles array, ordered from top to bottom
+ * @name FORGE.BackgroundPyramidRenderer#raycastChain
+ * @type {number}
+ */
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "raycastChain",
+{
+    /** @this {FORGE.BackgroundPyramidRenderer} */
+    get: function()
+    {
+        return this._raycastChain;
     }
 });
 
