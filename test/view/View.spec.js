@@ -55,17 +55,60 @@ describe("FORGE.View", function()
         expect(this.viewer.view.current.type).toEqual(FORGE.ViewType.RECTILINEAR);
     });
 
-    it("screenToWorld", function()
+    describe("screenToWorld", function()
     {
-        var screenPoint = new THREE.Vector2(400, 300);
-        var res = this.viewer.view.screenToWorld();
-        console.log(res);
+        var tests =
+        [
+            { value: new THREE.Vector2(400, 300), expected: new THREE.Vector3(0, 0, -1) },
+            { value: new THREE.Vector2(0, 0), expected: new THREE.Vector3(-0.5773502691896257, -0.5773502691896257, -0.5773502691896258) },
+            { value: new THREE.Vector2(800, 0), expected: new THREE.Vector3(0.5773502691896257, -0.5773502691896257, -0.5773502691896258) },
+            { value: new THREE.Vector2(800, 600), expected: new THREE.Vector3(0.5773502691896257, 0.5773502691896257, -0.5773502691896258) },
+            { value: new THREE.Vector2(0, 600), expected: new THREE.Vector3(-0.5773502691896257, 0.5773502691896257, -0.5773502691896258) },
+            { value: new THREE.Vector2(400, 300), camera: {yaw:90, pitch:0}, expected: new THREE.Vector3(1, 0, -6.123234262925839e-17) },
+            { value: new THREE.Vector2(400, 300), camera: {yaw:0, pitch:-90}, expected: new THREE.Vector3(0, -1, -6.123234262925839e-17) },
+            { value: new THREE.Vector2(400, 300), camera: {yaw:180, pitch:-90}, expected: new THREE.Vector3(7.498798786105971e-33, -1, 6.123234262925839e-17) },
+            { value: new THREE.Vector2(801, 1), expected: null },
+            { value: new THREE.Vector2(1, 601), expected: null },
+            { value: new THREE.Vector2(-1, 1), expected: null },
+            { value: new THREE.Vector2(1, -1), expected: null },
+            { value: new THREE.Vector2(400, 300), camera: {yaw:180, pitch:-90, fov: 45}, expected: new THREE.Vector3(0, 0, -1) },
+        ];
+
+        tests.forEach(function(test, index)
+        {
+            it("test " + index + " should return " + test.expected, function()
+            {
+                var camera = test.camera || {yaw:0, pitch:0, fov: 90};
+                this.viewer.camera.lookAt(camera.yaw, camera.pitch, 0, camera.fov);
+
+                expect(this.viewer.view.screenToWorld(test.value)).toEqual(test.expected);
+            });
+        });
     });
 
-    it("worldToScreen", function()
+    describe("worldToScreen", function()
     {
-        var worldPoint = new THREE.Vector3(0, 0, 300);
-        var res = this.viewer.view.worldToScreen(worldPoint);
-        console.log(res);
+        var tests =
+        [
+            { expected: new THREE.Vector2(400, 300), value: new THREE.Vector3(0, 0, -1) },
+            // { expected: new THREE.Vector2(0, 0), value: new THREE.Vector3(-0.5773502691896257, -0.5773502691896257, -0.5773502691896258) },
+            // { expected: new THREE.Vector2(800, 0), value: new THREE.Vector3(0.5773502691896257, -0.5773502691896257, -0.5773502691896258) },
+            // { expected: new THREE.Vector2(800, 600), value: new THREE.Vector3(0.5773502691896257, 0.5773502691896257, -0.5773502691896258) },
+            // { expected: new THREE.Vector2(0, 600), value: new THREE.Vector3(-0.5773502691896257, 0.5773502691896257, -0.5773502691896258) },
+            // { expected: new THREE.Vector2(400, 300), camera: {yaw:90, pitch:0}, expected: new THREE.Vector3(1, 0, -6.123234262925839e-17) },
+            // { expected: new THREE.Vector2(400, 300), camera: {yaw:0, pitch:-90}, expected: new THREE.Vector3(0, -1, -6.123234262925839e-17) },
+            // { expected: new THREE.Vector2(400, 300), camera: {yaw:180, pitch:-90}, expected: new THREE.Vector3(7.498798786105971e-33, -1, 6.123234262925839e-17) },
+        ];
+
+        tests.forEach(function(test, index)
+        {
+            it("test " + index + " should return " + test.expected, function()
+            {
+                var camera = test.camera || {yaw:0, pitch:0};
+                this.viewer.camera.lookAt(camera.yaw, camera.pitch);
+
+                expect(this.viewer.view.worldToScreen(test.value)).toEqual(test.expected);
+            });
+        });
     });
 });
