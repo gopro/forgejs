@@ -297,18 +297,30 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
         this._textureStackInterval = null;
     }
 
+    // if a tile parent has asked for a texture, just remove it from the stack
+    var parentName = tile.getParentName();
+    var index = this._textureStack.find(function(item) {
+        item.name === parentName;
+    });
+
+    if (index !== undefined)
+    {
+        this.log("unstack pending parent texture");
+        this._textureStack.splice(index, 1);
+    }
+
     this._textureStack.push(tile);
 
-    this.log("Texture stack length (+++): " + this._textureStack.length + " (" + tile.name + ")");
+    //this.log("Texture stack length (+++): " + this._textureStack.length + " (" + tile.name + ")");
 
-    if (this._textureStack.length > FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE)
-    {
-        var key = this._createKey(tile)
-        var tile = this._textureStack.shift();
-        var entry = this._texturePromises.get(key);
-        entry.load.reject("Tile load abort (stack size exceeded).");
-        this._texturePromises.delete(key);
-    }
+    // if (this._textureStack.length > FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE)
+    // {
+    //     var key = this._createKey(tile)
+    //     var tile = this._textureStack.shift();
+    //     var entry = this._texturePromises.get(key);
+    //     entry.load.reject("Tile load abort (stack size exceeded).");
+    //     this._texturePromises.delete(key);
+    // }
 
     this._textureStackInterval = window.setTimeout(this._textureStackPop.bind(this), FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS);
 };
@@ -325,7 +337,7 @@ FORGE.MediaStore.prototype._textureStackPop = function()
     while (this._textureStack.length > 0) 
     {
         var tile = this._textureStack.pop();
-        this.log("Texture stack length (---): " + this._textureStack.length + " (" + tile.name + ")");
+        //this.log("Texture stack length (---): " + this._textureStack.length + " (" + tile.name + ")");
 
         this._load(tile);
     }
