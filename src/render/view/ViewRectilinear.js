@@ -74,7 +74,7 @@ FORGE.ViewRectilinear.prototype.updateUniforms = function(uniforms)
  * @method FORGE.ViewRectilinear#worldToScreen
  * @param {THREE.Vector3} worldPt - 3D point in world space
  * @param {number} parallaxFactor - parallax factor [0..1]
- * @return {THREE.Vector2} point in screen coordinates
+ * @return {!THREE.Vector2} point in screen coordinates
  */
 FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor)
 {
@@ -92,7 +92,7 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
 
     if (worldPt4.z < 0)
     {
-        return new THREE.Vector2(Infinity, Infinity);
+        return null;
     }
 
     // Project on zn plane by dividing x,y components by -z
@@ -112,11 +112,18 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
  *
  * @method FORGE.ViewRectilinear#screenToWorld
  * @param {THREE.Vector2} screenPt - 2D point in screen space [0..w, 0..h]
- * @return {THREE.Vector3} world point
+ * @return {!THREE.Vector3} world point
  */
 FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
 {
-    screenPt = screenPt || new THREE.Vector2(this._viewer.renderer.displayResolution.width / 2, this._viewer.renderer.displayResolution.height / 2);
+    var resolution = this._viewer.renderer.displayResolution;
+
+    screenPt = screenPt || new THREE.Vector2(resolution.width / 2, resolution.height / 2);
+
+    if(screenPt.x < 0 || screenPt.x > resolution.width || screenPt.y < 0 || screenPt.y > resolution.height)
+    {
+        return null;
+    }
 
     var fragment = this._screenToFragment(screenPt);
     fragment.multiplyScalar(this._projectionScale);
