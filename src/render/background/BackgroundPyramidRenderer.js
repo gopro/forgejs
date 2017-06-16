@@ -579,53 +579,7 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
     // Renderer should find if some tile at current level are currently rendered
     this._renderList = [];
 
-    // this._raycast();
-
-    // if (this._raycastChain.length > 0)
-    // {
-    //     var topTile = this._raycastChain[0];
-    //     var topLevelDisplayed = topTile.name.split("-")[1];
-    //     if (parseInt(topLevelDisplayed) < this._level)
-    //     {
-    //         this.log("Raycast force tile subdivision (" + topTile.name + ")");
-    //         topTile.subdivide();
-    //         // this._refreshLocalTiles();
-    //     }
-    // }
-
     FORGE.BackgroundRenderer.prototype.render.call(this, this._viewer.camera.main);
-    
-    // Lookup render list to find if we need to subdivide something
-    if (this._level <= this.levelMax - 1)
-    {
-        var needSubdivide = !this._renderList.some(function(tile, index, array) {
-            return tile.level === this._level;
-        }, this);
-
-        if (needSubdivide === true)
-        {
-            console.log("need subdivide");
-            // Pick center tile with own raycaster and ask for subdivision
-
-            var screenPoint = new THREE.Vector2();
-            this._raycaster.setFromCamera(screenPoint, this._viewer.camera.main);
-
-            var intersects = this._raycaster.intersectObjects(this._scene.children, true);
-            if (intersects.length > 0)
-            {
-                intersects.reverse();
-
-                // Pick first tile
-                var tile = intersects[0].object;
-                if (tile instanceof FORGE.Tile)
-                {
-                    console.log("subdivide tile " + tile.name);
-                    tile.subdivide();
-                    tile._setOpacity(1);
-                } 
-            }
-        }          
-    } 
     
     // Cleanup scene
     this._scene.children.forEach(function(tile) {
