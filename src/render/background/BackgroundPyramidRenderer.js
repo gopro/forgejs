@@ -123,14 +123,16 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
-    for (var face=0; face<6; face++)
+    for (var f=0; f<6; f++)
     {
+        var face = Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[f];
+
         for (var y=0, ty = this.nbTilesPerAxis(this._level, "y"); y<ty; y++)
         {
             for (var x=0, tx = this.nbTilesPerAxis(this._level, "x"); x<tx; x++)
             {
                 this.getTile(null, this._level, face, x, y, "pyramid init");
-            }        
+            }
         }
     }
 
@@ -145,7 +147,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 FORGE.BackgroundPyramidRenderer.prototype._parseConfig = function(config)
 {
     // Set min fov to be used to reach max level of resolution
-    this._fovMin = 1.01 * FORGE.Math.degToRad(this._pyramidLevelToCameraFov(this._config.source.levels.length - 1));
+    this._fovMin = 1.01 * FORGE.Math.degToRad(this._pyramidLevelToCameraFov(config.source.levels.length - 1));
 };
 
 /**
@@ -363,17 +365,6 @@ FORGE.BackgroundPyramidRenderer.prototype.getParentTile = function(tile)
 };
 
 /**
- * Get tile by name
- * Look for a tile in the scene
- * @method FORGE.BackgroundPyramidRenderer#getTileByName
- * @return {FORGE.Tile=} the tile or undefined if not found
- */
-FORGE.BackgroundPyramidRenderer.prototype.getTileByName = function(name)
-{
-    return this.scene.children.find (function(item) { return item.name === name });
-};
-
-/**
  * Get tile
  * Lookup in cache first or create it if not already in cache
  * @method FORGE.BackgroundPyramidRenderer#getTile
@@ -389,19 +380,9 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
 
     var tile = this._tileCache[level].get(name);
 
-    // // CHECK HOW TO GET THE PARENT TILE
-    // parent = parent || tile.parent;
-
-    // if (level > 0)
-    // {
-    //     var parentXY = FORGE.Tile.getParentTileCoordinates(tile);
-    //     parent = this.getTile(parent, level - 1, face, parentXY.x, parentXY.y);
-    // }
-
     if (tile === undefined)
     {
         tile = new FORGE.Tile(null, this, x, y, level, face, creator);
-        // tile = new FORGE.Tile(parent, this, x, y, level, face, creator);
 
         tile.onDestroy.add(this._onTileDestroyed, this);
         this.log("Create tile " + tile.name + " (" + creator + ")");
@@ -556,7 +537,6 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
     this._levelPixelsHumanReadable = humanPixels.toFixed(1) + prefix + "pixels";
     this.log("Select new level: " + level + ", " + this._levelPixelsHumanReadable  + " (" + this._levelPixels + ")");
 };
-
 
 /**
  * Add tile to render list

@@ -84,6 +84,13 @@ FORGE.MediaStore = function(viewer, config)
      */
     this._pattern = "";
 
+    /**
+     * Faces configuration
+     * @type {object}
+     * @private
+     */
+    this._cubeFaceConfig = null;
+
     FORGE.BaseObject.call(this, "MediaStore");
 
     this._boot();
@@ -93,7 +100,18 @@ FORGE.MediaStore.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.MediaStore.prototype.constructor = FORGE.MediaStore;
 
 FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS = 250;
+
 FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE = 50;
+
+FORGE.MediaStore.CUBE_FACE_CONFIG = 
+{
+    "front" : "front",
+    "right" : "right",
+    "back"  : "back",
+    "left"  : "left",
+    "down"  : "down",
+    "up"    : "up"
+};
 
 /**
  * The maximum size of texture at once. It is set at 30Mb, as we assume the
@@ -139,6 +157,12 @@ FORGE.MediaStore.prototype._parseConfig = function(config)
     }
 
     this._pattern = config.pattern;
+
+    this._cubeFaceConfig = FORGE.MediaStore.CUBE_FACE_CONFIG;
+    if (typeof config.faces !== "undefined")
+    {
+        this._cubeFaceConfig = config.faces;
+    }
 };
 
 /**
@@ -152,7 +176,7 @@ FORGE.MediaStore.prototype._parseConfig = function(config)
 FORGE.MediaStore.prototype._createKey = function(tile)
 {
     var key = "";
-    key += typeof tile.face !== "undefined" ? tile.face + "-" : "";
+    key += typeof tile.face !== "undefined" ? this._cubeFaceConfig[tile.face] : "";
     key += typeof tile.level !== "undefined" ? tile.level + "-" : "";
     key += typeof tile.x !== "undefined" ? tile.x + "-" : "";
     key += typeof tile.y !== "undefined" ? tile.y : "";
@@ -179,7 +203,7 @@ FORGE.MediaStore.prototype._load = function(tile)
     this._loadingTextures.push(key);
 
     var url = this._pattern;
-    url = url.replace(/\{face\}/, tile.face);
+    url = url.replace(/\{face\}/, this._cubeFaceConfig[tile.face]);
     url = url.replace(/\{level\}/, tile.level.toString());
     url = url.replace(/\{x\}/, tile.x.toString());
     url = url.replace(/\{y\}/, tile.y.toString());
