@@ -820,6 +820,10 @@ FORGE.VideoDash.prototype._initDashMediaPlayer = function()
     this._dashMediaPlayer.initialize();
     // playback is paused on start
     this._dashMediaPlayer.setAutoPlay(false);
+    //keep downloading fragments in the background when paused
+    this._dashMediaPlayer.setScheduleWhilePaused(true);
+    //fast switch with ABR
+    this._dashMediaPlayer.setFastSwitchEnabled(true);
     // add video tag element and video source file
     this._dashMediaPlayer.attachView(this._video.element);
     this._dashMediaPlayer.attachSource(this._manifestUrl);
