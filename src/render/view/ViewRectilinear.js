@@ -120,16 +120,20 @@ FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
 
     screenPt = screenPt || new THREE.Vector2(resolution.width / 2, resolution.height / 2);
 
-    if(screenPt.x < 0 || screenPt.x > resolution.width || screenPt.y < 0 || screenPt.y > resolution.height)
+    if (screenPt.x < 0 || screenPt.x > resolution.width || screenPt.y < 0 || screenPt.y > resolution.height)
     {
         return null;
     }
 
+    // move the point in a -1..1 square
     var fragment = this._screenToFragment(screenPt);
+
+    // scale it (see _updateViewParams above)
     fragment.multiplyScalar(this._projectionScale);
 
     var cameraPt = new THREE.Vector4(fragment.x, fragment.y, -1, 0);
 
+    // move the point in the world system
     var worldPt = cameraPt.applyMatrix4(this._viewer.camera.modelViewInverse).normalize();
 
     return new THREE.Vector3(worldPt.x, worldPt.y, worldPt.z);
