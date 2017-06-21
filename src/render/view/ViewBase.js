@@ -157,9 +157,9 @@ FORGE.ViewBase.prototype._screenToFragment = function(screenPt)
 FORGE.ViewBase.prototype._fragmentToScreen = function(fragment)
 {
     var resolution = this._viewer.renderer.displayResolution;
-    fragment.x = ((fragment.x / resolution.ratio) + 1) * (resolution.width / 2);
-    fragment.y = ((fragment.y / resolution.ratio) + 1) * (resolution.height / 2);
-    return new THREE.Vector2(Math.round(fragment.x), resolution.height - Math.round(fragment.y));
+    var sx = ((fragment.x / resolution.ratio) + 1.0) * (resolution.width / 2.0);
+    var sy = (fragment.y + 1.0) * (resolution.height / 2.0);
+    return new THREE.Vector2(Math.round(sx), Math.round(sy));
 };
 
 /**

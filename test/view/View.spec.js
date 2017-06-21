@@ -145,28 +145,77 @@ describe("FORGE.View", function()
         });
     });
 
-    describe("worldToScreen", function()
+    describe("#worldToScreen()", function()
     {
+        // values may seem random, but they are computed independently from
+        // FORGE and then normalized, hence the curious values below
+        var sqrt3 = Math.sqrt(3) / 2,
+
+            sqrt217 = 2 * Math.sqrt(2 / 17),
+            sqrt334 = 3 / Math.sqrt(34),
+
+            hf60 = Math.atan2(1, 4/3* Math.tan(Math.PI / 6)),
+            sqrt213 = 2 / Math.sqrt(13),
+            sqrt3213 = 3 / (2 * Math.sqrt(13)),
+            sqrt33132 = 3 * Math.sqrt(3 / 13) / 2,
+            sqrt443 = 4 / Math.sqrt(43),
+            sqrt3343 = 3 * Math.sqrt(3 / 43),
+
+            hf120 = Math.atan2(1, 4/3 * Math.tan(Math.PI / 3)),
+            sqrt27 = 2 / Math.sqrt(7),
+            sqrt327 = 3 / (2 * Math.sqrt(7)),
+            sqrt372 = Math.sqrt(3 / 7) / 2;
+
         var tests =
         [
-            { expected: new THREE.Vector2(400, 300), value: new THREE.Vector3(0, 0, -1) },
-            // { expected: new THREE.Vector2(0, 0), value: new THREE.Vector3(-0.5773502691896257, -0.5773502691896257, -0.5773502691896258) },
-            // { expected: new THREE.Vector2(800, 0), value: new THREE.Vector3(0.5773502691896257, -0.5773502691896257, -0.5773502691896258) },
-            // { expected: new THREE.Vector2(800, 600), value: new THREE.Vector3(0.5773502691896257, 0.5773502691896257, -0.5773502691896258) },
-            // { expected: new THREE.Vector2(0, 600), value: new THREE.Vector3(-0.5773502691896257, 0.5773502691896257, -0.5773502691896258) },
-            // { expected: new THREE.Vector2(400, 300), camera: {yaw:90, pitch:0}, expected: new THREE.Vector3(1, 0, -6.123234262925839e-17) },
-            // { expected: new THREE.Vector2(400, 300), camera: {yaw:0, pitch:-90}, expected: new THREE.Vector3(0, -1, -6.123234262925839e-17) },
-            // { expected: new THREE.Vector2(400, 300), camera: {yaw:180, pitch:-90}, expected: new THREE.Vector3(7.498798786105971e-33, -1, 6.123234262925839e-17) },
+            { value: new THREE.Vector3(-sqrt217, -sqrt334, -sqrt334),       expected: new THREE.Vector2(0, 0) },
+            { value: new THREE.Vector3(-80, 0, -60),                        expected: new THREE.Vector2(0, 300) },
+            { value: new THREE.Vector3(-sqrt217, sqrt334, -sqrt334),        expected: new THREE.Vector2(0, 600) },
+            { value: new THREE.Vector3(0, -22, -22),                        expected: new THREE.Vector2(400, 0) },
+            { value: new THREE.Vector3(0, 0, -37),                          expected: new THREE.Vector2(400, 300) },
+            { value: new THREE.Vector3(0, 67, -67),                         expected: new THREE.Vector2(400, 600) },
+            { value: new THREE.Vector3(sqrt217, -sqrt334, -sqrt334),        expected: new THREE.Vector2(800, 0) },
+            { value: new THREE.Vector3(160, 0, -120),                       expected: new THREE.Vector2(800, 300) },
+            { value: new THREE.Vector3(sqrt217, sqrt334, -sqrt334),         expected: new THREE.Vector2(800, 600) },
+
+            { value: new THREE.Vector3(-sqrt213, -sqrt3213, -sqrt33132),     expected: new THREE.Vector2(0, 0),     camera: { fov: 60 } },
+            { value: new THREE.Vector3(-Math.cos(hf60), 0, -Math.sin(hf60)), expected: new THREE.Vector2(0, 300),   camera: { fov: 60 } },
+            { value: new THREE.Vector3(-sqrt213, sqrt3213, -sqrt33132),      expected: new THREE.Vector2(0, 600),   camera: { fov: 60 } },
+            { value: new THREE.Vector3(0, -0.5, -sqrt3),                     expected: new THREE.Vector2(400, 0),   camera: { fov: 60 } },
+            { value: new THREE.Vector3(0, 0, -78),                           expected: new THREE.Vector2(400, 300), camera: { fov: 60 } },
+            { value: new THREE.Vector3(0, 0.5, -sqrt3),                      expected: new THREE.Vector2(400, 600), camera: { fov: 60 } },
+            { value: new THREE.Vector3(sqrt213, -sqrt3213, -sqrt33132),      expected: new THREE.Vector2(800, 0),   camera: { fov: 60 } },
+            { value: new THREE.Vector3(Math.cos(hf60), 0, -Math.sin(hf60)),  expected: new THREE.Vector2(800, 300), camera: { fov: 60 } },
+            { value: new THREE.Vector3(sqrt213, sqrt3213, -sqrt33132),       expected: new THREE.Vector2(800, 600), camera: { fov: 60 } },
+
+            { value: new THREE.Vector3(-sqrt27, -sqrt327, -sqrt372),           expected: new THREE.Vector2(0, 0),       camera: { fov: 120 } },
+            { value: new THREE.Vector3(-Math.cos(hf120), 0, -Math.sin(hf120)), expected: new THREE.Vector2(0, 300),     camera: { fov: 120 } },
+            { value: new THREE.Vector3(-sqrt27, sqrt327, -sqrt372),            expected: new THREE.Vector2(0, 600),     camera: { fov: 120 } },
+            { value: new THREE.Vector3(0, -sqrt3, -0.5),                       expected: new THREE.Vector2(400, 0),     camera: { fov: 120 } },
+            { value: new THREE.Vector3(0, 0, -93),                             expected: new THREE.Vector2(400, 300),   camera: { fov: 120 } },
+            { value: new THREE.Vector3(0, sqrt3, -0.5),                        expected: new THREE.Vector2(400, 600),   camera: { fov: 120 } },
+            { value: new THREE.Vector3(sqrt27, -sqrt327, -sqrt372),            expected: new THREE.Vector2(800, 0),     camera: { fov: 120 } },
+            { value: new THREE.Vector3(Math.cos(hf120), 0, -Math.sin(hf120)),  expected: new THREE.Vector2(800, 300),   camera: { fov: 120 } },
+            { value: new THREE.Vector3(sqrt27, sqrt327, -sqrt372),             expected: new THREE.Vector2(800, 600),   camera: { fov: 120 } },
+
+            { value: new THREE.Vector3(20, 0, -20), expected: new THREE.Vector2(400, 300), camera: { yaw: 45 } },
+            { value: new THREE.Vector3(36, 0, 0),   expected: new THREE.Vector2(400, 300), camera: { yaw: 90 } },
+            { value: new THREE.Vector3(0, -54, 0),  expected: new THREE.Vector2(400, 300), camera: { pitch: -90 } },
+            { value: new THREE.Vector3(0, -570, 0), expected: new THREE.Vector2(400, 300), camera: { yaw: 180, pitch: -90 } }
         ];
 
         tests.forEach(function(test, index)
         {
             it("test " + index + " should return " + test.expected, function()
             {
-                var camera = test.camera || {yaw:0, pitch:0};
-                this.viewer.camera.lookAt(camera.yaw, camera.pitch);
+                var camera = FORGE.Utils.extendMultipleObjects({ yaw: 0, pitch: 0, fov: 90 }, test.camera);
+                this.viewer.camera.lookAt(camera.yaw, camera.pitch, 0, camera.fov);
+                this.viewer.update();
 
-                expect(this.viewer.view.worldToScreen(test.value)).toEqual(test.expected);
+                var res = this.viewer.view.worldToScreen(test.value);
+
+                expect(res.x).toBeCloseTo(test.expected.x, 10);
+                expect(res.y).toBeCloseTo(test.expected.y, 10);
             });
         });
     });
