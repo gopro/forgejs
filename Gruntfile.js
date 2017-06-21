@@ -171,7 +171,6 @@ module.exports = function(grunt)
         "src/loader/Cache.js",
         "src/loader/File.js",
         "src/loader/Loader.js",
-        "src/loader/DependencyManager.js",
 
         "src/time/Clock.js",
         "src/time/Timer.js",

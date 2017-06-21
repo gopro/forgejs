@@ -127,14 +127,6 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._actions = null;
 
     /**
-     * Dependencies interface reference.
-     * @name  FORGE.Viewer#_dependencies
-     * @type {FORGE.DependencyManager}
-     * @private
-     */
-    this._dependencies = null;
-
-    /**
      * Director's cut track manager
      * @name  FORGE.Viewer#_director
      * @type {FORGE.Director}
@@ -363,7 +355,6 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._createCanvas();
 
     this._system = new FORGE.System(this);
-    this._dependencies = new FORGE.DependencyManager(this);
     this._clock = new FORGE.Clock(this);
     this._audio = new FORGE.SoundManager(this);
     this._raf = new FORGE.RequestAnimationFrame(this);
@@ -1085,21 +1076,6 @@ Object.defineProperty(FORGE.Viewer.prototype, "actions",
     get: function()
     {
         return this._actions;
-    }
-});
-
-/**
- * Get the viewer dependencies module.
- * @name  FORGE.Viewer#dependencies
- * @type {FORGE.DependencyManager}
- * @readonly
- */
-Object.defineProperty(FORGE.Viewer.prototype, "dependencies",
-{
-    /** @this {FORGE.Viewer} */
-    get: function()
-    {
-        return this._dependencies;
     }
 });
 
