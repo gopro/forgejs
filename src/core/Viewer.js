@@ -94,6 +94,14 @@ FORGE.Viewer = function(parent, config, callbacks)
      */
     this._canvas = null;
 
+     /**
+     * System module reference.
+     * @name FORGE.Viewer#_system
+     * @type {FORGE.System}
+     * @private
+     */
+    this._system = null;
+
     /**
      * Audio / mixer interface reference.
      * @name FORGE.Viewer#_audio
@@ -342,6 +350,11 @@ FORGE.Viewer.prototype._boot = function(callback)
      * WARNING THE ORDER OF THE BOOT SEQUENCE MATTERS A LOT!
      * DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOURE DOING
      */
+
+    if(this._alive === false)
+    {
+        return;
+    }
 
     this._uid = "FORGE-instance-" + String(FORGE.VIEWERS.length);
     FORGE.VIEWERS.push(this._uid);
@@ -713,91 +726,169 @@ FORGE.Viewer.prototype.destroy = function()
      * DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOURE DOING
      */
 
-    this._raf.stop();
+    if(this._raf !== null)
+    {
+        this._raf.destroy();
+        this._raf = null;
+    }
+
+    if(this._system !== null)
+    {
+        this._system.destroy();
+        this._system = null;
+    }
+
+    if(this._plugins !== null)
+    {
+        this._plugins.destroy();
+        this._plugins = null;
+    }
+
+    if(this._load !== null)
+    {
+        this._load.destroy();
+        this._load = null;
+    }
+
+    if(this._history !== null)
+    {
+        this._history.destroy();
+        this._history = null;
+    }
+
+    if(this._clock !== null)
+    {
+        this._clock.destroy();
+        this._clock = null;
+    }
+
+    if(this._keyboard !== null)
+    {
+        this._keyboard.destroy();
+        this._keyboard = null;
+    }
+
+    if(this._gyroscope !== null)
+    {
+        this._gyroscope.destroy();
+        this._gyroscope = null;
+    }
+
+    if(this._gamepad !== null)
+    {
+        this._gamepad.destroy();
+        this._gamepad = null;
+    }
+
+    if(this._hotspots !== null)
+    {
+        this._hotspots.destroy();
+        this._hotspots = null;
+    }
+
+    if(this._director !== null)
+    {
+        this._director.destroy();
+        this._director = null;
+    }
+
+    if(this._renderManager !== null)
+    {
+        this._renderManager.destroy();
+        this._renderManager = null;
+    }
+
+    if(this._canvas !== null)
+    {
+        this._canvas.destroy();
+        this._canvas = null;
+    }
+
+    if(this._canvasContainer !== null)
+    {
+        this._canvasContainer.destroy();
+        this._canvasContainer = null;
+    }
+
+    if(this._domHotspotContainer !== null)
+    {
+        this._domHotspotContainer.destroy();
+        this._domHotspotContainer = null;
+    }
+
+    if(this._pluginContainer !== null)
+    {
+        this._pluginContainer.destroy();
+        this._pluginContainer = null;
+    }
+
+    if(this._container !== null)
+    {
+        this._container.destroy();
+        this._container = null;
+    }
+
+    if(this._postProcessing !== null)
+    {
+        this._postProcessing.destroy();
+        this._postProcessing = null;
+    }
+
+    if(this._actions !== null)
+    {
+        this._actions.destroy();
+        this._actions = null;
+    }
+
+    if(this._display !== null)
+    {
+        this._display.destroy();
+        this._display = null;
+    }
+
+    if(this._playlists !== null)
+    {
+        this._playlists.destroy();
+        this._playlists = null;
+    }
+
+    if(this._audio !== null)
+    {
+        this._audio.destroy();
+        this._audio = null;
+    }
+
+    if(this._story !== null)
+    {
+        this._story.destroy();
+        this._story = null;
+    }
+
+    if(this._tween !== null)
+    {
+        this._tween.destroy();
+        this._tween = null;
+    }
+
+    if(this._cache !== null)
+    {
+        this._cache.destroy();
+        this._cache = null;
+    }
+
+    if(this._i18n !== null)
+    {
+        this._i18n.destroy();
+        this._i18n = null;
+    }
+
+    if(this._controllers !== null)
+    {
+        this._controllers.destroy();
+        this._controllers = null;
+    }
 
     this._parent = null;
-
-    this._system.destroy();
-    this._system = null;
-
-    this._plugins.destroy();
-    this._plugins = null;
-
-    this._raf.destroy();
-    this._raf = null;
-
-    this._load.destroy();
-    this._load = null;
-
-    this._history.destroy();
-    this._history = null;
-
-    this._clock.destroy();
-    this._clock = null;
-
-    this._keyboard.destroy();
-    this._keyboard = null;
-
-    this._gyroscope.destroy();
-    this._gyroscope = null;
-
-    this._gamepad.destroy();
-    this._gamepad = null;
-
-    this._hotspots.destroy();
-    this._hotspots = null;
-
-    this._director.destroy();
-    this._director = null;
-
-    this._renderManager.destroy();
-    this._renderManager = null;
-
-    this._canvas.destroy();
-    this._canvas = null;
-
-    this._canvasContainer.destroy();
-    this._canvasContainer = null;
-
-    this._domHotspotContainer.destroy();
-    this._domHotspotContainer = null;
-
-    this._postProcessing.destroy();
-    this._postProcessing = null;
-
-    this._pluginContainer.destroy();
-    this._pluginContainer = null;
-
-    this._actions.destroy();
-    this._actions = null;
-
-    this._container.destroy();
-    this._container = null;
-
-    this._display.destroy();
-    this._display = null;
-
-    this._playlists.destroy();
-    this._playlists = null;
-
-    this._audio.destroy();
-    this._audio = null;
-
-    this._story.destroy();
-    this._story = null;
-
-    this._cache.destroy();
-    this._cache = null;
-
-    this._tween.destroy();
-    this._tween = null;
-
-    this._i18n.destroy();
-    this._i18n = null;
-
-    this._controllers.destroy();
-    this._controllers = null;
-
     this._callbacks = null;
 
     if (this._onReady !== null)
