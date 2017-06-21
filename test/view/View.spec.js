@@ -63,10 +63,12 @@ describe("FORGE.View", function()
             sqrt3 = Math.sqrt(3) / 2,
 
             hf90 = Math.atan2(1, 4/3) * Math.tan(Math.PI / 4),
+            mg90 = Math.atan(0.5),
+            hfmg90 = Math.atan(3 / 8),
             sqrt217 = 2 * Math.sqrt(2 / 17),
             sqrt334 = 3 / Math.sqrt(34),
 
-            hf60 = Math.atan2(1, 4/3* Math.tan(Math.PI / 6)),
+            hf60 = Math.atan2(1, 4/3 * Math.tan(Math.PI / 6)),
             sqrt213 = 2 / Math.sqrt(13),
             sqrt3213 = 3 / (2 * Math.sqrt(13)),
             sqrt33132 = 3 * Math.sqrt(3 / 13) / 2,
@@ -115,10 +117,15 @@ describe("FORGE.View", function()
             { value: new THREE.Vector2(400, 300), expected: new THREE.Vector3(0, -1, 0),         camera: { pitch: -90 } },
             { value: new THREE.Vector2(400, 300), expected: new THREE.Vector3(0, -1, 0),         camera: { yaw: 180, pitch: -90 } },
 
-            { value: new THREE.Vector2(801, 1),   expected: null },
-            { value: new THREE.Vector2(1, 601),   expected: null },
-            { value: new THREE.Vector2(-1, 1),    expected: null },
-            { value: new THREE.Vector2(1, -1),    expected: null }
+            { value: new THREE.Vector2(1200, 300), expected: new THREE.Vector3(Math.cos(hfmg90), 0, -Math.sin(hfmg90)) },
+            { value: new THREE.Vector2(400, 900),  expected: new THREE.Vector3(0, Math.cos(mg90), -Math.sin(mg90)) },
+            { value: new THREE.Vector2(-400, 300), expected: new THREE.Vector3(-Math.cos(hfmg90), 0, -Math.sin(hfmg90)) },
+            { value: new THREE.Vector2(400, -300), expected: new THREE.Vector3(0, -Math.cos(mg90), -Math.sin(mg90)) },
+
+            { value: new THREE.Vector2(1201, 1),   expected: null },
+            { value: new THREE.Vector2(1, 901),    expected: null },
+            { value: new THREE.Vector2(-401, 1),   expected: null },
+            { value: new THREE.Vector2(1, -301),   expected: null }
         ];
 
         tests.forEach(function(test, index)
@@ -151,6 +158,8 @@ describe("FORGE.View", function()
         // FORGE and then normalized, hence the curious values below
         var sqrt3 = Math.sqrt(3) / 2,
 
+            mg90 = Math.atan(0.5),
+            hfmg90 = Math.atan(3 / 8),
             sqrt217 = 2 * Math.sqrt(2 / 17),
             sqrt334 = 3 / Math.sqrt(34),
 
@@ -201,7 +210,17 @@ describe("FORGE.View", function()
             { value: new THREE.Vector3(20, 0, -20), expected: new THREE.Vector2(400, 300), camera: { yaw: 45 } },
             { value: new THREE.Vector3(36, 0, 0),   expected: new THREE.Vector2(400, 300), camera: { yaw: 90 } },
             { value: new THREE.Vector3(0, -54, 0),  expected: new THREE.Vector2(400, 300), camera: { pitch: -90 } },
-            { value: new THREE.Vector3(0, -570, 0), expected: new THREE.Vector2(400, 300), camera: { yaw: 180, pitch: -90 } }
+            { value: new THREE.Vector3(0, -570, 0), expected: new THREE.Vector2(400, 300), camera: { yaw: 180, pitch: -90 } },
+
+            { value: new THREE.Vector3(Math.cos(hfmg90), 0, -Math.sin(hfmg90)),  expected: new THREE.Vector2(1200, 300) },
+            { value: new THREE.Vector3(0, Math.cos(mg90), -Math.sin(mg90)),      expected: new THREE.Vector2(400, 900) },
+            { value: new THREE.Vector3(-Math.cos(hfmg90), 0, -Math.sin(hfmg90)), expected: new THREE.Vector2(-400, 300) },
+            { value: new THREE.Vector3(0, -Math.cos(mg90), -Math.sin(mg90)),     expected: new THREE.Vector2(400, -300) },
+
+            { value: new THREE.Vector3(0, 0, 8573),     expected: null },
+            { value: new THREE.Vector3(234, -493, 20),  expected: null },
+            { value: new THREE.Vector3(138, 3120, 329), expected: null },
+            { value: new THREE.Vector3(-31, -59, 328),  expected: null }
         ];
 
         tests.forEach(function(test, index)
@@ -214,8 +233,15 @@ describe("FORGE.View", function()
 
                 var res = this.viewer.view.worldToScreen(test.value);
 
-                expect(res.x).toBeCloseTo(test.expected.x, 10);
-                expect(res.y).toBeCloseTo(test.expected.y, 10);
+                if (test.expected !== null)
+                {
+                    expect(res.x).toBeCloseTo(test.expected.x, 10);
+                    expect(res.y).toBeCloseTo(test.expected.y, 10);
+                }
+                else
+                {
+                    expect(res).toBe(null);
+                }
             });
         });
     });

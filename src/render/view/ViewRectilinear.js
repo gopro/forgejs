@@ -16,6 +16,12 @@ FORGE.ViewRectilinear.prototype = Object.create(FORGE.ViewBase.prototype);
 FORGE.ViewRectilinear.prototype.constructor = FORGE.ViewRectilinear;
 
 /**
+ * Screen margin allowed for semi off screen elements (percentage)
+ * @type {number}
+ */
+FORGE.ViewRectilinear.OFF_SCREEN_MARGIN = 0.5;
+
+/**
  * Boot sequence.
  *
  * @method FORGE.ViewRectilinear#_boot
@@ -86,6 +92,11 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
     var worldPt4 = new THREE.Vector4(worldPt.x, worldPt.y, worldPt.z, 0);
     var cameraPt = worldPt4.applyMatrix4(this._viewer.camera.modelView);
 
+    if (cameraPt.z > 0)
+    {
+        return null;
+    }
+
     // Project on zn plane by dividing x,y components by -z
     var projScale = Math.max(Number.EPSILON, -cameraPt.z);
     var znPt = new THREE.Vector2(cameraPt.x, cameraPt.y).divideScalar(projScale);
@@ -111,7 +122,10 @@ FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
 
     screenPt = screenPt || new THREE.Vector2(resolution.width / 2, resolution.height / 2);
 
-    if (screenPt.x < 0 || screenPt.x > resolution.width || screenPt.y < 0 || screenPt.y > resolution.height)
+    var widthMargin = FORGE.ViewRectilinear.OFF_SCREEN_MARGIN * resolution.width,
+        heightMargin = FORGE.ViewRectilinear.OFF_SCREEN_MARGIN * resolution.height;
+    if (screenPt.x < -widthMargin || screenPt.x > resolution.width + widthMargin
+        || screenPt.y < -heightMargin || screenPt.y > resolution.height + heightMargin)
     {
         return null;
     }
