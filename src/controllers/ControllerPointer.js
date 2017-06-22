@@ -234,7 +234,20 @@ FORGE.ControllerPointer.prototype._pinchStartHandler = function(event)
     }
 
     this._viewer.canvas.pointer.onPinchMove.add(this._pinchMoveHandler, this);
-    this.log("_pinchStartHandler "+event);
+    this.log("_pinchStartHandler");
+    this.log(event);
+
+    this._pinchFovStart = this._camera.fov;
+    this._pinchScaleMin = this._camera.fovMin / this._camera.fov;
+    this._pinchScaleMax = this._camera.fovMax / this._camera.fov;
+    this._pinchScaleOffset = 0;
+    this._pinchLastScale = 1;
+    this._pinchThresholdCount = 0;
+    this._pinchThreshold = 5;
+    this._pinchDirection = event.data.additionalEvent;
+
+    console.log(this._pinchScaleMin+" "+this._pinchScaleMax)
+    console.log(event.data);
 };
 
 /**
@@ -250,7 +263,43 @@ FORGE.ControllerPointer.prototype._pinchMoveHandler = function(event)
         return;
     }
 
-    this.log("_pinchMoveHandler " + event.data["pinch"]);
+    event.data.preventDefault();
+
+    var scale = 1 / event.data.scale;
+    var directionTmp = scale < this._pinchLastScale ? "pinchin" : "pinchout";
+    var directionChanged = false;
+
+    if (directionTmp !== this._pinchDirection)
+    {
+        this._pinchThresholdCount++;
+
+        if(this._pinchThresholdCount >= this._pinchThreshold)
+        {
+            directionChanged = true;
+            this._pinchDirection = this._pinchDirection === "pinchin" ? "pinchout" : "pinchin";
+            this._pinchThresholdCount = 0;
+        }
+    }
+
+    //console.log(this._pinchDirection);
+
+    if (this._pinchDirection === "pinchin" && scale <= this._pinchScaleMin && directionChanged === false)
+    {
+        this._pinchScaleOffset = scale - this._pinchScaleMin;
+        console.log("min reached " + scale + " - " + this._pinchScaleOffset + " - " + this._pinchDirection);
+    }
+    else if (this._pinchDirection === "pinchout" && scale >= this._pinchScaleMax && directionChanged === false)
+    {
+        this._pinchScaleOffset = -scale + this._pinchScaleMax;
+        console.log("max reached " + scale + " - " + this._pinchScaleOffset + " - " + this._pinchDirection);
+    }
+    else
+    {
+        console.log(this._pinchScaleOffset);
+        this._camera.fov = this._pinchFovStart * (scale - this._pinchScaleOffset);
+    }
+
+    this._pinchLastScale = scale;
 };
 
 /**
