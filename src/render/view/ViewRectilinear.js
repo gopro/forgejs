@@ -114,7 +114,7 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
  *
  * @method FORGE.ViewRectilinear#screenToWorld
  * @param {THREE.Vector2} screenPt - 2D point in screen space [0..w, 0..h]
- * @return {!THREE.Vector3} world point
+ * @return {?THREE.Vector3} world point
  */
 FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
 {

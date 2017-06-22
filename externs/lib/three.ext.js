@@ -537,6 +537,11 @@ THREE.Vector3.prototype.setFromSpherical = function(arg1) {};
 THREE.Vector3.prototype.applyQuaternion = function(arg1) {};
 
 /**
+ * @return {THREE.Vector3}
+ */
+THREE.Vector3.prototype.normalize = function() {};
+
+/**
  * @constructor
  * @param {number=} arg1
  * @param {number=} arg2

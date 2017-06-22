@@ -269,7 +269,7 @@ FORGE.Math.cartesianToSpherical = function(x, y, z)
 
     if (res.radius === 0)
     {
-        return { radius: 0, theta: 0, phi: 0 }
+        return { radius: 0, theta: 0, phi: 0 };
     }
 
     res.phi = Math.asin(y / res.radius);
