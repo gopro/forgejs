@@ -57,6 +57,14 @@ FORGE.ControllerPointer = function(viewer, config)
     this._positionCurrent = null;
 
     /**
+     * The fov value when you start to pinch in/out
+     * @name FORGE.ControllerPointer#_pinchStartFov
+     * @type {number}
+     * @private
+     */
+    this._pinchStartFov = 0;
+
+    /**
      * Current velocity vector.
      * @name FORGE.ControllerPointer#_velocity
      * @type {THREE.Vector2}
@@ -233,6 +241,8 @@ FORGE.ControllerPointer.prototype._pinchStartHandler = function(event)
         return;
     }
 
+    this._pinchStartFov = this._camera.fov;
+
     this._viewer.canvas.pointer.onPinchMove.add(this._pinchMoveHandler, this);
     this.log("_pinchStartHandler "+event);
 };
@@ -250,7 +260,9 @@ FORGE.ControllerPointer.prototype._pinchMoveHandler = function(event)
         return;
     }
 
-    this.log("_pinchMoveHandler " + event.data["pinch"]);
+    event.data.preventDefault();
+
+    this._camera.fov = this._pinchStartFov * event.data.scale;
 };
 
 /**
