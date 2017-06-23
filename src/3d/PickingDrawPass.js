@@ -166,7 +166,8 @@ FORGE.PickingDrawPass.prototype._getObjectAtXnYn = function(xn, yn)
  */
 FORGE.PickingDrawPass.prototype._getObjectUnderPointerEvent = function(event)
 {
-    var position = FORGE.Pointer.getRelativeMousePosition(event.data);
+    var e = event.data.srcEvent || event.data;
+    var position = FORGE.Pointer.getRelativeMousePosition(e);
     var xn = position.x / event.data.target.width;
     var yn = 1 - position.y / event.data.target.height;
     return this._getObjectAtXnYn(xn, yn);
