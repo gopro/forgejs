@@ -58,6 +58,14 @@ FORGE.Media = function(viewer, config)
     this._loaded = false;
 
     /**
+     * Events object that will keep references of the ActionEventDispatcher
+     * @name FORGE.Media#_events
+     * @type {Object<FORGE.ActionEventDispatcher>}
+     * @private
+     */
+    this._events = null;
+
+    /**
      * On load complete event dispatcher.
      * @name  FORGE.Media#_onLoadComplete
      * @type {FORGE.EventDispatcher}
@@ -80,6 +88,8 @@ FORGE.Media.prototype.constructor = FORGE.Media;
  */
 FORGE.Media.prototype._boot = function()
 {
+    this._events = {};
+
     // This event can no be a lazzy one (memorize is true)
     this._onLoadComplete = new FORGE.EventDispatcher(this, true);
 
@@ -114,6 +124,11 @@ FORGE.Media.prototype._parseConfig = function(config)
     if (typeof config.source !== "undefined" && typeof config.source.format === "undefined")
     {
         config.source.format = FORGE.MediaFormat.FLAT;
+    }
+
+    if (typeof config.events === "object" && config.events !== null)
+    {
+        this._createEvents(config.events);
     }
 
     if (this._type === FORGE.MediaType.GRID)
@@ -208,7 +223,44 @@ FORGE.Media.prototype._parseConfig = function(config)
         this._displayObject.load(source.url);
 
         this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
+        this._displayObject.onPlay.add(this._onPlayHandler, this);
+        this._displayObject.onPause.add(this._onPauseHandler, this);
+        this._displayObject.onSeeked.add(this._onSeekedHandler, this);
+        this._displayObject.onEnded.add(this._onEndedHandler, this);
+
+
         return;
+    }
+};
+
+/**
+ * Create action events dispatchers.
+ * @method FORGE.Media#_createEvents
+ * @private
+ * @param {SceneMediaEventsConfig} events - The events config of the media.
+ */
+FORGE.Media.prototype._createEvents = function(events)
+{
+    var event;
+    for(var e in events)
+    {
+        event = new FORGE.ActionEventDispatcher(this._viewer, e);
+        event.addActions(events[e]);
+        this._events[e] = event;
+    }
+};
+
+/**
+ * Clear all object events.
+ * @method Media.Object3D#_clearEvents
+ * @private
+ */
+FORGE.Media.prototype._clearEvents = function()
+{
+    for(var e in this._events)
+    {
+        this._events[e].destroy();
+        this._events[e] = null;
     }
 };
 
@@ -258,6 +310,62 @@ FORGE.Media.prototype._notifyLoadComplete = function()
 };
 
 /**
+ * Internal handler on video play.
+ * @method FORGE.Media#_onPlayHandler
+ * @private
+ */
+FORGE.Media.prototype._onPlayHandler = function()
+{
+    // Actions defined from the json
+    if(FORGE.Utils.isTypeOf(this._events.onPlay, "ActionEventDispatcher") === true)
+    {
+        this._events.onPlay.dispatch();
+    }
+};
+
+/**
+ * Internal handler on video pause.
+ * @method FORGE.Media#_onPauseHandler
+ * @private
+ */
+FORGE.Media.prototype._onPauseHandler = function()
+{
+    // Actions defined from the json
+    if(FORGE.Utils.isTypeOf(this._events.onPlay, "ActionEventDispatcher") === true)
+    {
+        this._events.onPause.dispatch();
+    }
+};
+
+/**
+ * Internal handler on video seeked.
+ * @method FORGE.Media#_onSeekedHandler
+ * @private
+ */
+FORGE.Media.prototype._onSeekedHandler = function()
+{
+    // Actions defined from the json
+    if(FORGE.Utils.isTypeOf(this._events.onPlay, "ActionEventDispatcher") === true)
+    {
+        this._events.onSeeked.dispatch();
+    }
+};
+
+/**
+ * Internal handler on video ended.
+ * @method FORGE.Media#_onEndedHandler
+ * @private
+ */
+FORGE.Media.prototype._onEndedHandler = function()
+{
+    // Actions defined from the json
+    if(FORGE.Utils.isTypeOf(this._events.onPlay, "ActionEventDispatcher") === true)
+    {
+        this._events.onEnded.dispatch();
+    }
+};
+
+/**
  * Media destroy sequence
  *
  * @method FORGE.Media#destroy
@@ -275,6 +383,9 @@ FORGE.Media.prototype.destroy = function()
         this._onLoadComplete.destroy();
         this._onLoadComplete = null;
     }
+
+    this._clearEvents();
+    this._events = null;
 
     this._viewer = null;
 };
