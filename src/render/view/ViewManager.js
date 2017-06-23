@@ -163,6 +163,33 @@ FORGE.ViewManager.prototype.disableVR = function()
 };
 
 /**
+ * Convert a point from world space to screen space with the current view type.
+ *
+ * @method FORGE.ViewManager#worldToScreen
+ * @param {THREE.Vector3} worldPt - Point in world space
+ * @param {number} parallax - Parallax factor [0..1]
+ * @return {THREE.Vector2} Point in screen coordinates
+ * @todo Implement worldToScreen
+ */
+FORGE.ViewManager.prototype.worldToScreen = function(worldPt, parallax)
+{
+    return this._view.worldToScreen(worldPt, parallax);
+};
+
+/**
+ * Convert a point from screen space to world space with the current view type.
+ *
+ * @method FORGE.ViewManager#screenToWorld
+ * @param {THREE.Vector2} screenPt point in screen space
+ * @return {THREE.Vector3}
+ * @todo Implement screenToWorld
+ */
+FORGE.ViewManager.prototype.screenToWorld = function(screenPt)
+{
+    return this._view.screenToWorld(screenPt);
+};
+
+/**
  * Destroy sequence
  * @method FORGE.ViewManager#destroy
  */

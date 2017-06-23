@@ -16,6 +16,12 @@ FORGE.ViewRectilinear.prototype = Object.create(FORGE.ViewBase.prototype);
 FORGE.ViewRectilinear.prototype.constructor = FORGE.ViewRectilinear;
 
 /**
+ * Screen margin allowed for semi off screen elements (percentage)
+ * @type {number}
+ */
+FORGE.ViewRectilinear.OFF_SCREEN_MARGIN = 0.5;
+
+/**
  * Boot sequence.
  *
  * @method FORGE.ViewRectilinear#_boot
@@ -74,16 +80,16 @@ FORGE.ViewRectilinear.prototype.updateUniforms = function(uniforms)
  * @method FORGE.ViewRectilinear#worldToScreen
  * @param {THREE.Vector3} worldPt - 3D point in world space
  * @param {number} parallaxFactor - parallax factor [0..1]
- * @return {THREE.Vector2} point in screen coordinates
+ * @return {?THREE.Vector2} point in screen coordinates
  */
 FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor)
 {
+    worldPt = worldPt || new THREE.Vector3();
+    worldPt.normalize();
     parallaxFactor = parallaxFactor || 0;
 
     // Get point projected on unit sphere and apply camera rotation
     var worldPt4 = new THREE.Vector4(worldPt.x, worldPt.y, worldPt.z, 1.0);
-
-    // Apply reversed rotation
     var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
     var rotation = FORGE.Math.eulerToRotationMatrix(camEuler.yaw, camEuler.pitch, camEuler.roll, true);
     rotation = rotation.transpose();
@@ -91,10 +97,10 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
 
     if (worldPt4.z < 0)
     {
-        return new THREE.Vector2(Infinity, Infinity);
+        return null;
     }
 
-    // Project on zn plane by dividing x,y components by -z
+    // Project on zn plane by dividing x,y components by z
     var projScale = Math.max(Number.EPSILON, worldPt4.z);
     var znPt = new THREE.Vector2(worldPt4.x, worldPt4.y).divideScalar(projScale);
 
@@ -111,15 +117,31 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
  *
  * @method FORGE.ViewRectilinear#screenToWorld
  * @param {THREE.Vector2} screenPt - 2D point in screen space [0..w, 0..h]
- * @return {THREE.Vector3} world point
+ * @return {?THREE.Vector3} world point
  */
 FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
 {
+    var resolution = this._viewer.renderer.displayResolution;
+
+    screenPt = screenPt || new THREE.Vector2(resolution.width / 2, resolution.height / 2);
+
+    var widthMargin = FORGE.ViewRectilinear.OFF_SCREEN_MARGIN * resolution.width,
+        heightMargin = FORGE.ViewRectilinear.OFF_SCREEN_MARGIN * resolution.height;
+    if (screenPt.x < -widthMargin || screenPt.x > resolution.width + widthMargin
+        || screenPt.y < -heightMargin || screenPt.y > resolution.height + heightMargin)
+    {
+        return null;
+    }
+
+    // move the point in a -1..1 square
     var fragment = this._screenToFragment(screenPt);
+
+    // scale it (see _updateViewParams above)
     fragment.multiplyScalar(this._projectionScale);
 
     var cameraPt = new THREE.Vector4(fragment.x, fragment.y, -1, 0);
 
+    // move the point in the world system
     var worldPt = cameraPt.applyMatrix4(this._viewer.camera.modelViewInverse).normalize();
 
     return new THREE.Vector3(worldPt.x, worldPt.y, worldPt.z);
