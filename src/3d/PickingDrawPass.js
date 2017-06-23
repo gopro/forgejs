@@ -166,18 +166,18 @@ FORGE.PickingDrawPass.prototype._getObjectAtXnYn = function(xn, yn)
  */
 FORGE.PickingDrawPass.prototype._getObjectUnderPointerEvent = function(event)
 {
-    event.data.center = event.data.center || {x:event.data.x, y:event.data.y};
-    var xn = event.data.center.x / event.data.target.width;
-    var yn = 1 - event.data.center.y / event.data.target.height;
+    var position = FORGE.Pointer.getRelativeMousePosition(event.data);
+    var xn = position.x / event.data.target.width;
+    var yn = 1 - position.y / event.data.target.height;
     return this._getObjectAtXnYn(xn, yn);
 };
 
 /**
  * Pointer click handler
- * @method FORGE.PickingDrawPass#_onPointerClick
+ * @method FORGE.PickingDrawPass#_canvasPointerClickHandler
  * @private
  */
-FORGE.PickingDrawPass.prototype._onPointerClick = function(event)
+FORGE.PickingDrawPass.prototype._canvasPointerClickHandler = function(event)
 {
     var object = this._getObjectUnderPointerEvent(event);
 
@@ -191,10 +191,10 @@ FORGE.PickingDrawPass.prototype._onPointerClick = function(event)
 
 /**
  * Pointer move handler
- * @method FORGE.PickingDrawPass#_onPointerMove
+ * @method FORGE.PickingDrawPass#_canvasPointerMoveHandler
  * @private
  */
-FORGE.PickingDrawPass.prototype._onPointerMove = function(event)
+FORGE.PickingDrawPass.prototype._canvasPointerMoveHandler = function(event)
 {
     var object = this._getObjectUnderPointerEvent(event);
 
@@ -232,14 +232,14 @@ FORGE.PickingDrawPass.prototype.start = function()
 {
     this._viewer.canvas.pointer.enabled = true;
 
-    if (this._viewer.canvas.pointer.onClick.has(this._onPointerClick, this) === false)
+    if (this._viewer.canvas.pointer.onClick.has(this._canvasPointerClickHandler, this) === false)
     {
-        this._viewer.canvas.pointer.onClick.add(this._onPointerClick, this);
+        this._viewer.canvas.pointer.onClick.add(this._canvasPointerClickHandler, this);
     }
 
-    if (this._viewer.canvas.pointer.onMove.has(this._onPointerMove, this) === false)
+    if (this._viewer.canvas.pointer.onMove.has(this._canvasPointerMoveHandler, this) === false)
     {
-        this._viewer.canvas.pointer.onMove.add(this._onPointerMove, this);
+        this._viewer.canvas.pointer.onMove.add(this._canvasPointerMoveHandler, this);
     }
 };
 
@@ -249,14 +249,14 @@ FORGE.PickingDrawPass.prototype.start = function()
  */
 FORGE.PickingDrawPass.prototype.stop = function()
 {
-    if (this._viewer.canvas.pointer.onClick.has(this._onPointerClick, this))
+    if (this._viewer.canvas.pointer.onClick.has(this._canvasPointerClickHandler, this))
     {
-        this._viewer.canvas.pointer.onClick.remove(this._onPointerClick, this);
+        this._viewer.canvas.pointer.onClick.remove(this._canvasPointerClickHandler, this);
     }
 
-    if (this._viewer.canvas.pointer.onMove.has(this._onPointerMove, this))
+    if (this._viewer.canvas.pointer.onMove.has(this._canvasPointerMoveHandler, this))
     {
-        this._viewer.canvas.pointer.onMove.remove(this._onPointerMove, this);
+        this._viewer.canvas.pointer.onMove.remove(this._canvasPointerMoveHandler, this);
     }
 };
 
@@ -266,7 +266,7 @@ FORGE.PickingDrawPass.prototype.stop = function()
  */
 FORGE.PickingDrawPass.prototype.click = function()
 {
-    if(this._hoveredObject !== null && this._viewer.canvas.pointer.onClick.has(this._onPointerClick, this))
+    if(this._hoveredObject !== null && this._viewer.canvas.pointer.onClick.has(this._canvasPointerClickHandler, this))
     {
         this._hoveredObject.click();
     }
