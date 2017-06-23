@@ -56,7 +56,7 @@ FORGE.HotspotManager.prototype._parseConfig = function(config)
  * Create a hotspot from a hotpsot config object.
  * @method FORGE.HotspotManager#create
  * @param {HotspotConfig} config - The config of the hotspot you want to create.
- * @return {(FORGE.Hotspot3D|boolean)} Returns the hotspot if the hotspot is created, false if not.
+ * @return {(FORGE.Hotspot3D|FORGE.HotspotDOM|boolean)} Returns the hotspot if the hotspot is created, false if not.
  */
 FORGE.HotspotManager.prototype.create = function(config)
 {
