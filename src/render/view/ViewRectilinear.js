@@ -89,20 +89,23 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
     parallaxFactor = parallaxFactor || 0;
 
     // Get point projected on unit sphere and apply camera rotation
-    var worldPt4 = new THREE.Vector4(worldPt.x, worldPt.y, worldPt.z, 0);
-    var cameraPt = worldPt4.applyMatrix4(this._viewer.camera.modelView);
+    var worldPt4 = new THREE.Vector4(worldPt.x, worldPt.y, worldPt.z, 1.0);
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
+    var rotation = FORGE.Math.eulerToRotationMatrix(camEuler.yaw, camEuler.pitch, camEuler.roll, true);
+    rotation = rotation.transpose();
+    worldPt4.applyMatrix4(rotation);
 
-    if (cameraPt.z > 0)
+    if (worldPt4.z < 0)
     {
         return null;
     }
 
-    // Project on zn plane by dividing x,y components by -z
-    var projScale = Math.max(Number.EPSILON, -cameraPt.z);
-    var znPt = new THREE.Vector2(cameraPt.x, cameraPt.y).divideScalar(projScale);
+    // Project on zn plane by dividing x,y components by z
+    var projScale = Math.max(Number.EPSILON, worldPt4.z);
+    var znPt = new THREE.Vector2(worldPt4.x, worldPt4.y).divideScalar(projScale);
 
     // Apply fov scaling
-    znPt.x /= ((1 + parallaxFactor) * this._projectionScale);
+    znPt.x /= (1 + parallaxFactor) * this._projectionScale;
     znPt.y /= this._projectionScale;
 
     // Return fragment
