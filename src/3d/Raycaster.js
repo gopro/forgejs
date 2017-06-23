@@ -147,12 +147,8 @@ FORGE.Raycaster.prototype.stop = function()
  */
 FORGE.Raycaster.prototype._canvasPointerClickHandler = function(event)
 {
-    event.data.center = event.data.center ||
-    {
-        x: event.data.clientX,
-        y: event.data.clientY
-    };
-    this._raycast("click", event.data.center);
+    var position = FORGE.Pointer.getRelativeMousePosition(event.data.srcEvent);
+    this._raycast("click", position);
 };
 
 /**
@@ -163,12 +159,8 @@ FORGE.Raycaster.prototype._canvasPointerClickHandler = function(event)
  */
 FORGE.Raycaster.prototype._canvasPointerMoveHandler = function(event)
 {
-    event.data.center = event.data.center ||
-    {
-        x: event.data.clientX,
-        y: event.data.clientY
-    };
-    this._raycast("move", event.data.center);
+    var position = FORGE.Pointer.getRelativeMousePosition(event.data);
+    this._raycast("move", position);
 };
 
 /**
@@ -185,7 +177,7 @@ FORGE.Raycaster.prototype._cameraChangeHandler = function()
  * Raycasting internal method
  * @method FORGE.Raycaster#_raycast
  * @param {string} event - triggering event
- * @param {Object=} screenPoint - raycasting point in screen coordinates, if no screen point defined, it will raycast in the center of the view.
+ * @param {THREE.Vector2=} screenPoint - raycasting point in screen coordinates, if no screen point defined, it will raycast in the center of the view.
  * @private
  */
 FORGE.Raycaster.prototype._raycast = function(event, screenPoint)
@@ -198,11 +190,7 @@ FORGE.Raycaster.prototype._raycast = function(event, screenPoint)
 
     var resolution = this._viewer.renderer.canvasResolution;
 
-    screenPoint = screenPoint ||
-    {
-        x: resolution.width / 2,
-        y: resolution.height / 2
-    };
+    screenPoint = screenPoint || new THREE.Vector2(resolution.width / 2, resolution.height / 2);
 
     var camera = this._viewer.renderer.camera;
     var ndc = new THREE.Vector2(screenPoint.x / resolution.width, 1.0 - screenPoint.y / resolution.height).multiplyScalar(2).addScalar(-1);

@@ -928,6 +928,22 @@ FORGE.Pointer.prototype.destroy = function()
 };
 
 /**
+ * Get the relative mouse position inside the target element of a mouse event
+ * @method FORGE.Pointer.getRelativeMousePosition
+ * @static
+ * @param {MouseEvent} event - The mouse event
+ * @return {THREE.Vector2}
+ */
+FORGE.Pointer.getRelativeMousePosition = function(event)
+{
+    var rect = event.target.getBoundingClientRect();
+    var x = event.clientX - rect.left;
+    var y = event.clientY - rect.top;
+
+    return new THREE.Vector2(x, y);
+};
+
+/**
 * Get or set the enabled flag.
 * @name FORGE.Pointer#enabled
 * @type {boolean}
