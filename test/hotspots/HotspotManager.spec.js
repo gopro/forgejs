@@ -15,7 +15,7 @@ describe("HotspotManager", function() {
         this.viewer = null;
     });
 
-    describe("#clear()", function(){
+    describe("#clear()", function() {
         var config;
 
         beforeEach(function() {

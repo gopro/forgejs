@@ -56,16 +56,18 @@ FORGE.HotspotDOM.prototype.constructor = FORGE.HotspotDOM;
 
 /**
  * @name FORGE.HotspotDOM.DEFAULT_CONFIG
- * @type {HotspotDomConfig}
+ * @type {HotspotConfig}
  */
 FORGE.HotspotDOM.DEFAULT_CONFIG =
 {
-    id: "hostpot-dom",
-    width: 320,
-    height: 240,
-    color: "white",
-    index: 10
-
+    dom:
+    {
+        id: "hostpot-dom",
+        width: 320,
+        height: 240,
+        color: "white",
+        index: 10
+    }
 };
 
 /**
@@ -90,34 +92,41 @@ FORGE.HotspotDOM.prototype._boot = function()
  */
 FORGE.HotspotDOM.prototype._parseConfig = function(config)
 {
-    config = /** @type {HotspotConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.HotspotDOM.DEFAULT_CONFIG, config.dom));
+    config = /** @type {HotspotConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.HotspotDOM.DEFAULT_CONFIG, config));
 
-    if (config !== null && typeof config !== "undefined")
+    var dom = config.dom;
+
+    if (dom !== null && typeof dom !== "undefined")
     {
-        if (typeof config.id === "string")
+        if (typeof dom.id === "string")
         {
-            this._displayObject.id = config.id;
+            this._displayObject.id = dom.id;
         }
 
-        if (typeof config.width === "number" || typeof config.width === "string")
+        if (typeof dom.width === "number" || typeof dom.width === "string")
         {
-            this._displayObject.width = config.width;
+            this._displayObject.width = dom.width;
         }
 
-        if (typeof config.height === "number" || typeof config.width === "string")
+        if (typeof dom.height === "number" || typeof dom.width === "string")
         {
-            this._displayObject.height = config.height;
+            this._displayObject.height = dom.height;
         }
 
-        if (typeof config.color === "string")
+        if (typeof dom.color === "string")
         {
-            this._displayObject.background = config.color;
+            this._displayObject.background = dom.color;
         }
 
-        if (typeof config.index === "number")
+        if (typeof dom.index === "number")
         {
-            this._displayObject.index = config.index;
+            this._displayObject.index = dom.index;
         }
+    }
+
+    if (config.transform !== null && typeof config.transform !== "undefined")
+    {
+        this._transform.load(config.transform, false);
     }
 
     this.show();
@@ -162,6 +171,21 @@ FORGE.HotspotDOM.prototype.hide = function()
  */
 FORGE.HotspotDOM.prototype.update = function()
 {
+    // get the screen position of the hotspots
+    var position = this._viewer.view.worldToScreen(this._transform.position.values);
+
+    if (position !== null)
+    {
+        var x = position.x - this._displayObject.width / 2;
+        var y = position.y - this._displayObject.height / 2;
+        this._displayObject.left = x;
+        this._displayObject.top = y;
+    }
+    else
+    {
+        this._displayObject.dom.style.left = "99999px";
+        this._displayObject.dom.style.top = "99999px";
+    }
 };
 
 /**

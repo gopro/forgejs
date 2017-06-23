@@ -219,6 +219,20 @@ Object.defineProperty(FORGE.HotspotTransformValues.prototype, "z",
 });
 
 /**
+ * Get the vector representing the values
+ * @name FORGE.HotspotTransformValues#values
+ * @type {THREE.Vector3}
+ */
+Object.defineProperty(FORGE.HotspotTransformValues.prototype, "values",
+{
+    /** @this {FORGE.HotspotTransformValues} */
+    get: function()
+    {
+        return new THREE.Vector3(this._x, this._y, this._z);
+    }
+});
+
+/**
  * Get the onChange {@link FORGE.EventDispatcher}.
  * @name FORGE.HotspotTransformValues#onChange
  * @readonly
