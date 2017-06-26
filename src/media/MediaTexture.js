@@ -60,6 +60,11 @@ FORGE.MediaTexture.prototype.constructor = FORGE.MediaTexture;
  */
 FORGE.MediaTexture.prototype.destroy = function()
 {
+    if (this._texture !== null)
+    {
+        this._texture.dispose();
+    }
+    
     this._texture = null;
 };
 
