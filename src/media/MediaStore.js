@@ -176,7 +176,7 @@ FORGE.MediaStore.prototype._parseConfig = function(config)
 FORGE.MediaStore.prototype._createKey = function(tile)
 {
     var key = "";
-    key += typeof tile.face !== "undefined" ? this._cubeFaceConfig[tile.face] : "";
+    key += typeof tile.face !== "undefined" ? this._cubeFaceConfig[tile.face] + "-" : "";
     key += typeof tile.level !== "undefined" ? tile.level + "-" : "";
     key += typeof tile.x !== "undefined" ? tile.x + "-" : "";
     key += typeof tile.y !== "undefined" ? tile.y : "";
@@ -264,6 +264,28 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
 };
 
 /**
+ * Discard texture.
+ *
+ * @method FORGE.MediaStore#_discardTexture
+ * @param {string} key - texture key
+ * @private
+ */
+FORGE.MediaStore.prototype._discardTexture = function(key)
+{
+    if (this._textures.has(key) === false)
+    {
+        return;
+    }
+
+    var texture = this._textures.get(key);
+
+    this._size -= texture.size;
+    texture.destroy();
+
+    this._textures.delete(key);
+};
+
+/**
  * Check the current size of the store, and flush some texture if necessary.
  *
  * @method FORGE.MediaStore#_checkSize
@@ -299,9 +321,7 @@ FORGE.MediaStore.prototype._checkSize = function()
         // but don't delete if it is locked
         if (force === true || texture[1].locked !== true)
         {
-            this._size -= texture[1].size;
-            texture[1].destroy();
-            this._textures.delete(texture[0]);
+            this._discardTexture(texture[0]);
         }
     }
 };
@@ -424,6 +444,16 @@ FORGE.MediaStore.prototype.get = function(tile)
 FORGE.MediaStore.prototype.has = function(key)
 {
     return this._textures.has(key);
+};
+
+/**
+ * Discard texture for a given tile
+ * @method FORGE.MediaStore#discardTileTexture
+ * @param {FORGE.Tile} tile - tile
+ */
+FORGE.MediaStore.prototype.discardTileTexture = function(tile)
+{
+    this._discardTexture(this._createKey(tile));
 };
 
 /**
