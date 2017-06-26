@@ -39,12 +39,12 @@ FORGE.HotspotDOM = function(viewer, config)
     this._transform = null;
 
     /**
-     * The {@link FORGE.DisplayObjectContainer} representing the hotspot
-     * @name FORGE.HotspotDOM#_displayObject
-     * @type {FORGE.DisplayObjectContainer}
+     * The HTML element composing the hotspot
+     * @name FORGE.HotspotDOM#_dom
+     * @type {Element|HTMLElement}
      * @private
      */
-    this._displayObject = null;
+    this._dom = null;
 
     FORGE.BaseObject.call(this, "HotspotDOM");
 
@@ -77,11 +77,14 @@ FORGE.HotspotDOM.DEFAULT_CONFIG =
  */
 FORGE.HotspotDOM.prototype._boot = function()
 {
-    this._displayObject = new FORGE.DisplayObjectContainer(this._viewer);
+    this._dom = document.createElement("div");
+    this._dom.style.position = "absolute";
     this._transform = new FORGE.HotspotTransform();
-    this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
-    this._register();
+
     this._parseConfig(this._config);
+    this._register();
+
+    this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
 };
 
 /**
@@ -94,34 +97,54 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
 {
     config = /** @type {HotspotConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.HotspotDOM.DEFAULT_CONFIG, config));
 
+    this._uid = config.uid;
+
     var dom = config.dom;
 
     if (dom !== null && typeof dom !== "undefined")
     {
         if (typeof dom.id === "string")
         {
-            this._displayObject.id = dom.id;
+            this._dom.id = dom.id;
+        }
+        else
+        {
+            this.dom.id = this._uid;
         }
 
-        if (typeof dom.width === "number" || typeof dom.width === "string")
+        var rule = "." + this._dom.id + "-basic-class {";
+
+        if (typeof dom.width === "number")
         {
-            this._displayObject.width = dom.width;
+            rule += "width: " + dom.width + "px;";
+        }
+        else if (typeof dom.width === "string")
+        {
+            rule += "width: " + dom.width + ";";
         }
 
-        if (typeof dom.height === "number" || typeof dom.width === "string")
+        if (typeof dom.height === "number")
         {
-            this._displayObject.height = dom.height;
+            rule += "height: " + dom.height + "px;";
+        }
+        else if (typeof dom.height === "string")
+        {
+            rule += "height: " + dom.height + ";";
         }
 
         if (typeof dom.color === "string")
         {
-            this._displayObject.background = dom.color;
+            rule += "background-color: " + dom.color + ";";
         }
 
         if (typeof dom.index === "number")
         {
-            this._displayObject.index = dom.index;
+            rule+= "z-index: " + dom.index + ";";
         }
+
+        rule += "}";
+        this._viewer.domHotspotStyle.sheet.insertRule(rule);
+        this._dom.className = this._dom.id + "-basic-class";
     }
 
     if (config.transform !== null && typeof config.transform !== "undefined")
@@ -139,11 +162,11 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
  */
 FORGE.HotspotDOM.prototype._viewChangeHandler = function()
 {
-    this._displayObject.visible = true;
+    this._dom.style.display = "block";
 
     if (this._viewer.view.type !== FORGE.ViewType.RECTILINEAR)
     {
-        this._displayObject.visible = false;
+        this._dom.style.display = "none";
     }
 };
 
@@ -153,7 +176,7 @@ FORGE.HotspotDOM.prototype._viewChangeHandler = function()
  */
 FORGE.HotspotDOM.prototype.show = function()
 {
-    this._viewer.domHotspotContainer.addChild(this._displayObject);
+    this._viewer.domHotspotContainer.dom.appendChild(this._dom);
 };
 
 /**
@@ -162,7 +185,7 @@ FORGE.HotspotDOM.prototype.show = function()
  */
 FORGE.HotspotDOM.prototype.hide = function()
 {
-    this._viewer.domHotspotContainer.removeChild(this._displayObject, false);
+    this._viewer.domHotspotContainer.dom.removeChild(this._dom, false);
 };
 
 /**
@@ -176,15 +199,15 @@ FORGE.HotspotDOM.prototype.update = function()
 
     if (position !== null)
     {
-        var x = position.x - this._displayObject.width / 2;
-        var y = position.y - this._displayObject.height / 2;
-        this._displayObject.left = x;
-        this._displayObject.top = y;
+        var x = position.x - this._dom.clientWidth / 2;
+        var y = position.y - this._dom.clientHeight / 2;
+        this._dom.style.left = x + "px";
+        this._dom.style.top = y + "px";
     }
     else
     {
-        this._displayObject.dom.style.left = "99999px";
-        this._displayObject.dom.style.top = "99999px";
+        this._dom.style.left = "99999px";
+        this._dom.style.top = "99999px";
     }
 };
 
@@ -194,26 +217,11 @@ FORGE.HotspotDOM.prototype.update = function()
  */
 FORGE.HotspotDOM.prototype.destroy = function()
 {
-    this._displayObject.destroy();
-    this._displayObject = null;
+    this._dom = null;
 
     this._transform.destroy();
     this._transform = null;
 };
-
-/**
- * @name FORGE.HotspotDOM#displayObject
- * @readonly
- * @type {FORGE.DisplayObjectContainer}
- */
-Object.defineProperty(FORGE.HotspotDOM.prototype, "displayObject",
-{
-    /** @this {FORGE.HotspotDOM} */
-    get: function()
-    {
-        return this._displayObject;
-    }
-});
 
 /**
  * @name FORGE.HotspotDOM#dom
@@ -225,11 +233,6 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "dom",
     /** @this {FORGE.HotspotDOM} */
     get: function()
     {
-        if (this._displayObject !== null)
-        {
-            return this._displayObject.dom;
-        }
-
-        return null;
+        return this._dom;
     }
 });
