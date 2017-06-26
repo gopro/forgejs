@@ -78,6 +78,7 @@ FORGE.HotspotDOM.DEFAULT_CONFIG =
 FORGE.HotspotDOM.prototype._boot = function()
 {
     this._dom = document.createElement("div");
+    this._dom.classList.add("hotspot-dom");
     this._dom.style.position = "absolute";
     this._transform = new FORGE.HotspotTransform();
 
@@ -112,6 +113,19 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
             this.dom.id = this._uid;
         }
 
+        if (typeof dom.class === "string")
+        {
+            this._dom.classList.add(dom.class);
+        }
+        else if (Array.isArray(dom.class) === true)
+        {
+            for (var i = 0, ii = dom.class.length; i < ii; i++)
+            {
+                this._dom.classList.add(dom.class[i]);
+            }
+        }
+
+        // basic CSS from json configuration
         var rule = "." + this._dom.id + "-basic-class {";
 
         if (typeof dom.width === "number")
@@ -144,7 +158,7 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
 
         rule += "}";
         this._viewer.domHotspotStyle.sheet.insertRule(rule);
-        this._dom.className = this._dom.id + "-basic-class";
+        this._dom.classList.add(this._dom.id + "-basic-class");
     }
 
     if (config.transform !== null && typeof config.transform !== "undefined")

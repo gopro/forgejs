@@ -13,6 +13,16 @@
             "example": "hotspot-dom-billboard"
         },
 
+        "class": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "Class",
+            "description": "The class or list of class to add to the hotspot, useful to set CSS to the hotspot by group.",
+            "example": "round-blue-hotspot"
+        },
+
         "width": {
             "anyOf": [
                 { "type": "number" },
