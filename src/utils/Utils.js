@@ -520,6 +520,21 @@ FORGE.Utils.arrayByDifference = function(array, elements)
     });
 };
 
+
+/**
+ * Get an array of unique elements from a given array
+ * @method FORGE.Utils.arrayUnique
+ * @param  {Array} array input array to be filtered
+ * @return {Array} array of unique elements
+ */
+FORGE.Utils.arrayUnique = function(array)
+{
+    return array.filter(function(item, index, items)
+    {
+        return items.indexOf(item) === index;
+    });
+};
+
 /**
  * Remove and return item from an array at given index
  * @method FORGE.Utils.removeItemFromArrayAtIndex
