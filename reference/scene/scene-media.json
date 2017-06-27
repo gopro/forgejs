@@ -29,6 +29,10 @@
             "$ref": "scene-media-options"
         },
 
+        "events": {
+            "$ref": "scene-media-events"
+        },
+
         "fx": {
             "type": "string",
             "title": "FX",

@@ -1,0 +1,49 @@
+{
+    "id": "scene-media-events",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneMediaEventsConfig",
+    "description": "An instance of <a href=\"#scene-events\">the scene media events configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "onPlay": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onPlay",
+            "description": "The onPlay event of the media. The action uid or an array of action uids. Works only on video media.",
+            "example": "action-0"
+        },
+
+        "onPause": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onPause",
+            "description": "The onPause event of the media. The action uid or an array of action uids. Works only on video media.",
+            "example": "action-0"
+        },
+
+        "onSeeked": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onSeeked",
+            "description": "The onSeeked event of the media. The action uid or an array of action uids. Works only on video media.",
+            "example": "action-0"
+        },
+
+        "onEnded": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ],
+            "title": "onEnded",
+            "description": "The onEnded event of the media. The action uid or an array of action uids. Works only on video media.",
+            "example": "action-0"
+        }
+    }
+}
