@@ -74,14 +74,6 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
      * @private
      */
     this._tilesOnAxisY = 0;
-
-    /**
-     * Internal raycaster. Used to refresh where neighborhood is unknown
-     * @type {THREE.Raycaster}
-     * @private
-     */
-    this._raycaster = null;
-    this._raycastChain = null;
     
     /**
      * List of renderered tiles
@@ -134,9 +126,6 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     this.log("boot");
 
     this._parseConfig(this._config);
-
-    this._raycaster = new THREE.Raycaster();
-    this._raycastChain = [];
 
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
 
@@ -263,66 +252,6 @@ FORGE.BackgroundPyramidRenderer.prototype._onTileDestroyed = function(event)
     tile.onDestroy.remove(this._onTileDestroyed, this);
     this._tileCache[tile.level].delete(tile.name);
     this._scene.remove(tile);
-};
-
-/**
- * Internal raycast used to refresh textures
- * @method FORGE.BackgroundPyramidRenderer#_raycast
- * @private
- */
-FORGE.BackgroundPyramidRenderer.prototype._raycast = function()
-{
-    this._raycastChain = [];
-
-    // TODO: add a grid of points
-    var screenPoint = new THREE.Vector2(0.5, 0.5).multiplyScalar(2).addScalar(-1);
-    // var screenPoint = new THREE.Vector2(this._viewer.canvas.dom.width, this._viewer.canvas.dom.height).divideScalar(2).floor();
-    this._raycaster.setFromCamera(screenPoint, viewer.renderer.camera.main);
-    
-    var intersects = this._raycaster.intersectObjects(this._scene.children, true);
-
-    var count=0;
-    intersects.forEach(function(intersect, idx, array) {
-        if (intersect.object.level === this._level)
-        {
-            ++count;
-        }
-    }.bind(this));
-
-    if (count > 1)
-    {
-        return;
-    }
-
-    intersects = intersects.filter(function(intersect, idx, array) {
-        // return intersect.object instanceof FORGE.Tile && intersect.faceIndex === 0 && array.indexOf(intersect) === idx;
-        var isTile = intersect.object instanceof FORGE.Tile;
-        var isUnique = array.indexOf(intersect) === idx;
-        
-        // var name = intersect.object.name;
-
-        // var isFirstWithThisName = array.find(function(element) {
-        //     element.object.name === name;
-        // }) === idx;
-
-        // return isTile && isUnique && isFirstWithThisName;
-        return isTile && isUnique;
-    });
-
-    intersects.sort(function(a, b) {
-        if (a.object.level > b.object.level) {
-            return -1;
-        }
-        else {
-            return 1;
-        }
-    });
-
-    this._raycastChain = intersects.map(function(intersect, idx, array) {
-        return intersect.object;
-    });  
-
-    // console.log(intersects.length);
 };
 
 // Compute tile that should be displayed (and its parents) using camera yaw, pitch and fov
@@ -641,11 +570,10 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
     this._textureStore = null;
     this._tileCache = null;
+    this._renderNeighborList.length = 0;
+    this._renderNeighborList = null;
     this._renderList.length = 0;
-    this._renderList = [];
-    this._raycastChain.length = 0;
-    this._raycastChain = null;
-    this._raycaster = null;
+    this._renderList = null;
     this._config = null;
 
     FORGE.BackgroundRenderer.prototype.destroy.call(this);
@@ -774,20 +702,6 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "tilesOnAxisY",
     get: function()
     {
         return this._tilesOnAxisY;
-    }
-});
-
-/**
- * Get raycasted tiles array, ordered from top to bottom
- * @name FORGE.BackgroundPyramidRenderer#raycastChain
- * @type {number}
- */
-Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "raycastChain",
-{
-    /** @this {FORGE.BackgroundPyramidRenderer} */
-    get: function()
-    {
-        return this._raycastChain;
     }
 });
 
