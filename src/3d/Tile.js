@@ -14,14 +14,6 @@
 FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
 {
     /**
-     * Reference on parent tile
-     * @name FORGE.Tile#_parent
-     * @type {FORGE.Tile}
-     * @private
-     */
-    this._parent = parent;
-
-    /**
      * String describing what created the tile
      * @type {FORGE.Tile}
      */
@@ -85,52 +77,44 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
     this._displayTS = null;
 
     /**
-     * Reference on north west tile
-     * @name FORGE.Tile#_northWest
+     * Reference on parent tile
+     * @name FORGE.Tile#_parent
      * @type {FORGE.Tile}
      * @private
      */
-    this._northWest = null;
+    this._parent = parent;
 
     /**
-     * Reference on north east tile
-     * @name FORGE.Tile#_northEast
-     * @type {FORGE.Tile}
+     * Reference on children tiles
+     * @name FORGE.Tile#_children
+     * @type {Array<FORGE.Tile>}
      * @private
      */
-    this._northEast = null;   
+    this._children = null; 
 
     /**
-     * Reference on south east tile
-     * @name FORGE.Tile#_southEast
-     * @type {FORGE.Tile}
+     * Array of references on neighbour tiles
+     * @name FORGE.Tile#_neighbours
+     * @type {Array<FORGE.Tile>}
      * @private
      */
-    this._southEast = null;   
-
-    /**
-     * Reference on south west tile
-     * @name FORGE.Tile#_southWest
-     * @type {FORGE.Tile}
-     * @private
-     */
-    this._southWest = null;
+    this._neighbours = null;
 
     /**
      * Flag to know if parent has been checked
-     * @name FORGE.MediaStore#_parentCheckDone
+     * @name FORGE.MediaStore#_parentNeedsCheck
      * @type {boolean}
      * @private
      */
-    this._parentCheckDone = false;
+    this._parentNeedsCheck = true;
 
     /**
      * Flag to know if neighbourhood has been checked
-     * @name FORGE.MediaStore#_neighbourhoodCheckDone
+     * @name FORGE.MediaStore#_neighborsNeedCheck
      * @type {boolean}
      * @private
      */
-    this._neighbourhoodCheckDone = false;
+    this._neighborsNeedCheck = true;
 
     /**
      * Global opacity value
@@ -138,7 +122,7 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
      * @type {number}
      * @private
      */
-    this._opacity = 0.001;
+    this._opacity = 0;
 
     /**
      * Texture load pending flag
@@ -256,6 +240,9 @@ FORGE.Tile.getParentTileCoordinates = function(tile)
  */
 FORGE.Tile.prototype._boot = function()
 {
+    this._neighbours = []; 
+    this._children = []; 
+
     // Always ensure a new tile has a parent tile
     // This will prevent from zomming out into some empty area
     if (this._level > 0 && this._parent === null) {
@@ -269,20 +256,12 @@ FORGE.Tile.prototype._boot = function()
 
     this._setGeometry();
 
-    // Create checkboard colors as default material
-    var hs = FORGE.Tile.FACES_COLOR[this._face];
-    var l = (this._x & 1) ^ (this._y & 1) ? 0.25 : 0.50;
-    var hsl = new THREE.Color().setHSL(hs.h / 360, hs.s, l);
-    hsl = new THREE.Color(0x000000);
-
     // Level 0 objects are opaque to be rendered first
     var transparent = this._level > 0;
-    this._opacity = transparent ? 0.0 : 1.0;
-
-    // this.renderOrder = this._level;
+    this._opacity = transparent ? 0.001 : 1.0;
 
     this.material = new THREE.MeshBasicMaterial({
-        color:hsl,
+        color:new THREE.Color(0x000000),
         transparent: transparent,
         opacity: this._opacity,
         depthTest: false,
@@ -299,14 +278,17 @@ FORGE.Tile.prototype._boot = function()
 
 /**
  * Before render callback
- * This is called by THREE.js render routine
+ * This is called by THREE.js render routine before render is done
+ * Add to background renderer list and set opacity
  * @method FORGE.Tile#_onBeforeRender
  * @private
  */
 FORGE.Tile.prototype._onBeforeRender = function()
 {
-    // this._setOpacity(this._opacity);
+    // Add to renderer render list
+    this._renderer.addToRenderList(this);
 
+    // Update tile opacity if in transition
     if (this._renderer.level !== this._level)
     {
         if (this._opacity > 0)
@@ -316,24 +298,36 @@ FORGE.Tile.prototype._onBeforeRender = function()
 
         return;
     }
-    else
+
+    if (this._opacity < 1 && this.material.map !== null)
     {
-        if (this._opacity < 1 && this.material.map !== null)
-        {
-            this._setOpacity(this._opacity + FORGE.Tile.OPACITY_INCREMENT);
-        }
+        this._setOpacity(this._opacity + FORGE.Tile.OPACITY_INCREMENT);
     }
+};
 
-    // Add to renderer render list
-    this._renderer.addToRenderList(this);
-
-    // Get neighbour tiles to ensure there is no hole near the frustum
-    this._checkNeighbours();
-
+/**
+ * After render callback
+ * This is called by THREE.js render routine after render has been done
+ * Here we update all links to other tiles, ask for subdivision or neighbours
+ * Request texture if none
+ * @method FORGE.Tile#_onAfterRender
+ * @private
+ */
+FORGE.Tile.prototype._onAfterRender = function()
+{
     // Update last display timestamp
     this._displayTS = Date.now();
 
-    // Enable texture mapping
+    // Check if tile should be divided
+    if (this._renderer.level > this._level)
+    {
+        this._subdivide();
+    }
+
+    // Get all neighbour tiles references
+    this._checkNeighbours();
+
+    // Update texture mapping
     if (this._texturePending === false &&
         this._displayTS - this._createTS > FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS)
     {
@@ -342,6 +336,12 @@ FORGE.Tile.prototype._onBeforeRender = function()
         if (texPromise !== null)
         {
             texPromise.then(function(texture) {
+                // Check if tile has been destroyed in the meantime
+                if (this.material === null)
+                {
+                    return;
+                }
+
                 if (texture !== null && texture instanceof THREE.Texture)
                 {
                     this._texturePending = true;
@@ -360,21 +360,6 @@ FORGE.Tile.prototype._onBeforeRender = function()
                 //console.log("Tile texture loading error: " + error);
             }.bind(this));
         }
-    }
-
-};
-
-/**
- * After render callback
- * This is called by THREE.js render routine
- * @method FORGE.Tile#_onAfterRender
- * @private
- */
-FORGE.Tile.prototype._onAfterRender = function(renderer, scene, camera, geometry, material, group)
-{
-    if (this._renderer.level > this._level)
-    {
-        this._subdivide();
     }
 };
 
@@ -489,11 +474,6 @@ FORGE.Tile.prototype._setGeometry = function(rotation)
         -(baseOffset + fullTileHeight * this._y + 0.5 * tileSize.height),
         baseOffset);
 
-    // var position = new THREE.Vector3(0, 0, -0.5 * this._renderer.cubeSize);
-
-    // //console.log("tile height: " + tileSize.height + ", full tile height: " + fullTileHeight);
-    // console.log(this.name + " - position: " + position.x + ", " + position.y);
-
     var rotation = this._getRotation();
     this.rotation.copy(rotation);
     
@@ -546,13 +526,13 @@ FORGE.Tile.prototype._getRotation = function()
  */
 FORGE.Tile.prototype._subdivide = function()
 {
-    if (this._northWest !== null)
+    if (this._children.length === 4)
     {
         return;
     }
 
     // var halfSize = this.geometry.boundingBox.getSize().multiplyScalar(0.5);
-
+    var tile;
     var level = this._level + 1;
 
     var x0 = 2 * this._x;
@@ -560,9 +540,12 @@ FORGE.Tile.prototype._subdivide = function()
     var y0 = 2 * this._y;
     var y1 = 2 * this._y + 1;
 
-    this._northWest = this._renderer.getTile(this, level, this._face, x0, y0, "quarter NW of " + this.name);
-    // this._northWest.position.set(-halfSize.x, halfSize.y);
-    // this.add(this._northWest);
+    tile = this._renderer.getTile(this, level, this._face, x0, y0, "quarter NW of " + this.name);
+    if (this._children.indexOf(tile) === -1)
+    {    
+        tile.onDestroy.add(this._onChildTileDestroyed, this);
+        this._children.push(tile);
+    }
 
     var tx = this._renderer.nbTilesPerAxis(this._level + 1, "x");
     var ty = this._renderer.nbTilesPerAxis(this._level + 1, "y");
@@ -572,42 +555,92 @@ FORGE.Tile.prototype._subdivide = function()
 
     if (x1_in === true)
     {
-        this._northEast = this._renderer.getTile(this, level, this._face, x1, y0, "quarter NE of " + this.name);
-        // this._northEast.position.set(halfSize.x, halfSize.y);
-        // this.add(this._northEast);
+        tile = this._renderer.getTile(this, level, this._face, x1, y0, "quarter NE of " + this.name);
+        if (this._children.indexOf(tile) === -1)
+        {    
+            tile.onDestroy.add(this._onChildTileDestroyed, this);
+            this._children.push(tile);
+        }
     }
 
     if (y1_in === true)
     {
-        this._southWest = this._renderer.getTile(this, level, this._face, x0, y1, "quarter SW of " + this.name);
-        // this._southWest.position.set(-halfSize.x, -halfSize.y);
-        // this.add(this._southWest);
+        tile = this._renderer.getTile(this, level, this._face, x0, y1, "quarter SW of " + this.name);
+        if (this._children.indexOf(tile) === -1)
+        {    
+            tile.onDestroy.add(this._onChildTileDestroyed, this);
+            this._children.push(tile);
+        }
     }
 
     if (x1_in === true && y1_in === true)
     {
-        this._southEast = this._renderer.getTile(this, level, this._face, x1, y1, "quarter SE of " + this.name);
-        // this._southEast.position.set(halfSize.x, -halfSize.y);
-        // this.add(this._southEast);
+        tile = this._renderer.getTile(this, level, this._face, x1, y1, "quarter SE of " + this.name);
+        if (this._children.indexOf(tile) === -1)
+        {    
+            tile.onDestroy.add(this._onChildTileDestroyed, this);
+            this._children.push(tile);
+        }
     }
 };
 
 /**
- * Neighbor tile destroy event handler
- * @method FORGE.Tile#_onNeighborTileDestroyed
+ * Child tile destroy event handler
+ * @method FORGE.Tile#_onChildTileDestroyed
  */
-FORGE.Tile.prototype._onNeighborTileDestroyed = function()
+FORGE.Tile.prototype._onChildTileDestroyed = function(event)
 {
-    this._neighbourhoodCheckDone = false;
+    var tile = event.emitter;
+    tile.onDestroy.remove(this._onChildTileDestroyed, this);
+
+    if (this._children === null)
+    {
+        return;
+    }
+
+    var idx = this._children.indexOf(tile);
+
+    if (idx !== -1)
+    {
+        this._children.splice(idx, 1);
+    }
+};
+
+/**
+ * Neighbour tile destroy event handler
+ * @method FORGE.Tile#_onNeighbourTileDestroyed
+ */
+FORGE.Tile.prototype._onNeighbourTileDestroyed = function(event)
+{
+    var tile = event.emitter;
+    tile.onDestroy.remove(this._onNeighbourTileDestroyed, this);
+
+    this._neighborsNeedCheck = true;
+
+    if (this._neighbours === null)
+    {
+        return;
+    }
+
+    var idx = this._neighbours.indexOf(tile);
+
+    if (idx !== -1)
+    {
+        this._neighbours.splice(idx, 1);
+    }
 };
 
 /**
  * Parent tile destroy event handler
  * @method FORGE.Tile#_onParentTileDestroyed
  */
-FORGE.Tile.prototype._onParentTileDestroyed = function()
+FORGE.Tile.prototype._onParentTileDestroyed = function(event)
 {
-    this._parentCheckDone = false;
+    var tile = event.emitter;
+    tile.onDestroy.remove(this._onParentTileDestroyed, this);
+
+    this._parent = null;
+    this._parentNeedsCheck = true;
 };
 
 /**
@@ -618,25 +651,18 @@ FORGE.Tile.prototype._onParentTileDestroyed = function()
 FORGE.Tile.prototype._checkParent = function()
 {
     if (this._parent !== null ||
-        this._parentCheckDone === true ||
+        this._parentNeedsCheck === false ||
         this._level === 0 ||
         this._level !== this._renderer.level) {
         return;
     }
 
-    this._parentCheckDone = true;
+    this._parentNeedsCheck = false;
 
     var sequence = Promise.resolve();
     sequence.then(function() {
         this._parent = this._renderer.getParentTile(this);
         this._parent.onDestroy.add(this._onParentTileDestroyed, this);
-
-        // if (this._parent.children.indexOf(this) === -1)
-        // {
-        //     this._parent.add(this);   
-        // }
-        //console.log("Parent tile created (" + parent.name + ")");
-        
     }.bind(this));
 };
 
@@ -647,12 +673,13 @@ FORGE.Tile.prototype._checkParent = function()
  */
 FORGE.Tile.prototype._checkNeighbours = function()
 {
-    if (this._neighbourhoodCheckDone === true || this._level !== this._renderer.level)
+    if (this._neighborsNeedCheck === false ||
+        this._level !== this._renderer.level)
     {
         return;
     }
     
-    this._neighbourhoodCheckDone = true;
+    this._neighborsNeedCheck = false;
 
     var tx = Math.ceil(this._renderer.nbTilesPerAxis(this._level, "x"));
     var ty = Math.ceil(this._renderer.nbTilesPerAxis(this._level, "y"));
@@ -668,7 +695,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
     var ymin = Math.max(0, this._y - 1);
     var ymax = Math.min(ty - 1, this._y + 1);
 
-    var tileDestroyedCallback = this._onNeighborTileDestroyed.bind(this);
+    var tileDestroyedCallback = this._onNeighbourTileDestroyed.bind(this);
 
     // and do the job for the current face
     for (var y=ymin; y<=ymax; y++)
@@ -680,155 +707,172 @@ FORGE.Tile.prototype._checkNeighbours = function()
                 continue;
             }
 
-            (function (prenderer, plevel, pface, px, py) {
+            (function (prenderer, plevel, pface, px, py, neighbours) {
                 sequence.then(function()
                 {
                     var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour of " + name);
-                    tile.onDestroy.add(tileDestroyedCallback, this);
+                    if (neighbours.indexOf(tile) === -1)
+                    {
+                        tile.onDestroy.add(tileDestroyedCallback);
+                        neighbours.push(tile);
+                    }
                 });
-            })(this._renderer, this._level, this._face, x, y);
+            })(this._renderer, this._level, this._face, x, y, this._neighbours);
         }
     }
 
-    // When tile per axis is under 3, all tiles are on the edge
-    if (tx > 2 || ty > 2)
+
+    var tileX = this._x;
+    var tileY = this._y;
+
+    // Check if tile is on a left edge of the cube face
+    if (tileX === 0)
     {
-        var tileX = this._x;
-        var tileY = this._y;
-
-        // Check if tile is on a left edge of the cube face
-        if (tileX === 0)
+        sequence.then(function()
         {
-            sequence.then(function()
-            {
-                (function (prenderer, plevel, pface, px, py) {
-                    sequence.then(function()
+            (function (prenderer, plevel, pface, px, py, neighbours) {
+                sequence.then(function()
+                {
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.left-edge of " + name);
+                    if (neighbours.indexOf(tile) === -1)
                     {
-                        var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.left-edge of " + name);
-                        tile.onDestroy.add(tileDestroyedCallback, this);
-                    });
-                })(this._renderer, this._level, FORGE.Tile.FACE_PREVIOUS[this._face], tx - 1, tileY);
+                        tile.onDestroy.add(tileDestroyedCallback);
+                        neighbours.push(tile);
+                    }
+                });
+            })(this._renderer, this._level, FORGE.Tile.FACE_PREVIOUS[this._face], tx - 1, tileY, this._neighbours);
 
-            }.bind(this));
+        }.bind(this));
+    }
+
+    // Check if tile is on a right edge of the cube face
+    if (tileX === tx - 1)
+    {
+        sequence.then(function()
+        {
+            (function (prenderer, plevel, pface, px, py, neighbours) {
+                sequence.then(function()
+                {
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.right-edge of " + name);
+                    if (neighbours.indexOf(tile) === -1)
+                    {
+                        tile.onDestroy.add(tileDestroyedCallback);
+                        neighbours.push(tile);
+                    }
+                });
+            })(this._renderer, this._level, FORGE.Tile.FACE_NEXT[this._face], 0, tileY, this._neighbours);
+
+        }.bind(this));
+    }
+
+    // Check if tile is on a bottom edge of the cube face
+    if (tileY === ty - 1)
+    {
+        var fx, fy, face = "down";
+
+        if (this._face === "front")
+        {
+            fx = tileX;
+            fy = 0;
+        }
+        else if (this._face === "back")
+        {
+            fx = tx - 1 - tileX;
+            fy = ty - 1;
+        }
+        else if (this._face === "right")
+        {
+            fx = ty - 1;
+            fy = tileX;
+        }
+        else if (this._face === "left")
+        {
+            fx = 0;
+            fy = tx - 1 - tileX;
+        }
+        else if (this._face === "up")
+        {
+            fx = tileX;
+            fy = 0;
+            face = "front";
+        }
+        else if (this._face === "down")
+        {
+            fx = tx - 1 - tileX;
+            fy = ty - 1;
+            face = "back";
         }
 
-        // Check if tile is on a right edge of the cube face
-        if (tileX === tx - 1)
+        sequence.then(function()
         {
-            sequence.then(function()
-            {
-                (function (prenderer, plevel, pface, px, py) {
-                    sequence.then(function()
+            (function (prenderer, plevel, pface, px, py, neighbours) {
+                sequence.then(function()
+                {
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.bottom-edge of " + name);
+                    if (neighbours.indexOf(tile) === -1)
                     {
-                        var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.right-edge of " + name);
-                        tile.onDestroy.add(tileDestroyedCallback, this);
-                    });
-                })(this._renderer, this._level, FORGE.Tile.FACE_NEXT[this._face], 0, tileY);
+                        tile.onDestroy.add(tileDestroyedCallback);
+                        neighbours.push(tile);
+                    }
+                });
+            })(this._renderer, this._level, face, fx, fy, this._neighbours);
 
-            }.bind(this));
+        }.bind(this));
+    }
+
+    // Check if tile is on a top edge of the cube face
+    if (tileY === 0)
+    {
+        var fx, fy, face = "up";
+
+        if (this._face === "front")
+        {
+            fx = tileX;
+            fy = ty - 1;
+        }
+        else if (this._face === "back")
+        {
+            fx = tx - 1 - tileX;
+            fy = 0;
+        }
+        else if (this._face === "right")
+        {
+            fx = tx - 1;
+            fy = tx - 1 - tileX;
+        }
+        else if (this._face === "left")
+        {
+            fx = 0;
+            fy = tileX;
+        }
+        else if (this._face === "up")
+        {
+            fx = tx - 1 - tileX;
+            fy = 0;
+            face = "back";
+        }
+        else if (this._face === "down")
+        {
+            fx = tileX;
+            fy = tx - 1;
+            face = "front";
         }
 
-        // Check if tile is on a bottom edge of the cube face
-        if (tileY === ty - 1)
+        sequence.then(function()
         {
-            var fx, fy, face = "down";
-
-            if (this._face === "front")
-            {
-                fx = tileX;
-                fy = 0;
-            }
-            else if (this._face === "back")
-            {
-                fx = tx - 1 - tileX;
-                fy = ty - 1;
-            }
-            else if (this._face === "right")
-            {
-                fx = ty - 1;
-                fy = tileX;
-            }
-            else if (this._face === "left")
-            {
-                fx = 0;
-                fy = tx - 1 - tileX;
-            }
-            else if (this._face === "up")
-            {
-                fx = tileX;
-                fy = 0;
-                face = "front";
-            }
-            else if (this._face === "down")
-            {
-                fx = tx - 1 - tileX;
-                fy = ty - 1;
-                face = "back";
-            }
-
-            sequence.then(function()
-            {
-                (function (prenderer, plevel, pface, px, py) {
-                    sequence.then(function()
+            (function (prenderer, plevel, pface, px, py, neighbours) {
+                sequence.then(function()
+                {
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.top-edge of " + name);
+                    if (neighbours.indexOf(tile) === -1)
                     {
-                        var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.bottom-edge of " + name);
-                        tile.onDestroy.add(tileDestroyedCallback, this);
-                    });
-                })(this._renderer, this._level, face, fx, fy);
+                        tile.onDestroy.add(tileDestroyedCallback);
+                        neighbours.push(tile);
+                    }
+                });
+            })(this._renderer, this._level, face, fx, fy, this._neighbours);
 
-            }.bind(this));
-        }
-
-        // Check if tile is on a top edge of the cube face
-        if (tileY === 0)
-        {
-            var fx, fy, face = "up";
-
-            if (this._face === "front")
-            {
-                fx = tileX;
-                fy = ty - 1;
-            }
-            else if (this._face === "back")
-            {
-                fx = tx - 1 - tileX;
-                fy = 0;
-            }
-            else if (this._face === "right")
-            {
-                fx = tx - 1;
-                fy = tx - 1 - tileX;
-            }
-            else if (this._face === "left")
-            {
-                fx = 0;
-                fy = tileX;
-            }
-            else if (this._face === "up")
-            {
-                fx = tx - 1 - tileX;
-                fy = 0;
-                face = "back";
-            }
-            else if (this._face === "down")
-            {
-                fx = tileX;
-                fy = tx - 1;
-                face = "front";
-            }
-
-            sequence.then(function()
-            {
-                (function (prenderer, plevel, pface, px, py) {
-                    sequence.then(function()
-                    {
-                        var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.top-edge of " + name);
-                        tile.onDestroy.add(tileDestroyedCallback, this);
-                    });
-                })(this._renderer, this._level, face, fx, fy);
-
-            }.bind(this));
-        }
+        }.bind(this));
     }
 };
 
@@ -864,41 +908,39 @@ FORGE.Tile.prototype.destroy = function()
             }            
         }
         
+        if (this.material.map !== null)
+        {
+            this.material.map.dispose();
+            this.material.map = null;
+        }
+
         this.material.dispose();
+        this.material = null;
     }
 
     if (this.geometry !== null)
     {
         this.geometry.dispose();
-    }
-
-    this._position = null;
-
-    if (this._northWest !== null)
-    {
-        this._northWest.destroy();   
-        this._northWest = null;   
-    }
-    
-    if (this._northEast !== null)
-    {
-        this._northEast.destroy();   
-        this._northEast = null;   
-    }
-    
-    if (this._southEast !== null)
-    {
-        this._southEast.destroy();   
-        this._southEast = null;   
-    }
-    
-    if (this._southWest !== null)
-    {
-        this._southWest.destroy();   
-        this._southWest = null;   
+        this.geometry = null;
     }
 
     this._parent = null;
+
+    for (var i=0, ii=this._children.length; i<ii; i++)
+    {
+        this._children[i].onDestroy.remove(this._onChildTileDestroyed, this);
+    }
+    this._children.length = 0; 
+    this._children = null; 
+
+    for (var i=0, ii=this._neighbours.length; i<ii; i++)
+    {
+        this._neighbours[i].onDestroy.remove(this._onNeighbourTileDestroyed, this);
+    }
+    this._neighbours.length = 0;
+    this._neighbours = null; 
+
+    this._position = null;
 
     this._renderer = null;
 
@@ -1002,6 +1044,20 @@ Object.defineProperty(FORGE.Tile.prototype, "opacity",
 });
 
 /**
+ * Create timestamp.
+ * @name FORGE.Tile#createTS
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Tile.prototype, "createTS",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        return this._createTS;
+    }
+});
+
+/**
  * Last display timestamp.
  * @name FORGE.Tile#displayTS
  * @type {number}
@@ -1012,6 +1068,20 @@ Object.defineProperty(FORGE.Tile.prototype, "displayTS",
     get: function()
     {
         return this._displayTS;
+    }
+});
+
+/**
+ * Neighbour tiles.
+ * @name FORGE.Tile#neighbours
+ * @type {Array<FORGE.Tile}
+ */
+Object.defineProperty(FORGE.Tile.prototype, "neighbours",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        return this._neighbours;
     }
 });
 
