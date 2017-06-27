@@ -187,7 +187,7 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
         }
 
         rule += "}";
-        this._viewer.domHotspotStyle.sheet.insertRule(rule);
+        this._viewer.domHotspotStyle.sheet.insertRule(rule, 0);
         this._dom.classList.add(this._dom.id + "-basic-class");
     }
 
