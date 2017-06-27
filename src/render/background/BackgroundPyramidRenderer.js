@@ -82,7 +82,20 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
      */
     this._raycaster = null;
     this._raycastChain = null;
+    
+    /**
+     * List of renderered tiles
+     * @type {Array<FORGE.Tile>}
+     * @private
+     */
     this._renderList = null;
+    
+    /**
+     * List of tiles in renderered tiles neighborhood
+     * @type {Array<FORGE.Tile>}
+     * @private
+     */
+    this._renderNeighborList = null;
 
     /**
      * Number of pixels at current level presented in human readable format
@@ -96,6 +109,18 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
 
 FORGE.BackgroundPyramidRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
 FORGE.BackgroundPyramidRenderer.prototype.constructor = FORGE.BackgroundPyramidRenderer;
+
+/**
+ * Max allowed time since a tile has been created before discarding it
+ * @type {number}
+ */
+FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS = 2000;
+
+/**
+ * Max allowed time since a tile has been displayed before discarding it
+ * @type {number}
+ */
+FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS = 30000;
 
 /**
  * Boot routine.
@@ -236,7 +261,7 @@ FORGE.BackgroundPyramidRenderer.prototype._onTileDestroyed = function(event)
 {
     var tile = event.emitter;
     tile.onDestroy.remove(this._onTileDestroyed, this);
-    this._tileCache(tile.level).delete(tile.name);
+    this._tileCache[tile.level].delete(tile.name);
     this._scene.remove(tile);
 };
 
@@ -391,10 +416,7 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
 
     if (this._scene.children.indexOf(tile) === -1)
     {
-        // if (tile.level === 0)
-        // {
-            this._scene.add(tile);
-        // }
+        this._scene.add(tile);
     }
 
     return tile;
@@ -466,36 +488,11 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 {
     this._level = level;
 
-    // Restore all tiles visibility for this level and add them to the scene
-    if (typeof this._tileCache[level] !== "undefined")
-    {
-        this._tileCache[level].forEach(function(tile)
-        {
-            tile.visible = true;
-            // this.scene.add(tile);
-        });
-    }
-
     // Update internals
     this._tilesOnAxisX = this.nbTilesPerAxis(this._level, "x");
     this._tilesOnAxisY = this.nbTilesPerAxis(this._level, "y");
 
     this.log("Tiles per axis - X: " + this._tilesOnAxisX + ", Y: " + this._tilesOnAxisY);
-
-    // // Clear every tile at level -2/+1 and add every tile at level -1/current
-    // if (typeof this._tileCache[this._level - 2] !== "undefined")
-    // {
-    //     this._tileCache[this._level - 2].forEach(function(element, index, array) {
-    //         this._scene.remove(element);
-    //     }.bind(this));
-    // }
-
-    // if (typeof this._tileCache[this._level + 1] !== "undefined")
-    // {
-    //     this._tileCache[this._level + 1].forEach(function(element, index, array) {
-    //         this._scene.remove(element);
-    //     }.bind(this));
-    // }
 
     if (typeof (this._tileCache[this._level]) !== "undefined")
     {
@@ -546,6 +543,46 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 FORGE.BackgroundPyramidRenderer.prototype.addToRenderList = function(tile)
 {
     this._renderList.push(tile);
+
+    // Add tile neighbours to the list only if its level is the current one
+    if (tile.level === this._level)
+    {
+        this._renderNeighborList = this._renderNeighborList.concat(tile.neighbours);
+    }
+};
+
+/**
+ * Discard a tile. Removes from the cache and the scene
+ * @method FORGE.BackgroundPyramidRenderer#_discardTile
+ * @param {FORGE.Tile} tile - tile
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype._discardTile = function(tile)
+{
+    if (typeof this._tileCache[tile.level] !== "undefined")
+    {
+        this._tileCache[tile.level].delete(tile);   
+    }
+
+    // var rl = "";
+    // this._renderList.forEach(function(tile) {
+    //     rl += tile.name + " ";
+    // });
+
+    // var ns = "";
+    // this._renderNeighborList.forEach(function(tile) {
+    //     ns += tile.name + " ";
+    // });
+
+    // this.log("Discard tile " + tile.name + "(ns: " + ns + ")" + "(rl: " + rl + ")");
+    
+    // this.log("Discard tile " + tile.name);
+
+    this._scene.remove(tile);
+
+    this._textureStore.discardTileTexture(tile);
+
+    tile.destroy();
 };
 
 /**
@@ -558,23 +595,42 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
 {
     // Renderer should find if some tile at current level are currently rendered
     this._renderList = [];
+    this._renderNeighborList = [];
 
     FORGE.BackgroundRenderer.prototype.render.call(this, this._viewer.camera.main);
     
-    // Cleanup scene
+    this._renderNeighborList = FORGE.Utils.arrayUnique(this._renderNeighborList);
+
+    var clearList = [];
+
+    var now = Date.now();
+
     this._scene.children.forEach(function(tile) {
-        // Only remove tile upper than level zeror and not at current level
-        if (tile.level === 0 || tile.level === this._level)
+        // Clear tile policy
+        // Only applies to tiles with non zero level
+        // Delete all tiles with zero opacity
+        // Delete all tiles that has been created more than 2s ago and have never been displayed
+        // Delete all tiles that has not been displayed since 30s
+        
+        var timeSinceCreate = now - tile.createTS;
+        var timeSinceDisplay = now - tile.displayTS;
+
+        if (tile.level > 0 &&
+            this._renderNeighborList.indexOf(tile) === -1 &&
+            ((tile.displayTS === null && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS) ||
+            (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS) ||
+            tile.opacity === 0))
         {
-            return;
+            clearList.push(tile);
         }
 
-        // Remove tiles with zero opacity
-        if (tile.opacity === 0)
-        {
-            this._scene.remove(tile);
-        }
     }.bind(this));
+
+    clearList.forEach(function(tile)
+    {
+        this._discardTile(tile);
+    }.bind(this));
+
 };
 
 /**
