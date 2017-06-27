@@ -81,7 +81,7 @@ FORGE.Viewer = function(parent, config, callbacks)
     /**
      * The DOM hotspot style container reference.
      * @name FORGE.Viewer#_domHotspotStyle
-     * @type {HTMLStyleElement}
+     * @type {Element|HTMLStyleElement}
      * @private
      */
     this._domHotspotStyle = null;
