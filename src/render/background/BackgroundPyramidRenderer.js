@@ -568,6 +568,8 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
  */
 FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
+    this._viewer.camera.onCameraChange.remove(this._onCameraChange, this);
+
     this._textureStore = null;
     this._tileCache = null;
     this._renderNeighborList.length = 0;
