@@ -389,10 +389,11 @@ FORGE.Loader.prototype._xhr = function(file, type, onComplete, onError, onProgre
  * @method FORGE.Loader#image
  * @param  {string} key - The key for the image file.
  * @param  {string} url - The url of the image file.
- * @param  {Function} callback - The callback function called when file is completed.
- * @param  {Object} context - The callback context when file is completed.
+ * @param  {Function} success - The success callback function called when file is completed.
+ * @param  {Function} error - The error callback function called when file won't load.
+ * @param  {Object} context - The callbacks context when file is completed.
  */
-FORGE.Loader.prototype.image = function(key, url, callback, context)
+FORGE.Loader.prototype.image = function(key, url, success, error, context)
 {
     var file = new FORGE.File();
     file.type = "image";
@@ -411,7 +412,12 @@ FORGE.Loader.prototype.image = function(key, url, callback, context)
         file.loaded = true;
 
         this._viewer.cache.add(FORGE.Cache.types.IMAGE, file.key, file);
-        callback.call(context, file);
+
+        if(typeof success === "function")
+        {
+            success.call(context, file);
+        }
+
     }.bind(this);
 
     file.data.onerror = function()
@@ -419,7 +425,14 @@ FORGE.Loader.prototype.image = function(key, url, callback, context)
         file.data.onload = null;
         file.data.onerror = null;
 
-        throw "ERROR : FORGE.Loader.image, failed to load image key : " + key + " at url " + url;
+        if(typeof error === "function")
+        {
+            error.call(context, file);
+        }
+        else
+        {
+            throw "ERROR : FORGE.Loader.image, failed to load image key : " + key + " at url " + url;
+        }
     };
 
     file.data.src = file.url;
