@@ -46,6 +46,14 @@ FORGE.HotspotDOM = function(viewer, config)
      */
     this._dom = null;
 
+    /**
+     * Events object that will keep references of the ActionEventDispatcher
+     * @name FORGE.HotspotDOM#_events
+     * @type {Object<FORGE.ActionEventDispatcher>}
+     * @private
+     */
+    this._events = null;
+
     FORGE.BaseObject.call(this, "HotspotDOM");
 
     this._boot();
@@ -79,6 +87,8 @@ FORGE.HotspotDOM.prototype._boot = function()
 {
     this._transform = new FORGE.HotspotTransform();
 
+    this._events = {};
+
     this._parseConfig(this._config);
     this._register();
 
@@ -96,6 +106,11 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
     config = /** @type {HotspotConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.HotspotDOM.DEFAULT_CONFIG, config));
 
     this._uid = config.uid;
+
+    if (typeof config.events === "object" && config.events !== null)
+    {
+        this._createEvents(config.events);
+    }
 
     var dom = config.dom;
 
@@ -175,12 +190,75 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
         this._dom.classList.add(this._dom.id + "-basic-class");
     }
 
+    this._dom.style.pointerEvents = "auto";
+    this._dom.addEventListener("click", this._domClickHandler.bind(this));
+    this._dom.addEventListener("mouseover", this._domOverHandler.bind(this));
+    this._dom.addEventListener("mouseout", this._domOutHandler.bind(this));
+
     if (config.transform !== null && typeof config.transform !== "undefined")
     {
         this._transform.load(config.transform, false);
     }
 
     this.show();
+};
+
+FORGE.HotspotDOM.prototype._domClickHandler = function(event)
+{
+    // Actions defined from the json
+    if(FORGE.Utils.isTypeOf(this._events.onClick, "ActionEventDispatcher") === true)
+    {
+        this._events.onClick.dispatch();
+    }
+};
+
+FORGE.HotspotDOM.prototype._domOverHandler = function(event)
+{
+    // Actions defined from the json
+    if(FORGE.Utils.isTypeOf(this._events.onOver, "ActionEventDispatcher") === true)
+    {
+        this._events.onOver.dispatch();
+    }
+};
+
+FORGE.HotspotDOM.prototype._domOutHandler = function(event)
+{
+    // Actions defined from the json
+    if(FORGE.Utils.isTypeOf(this._events.onOut, "ActionEventDispatcher") === true)
+    {
+        this._events.onOut.dispatch();
+    }
+};
+
+/**
+ * Create action events dispatchers.
+ * @method FORGE.HotspotDOM#_createEvents
+ * @private
+ * @param {Object} events - The events config of the dom hotspot.
+ */
+FORGE.HotspotDOM.prototype._createEvents = function(events)
+{
+    var event;
+    for(var e in events)
+    {
+        event = new FORGE.ActionEventDispatcher(this._viewer, e);
+        event.addActions(events[e]);
+        this._events[e] = event;
+    }
+};
+
+/**
+ * Clear all object events.
+ * @method FORGE.HotspotDOM#_clearEvents
+ * @private
+ */
+FORGE.HotspotDOM.prototype._clearEvents = function()
+{
+    for(var e in this._events)
+    {
+        this._events[e].destroy();
+        this._events[e] = null;
+    }
 };
 
 /**
@@ -249,6 +327,9 @@ FORGE.HotspotDOM.prototype.destroy = function()
 
     this._transform.destroy();
     this._transform = null;
+
+    this._clearEvents();
+    this._events = null;
 };
 
 /**
