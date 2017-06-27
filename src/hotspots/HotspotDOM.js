@@ -137,6 +137,7 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
         else
         {
             this._dom = document.createElement("div");
+            this._dom.id = id;
         }
 
         this._dom.classList.add("hotspot-dom");
