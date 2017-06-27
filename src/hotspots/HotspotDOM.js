@@ -77,9 +77,6 @@ FORGE.HotspotDOM.DEFAULT_CONFIG =
  */
 FORGE.HotspotDOM.prototype._boot = function()
 {
-    this._dom = document.createElement("div");
-    this._dom.classList.add("hotspot-dom");
-    this._dom.style.position = "absolute";
     this._transform = new FORGE.HotspotTransform();
 
     this._parseConfig(this._config);
@@ -104,14 +101,31 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
 
     if (dom !== null && typeof dom !== "undefined")
     {
+        var id;
+
         if (typeof dom.id === "string")
         {
-            this._dom.id = dom.id;
+            id = dom.id;
         }
         else
         {
-            this.dom.id = this._uid;
+            id = this._uid;
         }
+
+        // get the already present hotspot in the dom, or create it
+        var div = document.getElementById(id);
+
+        if (div !== null)
+        {
+            this._dom = div;
+        }
+        else
+        {
+            this._dom = document.createElement("div");
+        }
+
+        this._dom.classList.add("hotspot-dom");
+        this._dom.style.position = "absolute";
 
         if (typeof dom.class === "string")
         {
