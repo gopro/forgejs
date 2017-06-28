@@ -65,6 +65,15 @@ FORGE.ControllerPointer = function(viewer, config)
     this._pinchStartFov = 0;
 
     /**
+     * This is used when we have reached the minimum or maximum scale,
+     * in order not to have a "no-effect" zone when zooming the other way
+     * @name FORGE.ControllerPointer#_pinchScaleFactorCorrection
+     * @type {number}
+     * @private
+     */
+    this._pinchScaleFactorCorrection = 1;
+
+    /**
      * Current velocity vector.
      * @name FORGE.ControllerPointer#_velocity
      * @type {THREE.Vector2}
@@ -242,6 +251,7 @@ FORGE.ControllerPointer.prototype._pinchStartHandler = function(event)
     }
 
     this._pinchStartFov = this._camera.fov;
+    this._pinchScaleFactorCorrection = 1;
 
     this._viewer.canvas.pointer.onPinchMove.add(this._pinchMoveHandler, this);
     this.log("_pinchStartHandler "+event);
@@ -262,7 +272,24 @@ FORGE.ControllerPointer.prototype._pinchMoveHandler = function(event)
 
     event.data.preventDefault();
 
-    this._camera.fov = this._pinchStartFov * event.data.scale;
+    var scale = this._zoom.invert ? event.data.scale : 1 / event.data.scale;
+    var fovMin = this._camera.fovMin;
+    var fovMax = this._camera.fovMax;
+
+    var tmpFov = this._pinchStartFov * scale / this._pinchScaleFactorCorrection;
+
+    if (tmpFov < fovMin)
+    {
+        this._pinchScaleFactorCorrection = this._pinchStartFov * scale / fovMin;
+    }
+    else if (tmpFov > fovMax)
+    {
+        this._pinchScaleFactorCorrection = this._pinchStartFov * scale / fovMax;
+    }
+
+    tmpFov = this._pinchStartFov * scale / this._pinchScaleFactorCorrection;
+
+    this._camera.fov = tmpFov;
 };
 
 /**
