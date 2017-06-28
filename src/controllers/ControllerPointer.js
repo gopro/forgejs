@@ -272,7 +272,7 @@ FORGE.ControllerPointer.prototype._pinchMoveHandler = function(event)
 
     event.data.preventDefault();
 
-    var scale = event.data.scale;
+    var scale = this._zoom.invert ? event.data.scale : 1 / event.data.scale;
     var fovMin = this._camera.fovMin;
     var fovMax = this._camera.fovMax;
 
