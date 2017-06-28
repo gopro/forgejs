@@ -979,6 +979,10 @@ FORGE.Device = (function(c)
             {
                 console.warn("Unable to check plugin device compatibility for: "+i);
             }
+            else if(this[i] === true && this[i] === config[i])
+            {
+                return true;
+            }
             else if(this[i] !== config[i])
             {
                 return false;
