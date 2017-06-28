@@ -177,6 +177,14 @@ FORGE.Image = function(viewer, config, className)
      */
     this._onLoadComplete = null;
 
+    /**
+     * On load error event dispatcher.
+     * @name  FORGE.Image#_onLoaderror
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onLoadError = null;
+
     FORGE.DisplayObject.call(this, viewer, null, className || "Image");
 };
 
@@ -522,7 +530,7 @@ FORGE.Image.prototype._updateScaleHeight = function()
 FORGE.Image.prototype._loadImage = function(key, url)
 {
     this._loaded = false;
-    this._viewer.load.image(key, url, this._loadImageComplete, this);
+    this._viewer.load.image(key, url, this._loadImageComplete, this._loadImageError, this);
 };
 
 /**
@@ -548,6 +556,27 @@ FORGE.Image.prototype._loadImageComplete = function(file)
     this._imageLoaded = true;
 
     this._loadComplete();
+};
+
+/**
+ * Event handler for image load error.
+ * @method FORGE.Image#_loadImageError
+ * @private
+ */
+FORGE.Image.prototype._loadImageError = function(file)
+{
+    //If image is destroy during loading time, don't execute the callback
+    if(this._alive === false)
+    {
+        return;
+    }
+
+    this.warn(file.url + " load error");
+
+    if(this._onLoadError !== null)
+    {
+        this._onLoadError.dispatch();
+    }
 };
 
 /**
@@ -793,6 +822,12 @@ FORGE.Image.prototype.destroy = function(clearCache)
         this._onLoadComplete = null;
     }
 
+    if(this._onLoadError !== null)
+    {
+        this._onLoadError.destroy();
+        this._onLoadError = null;
+    }
+
     this._img = null;
 
     if(typeof clearCache === "undefined" || clearCache === true)
@@ -969,5 +1004,25 @@ Object.defineProperty(FORGE.Image.prototype, "onLoadComplete",
         }
 
         return this._onLoadComplete;
+    }
+});
+
+/**
+* Get the onLoadError {@link FORGE.EventDispatcher}.
+* @name FORGE.Image#onLoadError
+* @readonly
+* @type {FORGE.EventDispatcher}
+*/
+Object.defineProperty(FORGE.Image.prototype, "onLoadError",
+{
+    /** @this {FORGE.Image} */
+    get: function()
+    {
+        if(this._onLoadError === null)
+        {
+            this._onLoadError = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onLoadError;
     }
 });
