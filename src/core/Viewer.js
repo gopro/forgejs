@@ -79,6 +79,14 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._domHotspotContainer = null;
 
     /**
+     * The DOM hotspot style container reference.
+     * @name FORGE.Viewer#_domHotspotStyle
+     * @type {Element|HTMLStyleElement}
+     * @private
+     */
+    this._domHotspotStyle = null;
+
+    /**
      * The plugins container reference.
      * @name FORGE.Viewer#_pluginContainer
      * @type {FORGE.DisplayObjectContainer}
@@ -574,6 +582,10 @@ FORGE.Viewer.prototype._createContainers = function()
     this._domHotspotContainer.maximize(true);
     this._container.addChild(this._domHotspotContainer);
 
+    this._domHotspotStyle = document.createElement("style");
+    this._domHotspotStyle.type = "text/css";
+    document.head.appendChild(this._domHotspotStyle);
+
     this._pluginContainer = new FORGE.DisplayObjectContainer(this);
     this._pluginContainer.id = "FORGE-plugin-container-" + this._uid;
     this._container.index = 0;
@@ -762,6 +774,12 @@ FORGE.Viewer.prototype.destroy = function()
         this._clock = null;
     }
 
+    if (this._controllers !== null)
+    {
+        this._controllers.destroy();
+        this._controllers = null;
+    }
+
     if(this._keyboard !== null)
     {
         this._keyboard.destroy();
@@ -880,12 +898,6 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._i18n.destroy();
         this._i18n = null;
-    }
-
-    if(this._controllers !== null)
-    {
-        this._controllers.destroy();
-        this._controllers = null;
     }
 
     this._parent = null;
@@ -1077,6 +1089,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "domHotspotContainer",
     get: function()
     {
         return this._domHotspotContainer;
+    }
+});
+
+/**
+ * Get the viewer DOM hotspot style container.
+ * @name FORGE.Viewer#domHotspotStyle
+ * @type {HTMLStyleElement}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "domHotspotStyle",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._domHotspotStyle;
     }
 });
 

@@ -83,7 +83,7 @@ FORGE.Utils.extendSimpleObject = function(from, to, recursive)
 
 /**
  * Extend multiple object you pass in arguments, the last overrides the first and so on ...
- * @method  FORGE.Utils.extedMultipleObjects
+ * @method  FORGE.Utils.extendMultipleObjects
  * @param  {...Object} obj - the objects to merge
  * @return {Object} return the merged objects.
  */

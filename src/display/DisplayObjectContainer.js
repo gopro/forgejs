@@ -296,7 +296,7 @@ FORGE.DisplayObjectContainer.prototype.addChild = function(child)
 
 /**
  * Add a child to this display object container at a specific index.
- * @method  FORGE.DisplayObjectContainer#addChild
+ * @method  FORGE.DisplayObjectContainer#addChildAt
  * @param {FORGE.DisplayObject} child - The {@link FORGE.DisplayObject} you want to add to this display object container.
  * @param {number} index - The index you want to apply to your child.
  */

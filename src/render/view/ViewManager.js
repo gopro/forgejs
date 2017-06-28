@@ -197,8 +197,11 @@ FORGE.ViewManager.prototype.destroy = function()
 {
     this._viewer = null;
 
-    this._view.destroy();
-    this._view = null;
+    if (this._view !== null)
+    {
+        this._view.destroy();
+        this._view = null;
+    }
 
     if (this._onChange !== null)
     {

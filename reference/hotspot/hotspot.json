@@ -87,6 +87,10 @@
             "$ref": "sound"
         },
 
+        "dom": {
+            "$ref": "hotspot-dom"
+        },
+
         "events": {
             "$ref": "hotspot-events"
         },

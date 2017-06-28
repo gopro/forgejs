@@ -559,7 +559,7 @@ FORGE.Director.prototype._clearEvents = function()
 {
     this._viewer.camera.animation.onComplete.remove(this._onTrackCompleteHandler, this);
 
-    if (this._viewer.story.scene.media.type === FORGE.MediaType.VIDEO)
+    if (this._viewer.story.scene !== null && this._viewer.story.scene.media.type === FORGE.MediaType.VIDEO)
     {
         this._viewer.story.scene.media.displayObject.onPlay.remove(this._playHandler, this);
         this._viewer.story.scene.media.displayObject.onPause.remove(this._pauseHandler, this);

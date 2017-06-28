@@ -80,6 +80,7 @@ module.exports = function(grunt)
         "src/3d/PickingManager.js",
 
         "src/hotspots/HotspotManager.js",
+        "src/hotspots/HotspotDOM.js",
         "src/hotspots/Hotspot3D.js",
         "src/hotspots/HotspotSound.js",
         "src/hotspots/HotspotMaterial.js",

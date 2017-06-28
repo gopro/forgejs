@@ -11,3 +11,9 @@ FORGE.HotspotType = {};
  */
 FORGE.HotspotType.THREE_DIMENSIONAL = "3d";
 
+/**
+ * @name FORGE.HotspotType.DOM
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotType.DOM = "dom";
