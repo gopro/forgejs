@@ -331,7 +331,7 @@ FORGE.Media.prototype._onPlayHandler = function()
 FORGE.Media.prototype._onPauseHandler = function()
 {
     // Actions defined from the json
-    if(FORGE.Utils.isTypeOf(this._events.onPlay, "ActionEventDispatcher") === true)
+    if(FORGE.Utils.isTypeOf(this._events.onPause, "ActionEventDispatcher") === true)
     {
         this._events.onPause.dispatch();
     }
@@ -345,7 +345,7 @@ FORGE.Media.prototype._onPauseHandler = function()
 FORGE.Media.prototype._onSeekedHandler = function()
 {
     // Actions defined from the json
-    if(FORGE.Utils.isTypeOf(this._events.onPlay, "ActionEventDispatcher") === true)
+    if(FORGE.Utils.isTypeOf(this._events.onSeeked, "ActionEventDispatcher") === true)
     {
         this._events.onSeeked.dispatch();
     }
@@ -359,7 +359,7 @@ FORGE.Media.prototype._onSeekedHandler = function()
 FORGE.Media.prototype._onEndedHandler = function()
 {
     // Actions defined from the json
-    if(FORGE.Utils.isTypeOf(this._events.onPlay, "ActionEventDispatcher") === true)
+    if(FORGE.Utils.isTypeOf(this._events.onEnded, "ActionEventDispatcher") === true)
     {
         this._events.onEnded.dispatch();
     }
