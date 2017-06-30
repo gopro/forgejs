@@ -610,7 +610,7 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
         if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
         {
             config.mediaFormat = mediaConfig.source.format;
-            var ratio = media.displayObject.element.width / media.displayObject.element.height;
+            var ratio = media.displayObject.element.width / media.displayObject.element.height || 1;
 
             if (typeof mediaConfig.source.fov !== "undefined")
             {
