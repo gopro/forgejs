@@ -14,10 +14,17 @@
 
         },
 
-         "invert": {
+        "invert": {
             "type": "boolean",
             "title": "Invert",
             "description": "Inversion of axis.",
+            "example": false
+        },
+
+        "toPointer": {
+            "type": "boolean",
+            "title": "toPointer",
+            "description": "Zoom action also rotate the camera to keep the same area under your pointer during the zoom",
             "example": false
         }
     },
