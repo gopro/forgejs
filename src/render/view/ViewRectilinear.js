@@ -89,7 +89,7 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
     parallaxFactor = parallaxFactor || 0;
 
     // Get point projected on unit sphere and apply camera rotation
-    var worldPt4 = new THREE.Vector4(worldPt.x, worldPt.y, worldPt.z, 1.0);
+    var worldPt4 = new THREE.Vector4(worldPt.x, worldPt.y, -worldPt.z, 1.0);
     var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
     var rotation = FORGE.Math.eulerToRotationMatrix(camEuler.yaw, camEuler.pitch, camEuler.roll, true);
     rotation = rotation.transpose();

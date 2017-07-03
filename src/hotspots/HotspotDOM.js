@@ -271,7 +271,7 @@ FORGE.HotspotDOM.prototype._viewChangeHandler = function()
 {
     this._dom.style.display = "block";
 
-    if (this._viewer.view.type !== FORGE.ViewType.RECTILINEAR)
+    if (this._viewer.view.type !== FORGE.ViewType.RECTILINEAR && this._viewer.view.type !== FORGE.ViewType.GOPRO)
     {
         this._dom.style.display = "none";
     }

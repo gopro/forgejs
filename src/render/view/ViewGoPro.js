@@ -105,6 +105,87 @@ FORGE.ViewGoPro.prototype.updateUniforms = function(uniforms)
 };
 
 /**
+ * Convert a point from world space to screen space.
+ *
+ * @method FORGE.ViewGoPro#worldToScreen
+ * @param {THREE.Vector3} worldPt - 3D point in world space
+ * @param {number} parallaxFactor - parallax factor [0..1]
+ * @return {?THREE.Vector2} point in screen coordinates
+ */
+FORGE.ViewGoPro.prototype.worldToScreen = function(worldPt, parallaxFactor)
+{
+    worldPt = worldPt || new THREE.Vector3();
+    worldPt.normalize();
+    parallaxFactor = parallaxFactor || 0;
+
+    var worldPt4 = new THREE.Vector4(-worldPt.x, -worldPt.y, worldPt.z, 1.0);
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
+    var rotation = FORGE.Math.eulerToRotationMatrix(camEuler.yaw, camEuler.pitch, camEuler.roll, true);
+    rotation = rotation.transpose();
+    worldPt4.applyMatrix4(rotation);
+
+    if (worldPt4.z > this._projectionDistance)
+    {
+        return null;
+    }
+
+    var alpha = (this._projectionDistance + 1) / (this._projectionDistance - worldPt4.z);
+    var x = -worldPt4.x * alpha;
+    var y = -worldPt4.y * alpha;
+
+    x /= (1 + parallaxFactor) * this._projectionScale;
+    y /= this._projectionScale;
+
+    return this._fragmentToScreen(new THREE.Vector2(x, y));
+};
+
+/**
+ * Convert a point from screen space to world space.
+ *
+ * @method FORGE.ViewGoPro#screenToWorld
+ * @param {THREE.Vector2} screenPt - 2D point in screen space [0..w, 0..h]
+ * @return {?THREE.Vector3} world point
+ */
+FORGE.ViewGoPro.prototype.screenToWorld = function(screenPt)
+{
+    var resolution = this._viewer.renderer.displayResolution;
+
+    screenPt = screenPt || new THREE.Vector2(resolution.width / 2, resolution.height / 2);
+
+    var widthMargin = FORGE.ViewRectilinear.OFF_SCREEN_MARGIN * resolution.width,
+        heightMargin = FORGE.ViewRectilinear.OFF_SCREEN_MARGIN * resolution.height;
+    if (screenPt.x < -widthMargin || screenPt.x > resolution.width + widthMargin
+        || screenPt.y < -heightMargin || screenPt.y > resolution.height + heightMargin)
+    {
+        return null;
+    }
+
+    var fragment = this._screenToFragment(screenPt);
+    fragment.multiplyScalar(this._projectionScale);
+
+    var xy2 = fragment.dot(fragment);
+    var zs12 = Math.pow(this._projectionDistance + 1, 2);
+    var delta = 4 * (this._projectionDistance * this._projectionDistance * xy2 * xy2
+                    - (xy2 + zs12) * (xy2 * this._projectionDistance * this._projectionDistance - zs12));
+
+    if (delta < 0)
+    {
+        return null;
+    }
+
+    // world coordinates
+    var cameraPt = new THREE.Vector4();
+    cameraPt.z = (2 * this._projectionDistance * xy2 - Math.sqrt(delta)) / (2 * (zs12 + xy2));
+    cameraPt.x = fragment.x * ((this._projectionDistance - cameraPt.z) / (this._projectionDistance + 1));
+    cameraPt.y = fragment.y * ((this._projectionDistance - cameraPt.z) / (this._projectionDistance + 1));
+
+    // apply inverted MVM
+    var worldPt = cameraPt.applyMatrix4(this._viewer.camera.modelViewInverse).normalize();
+
+    return new THREE.Vector3(worldPt.x, worldPt.y, worldPt.z);
+};
+
+/**
  * Get fov computed for projection.
  * @method FORGE.ViewGoPro#getProjectionFov
  */
