@@ -961,31 +961,107 @@ FORGE.Device = (function(c)
 
     /**
      * Check device requirement for an object from configuration/manifest.
-     * @method FORGE.Device#check
-     * @param  {Object} config - The device requirement configuration of the configuration/manifest.
+     * @method FORGE.Device.check
+     * @static
+     * @param {Object} config - The device requirement configuration of the configuration/manifest.
+     * @param {Object} [device=FORGE.Device] - The device environment to test. The default is FORGE.Device detection, but we need to modify it in test suites.
+     * @param {string} [condition="and"] [description]
      * @return {boolean} Returns true if the object is compatible with the device environment, false if not.
      */
-    Tmp.prototype.check = function(config)
+    Tmp.prototype.check = function(config, device, condition)
     {
-        //If configuration is undefined, the object has no device limitations
-        if(typeof config === "undefined")
-        {
-            return true;
-        }
+        condition = condition || "and";
+        device = device || FORGE.Device;
+
+        var result = true;
 
         for(var i in config)
         {
-            if(typeof this[i] === "undefined")
+            if(i === "and")
             {
-                console.warn("Unable to check plugin device compatibility for: "+i);
+                result = FORGE.Device.check(config[i], device, "and");
             }
-            else if(this[i] !== config[i])
+            else if(i === "or")
             {
-                return false;
+                result = FORGE.Device.check(config[i], device, "or");
+            }
+            else
+            {
+                result = FORGE.Device.checkValue(config[i], device[i]);
+            }
+
+            if(condition === "and" && result === false)
+            {
+                break;
+            }
+            else if(condition === "or" && result === true)
+            {
+                break;
             }
         }
 
-        return true;
+        return result;
+    };
+
+    /**
+     * Check a single device config for the main check method
+     * @method FORGE.Device.checkValue
+     * @static
+     * @param  {(Object|boolean|number|string)} config - The configuration to check
+     * @param  {*} device - The device value
+     * @return {boolean}
+     */
+    Tmp.prototype.checkValue = function(config, device)
+    {
+        var operation = "===";
+        var value;
+
+        if(typeof config === "object")
+        {
+            if(typeof config.operation === "string")
+            {
+                operation = config.operation;
+            }
+
+            value = config.value;
+        }
+        else
+        {
+            value = config;
+        }
+
+        var result = false;
+
+        switch(operation)
+        {
+            case "==":
+            case "===":
+                result = device === value;
+                break;
+
+            case "!=":
+            case "!==":
+                result = device !== value;
+                break;
+
+            case "<":
+                result = device < value;
+                break;
+
+            case "<=":
+                result = device <= value;
+                break;
+
+            case ">":
+                result = device > value;
+                break;
+
+            case ">=":
+                result = device >= value;
+                break;
+        }
+
+        return result;
     };
 
     /**
