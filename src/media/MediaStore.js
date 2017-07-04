@@ -77,12 +77,20 @@ FORGE.MediaStore = function(viewer, config)
     this._size = 0;
 
     /**
-     * The pattern to follow to laod the images
+     * The global pattern of texture file urls
      * @name FORGE.MediaStore#_pattern
      * @type {string}
      * @private
      */
     this._pattern = "";
+
+    /**
+     * object containing patterns of texture file urls per pyramid level
+     * @name FORGE.MediaStore#_patterns
+     * @type {Object}
+     * @private
+     */
+    this._patterns = null;
 
     /**
      * Faces configuration
@@ -136,6 +144,7 @@ FORGE.MediaStore.prototype._boot = function()
     this._loadingTextures = [];
     this._textureStack = [];
     this._texturePromises = new FORGE.Map();
+    this._patterns = {};
 
     this._parseConfig(this._config);
 };
@@ -151,12 +160,31 @@ FORGE.MediaStore.prototype._parseConfig = function(config)
 {
     // a pattern should contains at least {f}, {l}, {x} or {y}
     var re = /\{[lfxy]\}/;
-    if (typeof config.pattern !== "string" || config.pattern.match(re) === null)
+
+    // Check if there is a global pattern
+    if (typeof config.pattern === "string")
     {
-        throw "the pattern of the multi resolution media is wrong";
+        if (config.pattern.match(re) === null)
+        {
+            throw "the pattern of the multi resolution media is wrong";
+        }
+
+        this._pattern = config.pattern;
     }
 
-    this._pattern = config.pattern;
+    // Then check if each resolution level has its own pattern
+    for (var l=0,ll=config.levels.length; l<ll; l++)
+    {
+        if (typeof config.levels[l].pattern === "string")
+        {
+            if (config.pattern.match(re) === null)
+            {
+                throw "the pattern of the multi resolution media is wrong";
+            }
+
+            this._patterns[l] = config.levels[l].pattern;
+        }
+    }
 
     this._cubeFaceConfig = FORGE.MediaStore.CUBE_FACE_CONFIG;
     if (typeof config.faces !== "undefined")
@@ -202,7 +230,14 @@ FORGE.MediaStore.prototype._load = function(tile)
 
     this._loadingTextures.push(key);
 
+
     var url = this._pattern;
+
+    if (typeof this._patterns[tile.level] !== "undefined")
+    {
+        url = this._patterns[tile.level];
+    }
+
     url = url.replace(/\{face\}/, this._cubeFaceConfig[tile.face]);
     url = url.replace(/\{level\}/, tile.level.toString());
     url = url.replace(/\{x\}/, tile.x.toString());
@@ -317,7 +352,7 @@ FORGE.MediaStore.prototype._checkSize = function()
             entries = FORGE.Utils.sortArrayByProperty(entries, "1.lastTime");
             force = true;
         }
-
+        else
         // but don't delete if it is locked
         if (force === true || texture[1].locked !== true)
         {
@@ -464,6 +499,8 @@ FORGE.MediaStore.prototype.discardTileTexture = function(tile)
 FORGE.MediaStore.prototype.destroy = function()
 {
     this._unregister();
+
+    this._patterns = null;
 
     this._viewer = null;
     this._loadingTextures = null;
