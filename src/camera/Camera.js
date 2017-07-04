@@ -379,6 +379,9 @@ FORGE.Camera.prototype._parseConfig = function(config)
     this._updateFromEuler();
     this._updateComplete();
 
+    this._updateMainCamera();
+    this._updateFlatCamera();
+
     this._gaze.load(/** @type {CameraGazeConfig} */ (config.gaze));
 };
 
