@@ -61,6 +61,11 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
      */
     this._fovMin = 0;
 
+    /**
+     * Media limits specified by the config
+     * @type {object}
+     * @private
+     */
     this._limits = null;
 
     /**
@@ -243,7 +248,7 @@ FORGE.BackgroundPyramidRenderer.prototype._isTileInFrustum = function(tile)
 {
     var camera = this._viewer.camera.main;
     var frustum = new THREE.Frustum();
-    frustum.setFromMatrix(new THREE.Matrix4().multiply(camera.projectionMatrix, camera.matrixWorldInverse));
+    frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
     return frustum.intersectsObject(tile);
 };
 
@@ -350,7 +355,7 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
         this._tileCache[level].set(name, tile);
     }
 
-    if (this._scene.children.indexOf(tile) === -1)
+    if (this._scene.children.indexOf(tile) === -1 && this._isTileInFrustum(tile) === true)
     {
         this._scene.add(tile);
     }
@@ -688,9 +693,9 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "fovMin",
 });
 
 /**
- * Get limits.
+ * Get media limits.
  * @name FORGE.BackgroundPyramidRenderer#limits
- * @type {number}
+ * @type {object}
  */
 Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "limits",
 {
