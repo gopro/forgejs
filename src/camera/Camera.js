@@ -774,6 +774,7 @@ FORGE.Camera.prototype._getYawBoundaries = function()
     var max = this._yawMax;
     var view = this._viewer.renderer.view.current;
 
+    // Check first if background renderer exposes its own limits for the current media
     if (this._viewer.renderer.backgroundRenderer !== null &&
         this._viewer.renderer.backgroundRenderer.limits !== null &&
         typeof this._viewer.renderer.backgroundRenderer.limits.yaw !== "undefined")
@@ -872,6 +873,7 @@ FORGE.Camera.prototype._getPitchBoundaries = function()
     var max = this._pitchMax;
     var view = this._viewer.renderer.view.current;
 
+    // Check first if background renderer exposes its own limits for the current media
     if (this._viewer.renderer.backgroundRenderer !== null &&
         this._viewer.renderer.backgroundRenderer.limits !== null &&
         typeof this._viewer.renderer.backgroundRenderer.limits.pitch !== "undefined")
