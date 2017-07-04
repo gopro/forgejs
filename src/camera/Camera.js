@@ -798,10 +798,43 @@ FORGE.Camera.prototype._getYawBoundaries = function()
     var max = this._yawMax;
     var view = this._viewer.renderer.view.current;
 
-    if (view !== null)
+    if (this._viewer.renderer.backgroundRenderer !== null &&
+        this._viewer.renderer.backgroundRenderer.limits !== null &&
+        typeof this._viewer.renderer.backgroundRenderer.limits.yaw !== "undefined")
     {
-        min = Math.max(view.yawMin, min);
-        max = Math.min(view.yawMax, max);
+        var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
+
+        if (typeof this._viewer.renderer.backgroundRenderer.limits.yaw.min !== "undefined")
+        {
+            min = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.yaw.min) + halfHFov;
+        }
+
+        if (typeof this._viewer.renderer.backgroundRenderer.limits.yaw.max !== "undefined")
+        {
+            max = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.yaw.max) - halfHFov;
+        }
+    }
+    else
+    {
+        if (this._yawMin !== 0 || this._yawMax !== 0)
+        {
+            if (this._yawMin !== 0)
+            {
+                min = this._yawMin;
+            }
+            else if (this._yawMax !== 0)
+            {
+                min = this._yawMax;
+            }
+        }
+        else
+        {
+            if (view !== null)
+            {
+                min = Math.max(view.yawMin, min);
+                max = Math.min(view.yawMax, max);
+            }
+        }
     }
 
     return { min: min, max: max };
@@ -863,10 +896,43 @@ FORGE.Camera.prototype._getPitchBoundaries = function()
     var max = this._pitchMax;
     var view = this._viewer.renderer.view.current;
 
-    if (view !== null)
+    if (this._viewer.renderer.backgroundRenderer !== null &&
+        this._viewer.renderer.backgroundRenderer.limits !== null &&
+        typeof this._viewer.renderer.backgroundRenderer.limits.pitch !== "undefined")
     {
-        min = Math.max(view.pitchMin, min);
-        max = Math.min(view.pitchMax, max);
+        var halfVFov = 0.5 * this._fov;
+
+        if (typeof this._viewer.renderer.backgroundRenderer.limits.pitch.min !== "undefined")
+        {
+            min = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.pitch.min) + halfVFov;
+        }
+
+        if (typeof this._viewer.renderer.backgroundRenderer.limits.pitch.max !== "undefined")
+        {
+            max = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.pitch.max) - halfVFov;
+        }
+    }
+    else
+    {
+        if (this._pitchMin !== 0 || this._pitchMax !== 0)
+        {
+            if (this._pitchMin !== 0)
+            {
+                min = this._pitchMin;
+            }
+            else if (this._pitchMax !== 0)
+            {
+                min = this._pitchMax;
+            }
+        }
+        else
+        {
+            if (view !== null)
+            {
+                min = Math.max(view.pitchMin, min);
+                max = Math.min(view.pitchMax, max);
+            }
+        }
     }
 
     return { min: min, max: max };
@@ -956,6 +1022,13 @@ FORGE.Camera.prototype._setFov = function(value, unit)
     var changed = this._fov !== fov;
 
     this._fov = fov;
+
+    if (changed)
+    {
+        this._setYaw(this._yaw);
+        this._setPitch(this._pitch);
+        this._updateFromEuler();
+    }
 
     return changed;
 };
