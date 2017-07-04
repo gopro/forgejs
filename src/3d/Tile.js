@@ -464,7 +464,6 @@ FORGE.Tile.prototype._setGeometry = function(rotation)
     var tileSize = new FORGE.Size(scaleX * fullTileWidth, scaleY * fullTileHeight);
 
     this.geometry = new THREE.PlaneBufferGeometry(tileSize.width, tileSize.height);
-    this.geometry.computeBoundingBox();
 
     var baseOffset = -this._renderer.cubeSize * 0.5;
 
@@ -478,7 +477,6 @@ FORGE.Tile.prototype._setGeometry = function(rotation)
     this.rotation.copy(rotation);
     
     position.applyEuler(rotation);
-
     this.position.copy(position);
 };
 
