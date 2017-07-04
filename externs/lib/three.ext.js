@@ -469,6 +469,12 @@ THREE.Vector2.prototype.setX = function(arg1) {};
 THREE.Vector2.prototype.setY = function(arg1) {};
 
 /**
+ * @param  {THREE.Vector2} arg1
+ * @return {THREE.Vector2}
+ */
+THREE.Vector2.prototype.dot = function(arg1) {};
+
+/**
  * @constructor
  * @param {number=} arg1
  * @param {number=} arg2
