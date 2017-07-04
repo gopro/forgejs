@@ -180,9 +180,9 @@ FORGE.ViewGoPro.prototype.screenToWorld = function(screenPt)
     cameraPt.y = fragment.y * ((this._projectionDistance - cameraPt.z) / (this._projectionDistance + 1));
 
     // apply inverted MVM
-    var worldPt = cameraPt.applyMatrix4(this._viewer.camera.modelViewInverse).normalize();
+    var worldPt = cameraPt.applyMatrix4(this._viewer.camera.modelViewInverse);
 
-    return new THREE.Vector3(worldPt.x, worldPt.y, worldPt.z);
+    return new THREE.Vector3(worldPt.x, worldPt.y, worldPt.z).normalize();
 };
 
 /**
