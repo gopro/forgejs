@@ -610,8 +610,9 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
         if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
         {
             config.mediaFormat = mediaConfig.source.format;
-            var ratio = media.displayObject.element.width / media.displayObject.element.height;
 
+            //@todo must be done into the camera manager
+            var ratio = media.displayObject.element.width / media.displayObject.element.height || 1;
             if (typeof mediaConfig.source.fov !== "undefined")
             {
                 var vFov;
@@ -656,6 +657,13 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 
         var size = this._webGLRenderer.getSize();
         this._setRendererSize(new FORGE.Size(size.width, size.height));
+
+        // apply the calculated vertical fov value
+        // @todo must be done into the camera manager
+        if (typeof config.verticalFov !== "undefined")
+        {
+            this._camera.fov = FORGE.Math.radToDeg(config.verticalFov);
+        }
     }
     else if (type === FORGE.BackgroundType.MESH)
     {

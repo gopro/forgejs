@@ -31,6 +31,14 @@
             "$ref": "camera-value"
         },
 
+        "fovType": {
+            "type": "string",
+            "title": "Fov type",
+            "description": "Defines the fov type as 'vertical', 'horizontal' or 'diagonal'.",
+            "default": "vertical",
+            "example": "horizontal"
+        },
+
         "gaze": {
             "$ref": "camera-gaze"
         }

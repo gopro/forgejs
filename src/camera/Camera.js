@@ -120,6 +120,14 @@ FORGE.Camera = function(viewer)
     this._fovMax = 0;
 
     /**
+     * The fov type value.
+     * @name FORGE.Camera#_foveType
+     * @type {string}
+     * @private
+     */
+    this._fovType = "vertical";
+
+    /**
      * Parallax setting
      * Value range is between 0 and 1
      * @name FORGE.Camera#_parallax
@@ -373,6 +381,11 @@ FORGE.Camera.prototype._parseConfig = function(config)
     if (typeof config.fov.default === "number")
     {
         this._setFov(config.fov.default, FORGE.Math.DEGREES);
+    }
+
+    if (typeof config.fovType === "string")
+    {
+        this._setFovType(config.fovType);
     }
 
     this._updateFromEuler();
@@ -679,13 +692,13 @@ FORGE.Camera.prototype._updateFlatCamera = function()
     this._flat.top = this._flat.position.y + camH / 2;
     this._flat.bottom = this._flat.position.y - camH / 2;
 
-    var max = this._fovMax;
+    var max = this._fovMax; //@todo divide by the ratio corresponding to the fov type
     var view = this._viewer.renderer.view.current;
 
     if (view !== null && view.fovMax !== null)
     {
-        max = Math.min(view.fovMax, this._fovMax);
-        this._flat.zoom = max / this._fov;
+        max = Math.min(view.fovMax, max);
+        this._flat.zoom = max / this._fov; //@todo divide by the ratio corresponding to the f
     }
     else
     {
@@ -943,8 +956,8 @@ FORGE.Camera.prototype._setFov = function(value, unit)
  */
 FORGE.Camera.prototype._getFovBoundaries = function()
 {
-    var min = this._fovMin;
-    var max = this._fovMax;
+    var min = this._fovMin; //@todo divide by the ratio corresponding to the fov type and use the max value
+    var max = this._fovMax; //@todo divide by the ratio corresponding to the fov type and use the min value
     var view = this._viewer.renderer.view.current;
 
     if (view !== null)
@@ -954,6 +967,53 @@ FORGE.Camera.prototype._getFovBoundaries = function()
     }
 
     return { min: min, max: max };
+};
+
+/**
+ * Set the fov type for ratio calculation.
+ * @method  FORGE.Camera#_setFovType
+ * @param {string} type - The fov type to set. Can be 'vertical', 'horizontal' or 'diagonal'.
+ * @return {boolean} Returns true if the value has changed.
+ * @private
+ */
+FORGE.Camera.prototype._setFovType = function(type)
+{
+    var changed = this._fovType !== type;
+
+    this._fovType = type;
+
+    return changed;
+};
+
+/**
+ * Get the ratio value corresponding to the fov type.
+ * @return {number} Returns the ratio corresponding to the fov type.
+ */
+FORGE.Camera.prototype._getRatioFromFovType = function()
+{
+    //@todo finalize the method and verify the pixelWidth and pixelHeight for video which can be 0x0 which is false
+
+    //@todo calculate the real ratio
+    var ratioDisplay = 1;
+    if (this._viewer.renderer.backgroundRenderer !== null && this._viewer.renderer.backgroundRenderer.displayObject !== null)
+    {
+        if (this._viewer.renderer.backgroundRenderer.displayObject.pixelWidth !== 0 && this._viewer.renderer.backgroundRenderer.displayObject.pixelHeight !== 0)
+        {
+            ratioDisplay = this._viewer.renderer.backgroundRenderer.displayObject.pixelWidth / this._viewer.renderer.backgroundRenderer.displayObject.pixelHeight;
+        }
+    }
+
+    var ratio = 1;
+    if (this._fovType === "horizontal")
+    {
+        ratio = ratioDisplay;
+    }
+    else if (this._fovType === "diagonal")
+    {
+        ratio = Math.sqrt(1 + ratioDisplay * ratioDisplay);
+    }
+
+    return ratio;
 };
 
 /**
