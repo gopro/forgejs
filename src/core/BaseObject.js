@@ -157,14 +157,24 @@ FORGE.BaseObject.prototype._unregister = function()
 FORGE.BaseObject.prototype._stdout = function(value, mode)
 {
     var m = mode || "log";
-    console[m].apply(console, [
-        "%c[ForgeJS]%c "
-        + "FORGE." + this._className + " : " + value + " %c(@"
-        + window.performance.now().toFixed(2) + "ms)",
-        "background: #e2edff; color: #4286f4; font-weight: 700",
-        "font-weight: 400",
-        "color: #AAA"
-    ]);
+    var consoleLog = [];
+    if (FORGE.Device.chrome === true || FORGE.Device.firefox === true)
+    {
+        consoleLog = [ "%c[ForgeJS]%c "
+            + "FORGE." + this._className + ": " + value + " %c(@"
+            + window.performance.now().toFixed(2) + "ms)",
+            "background: #e2edff; color: #4286f4; font-weight: 700;",
+            "font-weight: 400;",
+            "color: #AAA;"
+            ];
+    }
+    else
+    {
+        consoleLog = [ "[ForgeJS] FORGE." + this._className + ": " + value + " (@"
+            + window.performance.now().toFixed(2) + "ms)"
+            ];
+    }
+    console[m].apply(console, consoleLog);
 
     if(typeof value === "object" && value !== null)
     {
