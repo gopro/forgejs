@@ -204,7 +204,12 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
     this.show();
 };
 
-FORGE.HotspotDOM.prototype._domClickHandler = function(event)
+/**
+ * DOM click handler
+ * @method FORGE.HotspotDOM#_domClickHandler
+ * @private
+ */
+FORGE.HotspotDOM.prototype._domClickHandler = function()
 {
     // Actions defined from the json
     if(FORGE.Utils.isTypeOf(this._events.onClick, "ActionEventDispatcher") === true)
@@ -213,7 +218,12 @@ FORGE.HotspotDOM.prototype._domClickHandler = function(event)
     }
 };
 
-FORGE.HotspotDOM.prototype._domOverHandler = function(event)
+/**
+ * DOM over handler
+ * @method FORGE.HotspotDOM#_domOverHandler
+ * @private
+ */
+FORGE.HotspotDOM.prototype._domOverHandler = function()
 {
     // Actions defined from the json
     if(FORGE.Utils.isTypeOf(this._events.onOver, "ActionEventDispatcher") === true)
@@ -222,7 +232,12 @@ FORGE.HotspotDOM.prototype._domOverHandler = function(event)
     }
 };
 
-FORGE.HotspotDOM.prototype._domOutHandler = function(event)
+/**
+ * DOM out handler
+ * @method FORGE.HotspotDOM#_domOutHandler
+ * @private
+ */
+FORGE.HotspotDOM.prototype._domOutHandler = function()
 {
     // Actions defined from the json
     if(FORGE.Utils.isTypeOf(this._events.onOut, "ActionEventDispatcher") === true)
