@@ -63,7 +63,7 @@ FORGE.MediaStore = function(viewer, config)
 
     /**
      * LIFO stack timer interval
-     * @type {number}
+     * @type {?number}
      * @private
      */
     this._textureStackInterval = null;
@@ -85,16 +85,16 @@ FORGE.MediaStore = function(viewer, config)
     this._pattern = "";
 
     /**
-     * object containing patterns of texture file urls per pyramid level
+     * Object containing patterns of texture file urls per pyramid level
      * @name FORGE.MediaStore#_patterns
-     * @type {Object}
+     * @type {?Object}
      * @private
      */
     this._patterns = null;
 
     /**
      * Faces configuration
-     * @type {object}
+     * @type {?Object}
      * @private
      */
     this._cubeFaceConfig = null;
@@ -107,10 +107,16 @@ FORGE.MediaStore = function(viewer, config)
 FORGE.MediaStore.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.MediaStore.prototype.constructor = FORGE.MediaStore;
 
+/**
+ * Texture stack interval in milliseconds
+ * @type {number}
+ */
 FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS = 250;
 
-FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE = 50;
-
+/**
+ * Table describing previous cube face
+ * @type {CubeFaceObject}
+ */
 FORGE.MediaStore.CUBE_FACE_CONFIG = 
 {
     "front" : "front",
@@ -217,7 +223,6 @@ FORGE.MediaStore.prototype._createKey = function(tile)
  *
  * @method FORGE.MediaStore#_load
  * @param {FORGE.Tile} tile - tile
- * @param {function} onLoadComplete - load complete callback
  * @private
  */
 FORGE.MediaStore.prototype._load = function(tile)
@@ -229,7 +234,6 @@ FORGE.MediaStore.prototype._load = function(tile)
     }
 
     this._loadingTextures.push(key);
-
 
     var url = this._pattern;
 
@@ -243,10 +247,6 @@ FORGE.MediaStore.prototype._load = function(tile)
     url = url.replace(/\{x\}/, tile.x.toString());
     url = url.replace(/\{y\}/, tile.y.toString());
 
-    var config = {
-        url: url
-    };
-
     var entry = this._texturePromises.get(key);
     if (entry.cancelled)
     {
@@ -254,6 +254,10 @@ FORGE.MediaStore.prototype._load = function(tile)
         this._texturePromises.delete(key);
         return;
     }
+
+    var config = {
+        url: url
+    };
 
     var image = new FORGE.Image(this._viewer, config);
 
@@ -380,7 +384,7 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
     var parentName = tile.getParentName();
     var index = this._textureStack.find(function(item)
     {
-        item.name === parentName;
+        return item.name === parentName;
     });
 
     if (index !== undefined)
@@ -390,17 +394,6 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
     }
 
     this._textureStack.push(tile);
-
-    //this.log("Texture stack length (+++): " + this._textureStack.length + " (" + tile.name + ")");
-
-    // if (this._textureStack.length > FORGE.MediaStore.TEXTURE_STACK_MAX_SIZE)
-    // {
-    //     var key = this._createKey(tile)
-    //     var tile = this._textureStack.shift();
-    //     var entry = this._texturePromises.get(key);
-    //     entry.load.reject("Tile load abort (stack size exceeded).");
-    //     this._texturePromises.delete(key);
-    // }
 
     this._textureStackInterval = window.setTimeout(this._textureStackPop.bind(this), FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS);
 };
@@ -443,8 +436,8 @@ FORGE.MediaStore.prototype.get = function(tile)
 
     // First check if texture is already loading (pending promise)
     // Return null, and client should do nothing but wait
-    var entry = this._texturePromises.get(key);
-    if (entry !== undefined)
+    var promise = this._texturePromises.get(key);
+    if (promise !== undefined)
     {
         return null;
     }
@@ -460,10 +453,10 @@ FORGE.MediaStore.prototype.get = function(tile)
     }
 
     // Create new entry in map of promises
-    var entry = {
+    var entry = /** @type {!TexturePromiseObject} */ ({
         load: loadingPromise,
         cancelled: false
-    };
+    });
 
     this._texturePromises.set(key, entry);
 

@@ -14,14 +14,14 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
     /**
      * Input scene and media config
      * @name FORGE.Media#_config
-     * @type {SceneMediaConfig}
+     * @type {?SceneMediaConfig}
      * @private
      */
     this._config = config;
 
     /**
      * Current level of the pyramid
-     * @type {Number}
+     * @type {number}
      * @private
      */
     this._level = 0;
@@ -35,14 +35,14 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
 
     /**
      * Texture store
-     * @type {FORGE.MediaStore}
+     * @type {?FORGE.MediaStore}
      * @private
      */
     this._textureStore = null;
 
     /**
      * Cache of tiles
-     * @type {Map}
+     * @type {?Object}
      * @private
      */
     this._tileCache = null;
@@ -63,7 +63,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
 
     /**
      * Media limits specified by the config
-     * @type {object}
+     * @type {?SceneMediaLimitsConfig}
      * @private
      */
     this._limits = null;
@@ -84,14 +84,14 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
     
     /**
      * List of renderered tiles
-     * @type {Array<FORGE.Tile>}
+     * @type {?Array<FORGE.Tile>}
      * @private
      */
     this._renderList = null;
     
     /**
      * List of tiles in renderered tiles neighborhood
-     * @type {Array<FORGE.Tile>}
+     * @type {?Array<FORGE.Tile>}
      * @private
      */
     this._renderNeighborList = null;
@@ -142,7 +142,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this._camera = this._viewer.renderer.camera.main;
 
-    this._camera.onCameraChange.add(this._onCameraChange, this);
+    this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
 
     this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
@@ -349,7 +349,7 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
         this._tileCache[level].set(name, tile);
     }
 
-    if (this._scene.children.indexOf(tile) === -1 && this._isTileInFrustum(tile) === true)
+    if (this._scene.children.indexOf(tile) === -1)
     {
         this._scene.add(tile);
     }
@@ -417,7 +417,7 @@ FORGE.BackgroundPyramidRenderer.prototype.removeFromScene = function(tile)
 /**
  * Select current level for the pyramid
  * @method FORGE.BackgroundPyramidRenderer#selectLevel
- * @param {Number} level pyramid level
+ * @param {number} level pyramid level
  */
 FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 {
@@ -690,7 +690,7 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "fovMin",
 /**
  * Get media limits.
  * @name FORGE.BackgroundPyramidRenderer#limits
- * @type {object}
+ * @type {?SceneMediaLimitsConfig}
  */
 Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "limits",
 {

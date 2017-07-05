@@ -49,6 +49,12 @@
             }
         },
 
+        "limits": {
+            "type": "SceneMediaLimitsConfig",
+            "title": "Limits",
+            "description": "Optional property defining angular limits of the source."
+        },
+
         "order": {
             "type": "string",
             "title": "Order",
