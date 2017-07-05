@@ -1008,7 +1008,7 @@ FORGE.Device = (function(c)
      * @method FORGE.Device.checkValue
      * @static
      * @param  {(Object|boolean|number|string)} config - The configuration to check
-     * @param  {*} device - The device value
+     * @param  {(boolean|number|string)} device - The device value
      * @return {boolean}
      */
     Tmp.prototype.checkValue = function(config, device)
