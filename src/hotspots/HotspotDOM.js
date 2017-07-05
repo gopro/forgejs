@@ -332,7 +332,7 @@ FORGE.HotspotDOM.prototype.destroy = function()
     this._clearEvents();
     this._events = null;
 
-    this._unregister();
+    FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**
