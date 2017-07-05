@@ -803,6 +803,7 @@ FORGE.Camera.prototype._getYawBoundaries = function()
 
     // Check first if background renderer exposes its own limits for the current media
     if (this._viewer.renderer.backgroundRenderer !== null &&
+        typeof this._viewer.renderer.backgroundRenderer.limits !== "undefined" &&
         this._viewer.renderer.backgroundRenderer.limits !== null &&
         typeof this._viewer.renderer.backgroundRenderer.limits.yaw !== "undefined")
     {
@@ -902,6 +903,7 @@ FORGE.Camera.prototype._getPitchBoundaries = function()
 
     // Check first if background renderer exposes its own limits for the current media
     if (this._viewer.renderer.backgroundRenderer !== null &&
+        typeof this._viewer.renderer.backgroundRenderer.limits !== "undefined" &&
         this._viewer.renderer.backgroundRenderer.limits !== null &&
         typeof this._viewer.renderer.backgroundRenderer.limits.pitch !== "undefined")
     {
