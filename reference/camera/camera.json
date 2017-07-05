@@ -15,6 +15,14 @@
             "example": 0.2
         },
 
+        "keep": {
+            "type": "boolean",
+            "title": "Keep",
+            "description": "Does the camera have to keep its previous configuration on scene load?",
+            "example": "true",
+            "default": false
+        },
+
         "yaw": {
             "$ref": "camera-value"
         },
