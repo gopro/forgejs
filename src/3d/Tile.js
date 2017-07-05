@@ -15,7 +15,7 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
 {
     /**
      * String describing what created the tile
-     * @type {FORGE.Tile}
+     * @type {string}
      */
     this._creator = creator;
 
@@ -58,12 +58,11 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
      * @private
      */
     this._face = face;
-    // this._face = typeof face === "number" ? FORGE.Tile.FACES[face] : face.toLowerCase();
 
     /**
      * Creation timestamp
      * @name FORGE.Tile#_createTS
-     * @type {Date}
+     * @type {?number}
      * @private
      */
     this._createTS = null;
@@ -71,7 +70,7 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
     /**
      * Last display timestamp
      * @name FORGE.Tile#_displayTS
-     * @type {Date}
+     * @type {?number}
      * @private
      */
     this._displayTS = null;
@@ -168,7 +167,7 @@ FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS = 200;
 
 /**
  * Table describing previous cube face
- * @type {object}
+ * @type {CubeFaceObject}
  */
 FORGE.Tile.FACE_PREVIOUS = {
     "front" : "left",
@@ -181,7 +180,7 @@ FORGE.Tile.FACE_PREVIOUS = {
 
 /**
  * Table describing next cube face
- * @type {object}
+ * @type {CubeFaceObject}
  */
 FORGE.Tile.FACE_NEXT = {
     "front" : "right",
@@ -195,7 +194,7 @@ FORGE.Tile.FACE_NEXT = {
 /**
  * Create tile name
  * @method FORGE.Tile#createName
- * @param {string} face - cube face
+ * @param {string|number} face - cube face
  * @param {number} level - pyramid level
  * @param {number} x - x coordinate (column)
  * @param {number} y - y coordinate (row)
@@ -438,10 +437,9 @@ FORGE.Tile.prototype._setOpacity = function(opacity)
  * Set geometry of the tile
  * This means rotation and position in world coordinates
  * @method FORGE.Tile#_setGeometry
- * @param {THREE.Euler} rotation face rotation
  * @private
  */
-FORGE.Tile.prototype._setGeometry = function(rotation)
+FORGE.Tile.prototype._setGeometry = function()
 {
     var tx = this._renderer.nbTilesPerAxis(this._level, "x");
     var ty = this._renderer.nbTilesPerAxis(this._level, "y");
@@ -729,7 +727,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
             {
                 sequence.then(function()
                 {
-                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.left-edge of " + name);
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour-left-edge of " + name);
                     if (neighbours.indexOf(tile) === -1)
                     {
                         tile.onDestroy.add(tileDestroyedCallback);
@@ -750,7 +748,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
             {
                 sequence.then(function()
                 {
-                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.right-edge of " + name);
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour-right-edge of " + name);
                     if (neighbours.indexOf(tile) === -1)
                     {
                         tile.onDestroy.add(tileDestroyedCallback);
@@ -806,7 +804,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
             {
                 sequence.then(function()
                 {
-                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.bottom-edge of " + name);
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour-bottom-edge of " + name);
                     if (neighbours.indexOf(tile) === -1)
                     {
                         tile.onDestroy.add(tileDestroyedCallback);
@@ -862,7 +860,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
             {
                 sequence.then(function()
                 {
-                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.top-edge of " + name);
+                    var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour-top-edge of " + name);
                     if (neighbours.indexOf(tile) === -1)
                     {
                         tile.onDestroy.add(tileDestroyedCallback);
@@ -878,7 +876,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
 /**
  * Get name of the parent tile
  * @method FORGE.Tile#getParentName
- * @return {string} parent tile name
+ * @return {?string} parent tile name
  */
 FORGE.Tile.prototype.getParentName = function()
 {
@@ -1003,7 +1001,7 @@ Object.defineProperty(FORGE.Tile.prototype, "level",
 /**
  * Get x coordinate.
  * @name FORGE.Tile#x
- * @type {string}
+ * @type {number}
  */
 Object.defineProperty(FORGE.Tile.prototype, "x",
 {
@@ -1017,7 +1015,7 @@ Object.defineProperty(FORGE.Tile.prototype, "x",
 /**
  * Get y coordinate.
  * @name FORGE.Tile#y
- * @type {string}
+ * @type {number}
  */
 Object.defineProperty(FORGE.Tile.prototype, "y",
 {
@@ -1073,7 +1071,7 @@ Object.defineProperty(FORGE.Tile.prototype, "displayTS",
 /**
  * Neighbour tiles.
  * @name FORGE.Tile#neighbours
- * @type {Array<FORGE.Tile}
+ * @type {Array<FORGE.Tile>}
  */
 Object.defineProperty(FORGE.Tile.prototype, "neighbours",
 {

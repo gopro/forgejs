@@ -446,6 +446,12 @@ THREE.Vector2.prototype.subVectors = function(arg1, arg2) {};
 THREE.Vector2.prototype.divideScalar = function(arg1) {};
 
 /**
+ * @param  {THREE.Vector2} arg1
+ * @return {THREE.Vector2}
+ */
+THREE.Vector2.prototype.divide = function(arg1) {};
+
+/**
  * @return {number}
  */
 THREE.Vector2.prototype.length = function() {};
@@ -543,6 +549,12 @@ THREE.Vector3.prototype.setFromSpherical = function(arg1) {};
 THREE.Vector3.prototype.applyQuaternion = function(arg1) {};
 
 /**
+ * @param {THREE.Euler} arg1
+ * @return {THREE.Vector3}
+ */
+THREE.Vector3.prototype.applyEuler = function(arg1) {};
+
+/**
  * @return {THREE.Vector3}
  */
 THREE.Vector3.prototype.normalize = function() {};
@@ -631,6 +643,13 @@ THREE.Matrix4.prototype.transpose = function() {};
  * @return {THREE.Matrix4}
  */
 THREE.Matrix4.prototype.set = function(arg1, arg2) {};
+
+/**
+ * @param {THREE.Matrix4} arg1
+ * @param {THREE.Matrix4} arg2
+ * @return {THREE.Matrix4}
+ */
+THREE.Matrix4.prototype.multiplyMatrices = function(arg1, arg2) {};
 
 /**
  * @param {THREE.Matrix4} arg1
@@ -1227,6 +1246,22 @@ THREE.Texture.prototype.dispose = function() {};
 
 /**
  * @constructor
+ * @return {!THREE.Frustum}
+ */
+THREE.Frustum = function() {};
+
+/**
+ * @param  {THREE.Matrix4} arg1
+ */
+THREE.Frustum.prototype.setFromMatrix = function(arg1) {};
+
+/**
+ * @param  {THREE.Object3D} arg1
+ */
+THREE.Frustum.prototype.intersectsObject = function(arg1) {};
+
+/**
+ * @constructor
  * @return {!THREE.Geometry}
  */
 THREE.Geometry = function() {};
@@ -1477,7 +1512,7 @@ THREE.Layer.prototype.test = function(arg1) {};
 // OTHER CUSTOM TYPES USED BY THREE ===============================================================================================
 
 /**
- * @typedef {{opacity:(number|undefined), transparent:(boolean|undefined), color:(number|string|undefined), side:(number|undefined)}}
+ * @typedef {{opacity:(number|undefined), transparent:(boolean|undefined), depthTest:(boolean|undefined), color:(THREE.Color|number|string|undefined), side:(number|undefined)}}
  */
 var MeshBasicMaterialOptions;
 

@@ -69,7 +69,7 @@ FORGE.RenderManager = function(viewer)
     /**
      * Background renderer.
      * @name FORGE.RenderManager#_backgroundRenderer
-     * @type {?(FORGE.BackgroundMeshRenderer|FORGE.BackgroundShaderRenderer)}
+     * @type {?(FORGE.BackgroundMeshRenderer|FORGE.BackgroundShaderRenderer|FORGE.BackgroundPyramidRenderer)}
      * @private
      */
     this._backgroundRenderer = null;
@@ -117,7 +117,7 @@ FORGE.RenderManager = function(viewer)
     /**
      * Background renderer ready flag
      * @name FORGE.RenderManager#_backgroundReady
-     * @type boolean
+     * @type {boolean}
      * @private
      */
     this._backgroundReady = false;
@@ -125,7 +125,7 @@ FORGE.RenderManager = function(viewer)
     /**
      * Render pipeline renderer ready flag
      * @name FORGE.RenderManager#_renderPipelineReady
-     * @type boolean
+     * @type {boolean}
      * @private
      */
     this._renderPipelineReady = false;
