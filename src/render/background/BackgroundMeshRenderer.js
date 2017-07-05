@@ -142,7 +142,7 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
  */
 FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObject)
 {
-    if (this._mesh === null) 
+    if (this._mesh === null)
     {
         this._updateInternals();
     }
