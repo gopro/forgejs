@@ -140,7 +140,9 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this._textureStore = this._viewer.story.scene.media.store;
 
-    this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
+    this._camera = this._viewer.renderer.camera.main;
+
+    this._camera.onCameraChange.add(this._onCameraChange, this);
 
     this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
@@ -264,14 +266,6 @@ FORGE.BackgroundPyramidRenderer.prototype._onTileDestroyed = function(event)
     tile.onDestroy.remove(this._onTileDestroyed, this);
     this._tileCache[tile.level].delete(tile.name);
     this._scene.remove(tile);
-};
-
-// Compute tile that should be displayed (and its parents) using camera yaw, pitch and fov
-// Useful for debugging refresh holes
-FORGE.BackgroundPyramidRenderer.prototype._getTileStackAtCurrentPoint = function()
-{
-    var camera = this._viewer.camera;
-    alert('_getTileStackAtCurrentPoint');
 };
 
 /**
@@ -437,7 +431,8 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 
     if (typeof (this._tileCache[this._level]) !== "undefined")
     {
-        this._tileCache[this._level].forEach(function(tile) {
+        this._tileCache[this._level].forEach(function(tile)
+        {
             this._scene.add(tile);
         }.bind(this));
     }
@@ -465,7 +460,7 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
     var prefix = "";
     if (rank >= 27)
     {
-        prefix = " too many "
+        prefix = " too many ";
     }
     else if (rank >= 3)
     {
@@ -473,7 +468,7 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
     }
 
     this._levelPixelsHumanReadable = humanPixels.toFixed(1) + prefix + "pixels";
-    this.log("Select new level: " + level + ", " + this._levelPixelsHumanReadable  + " (" + this._levelPixels + ")");
+    this.log("Select new level: " + level + ", " + this._levelPixelsHumanReadable + " (" + this._levelPixels + ")");
 };
 
 /**
@@ -538,7 +533,7 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
     this._renderList = [];
     this._renderNeighborList = [];
 
-    FORGE.BackgroundRenderer.prototype.render.call(this, this._viewer.camera.main);
+    FORGE.BackgroundRenderer.prototype.render.call(this, camera);
     
     this._renderNeighborList = FORGE.Utils.arrayUnique(this._renderNeighborList);
 
@@ -546,13 +541,13 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
 
     var now = Date.now();
 
-    this._scene.children.forEach(function(tile) {
-        // Clear tile policy
-        // Only applies to tiles with non zero level
-        // Delete all tiles with zero opacity
-        // Delete all tiles that has been created more than 2s ago and have never been displayed
-        // Delete all tiles that has not been displayed since 30s
-        
+    // Clear tile policy
+    // Only applies to tiles with non zero level
+    // Delete all tiles with zero opacity
+    // Delete all tiles that has been created more than 2s ago and have never been displayed
+    // Delete all tiles that has not been displayed since 30s
+    this._scene.children.forEach(function(tile)
+    {   
         var timeSinceCreate = now - tile.createTS;
         var timeSinceDisplay = now - tile.displayTS;
 

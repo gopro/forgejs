@@ -115,10 +115,10 @@ FORGE.MediaStore.CUBE_FACE_CONFIG =
 {
     "front" : "front",
     "right" : "right",
-    "back"  : "back",
-    "left"  : "left",
-    "down"  : "down",
-    "up"    : "up"
+    "back" : "back",
+    "left" : "left",
+    "down" : "down",
+    "up" : "up"
 };
 
 /**
@@ -173,7 +173,7 @@ FORGE.MediaStore.prototype._parseConfig = function(config)
     }
 
     // Then check if each resolution level has its own pattern
-    for (var l=0,ll=config.levels.length; l<ll; l++)
+    for (var l=0, ll=config.levels.length; l<ll; l++)
     {
         if (typeof config.levels[l].pattern === "string")
         {
@@ -222,7 +222,7 @@ FORGE.MediaStore.prototype._createKey = function(tile)
  */
 FORGE.MediaStore.prototype._load = function(tile)
 {
-    var key = this._createKey(tile)
+    var key = this._createKey(tile);
     if (this._loadingTextures.indexOf(key) !== -1)
     {
         return;
@@ -275,7 +275,7 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
 {
     image = image.emitter;
     var tile = image.data.tile;
-    var key = this._createKey(tile)
+    var key = this._createKey(tile);
 
     var texture = new THREE.Texture();
     texture.image = image.element;
@@ -378,7 +378,8 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
 
     // if a tile parent has asked for a texture, just remove it from the stack
     var parentName = tile.getParentName();
-    var index = this._textureStack.find(function(item) {
+    var index = this._textureStack.find(function(item)
+    {
         item.name === parentName;
     });
 

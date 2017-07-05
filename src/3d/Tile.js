@@ -155,19 +155,6 @@ FORGE.Tile.prototype.constructor = FORGE.Tile;
 FORGE.Tile.FACES = ["front", "right", "back", "left", "up", "down"];
 
 /**
- * Faces color object (debug purpose)
- * @type {Object}
- */
-FORGE.Tile.FACES_COLOR = {
-    "front" : { "h": 239, "s": 0.47 },
-    "left"  : { "h": 6  , "s": 0.66 },
-    "back"  : { "h": 178, "s": 0.41 },
-    "right" : { "h": 137, "s": 0.55 },
-    "up"    : { "h": 44 , "s": 0.46 },
-    "down"  : { "h": 263, "s": 0.56 }
-};
-
-/**
  * Opacity increment [unit per render cycle]
  * @type {number}
  */
@@ -186,10 +173,10 @@ FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS = 200;
 FORGE.Tile.FACE_PREVIOUS = {
     "front" : "left",
     "right" : "front",
-    "back"  : "right",
-    "left"  : "back",
-    "up"    : "up",
-    "down"  : "down"
+    "back" : "right",
+    "left" : "back",
+    "up" : "up",
+    "down" : "down"
 };
 
 /**
@@ -199,10 +186,10 @@ FORGE.Tile.FACE_PREVIOUS = {
 FORGE.Tile.FACE_NEXT = {
     "front" : "right",
     "right" : "back",
-    "back"  : "left",
-    "left"  : "front",
-    "up"    : "up",
-    "down"  : "down"
+    "back" : "left",
+    "left" : "front",
+    "up" : "up",
+    "down" : "down"
 };
 
 /**
@@ -216,7 +203,7 @@ FORGE.Tile.FACE_NEXT = {
 FORGE.Tile.createName = function(face, level, x, y)
 {
     face = typeof face === "number" ? FORGE.Tile.FACES[face] : face.toLowerCase();
-    return face.substring(0,1).toUpperCase() + "-" + level + "-" + y + "-" + x;
+    return face.substring(0, 1).toUpperCase() + "-" + level + "-" + y + "-" + x;
 };
 
 /**
@@ -245,7 +232,8 @@ FORGE.Tile.prototype._boot = function()
 
     // Always ensure a new tile has a parent tile
     // This will prevent from zomming out into some empty area
-    if (this._level > 0 && this._parent === null) {
+    if (this._level > 0 && this._parent === null)
+    {
         this._checkParent();
     }
 
@@ -335,7 +323,8 @@ FORGE.Tile.prototype._onAfterRender = function()
 
         if (texPromise !== null)
         {
-            texPromise.then(function(texture) {
+            texPromise.then(function(texture)
+            {
                 // Check if tile has been destroyed in the meantime
                 if (this.material === null)
                 {
@@ -356,8 +345,9 @@ FORGE.Tile.prototype._onAfterRender = function()
                 }
             }.bind(this),
 
-            function(error) {
-                //console.log("Tile texture loading error: " + error);
+            function(error)
+            {
+                console.warn("Tile texture loading error: " + error);
             }.bind(this));
         }
     }
@@ -370,23 +360,23 @@ FORGE.Tile.prototype._onAfterRender = function()
  */
 FORGE.Tile.prototype._addDebugLayer = function()
 {
-    var canvas = document.createElement('canvas');
+    var canvas = document.createElement("canvas");
     canvas.width = canvas.height = 512;
-    var ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#FF0000';
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#FF0000";
 
     var x = canvas.width / 2;
     var y = canvas.height / 2 - 25;
 
-    ctx.fillStyle = 'gray';
-    ctx.strokeStyle = 'white';
-    ctx.strokeRect(20,20, canvas.width - 40, canvas.height - 40); 
+    ctx.fillStyle = "gray";
+    ctx.strokeStyle = "white";
+    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40); 
 
     // General font style
-    ctx.textAlign = 'center';
-    ctx.textAlign = 'center';
+    ctx.textAlign = "center";
+    ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = "white";
 
     ctx.font = "16px Courier";
     ctx.fillText("TILE " + this.name, x, y);
@@ -396,11 +386,11 @@ FORGE.Tile.prototype._addDebugLayer = function()
     ctx.font = fontSize + "px Courier";
     var ceiling = canvas.width - 20;
     
-    ctx.textAlign = 'left';
+    ctx.textAlign = "left";
     ctx.font = "10px Courier";
     ctx.fillText("Level " + this._level, 10, canvas.height - 10);
 
-    ctx.textAlign = 'right';
+    ctx.textAlign = "right";
     ctx.fillText(this._renderer.pixelsAtCurrentLevelHumanReadable, canvas.width - 10, canvas.height - 10);
 
     var texture = new THREE.Texture(canvas);
@@ -424,7 +414,8 @@ FORGE.Tile.prototype._setOpacity = function(opacity)
 
     this._opacity = opacity;
 
-    var setNodeOpacity = function(node) {
+    var setNodeOpacity = function(node)
+    {
         if (node !== null && node.material !== null &&
             typeof node.material.opacity !== "undefined")
         {
@@ -434,11 +425,11 @@ FORGE.Tile.prototype._setOpacity = function(opacity)
             }
         }
 
-        for (var i=0,ii=node.children.length; i<ii; i++)
+        for (var i=0, ii=node.children.length; i<ii; i++)
         {
             setNodeOpacity(node.children[i]);
         }
-    }
+    };
 
     setNodeOpacity(this);
 };
@@ -496,24 +487,27 @@ FORGE.Tile.prototype._getRotation = function()
     {
         case "front":
             return new THREE.Euler(0, 0, 0);
-        break;
+            break;
+
         case "back":
             return new THREE.Euler(0, Math.PI, 0);
-        break;
+            break;
 
         case "left":
             return new THREE.Euler(0, Math.PI / 2, 0);
-        break;
+            break;
+
         case "right":
             return new THREE.Euler(0, -Math.PI / 2, 0);
-        break;
+            break;
 
         case "up":
             return new THREE.Euler(Math.PI / 2, 0, 0);
-        break;
+            break;
+
         case "down":
             return new THREE.Euler(-Math.PI / 2, 0, 0);
-        break;
+            break;
     }
 };
 
@@ -651,14 +645,16 @@ FORGE.Tile.prototype._checkParent = function()
     if (this._parent !== null ||
         this._parentNeedsCheck === false ||
         this._level === 0 ||
-        this._level !== this._renderer.level) {
+        this._level !== this._renderer.level)
+    {
         return;
     }
 
     this._parentNeedsCheck = false;
 
     var sequence = Promise.resolve();
-    sequence.then(function() {
+    sequence.then(function()
+    {
         this._parent = this._renderer.getParentTile(this);
         this._parent.onDestroy.add(this._onParentTileDestroyed, this);
     }.bind(this));
@@ -705,7 +701,8 @@ FORGE.Tile.prototype._checkNeighbours = function()
                 continue;
             }
 
-            (function (prenderer, plevel, pface, px, py, neighbours) {
+            (function (prenderer, plevel, pface, px, py, neighbours)
+            {
                 sequence.then(function()
                 {
                     var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour of " + name);
@@ -728,7 +725,8 @@ FORGE.Tile.prototype._checkNeighbours = function()
     {
         sequence.then(function()
         {
-            (function (prenderer, plevel, pface, px, py, neighbours) {
+            (function (prenderer, plevel, pface, px, py, neighbours)
+            {
                 sequence.then(function()
                 {
                     var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.left-edge of " + name);
@@ -748,7 +746,8 @@ FORGE.Tile.prototype._checkNeighbours = function()
     {
         sequence.then(function()
         {
-            (function (prenderer, plevel, pface, px, py, neighbours) {
+            (function (prenderer, plevel, pface, px, py, neighbours)
+            {
                 sequence.then(function()
                 {
                     var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.right-edge of " + name);
@@ -803,7 +802,8 @@ FORGE.Tile.prototype._checkNeighbours = function()
 
         sequence.then(function()
         {
-            (function (prenderer, plevel, pface, px, py, neighbours) {
+            (function (prenderer, plevel, pface, px, py, neighbours)
+            {
                 sequence.then(function()
                 {
                     var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.bottom-edge of " + name);
@@ -858,7 +858,8 @@ FORGE.Tile.prototype._checkNeighbours = function()
 
         sequence.then(function()
         {
-            (function (prenderer, plevel, pface, px, py, neighbours) {
+            (function (prenderer, plevel, pface, px, py, neighbours)
+            {
                 sequence.then(function()
                 {
                     var tile = prenderer.getTile(null, plevel, pface, px, py, "neighbour.top-edge of " + name);
