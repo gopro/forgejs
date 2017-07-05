@@ -37,7 +37,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._yawMin = 0;
+    this._yawMin = -Infinity;
 
     /**
      * The yaw maximum value in radians.
@@ -45,7 +45,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._yawMax = 0;
+    this._yawMax = Infinity;
 
     /**
      * The pitch value in radians.
@@ -61,7 +61,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._pitchMin = 0;
+    this._pitchMin = -Infinity;
 
     /**
      * The pitch maximum value  in radians.
@@ -69,7 +69,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._pitchMax = 0;
+    this._pitchMax = Infinity;
 
     /**
      * The roll value in radians.
@@ -85,7 +85,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._rollMin = 0;
+    this._rollMin = -Infinity;
 
     /**
      * The roll maximum value in radians.
@@ -93,7 +93,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._rollMax = 0;
+    this._rollMax = Infinity;
 
     /**
      * The fov value in radians.
@@ -101,7 +101,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._fov = 0;
+    this._fov = 90;
 
     /**
      * The fov minimum value in radians.
@@ -117,7 +117,7 @@ FORGE.Camera = function(viewer)
      * @type {number}
      * @private
      */
-    this._fovMax = 0;
+    this._fovMax = Infinity;
 
     /**
      * Parallax setting
@@ -127,6 +127,14 @@ FORGE.Camera = function(viewer)
      * @private
      */
     this._parallax = 0;
+
+    /**
+     * Does the camera keep its orientation between scenes?
+     * @name FORGE.Camera#_keep
+     * @type {boolean}
+     * @private
+     */
+    this._keep = false;
 
     /**
      * The modelview rotation matrix.
@@ -209,6 +217,14 @@ FORGE.Camera = function(viewer)
     this._gaze = null;
 
     /**
+     * Is the camera have load its configuration at least one time? For keep feature.
+     * @name FORGE.Camera#_initialized
+     * @type {boolean}
+     * @private
+     */
+    this._initialized = false;
+
+    /**
      * On camera change event dispatcher.
      * @name FORGE.Camera#_onCameraChange
      * @type {FORGE.EventDispatcher}
@@ -238,7 +254,9 @@ FORGE.Camera.RADIUS = 50;
  * @type {CameraConfig}
  * @const
  */
-FORGE.Camera.DEFAULT_CONFIG = {
+FORGE.Camera.DEFAULT_CONFIG =
+{
+    keep: false,
     parallax: 0,
     yaw:
     {
@@ -314,6 +332,12 @@ FORGE.Camera.prototype._parseConfig = function(config)
 {
     this._parallax = config.parallax;
     this._radius = this._parallax * FORGE.Camera.RADIUS;
+    this._keep = config.keep;
+
+    if(this._keep === true && this._initialized === true)
+    {
+        return;
+    }
 
     if (typeof config.yaw.min === "number")
     {
@@ -1004,6 +1028,8 @@ FORGE.Camera.prototype.load = function(config)
     this._config = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.Camera.DEFAULT_CONFIG, config));
 
     this._parseConfig(this._config);
+
+    this._initialized = true;
 };
 
 /**
@@ -1105,7 +1131,7 @@ FORGE.Camera.prototype.destroy = function()
 };
 
 /**
- * Get and set the ycamera configuration (default min & max for all angles yaw, pitch, roll and fov).
+ * Get and set the camera configuration (default min & max for all angles yaw, pitch, roll and fov).
  * @name FORGE.Camera#config
  * @type {CameraConfig}
  */
@@ -1121,6 +1147,21 @@ Object.defineProperty(FORGE.Camera.prototype, "config",
     set: function(config)
     {
         this.load(config);
+    }
+});
+
+/**
+ * Get the keep flag
+ * @name FORGE.Camera#keep
+ * @type {boolean}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Camera.prototype, "keep",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        return this._keep;
     }
 });
 
@@ -1155,6 +1196,7 @@ Object.defineProperty(FORGE.Camera.prototype, "yaw",
  * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#yawMin
  * @type {number}
+ * @readonly
  */
 Object.defineProperty(FORGE.Camera.prototype, "yawMin",
 {
@@ -1171,6 +1213,7 @@ Object.defineProperty(FORGE.Camera.prototype, "yawMin",
  * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#yawMax
  * @type {number}
+ * @readonly
  */
 Object.defineProperty(FORGE.Camera.prototype, "yawMax",
 {
@@ -1213,6 +1256,7 @@ Object.defineProperty(FORGE.Camera.prototype, "pitch",
  * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#pitchMin
  * @type {number}
+ * @readonly
  */
 Object.defineProperty(FORGE.Camera.prototype, "pitchMin",
 {
@@ -1229,6 +1273,7 @@ Object.defineProperty(FORGE.Camera.prototype, "pitchMin",
  * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#pitchMax
  * @type {number}
+ * @readonly
  */
 Object.defineProperty(FORGE.Camera.prototype, "pitchMax",
 {
@@ -1271,6 +1316,7 @@ Object.defineProperty(FORGE.Camera.prototype, "roll",
  * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#rollMin
  * @type {number}
+ * @readonly
  */
 Object.defineProperty(FORGE.Camera.prototype, "rollMin",
 {
@@ -1287,6 +1333,7 @@ Object.defineProperty(FORGE.Camera.prototype, "rollMin",
  * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#rollMax
  * @type {number}
+ * @readonly
  */
 Object.defineProperty(FORGE.Camera.prototype, "rollMax",
 {
@@ -1328,6 +1375,7 @@ Object.defineProperty(FORGE.Camera.prototype, "fov",
  * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#fovMin
  * @type {number}
+ * @readonly
  */
 Object.defineProperty(FORGE.Camera.prototype, "fovMin",
 {
@@ -1344,6 +1392,7 @@ Object.defineProperty(FORGE.Camera.prototype, "fovMin",
  * Return the most restrictive value between the camera value and the view value.
  * @name FORGE.Camera#fovMax
  * @type {number}
+ * @readonly
  */
 Object.defineProperty(FORGE.Camera.prototype, "fovMax",
 {
