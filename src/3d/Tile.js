@@ -255,10 +255,16 @@ FORGE.Tile.prototype._boot = function()
         side:THREE.FrontSide
     });
 
+    if (this._level === 0)
+    {
+        this._queryTexture();
+    }
+
     if (FORGE.Tile.DEBUG === true)
     {
         this._addDebugLayer();
     }
+
 
     this._createTS = Date.now();
 };
@@ -314,10 +320,27 @@ FORGE.Tile.prototype._onAfterRender = function()
     // Get all neighbour tiles references
     this._checkNeighbours();
 
-    // Update texture mapping
-    if (this._texturePending === false &&
-        this._displayTS - this._createTS > FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS)
+    if (this._level > 0 && this.material !== null && this.material.map === null)
     {
+        this._queryTexture();
+    }
+};
+
+/**
+ * Query texture for the tile
+ * @method FORGE.Tile#_addDebugLayer
+ * @private
+ */
+FORGE.Tile.prototype._queryTexture = function()
+{
+    // Update texture mapping
+    if (this._texturePending === false)
+    {
+        if (this._level > 0 && this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS)
+        {
+            return;
+        }
+
         var texPromise = this._renderer.textureStore.get(this);
 
         if (texPromise !== null)
