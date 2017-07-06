@@ -291,7 +291,7 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
     this._textures.set(key, mediaTexture);
 
     // destroy the image, it is no longer needed
-    this._loadingTextures.splice(this._loadingTextures.indexOf(image.data.key));
+    this._loadingTextures.splice(this._loadingTextures.indexOf(image.data.key), 1);
 
     var entry = this._texturePromises.get(key);
     entry.load.resolve(mediaTexture.texture);
