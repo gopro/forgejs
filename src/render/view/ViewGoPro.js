@@ -174,15 +174,17 @@ FORGE.ViewGoPro.prototype.screenToWorld = function(screenPt)
     }
 
     // world coordinates
-    var cameraPt = new THREE.Vector4();
-    cameraPt.z = (2 * this._projectionDistance * xy2 - Math.sqrt(delta)) / (2 * (zs12 + xy2));
-    cameraPt.x = fragment.x * ((this._projectionDistance - cameraPt.z) / (this._projectionDistance + 1));
-    cameraPt.y = fragment.y * ((this._projectionDistance - cameraPt.z) / (this._projectionDistance + 1));
+    var worldPt = new THREE.Vector4();
+    worldPt.z = (2 * this._projectionDistance * xy2 - Math.sqrt(delta)) / (2 * (zs12 + xy2));
+    worldPt.x = fragment.x * ((this._projectionDistance - worldPt.z) / (this._projectionDistance + 1));
+    worldPt.y = fragment.y * ((this._projectionDistance - worldPt.z) / (this._projectionDistance + 1));
 
-    // apply inverted MVM
-    var worldPt = cameraPt.applyMatrix4(this._viewer.camera.modelViewInverse);
+    // move the point in the world system
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
+    var rotation = FORGE.Math.eulerToRotationMatrix(-camEuler.yaw, camEuler.pitch, camEuler.roll, true);
+    worldPt.applyMatrix4(rotation);
 
-    return new THREE.Vector3(worldPt.x, worldPt.y, worldPt.z).normalize();
+    return new THREE.Vector3(worldPt.x, -worldPt.y, worldPt.z).normalize();
 };
 
 /**

@@ -139,12 +139,14 @@ FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
     // scale it (see _updateViewParams above)
     fragment.multiplyScalar(this._projectionScale);
 
-    var cameraPt = new THREE.Vector4(fragment.x, fragment.y, -1, 0);
+    var worldPt = new THREE.Vector4(fragment.x, fragment.y, -1, 0);
 
     // move the point in the world system
-    var worldPt = cameraPt.applyMatrix4(this._viewer.camera.modelViewInverse).normalize();
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
+    var rotation = FORGE.Math.eulerToRotationMatrix(-camEuler.yaw, camEuler.pitch, camEuler.roll, true);
+    worldPt.applyMatrix4(rotation);
 
-    return new THREE.Vector3(worldPt.x, worldPt.y, worldPt.z);
+    return new THREE.Vector3(worldPt.x, -worldPt.y, worldPt.z).normalize();
 };
 
 /**
