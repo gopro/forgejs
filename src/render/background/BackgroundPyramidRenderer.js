@@ -95,6 +95,13 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
      * @private
      */
     this._renderNeighborList = null;
+    
+    /**
+     * Enable tile clearing policy
+     * @type {boolean}
+     * @private
+     */
+    this._clearTilesEnabled = true;
 
     /**
      * Number of pixels at current level presented in human readable format
@@ -304,6 +311,69 @@ FORGE.BackgroundPyramidRenderer.prototype._levelXnYnToXY = function(level, xnyn)
 };
 
 /**
+ * Discard a tile. Removes from the cache and the scene
+ * @method FORGE.BackgroundPyramidRenderer#_discardTile
+ * @param {FORGE.Tile} tile - tile
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype._discardTile = function(tile)
+{
+    if (typeof this._tileCache[tile.level] !== "undefined")
+    {
+        this._tileCache[tile.level].delete(tile);   
+    }
+
+    this._scene.remove(tile);
+
+    this._textureStore.discardTileTexture(tile);
+
+    tile.destroy();
+};
+
+/**
+ * Tile clearing routine.
+ * Clear tile policy
+ * Only applies to tiles with non zero level
+ * Delete all tiles with zero opacity
+ * Delete all tiles that has been created more than 2s ago and have never been displayed
+ * Delete all tiles that has not been displayed since 30s
+ * @method FORGE.BackgroundPyramidRenderer#_clearTiles
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
+{
+    if (this._clearTilesEnabled === false)
+    {
+        return;
+    }
+
+    var clearList = [];
+
+    var now = Date.now();
+
+    this._scene.children.forEach(function(tile)
+    {   
+        var timeSinceCreate = now - tile.createTS;
+        var timeSinceDisplay = now - tile.displayTS;
+
+        if (tile.level > 0 &&
+            this._renderNeighborList.indexOf(tile) === -1 &&
+            ((tile.displayTS === null && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS) ||
+            (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS) ||
+            tile.opacity === 0))
+        {
+            clearList.push(tile);
+        }
+        
+    }.bind(this));
+
+    clearList.forEach(function(tile)
+    {
+        this._discardTile(tile);
+    }.bind(this));
+};
+
+/**
  * Get parent tile reference and create it if does not exist
  * @method FORGE.BackgroundPyramidRenderer#getParentTile
  * @param {FORGE.Tile} tile - tile
@@ -488,40 +558,6 @@ FORGE.BackgroundPyramidRenderer.prototype.addToRenderList = function(tile)
 };
 
 /**
- * Discard a tile. Removes from the cache and the scene
- * @method FORGE.BackgroundPyramidRenderer#_discardTile
- * @param {FORGE.Tile} tile - tile
- * @private
- */
-FORGE.BackgroundPyramidRenderer.prototype._discardTile = function(tile)
-{
-    if (typeof this._tileCache[tile.level] !== "undefined")
-    {
-        this._tileCache[tile.level].delete(tile);   
-    }
-
-    // var rl = "";
-    // this._renderList.forEach(function(tile) {
-    //     rl += tile.name + " ";
-    // });
-
-    // var ns = "";
-    // this._renderNeighborList.forEach(function(tile) {
-    //     ns += tile.name + " ";
-    // });
-
-    // this.log("Discard tile " + tile.name + "(ns: " + ns + ")" + "(rl: " + rl + ")");
-    
-    // this.log("Discard tile " + tile.name);
-
-    this._scene.remove(tile);
-
-    this._textureStore.discardTileTexture(tile);
-
-    tile.destroy();
-};
-
-/**
  * Render routine.
  * Do preliminary job of specific background renderer, then summon superclass method
  * @method FORGE.BackgroundPyramidRenderer#render
@@ -537,36 +573,7 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
     
     this._renderNeighborList = FORGE.Utils.arrayUnique(this._renderNeighborList);
 
-    var clearList = [];
-
-    var now = Date.now();
-
-    // Clear tile policy
-    // Only applies to tiles with non zero level
-    // Delete all tiles with zero opacity
-    // Delete all tiles that has been created more than 2s ago and have never been displayed
-    // Delete all tiles that has not been displayed since 30s
-    this._scene.children.forEach(function(tile)
-    {   
-        var timeSinceCreate = now - tile.createTS;
-        var timeSinceDisplay = now - tile.displayTS;
-
-        if (tile.level > 0 &&
-            this._renderNeighborList.indexOf(tile) === -1 &&
-            ((tile.displayTS === null && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS) ||
-            (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS) ||
-            tile.opacity === 0))
-        {
-            clearList.push(tile);
-        }
-
-    }.bind(this));
-
-    clearList.forEach(function(tile)
-    {
-        this._discardTile(tile);
-    }.bind(this));
-
+    this._clearTiles();
 };
 
 /**
