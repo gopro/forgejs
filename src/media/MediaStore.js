@@ -380,17 +380,19 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
         this._textureStackInterval = null;
     }
 
-    // if a tile parent has asked for a texture, just remove it from the stack
+    // if a tile parent has asked for a texture, cancel it
     var parentName = tile.getParentName();
-    var index = this._textureStack.find(function(item)
+    var parentTile = this._textureStack.find(function(item)
     {
         return item.name === parentName;
     });
 
-    if (index !== undefined)
+    if (parentTile !== undefined)
     {
         this.log("unstack pending parent texture");
-        this._textureStack.splice(index, 1);
+        var parentKey = this._createKey(parentTile);
+        var entry = this._texturePromises.get(parentKey);
+        entry.cancelled = true;
     }
 
     this._textureStack.push(tile);
