@@ -233,6 +233,7 @@ FORGE.MediaStore.prototype._load = function(tile)
         return;
     }
 
+    this.log("Push loading texture for tile " + tile.name);
     this._loadingTextures.push(key);
 
     var url = this._pattern;
@@ -250,6 +251,8 @@ FORGE.MediaStore.prototype._load = function(tile)
     var entry = this._texturePromises.get(key);
     if (entry.cancelled)
     {
+        this.log("Load promise cancelled for tile " + tile.name);
+
         entry.load.reject("Tile cancelled");
         this._texturePromises.delete(key);
         return;
@@ -280,6 +283,8 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
     image = image.emitter;
     var tile = image.data.tile;
     var key = this._createKey(tile);
+
+    this.log("Texture load complete for tile " + tile.name);
 
     var texture = new THREE.Texture();
     texture.image = image.element;
@@ -414,6 +419,7 @@ FORGE.MediaStore.prototype._textureStackPop = function()
         var tile = this._textureStack.pop();
         //this.log("Texture stack length (---): " + this._textureStack.length + " (" + tile.name + ")");
 
+        this.log("Pop texture request from stack for tile " + tile.name);
         this._load(tile);
     }
 };
@@ -444,12 +450,15 @@ FORGE.MediaStore.prototype.get = function(tile)
         return null;
     }
 
+    this.log("Create load promise for tile " + tile.name);
+
     var loadingPromise = FORGE.Utils.makePromise();
 
     // Texture already available
     // Return resolved promise
     if (this._textures.has(key))
     {
+        this.log("and resolve it immediately");
         loadingPromise.resolve(this._textures.get(key));
         return loadingPromise;
     }
