@@ -321,6 +321,14 @@ FORGE.Camera.prototype._boot = function()
     this._createMainCamera();
     this._createFlatCamera();
     this._createVRCameras();
+
+    // Check config to allow default to be set if they were depending
+    // on some parameter external to the camera. For example: multiresolution fovMin set
+    // by the background renderer
+    if (this._config !== null)
+    {
+        this._parseConfig(this._config);
+    }
 };
 
 /**
@@ -1105,14 +1113,6 @@ FORGE.Camera.prototype._updateInternals = function()
 {
     // Force camera to update its values to bound it in new boundaries after view change
     var changed = this._setAll(this._yaw, this._pitch, this._roll, this._fov);
-
-    // Check config to allow default to be set if they were depending
-    // on some parameter external to the camera. For example: multiresolution fovMin set
-    // by the background renderer
-    if (this._config !== null)
-    {
-        this._parseConfig(this._config);
-    }
 
     if (changed === true)
     {
