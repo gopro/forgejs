@@ -835,7 +835,7 @@ FORGE.RenderManager.prototype.render = function()
         }
         else
         {
-            this._backgroundRenderer.render(null);            
+            this._backgroundRenderer.render(null);
         }
 
         this._renderPipeline.render(camera);
@@ -967,12 +967,6 @@ FORGE.RenderManager.prototype.destroy = function()
         this._objectRenderer = null;
     }
 
-    if (this._viewManager !== null)
-    {
-        this._viewManager.destroy();
-        this._viewManager = null;
-    }
-
     if (this._backgroundRenderer !== null)
     {
         this._backgroundRenderer.destroy();
@@ -983,6 +977,12 @@ FORGE.RenderManager.prototype.destroy = function()
     {
         this._camera.destroy();
         this._camera = null;
+    }
+
+    if (this._viewManager !== null)
+    {
+        this._viewManager.destroy();
+        this._viewManager = null;
     }
 
     if (this._renderDisplay !== null)
