@@ -474,6 +474,24 @@ FORGE.RenderManager.prototype._setupRenderPipeline = function()
 };
 
 /**
+ * Render background.
+ * @method FORGE.RenderManager#_drawBackground
+ * @param {THREE.PerspectiveCamera} camera - perspective camera used to render mesh, N/A with shader rendering
+ * @private
+ */
+FORGE.RenderManager.prototype._drawBackground = function(camera)
+{
+    // this.log("_drawBackground");
+
+    if (this._backgroundRenderer === null)
+    {
+        return;
+    }
+
+    this._backgroundRenderer.render(camera || null);
+};
+
+/**
  * Set renderer size and all objects aware of resolution
  * @method FORGE.RenderManager#_setRendererSize
  * @param {FORGE.Size} size - new renderer size
@@ -829,14 +847,7 @@ FORGE.RenderManager.prototype.render = function()
 
         this._webGLRenderer.setViewport(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 
-        if (vr === true)
-        {
-            this._backgroundRenderer.render(camera);
-        }
-        else
-        {
-            this._backgroundRenderer.render(null);
-        }
+        this._drawBackground((vr === true) ? camera : null);
 
         this._renderPipeline.render(camera);
 
