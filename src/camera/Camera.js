@@ -821,13 +821,13 @@ FORGE.Camera.prototype._getYawBoundaries = function()
     }
     else
     {
-        if (this._yawMin !== 0 || this._yawMax !== 0)
+        if (this._yawMin !== -Infinity || this._yawMax !== Infinity)
         {
-            if (this._yawMin !== 0)
+            if (this._yawMin !== -Infinity)
             {
                 min = this._yawMin;
             }
-            else if (this._yawMax !== 0)
+            else if (this._yawMax !== Infinity)
             {
                 min = this._yawMax;
             }
@@ -921,13 +921,13 @@ FORGE.Camera.prototype._getPitchBoundaries = function()
     }
     else
     {
-        if (this._pitchMin !== 0 || this._pitchMax !== 0)
+        if (this._pitchMin !== -Infinity || this._pitchMax !== Infinity)
         {
-            if (this._pitchMin !== 0)
+            if (this._pitchMin !== -Infinity)
             {
                 min = this._pitchMin;
             }
-            else if (this._pitchMax !== 0)
+            else if (this._pitchMax !== Infinity)
             {
                 min = this._pitchMax;
             }
