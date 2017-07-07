@@ -337,7 +337,8 @@ FORGE.Tile.prototype._queryTexture = function()
     if (this.material !== null && this.material.map === null && this._texturePending === false)
     {
         // Check if predelay since creation has been respected (except for level 0)
-        if (this._level > 0 && this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS)
+        if (this._level !== this._renderer.level ||
+            (this._level > 0 && this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS))
         {
             return;
         }

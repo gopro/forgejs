@@ -233,6 +233,15 @@ FORGE.MediaStore.prototype._load = function(tile)
         return;
     }
 
+    var entry = this._texturePromises.get(key);
+    if (entry.cancelled)
+    {
+        this.log("Load promise cancelled for tile " + tile.name);
+        entry.load.reject("Tile cancelled");
+        this._texturePromises.delete(key);
+        return;
+    }
+
     this.log("Push loading texture for tile " + tile.name);
     this._loadingTextures.push(key);
 
@@ -247,17 +256,7 @@ FORGE.MediaStore.prototype._load = function(tile)
     url = url.replace(/\{level\}/, tile.level.toString());
     url = url.replace(/\{x\}/, tile.x.toString());
     url = url.replace(/\{y\}/, tile.y.toString());
-
-    var entry = this._texturePromises.get(key);
-    if (entry.cancelled)
-    {
-        this.log("Load promise cancelled for tile " + tile.name);
-
-        entry.load.reject("Tile cancelled");
-        this._texturePromises.delete(key);
-        return;
-    }
-
+   
     var config = {
         url: url
     };
@@ -394,7 +393,7 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
 
     if (parentTile !== undefined)
     {
-        this.log("unstack pending parent texture");
+        this.log("Unstack pending parent texture and cancel it");
         var parentKey = this._createKey(parentTile);
         var entry = this._texturePromises.get(parentKey);
         entry.cancelled = true;
@@ -441,6 +440,16 @@ FORGE.MediaStore.prototype._textureStackPop = function()
 FORGE.MediaStore.prototype.get = function(tile)
 {
     var key = this._createKey(tile);
+
+    // If texture is available, return a resolved promise
+    if (this._textures.has(key))
+    {
+        this.log("Texture available, return resolved promise");
+        var promise = FORGE.Utils.makePromise();
+        var mediaTexture = this._textures.get(key);
+        promise.resolve(mediaTexture.texture);
+        return promise;
+    }
 
     // First check if texture is already loading (pending promise)
     // Return null, and client should do nothing but wait
