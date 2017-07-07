@@ -158,6 +158,11 @@ FORGE.Tile.FACES = ["front", "right", "back", "left", "up", "down"];
  * @type {number}
  */
 FORGE.Tile.OPACITY_INCREMENT = 0.04;
+
+/**
+ * Opacity decrement [unit per render cycle]
+ * @type {number}
+ */
 FORGE.Tile.OPACITY_DECREMENT = 0.01;
 
 /**
