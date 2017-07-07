@@ -158,6 +158,7 @@ FORGE.Tile.FACES = ["front", "right", "back", "left", "up", "down"];
  * @type {number}
  */
 FORGE.Tile.OPACITY_INCREMENT = 0.04;
+FORGE.Tile.OPACITY_DECREMENT = 0.01;
 
 /**
  * Texture load predelay (time between creation and display)
@@ -286,7 +287,7 @@ FORGE.Tile.prototype._onBeforeRender = function()
     {
         if (this._opacity > 0)
         {
-            this._setOpacity(this._opacity - FORGE.Tile.OPACITY_INCREMENT);
+            this._setOpacity(this._opacity - FORGE.Tile.OPACITY_DECREMENT);
         }
 
         return;
