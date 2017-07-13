@@ -8,15 +8,11 @@
     "properties": {
 
         "yaw": {
-            "type": "SceneMediaRangeConfig",
-            "title": "Yaw range",
-            "description": "Horizontal angular range value."
+            "$ref": "scene-media-range"
         },
 
         "pitch": {
-            "type": "SceneMediaRangeConfig",
-            "title": "Pitch range",
-            "description": "Vertical angular range value."
+            "$ref": "scene-media-range"
         }
     }
 }

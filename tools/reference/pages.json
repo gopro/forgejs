@@ -118,6 +118,8 @@
                 "scene-media-source",
                 "scene-media-level",
                 "scene-media-options",
+                "scene-media-limits",
+                "scene-media-range",
                 "scene-events"
             ]
         },
@@ -388,6 +390,8 @@
                 "scene-media",
                 "scene-media-source",
                 "scene-media-level",
+                "scene-media-limits",
+                "scene-media-range",
                 "scene-media-options",
                 "scene-events"
             ]

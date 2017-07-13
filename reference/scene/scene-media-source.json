@@ -50,9 +50,7 @@
         },
 
         "limits": {
-            "type": "SceneMediaLimitsConfig",
-            "title": "Limits",
-            "description": "Optional property defining angular limits of the source."
+            "$ref": "scene-media-limits"
         },
 
         "order": {
