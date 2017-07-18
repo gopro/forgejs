@@ -194,7 +194,7 @@ module.exports = function(grunt)
     //The same array excluding FORGE.js for jshint
     var sourceFilesForJSHint = sourceFiles.slice(1);
 
-    var threeVersion = "83";
+    var threeVersion = "86";
 
     var customThree =
     [
