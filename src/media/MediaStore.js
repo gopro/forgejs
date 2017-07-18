@@ -117,14 +117,13 @@ FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS = 250;
  * Table describing previous cube face
  * @type {CubeFaceObject}
  */
-FORGE.MediaStore.CUBE_FACE_CONFIG = 
-{
-    "front" : "front",
-    "right" : "right",
-    "back" : "back",
-    "left" : "left",
-    "down" : "down",
-    "up" : "up"
+FORGE.MediaStore.CUBE_FACE_CONFIG = {
+    "front": "front",
+    "right": "right",
+    "back": "back",
+    "left": "left",
+    "down": "down",
+    "up": "up"
 };
 
 /**
@@ -179,7 +178,7 @@ FORGE.MediaStore.prototype._parseConfig = function(config)
     }
 
     // Then check if each resolution level has its own pattern
-    for (var l=0, ll=config.levels.length; l<ll; l++)
+    for (var l = 0, ll = config.levels.length; l < ll; l++)
     {
         if (typeof config.levels[l].pattern === "string")
         {
@@ -256,7 +255,7 @@ FORGE.MediaStore.prototype._load = function(tile)
     url = url.replace(/\{level\}/, tile.level.toString());
     url = url.replace(/\{x\}/, tile.x.toString());
     url = url.replace(/\{y\}/, tile.y.toString());
-   
+
     var config = {
         url: url
     };
@@ -413,7 +412,7 @@ FORGE.MediaStore.prototype._textureStackPop = function()
 {
     this._textureStackInterval = null;
 
-    while (this._textureStack.length > 0) 
+    while (this._textureStack.length > 0)
     {
         var tile = this._textureStack.pop();
         //this.log("Texture stack length (---): " + this._textureStack.length + " (" + tile.name + ")");
@@ -473,7 +472,8 @@ FORGE.MediaStore.prototype.get = function(tile)
     }
 
     // Create new entry in map of promises
-    var entry = /** @type {!TexturePromiseObject} */ ({
+    var entry = /** @type {!TexturePromiseObject} */ (
+    {
         load: loadingPromise,
         cancelled: false
     });

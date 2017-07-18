@@ -501,7 +501,7 @@ FORGE.Tile.prototype._setGeometry = function()
 
     var rotation = this._getRotation();
     this.rotation.copy(rotation);
-    
+
     position.applyEuler(rotation);
     this.position.copy(position);
 };
