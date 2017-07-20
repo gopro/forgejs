@@ -78,3 +78,9 @@ var TexturePromiseObject;
  */
 var CubeFaceObject;
 
+/**
+ * @typedef {{x:number, y:number}}
+ * @name TilesOnLevel
+ */
+var TilesOnLevel;
+
