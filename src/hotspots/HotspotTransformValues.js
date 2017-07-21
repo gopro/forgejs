@@ -54,6 +54,7 @@ FORGE.HotspotTransformValues = function(transformUid, x, y, z)
  * @method FORGE.HotspotTransformValues#load
  * @param {HotspotTransformValuesConfig} values
  * @param {boolean} notify - Do we notify the transform object after the load ?
+ * @return {boolean} Returns if any value has changed.
  */
 FORGE.HotspotTransformValues.prototype.load = function(values, notify)
 {
@@ -87,6 +88,8 @@ FORGE.HotspotTransformValues.prototype.load = function(values, notify)
         var transform = FORGE.UID.get(this._transformUid);
         transform.notifyChange();
     }
+
+    return changed;
 };
 
 /**
