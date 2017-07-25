@@ -139,6 +139,18 @@ MediaPlayer.prototype.setAutoSwitchQualityFor = function(type, value) {};
  * @param {boolean} value
  * @default false
  */
+MediaPlayer.prototype.setFastSwitchEnabled = function(value) {};
+
+/**
+ * @param {boolean} value
+ * @default {boolean} true
+ */
+MediaPlayer.prototype.setScheduleWhilePaused = function(value) {};
+
+/**
+ * @param {boolean} value
+ * @default false
+ */
 MediaPlayer.prototype.enableBufferOccupancyABR = function(value) {};
 
 /**
