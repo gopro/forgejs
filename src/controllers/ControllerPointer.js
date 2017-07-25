@@ -41,7 +41,7 @@ FORGE.ControllerPointer = function(viewer, config)
     this._fullscreen = true;
 
     /**
-     * Previous position vector.
+     * Start position vector.
      * @name FORGE.ControllerPointer#_positionStart
      * @type {THREE.Vector2}
      * @private
@@ -49,12 +49,20 @@ FORGE.ControllerPointer = function(viewer, config)
     this._positionStart = null;
 
     /**
-     * Previous position vector.
+     * Current position vector.
      * @name FORGE.ControllerPointer#_positionCurrent
      * @type {THREE.Vector2}
      * @private
      */
     this._positionCurrent = null;
+
+    /**
+     * Previous position vector.
+     * @name FORGE.ControllerPointer#_positionPrevious
+     * @type {THREE.Vector2}
+     * @private
+     */
+    this._positionPrevious = null;
 
     /**
      * The fov value when you start to pinch in/out
@@ -89,6 +97,14 @@ FORGE.ControllerPointer = function(viewer, config)
      */
     this._inertia = null;
 
+    /**
+     * Panning flag.
+     * @name FORGE.ControllerPointer#_panning
+     * @type {boolean}
+     * @private
+     */
+    this._panning = false;
+
     FORGE.ControllerBase.call(this, viewer, "ControllerPointer");
 };
 
@@ -106,6 +122,7 @@ FORGE.ControllerPointer.DEFAULT_OPTIONS =
 
     orientation:
     {
+        drag: false,
         hardness: 0.6, //Hardness factor impatcing controller response to some instant force.
         damping: 0.15, //Damping factor controlling inertia.
         velocityMax: 300,
@@ -136,6 +153,7 @@ FORGE.ControllerPointer.prototype._boot = function()
     this._inertia = new THREE.Vector2();
     this._velocity = new THREE.Vector2();
     this._positionStart = new THREE.Vector2();
+    this._positionPrevious = new THREE.Vector2();
     this._positionCurrent = new THREE.Vector2();
 
     this._parseConfig(this._config);
@@ -182,10 +200,12 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
     this.log("_panStartHandler (" + event.data.velocityX.toFixed(2) + ", " + event.data.velocityY.toFixed(2) + ")");
 
     this._active = true;
+    this._panning = true;
 
-    this._positionStart = new THREE.Vector2(event.data.center.x, event.data.center.y);
+    var position = FORGE.Pointer.getRelativeMousePosition(event.data.srcEvent);
+    this._positionStart = new THREE.Vector2(position.x, position.y);
+    this._positionPrevious.copy(this._positionStart);
     this._positionCurrent.copy(this._positionStart);
-
     this._velocity.set(0, 0);
 
     if (this._onControlStart !== null)
@@ -204,13 +224,21 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
  */
 FORGE.ControllerPointer.prototype._panMoveHandler = function(event)
 {
-    if(this._viewer.controllers.enabled === false)
+    var position = FORGE.Pointer.getRelativeMousePosition(event.data.srcEvent);
+
+    if(this._viewer.controllers.enabled === false || position === null)
     {
         return;
     }
 
-    this._positionCurrent.set(event.data.center.x, event.data.center.y);
+    this._positionPrevious.copy(this._positionCurrent);
+    this._positionCurrent.set(position.x, position.y);
     // this.log("Current position: " + this._positionCurrent.x + ", " + this._positionCurrent.y);
+
+    if(this._orientation.drag === true && this._panning === true)
+    {
+        this._updateCameraWithDrag();
+    }
 };
 
 /**
@@ -224,6 +252,7 @@ FORGE.ControllerPointer.prototype._panEndHandler = function()
     this.log("_panEndHandler");
 
     this._active = false;
+    this._panning = false;
 
     this._velocity.set(0, 0);
     this._positionStart.set(0, 0);
@@ -235,6 +264,86 @@ FORGE.ControllerPointer.prototype._panEndHandler = function()
     }
 
     this._viewer.controllers.notifyControlEnd(this);
+};
+
+/**
+ * Update the camera from the mouse position.
+ * @method FORGE.ControllerPointer#_updateCameraWithDrag
+ * @private
+ */
+FORGE.ControllerPointer.prototype._updateCameraWithDrag = function()
+{
+    var stw0 = this._viewer.view.screenToWorld(this._positionPrevious);
+    var stw1 = this._viewer.view.screenToWorld(this._positionCurrent);
+
+    // If the screen point do not match any world position, return
+    if(stw0 === null || stw1 === null)
+    {
+        return;
+    }
+
+    var spherical0 = FORGE.Math.cartesianToSpherical(stw0.x, stw0.y, stw0.z);
+    var quat0 = FORGE.Quaternion.fromEuler(spherical0.theta, spherical0.phi, 0);
+
+    var spherical1 = FORGE.Math.cartesianToSpherical(stw1.x, stw1.y, stw1.z);
+    var quat1 = FORGE.Quaternion.fromEuler(spherical1.theta, spherical1.phi, 0);
+
+    this._camera.yaw += FORGE.Math.radToDeg(spherical0.theta - spherical1.theta);
+    this._camera.pitch += FORGE.Math.radToDeg(spherical0.phi - spherical1.phi);
+    this._camera.roll = 0;
+};
+
+/**
+ * Update the camera from the velocity that results of the mouse movement.
+ * @method FORGE.ControllerPointer#_updateCameraWithVelocity
+ * @private
+ */
+FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
+{
+    var size = this._viewer.renderer.displayResolution;
+    var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
+
+    this._velocity.subVectors(this._positionCurrent, this._positionStart);
+
+    if (this._velocity.length() > this._orientation.velocityMax)
+    {
+        this._velocity.setLength(this._orientation.velocityMax);
+    }
+
+    this._velocity.multiplyScalar(hardness);
+
+    // this.log("Current velocity: " + this._velocity.x + ", " + this._velocity.y);
+
+    var invert = this._orientation.invert;
+    var invertX = (invert === true) ? -1 : (typeof invert === "object" && invert.x === true) ? -1 : 1;
+    var invertY = (invert === true) ? -1 : (typeof invert === "object" && invert.y === true) ? -1 : 1;
+
+    var dx = this._velocity.x + this._inertia.x;
+    var dy = this._velocity.y + this._inertia.y;
+
+    if (dx === 0 && dy === 0)
+    {
+        return;
+    }
+
+    var yaw = invertX * dx;
+    //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
+    if(Math.abs(yaw) > 0.05)
+    {
+        this._camera.yaw += yaw;
+        this._camera.flat.position.x += dx;
+    }
+
+    var pitch = invertY * dy;
+    //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
+    if(Math.abs(pitch) > 0.05)
+    {
+        this._camera.pitch -= pitch;
+        this._camera.flat.position.y -= dy;
+    }
+
+    // Damping 1 -> stops instantly, 0 infinite rebounds
+    this._inertia.add(this._velocity).multiplyScalar(FORGE.Math.clamp(1 - this._orientation.damping, 0, 1));
 };
 
 /**
@@ -406,50 +515,10 @@ FORGE.ControllerPointer.prototype.disable = function()
  */
 FORGE.ControllerPointer.prototype.update = function()
 {
-    var size = this._viewer.renderer.displayResolution;
-    var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
-
-    this._velocity.subVectors(this._positionCurrent, this._positionStart);
-
-    if (this._velocity.length() > this._orientation.velocityMax)
+    if(this._orientation.drag !== true)
     {
-        this._velocity.setLength(this._orientation.velocityMax);
+        this._updateCameraWithVelocity();
     }
-
-    this._velocity.multiplyScalar(hardness);
-
-    // this.log("Current velocity: " + this._velocity.x + ", " + this._velocity.y);
-
-    var invert = this._orientation.invert;
-    var invertX = (invert === true) ? -1 : (typeof invert === "object" && invert.x === true) ? -1 : 1;
-    var invertY = (invert === true) ? -1 : (typeof invert === "object" && invert.y === true) ? -1 : 1;
-
-    var dx = this._velocity.x + this._inertia.x;
-    var dy = this._velocity.y + this._inertia.y;
-
-    if (dx === 0 && dy === 0)
-    {
-        return;
-    }
-
-    var yaw = invertX * dx;
-    //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
-    if(Math.abs(yaw) > 0.05)
-    {
-        this._camera.yaw += yaw;
-        this._camera.flat.position.x += dx;
-    }
-
-    var pitch = invertY * dy;
-    //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
-    if(Math.abs(pitch) > 0.05)
-    {
-        this._camera.pitch -= pitch;
-        this._camera.flat.position.y -= dy;
-    }
-
-    // Damping 1 -> stops instantly, 0 infinite rebounds
-    this._inertia.add(this._velocity).multiplyScalar(FORGE.Math.clamp(1 - this._orientation.damping, 0, 1));
 };
 
 /**
@@ -460,3 +529,41 @@ FORGE.ControllerPointer.prototype.destroy = function()
 {
     FORGE.ControllerBase.prototype.destroy.call(this);
 };
+
+/**
+ * Get and set the orientation options
+ * @name FORGE.ControllerPointer#orientation
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.ControllerPointer.prototype, "orientation",
+{
+    /** @this {FORGE.ControllerPointer} */
+    get: function()
+    {
+        return this._orientation;
+    },
+    /** @this {FORGE.ControllerPointer} */
+    set: function(value)
+    {
+        this._orientation = value;
+    }
+});
+
+/**
+ * Get and set the zoom options
+ * @name FORGE.ControllerPointer#zoom
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.ControllerPointer.prototype, "zoom",
+{
+    /** @this {FORGE.ControllerPointer} */
+    get: function()
+    {
+        return this._zoom;
+    },
+    /** @this {FORGE.ControllerPointer} */
+    set: function(value)
+    {
+        this._zoom = value;
+    }
+});
