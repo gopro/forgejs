@@ -936,11 +936,16 @@ FORGE.Pointer.prototype.destroy = function()
  */
 FORGE.Pointer.getRelativeMousePosition = function(event)
 {
-    var rect = event.target.getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
+    if(typeof event.target.getBoundingClientRect === "function")
+    {
+        var rect = event.target.getBoundingClientRect();
+        var x = event.clientX - rect.left;
+        var y = event.clientY - rect.top;
 
-    return new THREE.Vector2(x, y);
+        return new THREE.Vector2(x, y);
+    }
+
+    return null;
 };
 
 /**
