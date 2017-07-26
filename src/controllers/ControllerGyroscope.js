@@ -102,7 +102,7 @@ FORGE.ControllerGyroscope.prototype._boot = function()
 
 /**
  * Device ready handler. Enables the gyro controller if gyro is available on the device.
- * @method FORGE.ControlerGyroscope#_deviceReadyHandler
+ * @method FORGE.ControllerGyroscope#_deviceReadyHandler
  * @private
  */
 FORGE.ControllerGyroscope.prototype._deviceReadyHandler = function()
