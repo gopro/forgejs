@@ -390,7 +390,7 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
         return item.name === parentName;
     });
 
-    if (parentTile !== undefined)
+    if (parentTile !== undefined && parentTile.level !== 0)
     {
         this.log("Unstack pending parent texture and cancel it");
         var parentKey = this._createKey(parentTile);

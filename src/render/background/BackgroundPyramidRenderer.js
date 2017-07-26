@@ -144,7 +144,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
 
-    // if we have a low res ground level, force its load (max 96 tiles)
+    // if we have a low res/not so big ground level, force its load (max 96 tiles)
     var lowX = this.nbTilesPerAxis(0, "x"),
         lowY = this.nbTilesPerAxis(0, "y");
 
@@ -248,12 +248,15 @@ FORGE.BackgroundPyramidRenderer.prototype._cameraFovToPyramidLevel = function(fo
     // check the nearest level to this optimal number
     var level = this._tilesLevel.findIndex(function(lvl)
     {
-        return lvl.y > tiles;
+        return lvl.y >= tiles;
     });
 
-    level = (level === -1) ? this._tilesLevel.length - 1 : level;
+    if (level === -1)
+    {
+        level = this._tilesLevel.length - 1;
+    }
 
-    return level;
+    return Math.max(0, level);
 };
 
 /**
