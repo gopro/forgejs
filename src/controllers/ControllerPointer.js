@@ -202,7 +202,7 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
     this._active = true;
     this._panning = true;
 
-    var position = FORGE.Pointer.getRelativeMousePosition(event.data.srcEvent);
+    var position = FORGE.Pointer.getRelativeMousePosition(event.data);
     this._positionStart = new THREE.Vector2(position.x, position.y);
     this._positionPrevious.copy(this._positionStart);
     this._positionCurrent.copy(this._positionStart);
@@ -224,7 +224,7 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
  */
 FORGE.ControllerPointer.prototype._panMoveHandler = function(event)
 {
-    var position = FORGE.Pointer.getRelativeMousePosition(event.data.srcEvent);
+    var position = FORGE.Pointer.getRelativeMousePosition(event.data);
 
     if(this._viewer.controllers.enabled === false || position === null)
     {
