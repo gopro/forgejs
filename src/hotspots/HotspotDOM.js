@@ -11,6 +11,8 @@
  * @param {FORGE.Viewer} viewer - viewer reference
  * @param {HotspotConfig} config - hotspot configuration
  * @extends {FORGE.BaseObject}
+ *
+ * @todo facingCenter with CSS 3D, rotation values and scale values
  */
 FORGE.HotspotDOM = function(viewer, config)
 {
@@ -53,6 +55,39 @@ FORGE.HotspotDOM = function(viewer, config)
      * @private
      */
     this._events = null;
+
+    /**
+     * Visibility flag
+     * @name  FORGE.HotspotDOM#_visible
+     * @type {boolean}
+     * @private
+     */
+    this._visible = true;
+
+    /**
+     * Is this object is interactive / raycastable
+     * @name FORGE.HotspotDOM#_interactive
+     * @type {boolean}
+     * @private
+     */
+    this._interactive = true;
+
+    /**
+     * Does the hotspot is facing the camera ? Useful for a flat hotspot we want
+     * to always be facing to the camera.
+     * @name FORGE.HotspotDOM#_facingCenter
+     * @type {boolean}
+     * @private
+     */
+    this._facingCenter = false;
+
+    /**
+     * The pointer cursor when pointer is over the hotspot zone
+     * @name FORGE.HotspotDOM#_cursor
+     * @type {string}
+     * @private
+     */
+    this._cursor = "pointer";
 
     FORGE.BaseObject.call(this, "HotspotDOM");
 
@@ -201,6 +236,11 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
         this._transform.load(config.transform, false);
     }
 
+    this._visible = (typeof config.visible === "boolean") ? config.visible : true;
+    // this._facingCenter = (typeof config.facingCenter === "boolean") ? config.facingCenter : false;
+    this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
+    this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
+
     this.show();
 };
 
@@ -230,6 +270,8 @@ FORGE.HotspotDOM.prototype._domOverHandler = function()
     {
         this._events.onOver.dispatch();
     }
+
+    this._dom.style.cursor = this._cursor;
 };
 
 /**
@@ -244,6 +286,8 @@ FORGE.HotspotDOM.prototype._domOutHandler = function()
     {
         this._events.onOut.dispatch();
     }
+
+    this._dom.style.cursor = "default";
 };
 
 /**
@@ -278,7 +322,7 @@ FORGE.HotspotDOM.prototype._clearEvents = function()
 };
 
 /**
- * Handles the changing view, as it can only be present in the Rectilinear view.
+ * Handles the changing view, as it can only be present in the Rectilinear and GoPro view.
  * @method FORGE.HotspotDOM#_viewChangeHandler
  * @private
  */
@@ -286,7 +330,7 @@ FORGE.HotspotDOM.prototype._viewChangeHandler = function()
 {
     this._dom.style.display = "block";
 
-    if (this._viewer.view.type !== FORGE.ViewType.RECTILINEAR && this._viewer.view.type !== FORGE.ViewType.GOPRO)
+    if ((this._viewer.view.type !== FORGE.ViewType.RECTILINEAR && this._viewer.view.type !== FORGE.ViewType.GOPRO) || this._visible === false)
     {
         this._dom.style.display = "none";
     }
@@ -351,6 +395,7 @@ FORGE.HotspotDOM.prototype.destroy = function()
 };
 
 /**
+ * Get the DOM content of the hotspot
  * @name FORGE.HotspotDOM#dom
  * @readonly
  * @type {?Element|HTMLElement}
@@ -361,5 +406,61 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "dom",
     get: function()
     {
         return this._dom;
+    }
+});
+
+/**
+ * Get and set the visible flag
+ * @name FORGE.HotspotDOM#visible
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.HotspotDOM.prototype, "visible",
+{
+    /** @this {FORGE.HotspotDOM} */
+    get: function()
+    {
+        return this._visible;
+    },
+    /** @this {FORGE.HotspotDOM} */
+    set: function(value)
+    {
+        this._visible = Boolean(value);
+
+        if (this._visible === true)
+        {
+            this._viewChangeHandler();
+        }
+        else
+        {
+            this._dom.style.display = "none";
+        }
+    }
+});
+
+/**
+ * Get and set the interactive flag for the main hotspot DOM container
+ * @name FORGE.HotspotDOM#interactive
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.HotspotDOM.prototype, "interactive",
+{
+    /** @this {FORGE.HotspotDOM} */
+    get: function()
+    {
+        return this._interactive;
+    },
+    /** @this {FORGE.HotspotDOM} */
+    set: function(value)
+    {
+        this._interactive = Boolean(value);
+
+        if (this._interactive === true)
+        {
+            this._dom.style.pointerEvents = "auto";
+        }
+        else
+        {
+            this._dom.style.pointerEvents = "none";
+        }
     }
 });
