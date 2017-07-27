@@ -147,7 +147,7 @@ FORGE.Raycaster.prototype.stop = function()
  */
 FORGE.Raycaster.prototype._canvasPointerClickHandler = function(event)
 {
-    var position = FORGE.Pointer.getRelativeMousePosition(event.data.srcEvent);
+    var position = FORGE.Pointer.getRelativeMousePosition(event.data);
     this._raycast("click", position);
 };
 

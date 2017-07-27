@@ -936,11 +936,37 @@ FORGE.Pointer.prototype.destroy = function()
  */
 FORGE.Pointer.getRelativeMousePosition = function(event)
 {
-    var rect = event.target.getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
+    if(typeof event.target.getBoundingClientRect === "function")
+    {
+        var rect = event.target.getBoundingClientRect();
 
-    return new THREE.Vector2(x, y);
+        // event.center is part of an Hammer event but it is not set on all kinds of events.
+        if(typeof event.center !== "undefined")
+        {
+            var centerX = event.center.x;
+            var centerY = event.center.y;
+        }
+
+        var clientX = event.clientX;
+        var clientY = event.clientY;
+        var pageX = event.pageX;
+        var pageY = event.pageY;
+
+        if(typeof event.srcEvent !== "undefined")
+        {
+            clientX = event.srcEvent.clientX;
+            clientY = event.srcEvent.clientY;
+            pageX = event.srcEvent.pageX;
+            pageY = event.srcEvent.pageY;
+        }
+
+        var x = (centerX || clientX || pageX) - rect.left;
+        var y = (centerY || clientY || pageY) - rect.top;
+
+        return new THREE.Vector2(x, y);
+    }
+
+    return null;
 };
 
 /**
