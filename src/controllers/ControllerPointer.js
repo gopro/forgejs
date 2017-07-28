@@ -361,39 +361,11 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         var spherical1 = FORGE.Math.cartesianToSpherical(stw1.x, stw1.y, stw1.z);
         var quat1 = FORGE.Quaternion.fromEuler(spherical1.theta, spherical1.phi, 0);
 
-        // Quaternion version ==========
-
         var quat = FORGE.Quaternion.diffBetweenQuaternions(quat1, quat0);
         var euler = FORGE.Quaternion.toEuler(quat);
 
         this._camera.yaw += FORGE.Math.radToDeg(euler.yaw);
         this._camera.pitch += FORGE.Math.radToDeg(euler.pitch);
-
-        // Yaw pitch version ============
-
-        // this._camera.yaw += FORGE.Math.radToDeg(spherical0.theta - spherical1.theta);
-        // this._camera.pitch += FORGE.Math.radToDeg(spherical0.phi - spherical1.phi);
-        // this._camera.roll = 0;
-
-        // Matrix version ===============
-
-        // var yaw = spherical0.theta - spherical1.theta;
-        // var pitch = spherical0.phi - spherical1.phi;
-
-        // var modelView = this._camera.modelView;
-
-        // var matrixYaw = FORGE.Math.eulerToRotationMatrix(yaw, 0, 0);
-        // var matrixPitch = FORGE.Math.eulerToRotationMatrix(0, pitch, 0);
-
-        // var matrix = modelView.multiply(matrixPitch).multiply(matrixYaw);
-        // var matrix = modelView.multiply(matrixYaw).multiply(matrixPitch);
-        // var matrix = matrixPitch.multiply(matrixYaw).multiply(modelView);
-        // var matrix = matrixYaw.multiply(matrixPitch).multiply(modelView);
-
-        // var matrix = FORGE.Math.eulerToRotationMatrix(yaw, pitch, 0).multiply(modelView);
-        // var matrix = modelView.multiply(FORGE.Math.eulerToRotationMatrix(yaw, pitch, 0));
-
-        // this._camera.modelView = matrix;
     }
     else
     {
