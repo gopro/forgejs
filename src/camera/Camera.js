@@ -1471,7 +1471,6 @@ Object.defineProperty(FORGE.Camera.prototype, "parallax",
 /**
  * Get the modelView of the camera.
  * @name FORGE.Camera#modelView
- * @readonly
  * @type {THREE.Matrix4}
  */
 Object.defineProperty(FORGE.Camera.prototype, "modelView",
@@ -1480,6 +1479,13 @@ Object.defineProperty(FORGE.Camera.prototype, "modelView",
     get: function()
     {
         return this._modelView;
+    },
+    /** @this {FORGE.Camera} */
+    set: function(value)
+    {
+        this._modelView = value;
+        this._updateFromMatrix();
+        this._updateComplete();
     }
 });
 

@@ -135,7 +135,8 @@ FORGE.ControllerPointer.DEFAULT_OPTIONS =
     zoom:
     {
         hardness: 5,
-        invert: false
+        invert: false,
+        toPointer: false
     }
 };
 
@@ -452,7 +453,34 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         delta *= (event.data.deltaY * factorDeltaY) / 5;
     }
 
-    this._camera.fov = this._camera.fov - delta;
+    var fov = this._camera.fov - delta;
+
+    if(this._zoom.toPointer === true)
+    {
+        var screen = FORGE.Pointer.getRelativeMousePosition(event.data);
+        var stw0 = this._viewer.view.screenToWorld(screen);
+        var spherical0 = FORGE.Math.cartesianToSpherical(stw0.x, stw0.y, stw0.z);
+        var quat0 = FORGE.Quaternion.fromEuler(spherical0.theta, spherical0.phi, 0);
+
+        // Change the camera fov
+        this._camera.fov = fov;
+        this._viewer.view.current.updateUniforms();
+
+        var stw1 = this._viewer.view.screenToWorld(screen);
+        var spherical1 = FORGE.Math.cartesianToSpherical(stw1.x, stw1.y, stw1.z);
+        var quat1 = FORGE.Quaternion.fromEuler(spherical1.theta, spherical1.phi, 0);
+
+        var quat = FORGE.Quaternion.diffBetweenQuaternions(quat1, quat0);
+        var euler = FORGE.Quaternion.toEuler(quat);
+
+        this._camera.yaw += FORGE.Math.radToDeg(euler.yaw);
+        this._camera.pitch += FORGE.Math.radToDeg(euler.pitch);
+    }
+    else
+    {
+        this._camera.fov = fov;
+    }
+
     this.log("_wheelHandler (fov:" + this._camera.fov + ")");
 };
 
