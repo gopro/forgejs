@@ -687,6 +687,7 @@ module.exports = function(grunt)
     grunt.registerTask("min", "Compile the source with closure compiler", function(arg1)
     {
         var debug = (arg1 === "debug");
+        var test = (arg1 === "test");
 
         var tasks =
         [
@@ -710,9 +711,13 @@ module.exports = function(grunt)
             "concat:customThreeMin",
             "concat:customThreeMinWithoutVersion",
             "clean:glsl",
-            "clean:buildTmp",
-            "karma:run"
+            "clean:buildTmp"
         ];
+
+        if(test === true)
+        {
+            tasks.push("karma:run");
+        }
 
         //grunt.option("force", true);
 
