@@ -684,10 +684,9 @@ module.exports = function(grunt)
     ]);
 
     // Build with closure compiler
-    grunt.registerTask("min", "Compile the source with closure compiler", function(arg1)
+    grunt.registerTask("min", "Compile the source with closure compiler", function()
     {
-        var debug = (arg1 === "debug");
-        var test = (arg1 === "test");
+        var noTest = grunt.option("no-test");
 
         var tasks =
         [
@@ -701,7 +700,7 @@ module.exports = function(grunt)
             "replace:log",
             "copy:license",
             "copy:closure",
-            "closureExport:build:" + debug,
+            "closureExport:build",
             "referenceConcat:build",
             "externsGeneration:build",
             "concat:closure",
@@ -714,14 +713,11 @@ module.exports = function(grunt)
             "clean:buildTmp"
         ];
 
-        if(test === true)
+        if (noTest !== true)
         {
             tasks.push("karma:run");
         }
 
-        //grunt.option("force", true);
-
         grunt.task.run(tasks);
     });
-
 };

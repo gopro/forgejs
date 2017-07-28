@@ -8,7 +8,7 @@
 
 module.exports = function(grunt)
 {
-    grunt.registerMultiTask('closureExport', 'Auto extract keywords for Closure compilation and generate file according to those.', function(debug)
+    grunt.registerMultiTask('closureExport', 'Auto extract keywords for Closure compilation and generate file according to those.', function()
     {
         var self = this;
 
@@ -427,7 +427,7 @@ module.exports = function(grunt)
 
             for (var i = 0; i < src.length; i++)
             {
-                if (self.args[0] !== 'true')
+                if (grunt.option("keep-log") !== true)
                 {
                     removeDebugLog(src[i]);
                 }
