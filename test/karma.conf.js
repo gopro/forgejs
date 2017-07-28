@@ -2,6 +2,8 @@
 // Generated on Mon Apr 24 2017 15:12:34 GMT+0200 (CEST)
 
 module.exports = function(config) {
+  var threeVersion = "86";
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -13,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        "lib/three.js/three.r83.custom.min.js",
+        "lib/three.js/three.r"+threeVersion+".custom.min.js",
         "lib/dash.js/dash.all.min.js",
         "lib/hammer.js/hammer.min.js",
         "lib/omnitone/omnitone.min.js",

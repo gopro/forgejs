@@ -645,10 +645,12 @@ FORGE.SoundManager.prototype._setContextListenerOrientation = function()
         var cameraDirection = new THREE.Vector3();
         var qCamera = this._viewer.renderer.camera.main.quaternion;
 
-        cameraDirection.set(0, 0, 1); //@todo verify the perspective matrix (0, 0, -1)
+        // front vector indicating where the listener is facing to
+        cameraDirection.set(0, 0, -1);
         cameraDirection.applyQuaternion(qCamera);
         var camera = cameraDirection.clone();
 
+        // up vector repesenting the direction of the top of the listener head
         cameraDirection.set(0, 1, 0);
         cameraDirection.applyQuaternion(qCamera);
         var cameraUp = cameraDirection;
