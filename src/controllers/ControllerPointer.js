@@ -458,7 +458,8 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         delta *= (event.data.deltaY * factorDeltaY) / 5;
     }
 
-    var fov = this._camera.fov - delta;
+    var logZoomFactor = Math.min(1, this._camera.fov / 90) / Math.LN2;
+    this._camera.fov -= delta * logZoomFactor;
 
     if(this._zoom.toPointer === true)
     {
@@ -467,8 +468,6 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         var spherical0 = FORGE.Math.cartesianToSpherical(stw0.x, stw0.y, stw0.z);
         var quat0 = FORGE.Quaternion.fromEuler(spherical0.theta, spherical0.phi, 0);
 
-        // Change the camera fov
-        this._camera.fov = fov;
         this._viewer.view.current.updateUniforms();
 
         var stw1 = this._viewer.view.screenToWorld(screen);
@@ -481,15 +480,6 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         this._camera.yaw += FORGE.Math.radToDeg(euler.yaw);
         this._camera.pitch += FORGE.Math.radToDeg(euler.pitch);
     }
-    else
-    {
-        this._camera.fov = fov;
-    }
-
-    delta *= hardness;
-
-    var logZoomFactor = Math.min(1, this._camera.fov / 90) / Math.LN2;
-    this._camera.fov -= delta * logZoomFactor;
 
     this.log("_wheelHandler (fov:" + this._camera.fov + ")");
 };

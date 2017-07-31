@@ -268,8 +268,8 @@ FORGE.BackgroundPyramidRenderer.prototype._cameraFovToPyramidLevel = function(fo
  */
 FORGE.BackgroundPyramidRenderer.prototype._pyramidLevelToCameraFov = function(level)
 {
-    var level = this._tilesLevel[level];
-    var fov = 90 / level.y;
+    var lvl = this._tilesLevel[level];
+    var fov = 90 / lvl.y;
     return fov;
 };
 
@@ -483,17 +483,17 @@ FORGE.BackgroundPyramidRenderer.prototype.nbTilesPerAxis = function(level, axis)
         return 1;
     }
 
-    var level = this._tilesLevel[level];
+    var lvl = this._tilesLevel[level];
 
-    if (typeof level !== "undefined")
+    if (typeof lvl !== "undefined")
     {
         if (axis === "x")
         {
-            return level.x;
+            return lvl.x;
         }
         else if (axis === "y")
         {
-            return level.y;
+            return lvl.y;
         }
     }
 

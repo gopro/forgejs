@@ -127,7 +127,7 @@ FORGE.ViewBase.prototype.constructor = FORGE.ViewBase;
  */
 FORGE.ViewBase.prototype._boot = function()
 {
-
+    this._viewer.story.onSceneLoadComplete.add(this.updateUniforms, this);
 };
 
 /**
