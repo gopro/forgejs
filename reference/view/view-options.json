@@ -1,0 +1,24 @@
+{
+    "id": "view-options",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ViewOptionsConfig",
+    "description": "An instance of <a href=\"#view\">the view options configuration.</a>",
+    "type": "object",
+
+    "properties": {
+
+        "repeatX": {
+            "type": "boolean",
+            "title": "Repeat X",
+            "description": "Does the view repeat the media on the X axis (ViewFlat only)",
+            "default": "false"
+        },
+
+        "repeatY": {
+            "type": "boolean",
+            "title": "Repeat Y",
+            "description": "Does the view repeat the media on the Y axis (ViewFlat only)",
+            "default": "false"
+        }
+    }
+}

@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.ViewRectilinear
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {Object} [options] - The view options
+ * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */
 FORGE.ViewRectilinear = function(viewer, options)
