@@ -3,11 +3,12 @@
  *
  * @constructor FORGE.ViewBase
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {?ViewOptionsConfig} options - The view options.
  * @param {string} className - object className.
  * @param {string} type - object view type.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ViewBase = function(viewer, className, type)
+FORGE.ViewBase = function(viewer, options, className, type)
 {
     /**
      * The Viewer reference.
@@ -16,6 +17,14 @@ FORGE.ViewBase = function(viewer, className, type)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * The view options
+     * @name FORGE.ViewBase#_options
+     * @type {?ViewOptionsConfig}
+     * @private
+     */
+    this._options = options || null;
 
     /**
      * Projection scale.
@@ -387,5 +396,20 @@ Object.defineProperty(FORGE.ViewBase.prototype, "shaderWTS",
     get: function()
     {
         return this._shaderWTS;
+    }
+});
+
+/**
+ * Options getter
+ * @name FORGE.ViewBase#options
+ * @type {ViewOptionsConfig}
+ * @readonly
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "options",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._options;
     }
 });

@@ -3,9 +3,10 @@
  *
  * @constructor FORGE.ViewGoPro
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewGoPro = function(viewer)
+FORGE.ViewGoPro = function(viewer, options)
 {
     /**
      * Projection distance.
@@ -15,7 +16,7 @@ FORGE.ViewGoPro = function(viewer)
      */
     this._projectionDistance = 0;
 
-    FORGE.ViewBase.call(this, viewer, "ViewGoPro", FORGE.ViewType.GOPRO);
+    FORGE.ViewBase.call(this, viewer, options, "ViewGoPro", FORGE.ViewType.GOPRO);
 
     this._boot();
 };

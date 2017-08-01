@@ -3,11 +3,12 @@
  *
  * @constructor FORGE.ViewFlat
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewFlat = function(viewer)
+FORGE.ViewFlat = function(viewer, options)
 {
-    FORGE.ViewBase.call(this, viewer, "ViewFlat", FORGE.ViewType.FLAT);
+    FORGE.ViewBase.call(this, viewer, options, "ViewFlat", FORGE.ViewType.FLAT);
 
     /**
      * Repeat texture horizontally
@@ -50,6 +51,9 @@ FORGE.ViewFlat.prototype._boot = function()
 
     this._fovMin = FORGE.Math.degToRad(20);
     this._fovMax = FORGE.Math.degToRad(180);
+
+    this._repeatX = this._options.repeatX || false;
+    this._repeatY = this._options.repeatY || false;
 };
 
 /**

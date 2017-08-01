@@ -39,6 +39,14 @@ FORGE.ViewManager = function(viewer)
     this._viewTypeBackup = "";
 
     /**
+     * The view options to restore when the user quit VR mode
+     * @name  FORGE.ViewManager#_viewOptionsBackup
+     * @type {?ViewOptionsConfig}
+     * @private
+     */
+    this._viewOptionsBackup = null;
+
+    /**
      * Event dispatcher for view change.
      * @name FORGE.ViewManager#_onChange
      * @type {FORGE.EventDispatcher}
@@ -56,10 +64,11 @@ FORGE.ViewManager.prototype.constructor = FORGE.ViewManager;
 /**
  * Set the view type
  * @method FORGE.ViewManager#_setView
- * @param {string} type - The type of the view to set
+ * @param {string} type - The type of the view to set.
+ * @param {?ViewOptionsConfig} options - The view options.
  * @private
  */
-FORGE.ViewManager.prototype._setView = function(type)
+FORGE.ViewManager.prototype._setView = function(type, options)
 {
     if (this._view !== null && this._view.type === type)
     {
@@ -70,19 +79,21 @@ FORGE.ViewManager.prototype._setView = function(type)
 
     this.log("set view "+type);
 
+    options = options || null;
+
     switch (type)
     {
         case FORGE.ViewType.GOPRO:
-            this._view = new FORGE.ViewGoPro(this._viewer);
+            this._view = new FORGE.ViewGoPro(this._viewer, options);
             break;
 
         case FORGE.ViewType.FLAT:
-            this._view = new FORGE.ViewFlat(this._viewer);
+            this._view = new FORGE.ViewFlat(this._viewer, options);
             break;
 
         case FORGE.ViewType.RECTILINEAR:
         default:
-            this._view = new FORGE.ViewRectilinear(this._viewer);
+            this._view = new FORGE.ViewRectilinear(this._viewer, options);
             break;
     }
 
@@ -135,8 +146,9 @@ FORGE.ViewManager.prototype.load = function(config)
     var extendedViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(globalViewConfig, sceneViewConfig));
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
+    var options = /** @type {ViewOptionsConfig} */ (extendedViewConfig.options);
 
-    this._setView(type);
+    this._setView(type, options);
 };
 
 /**
@@ -146,7 +158,8 @@ FORGE.ViewManager.prototype.load = function(config)
 FORGE.ViewManager.prototype.enableVR = function()
 {
     this._viewTypeBackup = this._view.type;
-    this._setView(FORGE.ViewType.RECTILINEAR);
+    this._viewOptionsBackup = this._view.options;
+    this._setView(FORGE.ViewType.RECTILINEAR, null);
 };
 
 /**
@@ -157,7 +170,7 @@ FORGE.ViewManager.prototype.disableVR = function()
 {
     if(this._viewTypeBackup !== "")
     {
-        this._setView(this._viewTypeBackup); // Restore the view as before the VR mode
+        this._setView(this._viewTypeBackup, this._viewOptionsBackup); // Restore the view as before the VR mode
         this._viewer.camera.roll = 0; // Reset the roll to 0
     }
 };
@@ -258,7 +271,7 @@ Object.defineProperty(FORGE.ViewManager.prototype, "type",
     /** @this {FORGE.ViewManager} */
     set: function(value)
     {
-        this._setView(value);
+        this._setView(value, null);
     }
 });
 

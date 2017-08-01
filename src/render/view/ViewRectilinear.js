@@ -3,11 +3,12 @@
  *
  * @constructor FORGE.ViewRectilinear
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewRectilinear = function(viewer)
+FORGE.ViewRectilinear = function(viewer, options)
 {
-    FORGE.ViewBase.call(this, viewer, "ViewRectilinear", FORGE.ViewType.RECTILINEAR);
+    FORGE.ViewBase.call(this, viewer, options, "ViewRectilinear", FORGE.ViewType.RECTILINEAR);
 
     this._boot();
 };

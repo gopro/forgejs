@@ -12,6 +12,10 @@
             "title": "The type of view",
             "description": "Two views are available: <ul><li>Rectilinear</li><li>GoPro</li><li>Flat</li></ul>",
             "default": "Rectilinear"
+        },
+
+        "options": {
+            "$ref": "view-options"
         }
     }
 }
