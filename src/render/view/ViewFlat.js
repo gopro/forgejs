@@ -3,11 +3,12 @@
  *
  * @constructor FORGE.ViewFlat
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {Object} [options] - The view options
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewFlat = function(viewer)
+FORGE.ViewFlat = function(viewer, options)
 {
-    FORGE.ViewBase.call(this, viewer, "ViewFlat", FORGE.ViewType.FLAT);
+    FORGE.ViewBase.call(this, viewer, options, "ViewFlat", FORGE.ViewType.FLAT);
 
     /**
      * Repeat texture horizontally

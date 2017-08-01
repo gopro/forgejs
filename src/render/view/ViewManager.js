@@ -57,9 +57,10 @@ FORGE.ViewManager.prototype.constructor = FORGE.ViewManager;
  * Set the view type
  * @method FORGE.ViewManager#_setView
  * @param {string} type - The type of the view to set
+ * @param {Object} [options=null] - The view options
  * @private
  */
-FORGE.ViewManager.prototype._setView = function(type)
+FORGE.ViewManager.prototype._setView = function(type, options)
 {
     if (this._view !== null && this._view.type === type)
     {
@@ -73,16 +74,16 @@ FORGE.ViewManager.prototype._setView = function(type)
     switch (type)
     {
         case FORGE.ViewType.GOPRO:
-            this._view = new FORGE.ViewGoPro(this._viewer);
+            this._view = new FORGE.ViewGoPro(this._viewer, options);
             break;
 
         case FORGE.ViewType.FLAT:
-            this._view = new FORGE.ViewFlat(this._viewer);
+            this._view = new FORGE.ViewFlat(this._viewer, options);
             break;
 
         case FORGE.ViewType.RECTILINEAR:
         default:
-            this._view = new FORGE.ViewRectilinear(this._viewer);
+            this._view = new FORGE.ViewRectilinear(this._viewer, options);
             break;
     }
 
@@ -135,8 +136,9 @@ FORGE.ViewManager.prototype.load = function(config)
     var extendedViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(globalViewConfig, sceneViewConfig));
 
     var type = (typeof extendedViewConfig.type === "string") ? extendedViewConfig.type.toLowerCase() : FORGE.ViewType.RECTILINEAR;
+    var options = extendedViewConfig.options;
 
-    this._setView(type);
+    this._setView(type, options);
 };
 
 /**
