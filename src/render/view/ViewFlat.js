@@ -51,6 +51,9 @@ FORGE.ViewFlat.prototype._boot = function()
 
     this._fovMin = FORGE.Math.degToRad(20);
     this._fovMax = FORGE.Math.degToRad(180);
+
+    this._repeatX = this._options.repeatX || false;
+    this._repeatY = this._options.repeatY || false;
 };
 
 /**
