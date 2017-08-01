@@ -10,7 +10,7 @@ Personal support issues **are not allowed** on the issue tracker, so please seek
 
 ## Issue tracker
 
-The [issue tracker](https://www.github.com/gopro/gopro-forgejs-src/issues) is the best place to report a bug, suggest a new feature for the player, request documentation (support) and contribute with code to the project. Please make sure to check the following guide on how to use the issue tracker :
+The [issue tracker](https://github.com/gopro/forgejs/issues) is the best place to report a bug, suggest a new feature for the player, request documentation (support) and contribute with code to the project. Please make sure to check the following guide on how to use the issue tracker :
 
 ### Reporting a bug
 
