@@ -459,7 +459,7 @@ FORGE.RenderPipeline.prototype._setupDefaultBackground = function()
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     var defaultTexture = new THREE.TextureLoader().load(canvas.toDataURL());
-    defaultTexture.name = "forge-default-texture";
+    defaultTexture.name = FORGE.NAME+".default-texture";
 
     this.addBackground(defaultTexture, null, 0);
 };

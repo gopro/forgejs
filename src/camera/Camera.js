@@ -416,7 +416,7 @@ FORGE.Camera.prototype._createMainCamera = function()
     {
         var aspect = this._viewer.renderer.displayResolution.ratio;
         this._main = new THREE.PerspectiveCamera(this._fov, aspect, FORGE.RenderManager.DEPTH_NEAR, 2 * FORGE.RenderManager.DEPTH_FAR);
-        this._main.name = "CameraMain";
+        this._main.name = FORGE.NAME+".CameraMain";
         this._main.matrixAutoUpdate = false;
     }
 };
@@ -436,7 +436,7 @@ FORGE.Camera.prototype._createFlatCamera = function()
             FORGE.RenderManager.DEPTH_NEAR,
             FORGE.RenderManager.DEPTH_FAR);
 
-        this._flat.name = "CameraFlat";
+        this._flat.name = FORGE.NAME+".CameraFlat";
         this._flat.matrixAutoUpdate = false;
     }
 };
@@ -449,13 +449,13 @@ FORGE.Camera.prototype._createFlatCamera = function()
 FORGE.Camera.prototype._createVRCameras = function()
 {
     this._left = this._main.clone();
-    this._left.name = "CameraLeft";
+    this._left.name = FORGE.NAME+".CameraLeft";
     this._left.layers.enable(1);
 
     this._left.add(this._gaze.object);
 
     this._right = this._main.clone();
-    this._right.name = "CameraRight";
+    this._right.name = FORGE.NAME+".CameraRight";
     this._right.layers.enable(2);
 };
 

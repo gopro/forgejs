@@ -76,7 +76,7 @@ FORGE.PickingDrawPass.prototype._boot = function()
         vertexShader: FORGE.ShaderLib.parseIncludes(shader.vertexShader),
         uniforms: shader.uniforms,
         side: THREE.FrontSide,
-        name: "PickingMaterial"
+        name: FORGE.NAME+".PickingMaterial"
     });
 
     // Create picking render target
@@ -90,7 +90,7 @@ FORGE.PickingDrawPass.prototype._boot = function()
     var height = this._viewer.renderer.canvasResolution.height / this._scaling;
 
     this._target = new THREE.WebGLRenderTarget(width, height, rtParams);
-    this._target.name = "Picking RenderTarget";
+    this._target.name = FORGE.NAME+".PickingRenderTarget";
 };
 
 /**

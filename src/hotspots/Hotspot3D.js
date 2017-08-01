@@ -154,7 +154,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._register();
 
     // Set the mesh name
-    this._mesh.name = "mesh-" + this._uid;
+    this._mesh.name = FORGE.NAME+".mesh-" + this._uid;
     this._mesh.userData = config;
 
     this._name = (typeof config.name === "string") ? config.name : "";
@@ -199,11 +199,11 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
     this._viewer.renderer.view.current.updateUniforms(material.uniforms);
 
     // Check what is the current render pass looking at the material: Hotspot or Picking Material
-    if (material.name === "HotspotMaterial")
+    if (material.name === FORGE.NAME+".HotspotMaterial")
     {
         this._material.update();
     }
-    else if (material.name === "PickingMaterial")
+    else if (material.name === FORGE.NAME+"PickingMaterial")
     {
         // As picking material is the same for all spots renderer in this pass, material uniforms won't be refreshed
         // Setting material.uniforms.tColor value will be useless, set direct value by acceding program uniforms map

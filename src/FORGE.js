@@ -7,6 +7,14 @@
 var FORGE = FORGE || {};
 
 /**
+ * Name of ForgeJS.
+ * @name FORGE.NAME
+ * @type {string}
+ * @const
+ */
+FORGE.NAME = 'FORGEJS';
+
+/**
  * Version number of ForgeJS.
  * @name FORGE.VERSION
  * @type {string}

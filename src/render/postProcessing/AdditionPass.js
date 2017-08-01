@@ -36,7 +36,7 @@ FORGE.AdditionPass = function(composer)
         vertexShader: vertexShader,
         uniforms: uniforms,
         side: THREE.FrontSide,
-        name: "FORGE.AdditionPassMaterial"
+        name: FORGE.NAME+".AdditionPassMaterial"
     });
 
     FORGE.ShaderPass.call(this, "", "Addition", this._material, "tTexture");

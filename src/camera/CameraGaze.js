@@ -81,7 +81,7 @@ FORGE.CameraGaze.prototype._boot = function()
     this._timer = this._viewer.clock.create(false);
 
     this._object = new THREE.Object3D();
-    this._object.name = "CameraGaze";
+    this._object.name = FORGE.NAME+".CameraGaze";
     this._object.position.z = -2;
 
     this._createCursor();
@@ -128,7 +128,7 @@ FORGE.CameraGaze.prototype._createCursor = function()
     });
 
     var ring = new THREE.Mesh(this._createRingGeometry(this._config.cursor.innerRadius, this._config.cursor.outerRadius), material);
-    ring.name = "cursor";
+    ring.name = FORGE.NAME+".GazeCursor";
 
     this._object.add(ring);
 };
@@ -143,7 +143,7 @@ FORGE.CameraGaze.prototype._updateProgressRing = function(progress)
 {
     this._progress = progress;
 
-    this._destroyRing("progress");
+    this._destroyRing(FORGE.NAME+".GazeProgress");
 
     this._createProgress();
 };
@@ -166,7 +166,7 @@ FORGE.CameraGaze.prototype._createProgress = function()
     var thetaLength = (this._progress / 100) * FORGE.Math.TWOPI;
 
     var ring = new THREE.Mesh(this._createRingGeometry(this._config.progress.innerRadius, this._config.progress.outerRadius, 32, 1, (Math.PI / 2), thetaLength), material);
-    ring.name = "progress";
+    ring.name = FORGE.NAME+".GazeProgress";
     ring.rotateY(Math.PI);
 
     this._object.add(ring);
@@ -220,8 +220,8 @@ FORGE.CameraGaze.prototype.load = function(config)
 {
     this._config = config;
 
-    this._destroyRing("progress");
-    this._destroyRing("cursor");
+    this._destroyRing(FORGE.NAME+".GazeProgress");
+    this._destroyRing(FORGE.NAME+".GazeCursor");
 
     this._createCursor();
 

@@ -528,7 +528,7 @@ FORGE.BackgroundMeshRenderer.prototype._updateInternals = function()
         fragmentShader: fragmentShader,
         vertexShader: vertexShader,
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
-        name: "BackgroundMeshMaterial",
+        name: FORGE.NAME+".BackgroundMeshMaterial",
         transparent: true,
         side: THREE.BackSide
     });
