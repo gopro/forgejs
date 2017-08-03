@@ -10,25 +10,23 @@ FORGE.ViewFlat = function(viewer, options)
 {
     FORGE.ViewBase.call(this, viewer, options, "ViewFlat", FORGE.ViewType.FLAT);
 
-    /**
-     * Repeat texture horizontally
-     * @type {boolean}
-     * @private
-     */
-    this._repeatX = false;
-
-    /**
-     * Repeat texture vertically
-     * @type {boolean}
-     * @private
-     */
-    this._repeatY = false;
-
     this._boot();
 };
 
 FORGE.ViewFlat.prototype = Object.create(FORGE.ViewBase.prototype);
 FORGE.ViewFlat.prototype.constructor = FORGE.ViewFlat;
+
+/**
+ * Flat view default options
+ * @name FORGE.ViewFlat.DEFAULT_OPTIONS
+ * @type {ViewOptionsConfig}
+ * @const
+ */
+FORGE.ViewFlat.DEFAULT_OPTIONS =
+{
+    repeatX: false,
+    repeatY: false
+};
 
 /**
  * Boot sequence.
@@ -52,8 +50,7 @@ FORGE.ViewFlat.prototype._boot = function()
     this._fovMin = FORGE.Math.degToRad(20);
     this._fovMax = FORGE.Math.degToRad(180);
 
-    this._repeatX = this._options.repeatX || false;
-    this._repeatY = this._options.repeatY || false;
+    this._options = FORGE.Utils.extendSimpleObject(FORGE.ViewFlat.DEFAULT_OPTIONS, this._options);
 };
 
 /**
@@ -70,7 +67,7 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
 
     if (this._viewer.renderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer)
     {
-        if (this._repeatX === false)
+        if (this._options.repeatX === false)
         {
             var hfov = vfov * this._viewer.renderer.displayResolution.ratio;
             var texRatio = this._viewer.renderer.backgroundRenderer.textureSize.ratio;
@@ -83,7 +80,7 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
             this._yawMax = FORGE.Math.degToRad(360);
         }
 
-        if (this._repeatY === false)
+        if (this._options.repeatY === false)
         {
             this._pitchMax = 0.5 * Math.max(0, Math.PI - vfov);
             this._pitchMin = -this._pitchMax;
@@ -123,12 +120,12 @@ FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
 
     if (uniforms.hasOwnProperty("tRepeatX"))
     {
-        uniforms.tRepeatX.value = this._repeatX ? 1 : 0;
+        uniforms.tRepeatX.value = this._options.repeatX ? 1 : 0;
     }
 
     if (uniforms.hasOwnProperty("tRepeatY"))
     {
-        uniforms.tRepeatY.value = this._repeatY ? 1 : 0;
+        uniforms.tRepeatY.value = this._options.repeatY ? 1 : 0;
     }
 
     if (uniforms.hasOwnProperty("tYaw"))
@@ -189,13 +186,13 @@ Object.defineProperty(FORGE.ViewFlat.prototype, "repeatX",
     /** @this {FORGE.ViewFlat} */
     get: function()
     {
-        return this._repeatX;
+        return this._options.repeatX;
     },
 
     /** @this {FORGE.ViewFlat} */
     set: function(value)
     {
-        this._repeatX = value;
+        this._options.repeatX = value;
         this._updateViewParams();
 
         // Notify the view manager of the change
@@ -213,13 +210,13 @@ Object.defineProperty(FORGE.ViewFlat.prototype, "repeatY",
     /** @this {FORGE.ViewFlat} */
     get: function()
     {
-        return this._repeatY;
+        return this._options.repeatY;
     },
 
     /** @this {FORGE.ViewFlat} */
     set: function(value)
     {
-        this._repeatY = value;
+        this._options.repeatY = value;
         this._updateViewParams();
 
         // Notify the view manager of the change
