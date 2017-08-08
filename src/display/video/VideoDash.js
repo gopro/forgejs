@@ -120,6 +120,14 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
     this._mutedVolume = 0;
 
     /**
+     * Playback rate of the video
+     * @name FORGE.VideoDash#_playbackRate
+     * @type {number}
+     * @private
+     */
+    this._playbackRate = 1;
+
+    /**
      * Does the video have received its metaData?
      * @name  FORGE.VideoDash#_metaDataLoaded
      * @type {boolean}
@@ -769,6 +777,7 @@ FORGE.VideoDash.prototype._createVideoTag = function()
     element.setAttribute("width", this.pixelWidth);
     element.setAttribute("height", this.pixelHeight);
     element.volume = 0;
+    element.playbackRate = this._playbackRate;
     element.crossOrigin = "anonymous";
     element.id = "FORGE-VideoDash-" + this._uid;
 
@@ -2507,6 +2516,34 @@ Object.defineProperty(FORGE.VideoDash.prototype, "muted",
         else
         {
             this.unmute();
+        }
+    }
+});
+
+/**
+ * Get and set the playback rate of the video.
+ * @name FORGE.VideoDash#playbackRate
+ * @type {number}
+ */
+Object.defineProperty(FORGE.VideoDash.prototype, "playbackRate",
+{
+    /** @this {FORGE.VideoDash} */
+    get: function()
+    {
+        return this._playbackRate;
+    },
+
+    /** @this {FORGE.VideoDash} */
+    set: function(value)
+    {
+        if(typeof value === "number")
+        {
+            this._playbackRate = Math.abs(value);
+
+            if (this._video !== null && this._video.element !== null)
+            {
+                this._video.element.playbackRate = this._playbackRate;
+            }
         }
     }
 });

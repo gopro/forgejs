@@ -157,6 +157,14 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._mutedVolume = 0;
 
     /**
+     * Playback rate of the video
+     * @name FORGE.VideoHTML5#_playbackRate
+     * @type {number}
+     * @private
+     */
+    this._playbackRate = 1;
+
+    /**
      * FOADecoder is a ready-made FOA decoder and binaural renderer.
      * @name  FORGE.VideoHTML5#_decoder
      * @type {?FOADecoder}
@@ -795,6 +803,7 @@ FORGE.VideoHTML5.prototype._createVideoAt = function(index)
     element.setAttribute("width", this.pixelWidth);
     element.setAttribute("height", this.pixelHeight);
     element.volume = 0;
+    element.playbackRate = this._playbackRate;
     element.crossOrigin = "anonymous";
     element.id = "FORGE-VideoHTML5-" + this._uid + "-" + index;
 
@@ -1289,6 +1298,9 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
 
     //Update the volume of the requested video
     this._updateVolume(requestedVideo);
+
+    //Apply the current playback rate
+    requestedVideo.element.playbackRate = this._playbackRate;
 
     //Get the current video and clean some events listener (seek while sync), and destroy video tag.
     var videoToBeRemoved = this._getCurrentVideo();
@@ -2632,7 +2644,7 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "volume",
 });
 
 /**
- * Get and set the muet status of the video.
+ * Get and set the mute status of the video.
  * @name FORGE.VideoHTML5#muted
  * @type {boolean}
  */
@@ -2654,6 +2666,36 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "muted",
         else
         {
             this.unmute();
+        }
+    }
+});
+
+/**
+ * Get and set the playback rate of the video.
+ * @name FORGE.VideoHTML5#playbackRate
+ * @type {number}
+ */
+Object.defineProperty(FORGE.VideoHTML5.prototype, "playbackRate",
+{
+    /** @this {FORGE.VideoHTML5} */
+    get: function()
+    {
+        return this._playbackRate;
+    },
+
+    /** @this {FORGE.VideoHTML5} */
+    set: function(value)
+    {
+        if(typeof value === "number")
+        {
+            this._playbackRate = Math.abs(value);
+
+            var video = this._getCurrentVideo();
+
+            if (video !== null && video.element !== null)
+            {
+                video.element.playbackRate = this._playbackRate;
+            }
         }
     }
 });
