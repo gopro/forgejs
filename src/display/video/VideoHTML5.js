@@ -350,6 +350,14 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._onPlaying = null;
 
     /**
+     * On rate change event dispatcher.
+     * @name  FORGE.VideoHTML5#_onRateChange
+     * @type {?FORGE.EventDispatcher}
+     * @private
+     */
+    this._onRateChange = null;
+
+    /**
      * On mute event dispatcher.
      * @name  FORGE.VideoHTML5#_onMute
      * @type {?FORGE.EventDispatcher}
@@ -1650,6 +1658,7 @@ FORGE.VideoHTML5.prototype._installEvents = function(element)
     element.addEventListener("waiting", this._onEventBind, false);
     element.addEventListener("stalled", this._onEventBind, false);
     element.addEventListener("playing", this._onEventBind, false);
+    element.addEventListener("ratechange", this._onEventBind, false);
 };
 
 /**
@@ -1678,6 +1687,7 @@ FORGE.VideoHTML5.prototype._uninstallEvents = function(element)
     element.removeEventListener("waiting", this._onEventBind, false);
     element.removeEventListener("stalled", this._onEventBind, false);
     element.removeEventListener("playing", this._onEventBind, false);
+    element.removeEventListener("ratechange", this._onEventBind, false);
 
     //Request specific
     element.removeEventListener("error", this._onRequestErrorBind, false);
@@ -1862,6 +1872,14 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             if (this._onPlaying !== null)
             {
                 this._onPlaying.dispatch(event);
+            }
+
+            break;
+
+        case "ratechange":
+            if (this._onRateChange !== null)
+            {
+                this._onRateChange.dispatch(event);
             }
 
             break;
@@ -2180,6 +2198,12 @@ FORGE.VideoHTML5.prototype.destroy = function()
     {
         this._onPlaying.destroy();
         this._onPlaying = null;
+    }
+
+    if (this._onRateChange !== null)
+    {
+        this._onRateChange.destroy();
+        this._onRateChange = null;
     }
 
     if (this._onMute !== null)
@@ -3091,6 +3115,26 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "onPlaying",
         }
 
         return this._onPlaying;
+    }
+});
+
+/**
+ * Get the "onRateChange" event {@link FORGE.EventDispatcher} of the video.
+ * @name FORGE.VideoHTML5#onRateChange
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.VideoHTML5.prototype, "onRateChange",
+{
+    /** @this {FORGE.VideoHTML5} */
+    get: function()
+    {
+        if (this._onRateChange === null)
+        {
+            this._onRateChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onRateChange;
     }
 });
 

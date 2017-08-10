@@ -353,6 +353,14 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
     this._onStalled = null;
 
     /**
+     * On rate change event dispatcher.
+     * @name  FORGE.VideoDash#_onRateChange
+     * @type {?FORGE.EventDispatcher}
+     * @private
+     */
+    this._onRateChange = null;
+
+    /**
      * On playing event dispatcher.
      * @name  FORGE.VideoDash#_onPlaying
      * @type {?FORGE.EventDispatcher}
@@ -553,6 +561,14 @@ FORGE.VideoDash = function(viewer, key, config, qualityMode)
     this._onStalledBind = null;
 
     /**
+     * Event handler for current video rate change binded to this.
+     * @name FORGE.VideoDash#_onRateChangeBind
+     * @type {Function}
+     * @private
+     */
+    this._onRateChangeBind = null;
+
+    /**
      * Event handler for current video playing binded to this.
      * @name FORGE.VideoDash#_onPlayingBind
      * @type {Function}
@@ -662,6 +678,7 @@ FORGE.VideoDash.prototype._boot = function()
     this._onEndedBind = this._onEndedHandler.bind(this);
     this._onErrorBind = this._onErrorHandler.bind(this);
     this._onStalledBind = this._onStalledHandler.bind(this);
+    this._onRateChangeBind = this._onRateChangeHandler.bind(this);
     this._onPlayingBind = this._onPlayingHandler.bind(this);
     this._onQualityRequestBind = this._onQualityRequestHandler.bind(this);
     this._onQualityChangeBind = this._onQualityChangeHandler.bind(this);
@@ -887,6 +904,7 @@ FORGE.VideoDash.prototype._installEvents = function()
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["STREAM_INITIALIZED"], this._onLoadStartBind);
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_PLAYING"], this._onPlayingBind);
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["BUFFER_EMPTY"], this._onStalledBind);
+    this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PLAYBACK_RATE_CHANGED"], this._onRateChangeBind);
 
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["PERIOD_SWITCH_COMPLETED"], this._onSwitchCompletedBind);
     this._dashMediaPlayer.on(dashjs.MediaPlayer.events["METRIC_CHANGED"], this._onMetricsChangedBind);
@@ -920,6 +938,7 @@ FORGE.VideoDash.prototype._uninstallEvents = function()
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["STREAM_INITIALIZED"], this._onLoadStartBind);
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_PLAYING"], this._onPlayingBind);
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["BUFFER_EMPTY"], this._onStalledBind);
+    this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PLAYBACK_RATE_CHANGED"], this._onRateChangeBind);
 
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["PERIOD_SWITCH_COMPLETED"], this._onSwitchCompletedBind);
     this._dashMediaPlayer.off(dashjs.MediaPlayer.events["METRIC_CHANGED"], this._onMetricsChangedBind);
@@ -1563,6 +1582,23 @@ FORGE.VideoDash.prototype._onStalledHandler = function(event)
 };
 
 /**
+ * Private event handler for rate change.
+ * @method  FORGE.VideoDash#_onRateChangeHandler
+ * @private
+ * @param  {Event} event - The native video event.
+ */
+FORGE.VideoDash.prototype._onRateChangeHandler = function(event)
+{
+    var element = this._video.element;
+    this.log("onRateChange [readyState: " + element.readyState + "]");
+
+    if (this._onRateChange !== null)
+    {
+        this._onRateChange.dispatch(event);
+    }
+};
+
+/**
  * Private event handler for playing.
  * @method  FORGE.VideoDash#_onPlayingHandler
  * @private
@@ -2015,6 +2051,12 @@ FORGE.VideoDash.prototype.destroy = function()
         this._onStalled = null;
     }
 
+    if (this._onRateChange !== null)
+    {
+        this._onRateChange.destroy();
+        this._onRateChange = null;
+    }
+
     if (this._onPlaying !== null)
     {
         this._onPlaying.destroy();
@@ -2074,6 +2116,7 @@ FORGE.VideoDash.prototype.destroy = function()
     this._onErrorBind = null;
     this._onPlayingBind = null;
     this._onStalledBind = null;
+    this._onRateChangeBind = null;
     this._onQualityRequestBind = null;
     this._onQualityChangeBind = null;
     //this._onQualityAbortBind = null;
@@ -2885,6 +2928,26 @@ Object.defineProperty(FORGE.VideoDash.prototype, "onStalled",
         }
 
         return this._onStalled;
+    }
+});
+
+/**
+ * Get the "onRateChange" event {@link FORGE.EventDispatcher} of the video.
+ * @name FORGE.VideoDash#onRateChange
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.VideoDash.prototype, "onRateChange",
+{
+    /** @this {FORGE.VideoDash} */
+    get: function()
+    {
+        if (this._onRateChange === null)
+        {
+            this._onRateChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onRateChange;
     }
 });
 
