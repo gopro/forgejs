@@ -157,6 +157,14 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._mutedVolume = 0;
 
     /**
+     * Playback rate of the video
+     * @name FORGE.VideoHTML5#_playbackRate
+     * @type {number}
+     * @private
+     */
+    this._playbackRate = 1;
+
+    /**
      * FOADecoder is a ready-made FOA decoder and binaural renderer.
      * @name  FORGE.VideoHTML5#_decoder
      * @type {?FOADecoder}
@@ -340,6 +348,14 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
      * @private
      */
     this._onPlaying = null;
+
+    /**
+     * On rate change event dispatcher.
+     * @name  FORGE.VideoHTML5#_onRateChange
+     * @type {?FORGE.EventDispatcher}
+     * @private
+     */
+    this._onRateChange = null;
 
     /**
      * On mute event dispatcher.
@@ -795,6 +811,7 @@ FORGE.VideoHTML5.prototype._createVideoAt = function(index)
     element.setAttribute("width", this.pixelWidth);
     element.setAttribute("height", this.pixelHeight);
     element.volume = 0;
+    element.playbackRate = this._playbackRate;
     element.crossOrigin = "anonymous";
     element.id = "FORGE-VideoHTML5-" + this._uid + "-" + index;
 
@@ -1290,6 +1307,9 @@ FORGE.VideoHTML5.prototype._setCurrentIndex = function(index, sync)
     //Update the volume of the requested video
     this._updateVolume(requestedVideo);
 
+    //Apply the current playback rate
+    requestedVideo.element.playbackRate = this._playbackRate;
+
     //Get the current video and clean some events listener (seek while sync), and destroy video tag.
     var videoToBeRemoved = this._getCurrentVideo();
 
@@ -1638,6 +1658,7 @@ FORGE.VideoHTML5.prototype._installEvents = function(element)
     element.addEventListener("waiting", this._onEventBind, false);
     element.addEventListener("stalled", this._onEventBind, false);
     element.addEventListener("playing", this._onEventBind, false);
+    element.addEventListener("ratechange", this._onEventBind, false);
 };
 
 /**
@@ -1666,6 +1687,7 @@ FORGE.VideoHTML5.prototype._uninstallEvents = function(element)
     element.removeEventListener("waiting", this._onEventBind, false);
     element.removeEventListener("stalled", this._onEventBind, false);
     element.removeEventListener("playing", this._onEventBind, false);
+    element.removeEventListener("ratechange", this._onEventBind, false);
 
     //Request specific
     element.removeEventListener("error", this._onRequestErrorBind, false);
@@ -1850,6 +1872,14 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
             if (this._onPlaying !== null)
             {
                 this._onPlaying.dispatch(event);
+            }
+
+            break;
+
+        case "ratechange":
+            if (this._onRateChange !== null)
+            {
+                this._onRateChange.dispatch(event);
             }
 
             break;
@@ -2168,6 +2198,12 @@ FORGE.VideoHTML5.prototype.destroy = function()
     {
         this._onPlaying.destroy();
         this._onPlaying = null;
+    }
+
+    if (this._onRateChange !== null)
+    {
+        this._onRateChange.destroy();
+        this._onRateChange = null;
     }
 
     if (this._onMute !== null)
@@ -2632,7 +2668,7 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "volume",
 });
 
 /**
- * Get and set the muet status of the video.
+ * Get and set the mute status of the video.
  * @name FORGE.VideoHTML5#muted
  * @type {boolean}
  */
@@ -2654,6 +2690,36 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "muted",
         else
         {
             this.unmute();
+        }
+    }
+});
+
+/**
+ * Get and set the playback rate of the video.
+ * @name FORGE.VideoHTML5#playbackRate
+ * @type {number}
+ */
+Object.defineProperty(FORGE.VideoHTML5.prototype, "playbackRate",
+{
+    /** @this {FORGE.VideoHTML5} */
+    get: function()
+    {
+        return this._playbackRate;
+    },
+
+    /** @this {FORGE.VideoHTML5} */
+    set: function(value)
+    {
+        if(typeof value === "number")
+        {
+            this._playbackRate = Math.abs(value);
+
+            var video = this._getCurrentVideo();
+
+            if (video !== null && video.element !== null)
+            {
+                video.element.playbackRate = this._playbackRate;
+            }
         }
     }
 });
@@ -3049,6 +3115,26 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "onPlaying",
         }
 
         return this._onPlaying;
+    }
+});
+
+/**
+ * Get the "onRateChange" event {@link FORGE.EventDispatcher} of the video.
+ * @name FORGE.VideoHTML5#onRateChange
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.VideoHTML5.prototype, "onRateChange",
+{
+    /** @this {FORGE.VideoHTML5} */
+    get: function()
+    {
+        if (this._onRateChange === null)
+        {
+            this._onRateChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onRateChange;
     }
 });
 
