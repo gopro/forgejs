@@ -221,7 +221,7 @@ FORGE.BackgroundPyramidRenderer.prototype._parseConfig = function(config)
  */
 FORGE.BackgroundPyramidRenderer.prototype._clear = function()
 {
-    // ...
+    //@todo
 };
 
 
@@ -231,7 +231,7 @@ FORGE.BackgroundPyramidRenderer.prototype._clear = function()
  */
 FORGE.BackgroundPyramidRenderer.prototype.updateAfterViewChange = function()
 {
-    // ...
+    //@todo
 };
 
 /**
