@@ -16,6 +16,12 @@ Many documentation ressources are available online:
 - [Known issues and limitations](https://forgejs.org/known-issues-and-limitations).
 - [Frequently asked questions](https://forgejs.org/faq).
 
+## Repositories
+
+Linked project repositories for the ForgeJS javascript framework.
+- [Plugins](https://github.com/gopro/forgejs-plugins)
+- [Samples](https://github.com/gopro/forgejs-samples)
+
 ## Get the build
 
 The latest build is available online on our [ForgeJS download page](https://forgejs.org/download).
@@ -26,10 +32,10 @@ ForgeJS is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.
 
 ForgeJS has the following dependencies:
 
-- [three.js](https://threejs.org/) r83 ([MIT license](https://github.com/mrdoob/three.js/blob/dev/LICENSE))
+- [three.js](https://threejs.org/) r86 ([MIT license](https://github.com/mrdoob/three.js/blob/dev/LICENSE))
 - [hammer.js](http://hammerjs.github.io/) 2.0.8 ([MIT license](https://github.com/hammerjs/hammer.js/blob/master/LICENSE.md))
 - [omnitone](http://googlechrome.github.io/omnitone/#home) 0.2.2 ([Apache 2.0 license](https://github.com/GoogleChrome/omnitone/blob/master/LICENSE))
-- [dash.js](https://github.com/Dash-Industry-Forum/dash.js) 2.3.0 ([BSD license](https://github.com/Dash-Industry-Forum/dash.js/blob/development/LICENSE.md))
+- [dash.js](https://github.com/Dash-Industry-Forum/dash.js) 2.5.0 ([BSD license](https://github.com/Dash-Industry-Forum/dash.js/blob/development/LICENSE.md))
 
 > NOTE: We made a custom build of three.js with some classes concatenated to it. These classes are included in the original three.js repository but not concatenated in the main build. We added EffectComposer, RenderPass, ClearPass, MaskPass, ShaderPass, TexturePass and CopyShader in our three.custom.min.js.
 
