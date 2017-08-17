@@ -90,8 +90,6 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
             this._pitchMin = FORGE.Math.degToRad(-180);
             this._pitchMax = FORGE.Math.degToRad(180);
         }
-
-        this._viewer.view.notifyChange();
     }
 
     // Mesh rendering in flat view is limited around -+ 20 degrees

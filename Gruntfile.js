@@ -34,6 +34,8 @@ module.exports = function(grunt)
 
         "src/media/MediaType.js",
         "src/media/MediaFormat.js",
+        "src/media/MediaStore.js",
+        "src/media/MediaTexture.js",
         "src/media/Media.js",
 
         "src/render/RenderManager.js",
@@ -45,6 +47,7 @@ module.exports = function(grunt)
         "src/render/background/BackgroundRenderer.js",
         "src/render/background/BackgroundType.js",
         "src/render/background/BackgroundMeshRenderer.js",
+        "src/render/background/BackgroundPyramidRenderer.js",
         "src/render/background/BackgroundShaderRenderer.js",
 
         "src/render/postProcessing/PostProcessing.js",
@@ -78,6 +81,7 @@ module.exports = function(grunt)
         "src/3d/Raycaster.js",
         "src/3d/PickingDrawPass.js",
         "src/3d/PickingManager.js",
+        "src/3d/Tile.js",
 
         "src/hotspots/HotspotManager.js",
         "src/hotspots/HotspotDOM.js",

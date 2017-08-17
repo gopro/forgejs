@@ -315,11 +315,20 @@ FORGE.Camera.prototype._boot = function()
 
     this._gaze = new FORGE.CameraGaze(this._viewer, FORGE.Camera.DEFAULT_CONFIG.gaze);
 
-    this._viewer.renderer.view.onChange.add(this._onViewChange, this);
+    this._viewer.renderer.view.onChange.add(this._updateInternals, this);
+    this._viewer.renderer.onBackgroundReady.add(this._updateInternals, this);
 
     this._createMainCamera();
     this._createFlatCamera();
     this._createVRCameras();
+
+    // Check config to allow default to be set if they were depending
+    // on some parameter external to the camera. For example: multiresolution fovMin set
+    // by the background renderer
+    if (this._config !== null)
+    {
+        this._parseConfig(this._config);
+    }
 };
 
 /**
@@ -401,6 +410,9 @@ FORGE.Camera.prototype._parseConfig = function(config)
 
     this._updateFromEuler();
     this._updateComplete();
+
+    this._updateMainCamera();
+    this._updateFlatCamera();
 
     this._gaze.load(/** @type {CameraGazeConfig} */ (config.gaze));
 };
@@ -797,10 +809,45 @@ FORGE.Camera.prototype._getYawBoundaries = function()
     var max = this._yawMax;
     var view = this._viewer.renderer.view.current;
 
-    if (view !== null)
+    // Check first if background renderer exposes its own limits for the current media
+    if (this._viewer.renderer.backgroundRenderer !== null &&
+        typeof this._viewer.renderer.backgroundRenderer.limits !== "undefined" &&
+        this._viewer.renderer.backgroundRenderer.limits !== null &&
+        typeof this._viewer.renderer.backgroundRenderer.limits.yaw !== "undefined")
     {
-        min = Math.max(view.yawMin, min);
-        max = Math.min(view.yawMax, max);
+        var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
+
+        if (typeof this._viewer.renderer.backgroundRenderer.limits.yaw.min !== "undefined")
+        {
+            min = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.yaw.min) + halfHFov;
+        }
+
+        if (typeof this._viewer.renderer.backgroundRenderer.limits.yaw.max !== "undefined")
+        {
+            max = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.yaw.max) - halfHFov;
+        }
+    }
+    else
+    {
+        if (this._yawMin !== -Infinity || this._yawMax !== Infinity)
+        {
+            if (this._yawMin !== -Infinity)
+            {
+                min = this._yawMin;
+            }
+            else if (this._yawMax !== Infinity)
+            {
+                min = this._yawMax;
+            }
+        }
+        else
+        {
+            if (view !== null)
+            {
+                min = Math.max(view.yawMin, min);
+                max = Math.min(view.yawMax, max);
+            }
+        }
     }
 
     return { min: min, max: max };
@@ -862,10 +909,45 @@ FORGE.Camera.prototype._getPitchBoundaries = function()
     var max = this._pitchMax;
     var view = this._viewer.renderer.view.current;
 
-    if (view !== null)
+    // Check first if background renderer exposes its own limits for the current media
+    if (this._viewer.renderer.backgroundRenderer !== null &&
+        typeof this._viewer.renderer.backgroundRenderer.limits !== "undefined" &&
+        this._viewer.renderer.backgroundRenderer.limits !== null &&
+        typeof this._viewer.renderer.backgroundRenderer.limits.pitch !== "undefined")
     {
-        min = Math.max(view.pitchMin, min);
-        max = Math.min(view.pitchMax, max);
+        var halfVFov = 0.5 * this._fov;
+
+        if (typeof this._viewer.renderer.backgroundRenderer.limits.pitch.min !== "undefined")
+        {
+            min = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.pitch.min) + halfVFov;
+        }
+
+        if (typeof this._viewer.renderer.backgroundRenderer.limits.pitch.max !== "undefined")
+        {
+            max = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.pitch.max) - halfVFov;
+        }
+    }
+    else
+    {
+        if (this._pitchMin !== -Infinity || this._pitchMax !== Infinity)
+        {
+            if (this._pitchMin !== -Infinity)
+            {
+                min = this._pitchMin;
+            }
+            else if (this._pitchMax !== Infinity)
+            {
+                min = this._pitchMax;
+            }
+        }
+        else
+        {
+            if (view !== null)
+            {
+                min = Math.max(view.pitchMin, min);
+                max = Math.min(view.pitchMax, max);
+            }
+        }
     }
 
     return { min: min, max: max };
@@ -956,6 +1038,13 @@ FORGE.Camera.prototype._setFov = function(value, unit)
 
     this._fov = fov;
 
+    if (changed)
+    {
+        this._setYaw(this._yaw);
+        this._setPitch(this._pitch);
+        this._updateFromEuler();
+    }
+
     return changed;
 };
 
@@ -971,10 +1060,24 @@ FORGE.Camera.prototype._getFovBoundaries = function()
     var max = this._fovMax;
     var view = this._viewer.renderer.view.current;
 
-    if (view !== null)
+    // if JSON specifies a fov min (not default 0 value), use it
+    // useful for multiresolution where fov limit will be computed depending
+    // on max level of resolution available and stored in JSON
+    if (this._viewer.renderer.backgroundRenderer !== null && "fovMin" in this._viewer.renderer.backgroundRenderer)
     {
-        min = Math.max(view.fovMin, min);
-        max = Math.min(view.fovMax, max);
+        min = this._viewer.renderer.backgroundRenderer.fovMin;
+    }
+    else if (this._fovMin !== 0)
+    {
+        min = this._fovMin;
+    }
+    else
+    {
+        if (view !== null)
+        {
+            min = Math.max(view.fovMin, min);
+            max = Math.min(view.fovMax, max);
+        }
     }
 
     return { min: min, max: max };
@@ -1002,11 +1105,11 @@ FORGE.Camera.prototype._setAll = function(yaw, pitch, roll, fov, unit)
 };
 
 /**
- * On view change handler
- * @method FORGE.Camera#_onViewChange
+ * Update internals after a remote component has changed something
+ * @method FORGE.Camera#_updateInternals
  * @private
  */
-FORGE.Camera.prototype._onViewChange = function()
+FORGE.Camera.prototype._updateInternals = function()
 {
     // Force camera to update its values to bound it in new boundaries after view change
     var changed = this._setAll(this._yaw, this._pitch, this._roll, this._fov);
@@ -1112,6 +1215,9 @@ FORGE.Camera.prototype.destroy = function()
 
     this._gaze.destroy();
     this._gaze = null;
+
+    this._viewer.renderer.view.onChange.remove(this._updateInternals, this);
+    this._viewer.renderer.onBackgroundReady.remove(this._updateInternals, this);
 
     if (this._onCameraChange !== null)
     {

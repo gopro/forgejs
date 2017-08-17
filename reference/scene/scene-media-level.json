@@ -9,7 +9,7 @@
         "name": {
             "type": "string",
             "title": "Name",
-            "description": "If set, specifies the <code>{z}</code> pattern for this level. If not, the value will be the index of the level in the levels array.",
+            "description": "If set, specifies the <code>{level}</code> pattern for this level. If not, the value will be the index of the level in the levels array.",
             "example": "4K"
         },
 
@@ -29,6 +29,13 @@
                 "webvr": true,
                 "os": "Windows"
             }
+        },
+
+        "pattern": {
+            "type": "string",
+            "title": "Pattern",
+            "description": "The pattern to respect in case of a multi tiles media. Four parameters are authorized:<ul><li><code>{face}</code> is for the face, in case of a cubemap media</li><li><code>{level}</code> is for the level of quality of the tile, in case of a multi resolution media</li><li><code>{x}</code> if for the <b>x</b> coordinates of the tile</li><li><code>{y}</code> if for the <b>y</b> coordinates of the tile</li>",
+            "example": "multi/equi/{level}/{y}/{x}.jpg"
         },
 
         "width": {

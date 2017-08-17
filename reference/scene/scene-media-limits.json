@@ -1,0 +1,18 @@
+{
+    "id": "scene-media-limits",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneMediaLimitsConfig",
+    "description": "The limits of a panoramic media object. An instance of <a href=\"#scene-media-limits\">a scene media limits object.</a>",
+    "type": "object",
+
+    "properties": {
+
+        "yaw": {
+            "$ref": "scene-media-range"
+        },
+
+        "pitch": {
+            "$ref": "scene-media-range"
+        }
+    }
+}

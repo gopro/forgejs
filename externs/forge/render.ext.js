@@ -59,3 +59,28 @@ var TUniform;
  * @name VRFieldOfViewObject
  */
 var VRFieldOfViewObject;
+
+/**
+ * @typedef {{load:Promise, cancelled:boolean}}
+ * @name TexturePromiseObject
+ */
+var TexturePromiseObject;
+
+/**
+ * @typedef {{front:string, left:string, back:string, right:string, up:string, down:string}}
+ * @name CubeFaceObject
+ * @property {string} front
+ * @property {string} left
+ * @property {string} back
+ * @property {string} right
+ * @property {string} up
+ * @property {string} down
+ */
+var CubeFaceObject;
+
+/**
+ * @typedef {{x:number, y:number}}
+ * @name TilesOnLevel
+ */
+var TilesOnLevel;
+

@@ -304,6 +304,8 @@ FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
     var size = this._viewer.renderer.displayResolution;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
 
+    var logZoomFactor = Math.min(1, this._camera.fov / 90) / Math.LN2;
+
     this._velocity.subVectors(this._positionCurrent, this._positionStart);
 
     if (this._velocity.length() > this._orientation.velocityMax)
@@ -312,6 +314,7 @@ FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
     }
 
     this._velocity.multiplyScalar(hardness);
+    this._velocity.multiplyScalar(logZoomFactor);
 
     // this.log("Current velocity: " + this._velocity.x + ", " + this._velocity.y);
 
@@ -328,8 +331,10 @@ FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
     }
 
     var yaw = invertX * dx;
+
+    var threshold = logZoomFactor * 0.05;
     //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
-    if(Math.abs(yaw) > 0.05)
+    if(Math.abs(yaw) > threshold)
     {
         this._camera.yaw += yaw;
         this._camera.flat.position.x += dx;
@@ -337,7 +342,7 @@ FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
 
     var pitch = invertY * dy;
     //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
-    if(Math.abs(pitch) > 0.05)
+    if(Math.abs(pitch) > threshold)
     {
         this._camera.pitch -= pitch;
         this._camera.flat.position.y -= dy;
@@ -453,7 +458,8 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         delta *= (event.data.deltaY * factorDeltaY) / 5;
     }
 
-    var fov = this._camera.fov - delta;
+    var logZoomFactor = Math.min(1, this._camera.fov / 90) / Math.LN2;
+    this._camera.fov -= delta * logZoomFactor;
 
     if(this._zoom.toPointer === true)
     {
@@ -462,8 +468,6 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         var spherical0 = FORGE.Math.cartesianToSpherical(stw0.x, stw0.y, stw0.z);
         var quat0 = FORGE.Quaternion.fromEuler(spherical0.theta, spherical0.phi, 0);
 
-        // Change the camera fov
-        this._camera.fov = fov;
         this._viewer.view.current.updateUniforms();
 
         var stw1 = this._viewer.view.screenToWorld(screen);
@@ -475,10 +479,6 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
 
         this._camera.yaw += FORGE.Math.radToDeg(euler.yaw);
         this._camera.pitch += FORGE.Math.radToDeg(euler.pitch);
-    }
-    else
-    {
-        this._camera.fov = fov;
     }
 
     this.log("_wheelHandler (fov:" + this._camera.fov + ")");

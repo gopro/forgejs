@@ -1,0 +1,22 @@
+{
+    "id": "scene-media-range",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneMediaRangeConfig",
+    "description": "A range value. An instance of <a href=\"#scene-media-range\">a scene media range object.</a>",
+    "type": "object",
+
+    "properties": {
+
+        "min": {
+            "type": "number",
+            "title": "Minimum value",
+            "description": "Minimum value of the range."
+        },
+
+        "max": {
+            "type": "number",
+            "title": "Maximum value",
+            "description": "Maximum value of the range."
+        }
+    }
+}
