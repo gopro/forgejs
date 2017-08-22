@@ -17,6 +17,11 @@ var HotspotTransformScale;
 /**
  * @typedef {{x:number, y:number, z:number}}
  */
+var HotspotTransformOffset;
+
+/**
+ * @typedef {{x:number, y:number, z:number}}
+ */
 var HotspotTransformValuesConfig;
 
 /**

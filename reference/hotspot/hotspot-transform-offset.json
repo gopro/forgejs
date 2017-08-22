@@ -1,0 +1,33 @@
+{
+    "id": "hotspot-transform-offset",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotTransformOffsetConfig",
+    "description": "An instance of <a href='#hotspot-transform-offset'>a hotspot transform offset.</a>",
+    "type": "object",
+
+    "properties": {
+        "x": {
+            "type": "number",
+            "title": "X",
+            "description": "Offset on x.",
+            "default": 1,
+            "example": 8
+        },
+
+        "y": {
+            "type": "number",
+            "title": "Y",
+            "description": "Offset on y.",
+            "default": 1,
+            "example": 3
+        },
+
+        "z": {
+            "type": "number",
+            "title": "Z",
+            "description": "Offset on z.",
+            "default": 1,
+            "example": 5
+        }
+    }
+}

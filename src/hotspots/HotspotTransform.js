@@ -32,6 +32,15 @@ FORGE.HotspotTransform = function()
     this._scale = null;
 
     /**
+     * The offset applied to the 3D object from it's center.<br>
+     * Is expressed in world units (x, y, z).
+     * @name FORGE.HotspotTransform#_offset
+     * @type {FORGE.HotspotTransformValues}
+     * @private
+     */
+    this._offset = null;
+
+    /**
      * onChange event dispatcher for transform change.
      * @name  FORGE.HotspotTransform#_onChange
      * @type {FORGE.EventDispatcher}
@@ -47,6 +56,11 @@ FORGE.HotspotTransform = function()
 FORGE.HotspotTransform.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.HotspotTransform.prototype.constructor = FORGE.HotspotTransform;
 
+/**
+ * Init HotspotTransform.
+ * @method  FORGE.HotspotTransform#_boot
+ * @private
+ */
 FORGE.HotspotTransform.prototype._boot = function()
 {
     this._register();
@@ -54,6 +68,7 @@ FORGE.HotspotTransform.prototype._boot = function()
     this._position = new FORGE.HotspotTransformValues(this._uid, 0, 0, -200);
     this._rotation = new FORGE.HotspotTransformValues(this._uid, 0, 0, 0);
     this._scale = new FORGE.HotspotTransformValues(this._uid, 1, 1, 1);
+    this._offset = new FORGE.HotspotTransformValues(this._uid, 0, 0, 0);
 };
 
 /**
@@ -66,6 +81,21 @@ FORGE.HotspotTransform.prototype._boot = function()
 FORGE.HotspotTransform.prototype._parseConfig = function(config)
 {
     var changed = false;
+
+    if (typeof config.offset !== "undefined")
+    {
+        var offset = FORGE.Utils.extendSimpleObject({}, this._offset.dump());
+
+        offset.x = (typeof config.offset.x === "number") ? config.offset.x : 0;
+        offset.y = (typeof config.offset.y === "number") ? config.offset.y : 0;
+        offset.z = (typeof config.offset.z === "number") ? config.offset.z : 0;
+
+        if (FORGE.Utils.compareObjects(this._offset.dump(), offset) === false)
+        {
+            this._offset.load(/** @type {HotspotTransformValuesConfig} */ (offset), false);
+            changed = true;
+        }
+    }
 
     if (typeof config.position !== "undefined")
     {
@@ -140,6 +170,11 @@ FORGE.HotspotTransform.prototype._parsePosition = function(config)
 
             position = FORGE.Math.sphericalToCartesian(radius, theta, phi);
         }
+
+        //apply offset
+        position.x += this._offset.x;
+        position.y += this._offset.y;
+        position.z += this._offset.z;
     }
 
     return position;
@@ -185,7 +220,8 @@ FORGE.HotspotTransform.prototype.dump = function()
     {
         position: this._position.dump(),
         rotation: this._rotation.dump(),
-        scale: this._scale.dump()
+        scale: this._scale.dump(),
+        offset: this._offset.dump()
     };
 
     return dump;
@@ -259,6 +295,27 @@ Object.defineProperty(FORGE.HotspotTransform.prototype, "scale",
     set: function(value)
     {
         var config = { scale: value };
+        this._parseConfig(config);
+    }
+});
+
+/**
+ * Get/set the offset of the transform object
+ * @name FORGE.HotspotTransform#offset
+ * @type {HotspotTransformOffset}
+ */
+Object.defineProperty(FORGE.HotspotTransform.prototype, "offset",
+{
+    /** @this {FORGE.HotspotTransform} */
+    get: function()
+    {
+        return this._offset;
+    },
+
+    /** @this {FORGE.HotspotTransform} */
+    set: function(value)
+    {
+        var config = { offset: value };
         this._parseConfig(config);
     }
 });
