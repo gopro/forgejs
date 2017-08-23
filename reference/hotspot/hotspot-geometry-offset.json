@@ -1,0 +1,25 @@
+{
+    "id": "hotspot-geometry-offset",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "HotspotGeometryOffsetConfig",
+    "description": "An instance of <a href='#hotspot-geometry-offset'>a hotspot geometry offset.</a>",
+    "type": "object",
+
+    "properties": {
+        "x": {
+            "type": "number",
+            "title": "X",
+            "description": "Offset on x in word units.",
+            "default": 0,
+            "example": 20
+        },
+
+        "y": {
+            "type": "number",
+            "title": "Y",
+            "description": "Offset on y in word units.",
+            "default": 0,
+            "example": -50
+        }
+    }
+}

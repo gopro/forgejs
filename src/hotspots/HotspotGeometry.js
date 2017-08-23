@@ -52,6 +52,13 @@ FORGE.HotspotGeometry.DEFAULT_CONFIG =
         height: 20,
         widthSegments: 8,
         heightSegments: 8
+    },
+
+    offset:
+    {
+        x: 0,
+        y: 0,
+        z: 0
     }
 };
 
@@ -65,6 +72,8 @@ FORGE.HotspotGeometry.prototype._parseConfig = function(config)
     this._type = config.type;
 
     var options = config.options;
+
+    var offset = (typeof config.offset !== "undefined") ? config.offset : { x: 0, y: 0, z: 0 };
 
     switch (this._type)
     {
@@ -92,6 +101,9 @@ FORGE.HotspotGeometry.prototype._parseConfig = function(config)
             this._geometry = this._createPlane(options);
             break;
     }
+
+    // add offset values
+    this._geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
 };
 
 /**

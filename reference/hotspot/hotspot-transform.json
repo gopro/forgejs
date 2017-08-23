@@ -16,10 +16,6 @@
 
         "scale": {
             "$ref": "hotspot-transform-scale"
-        },
-
-        "offset": {
-            "$ref": "hotspot-transform-offset"
         }
     }
 }

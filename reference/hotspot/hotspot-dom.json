@@ -55,6 +55,10 @@
             "title": "Index",
             "description": "The index of the hotspot, will be used to order hotspots in the z axis.",
             "example": 20
+        },
+
+        "offset": {
+            "$ref": "hotspot-dom-offset"
         }
     },
 

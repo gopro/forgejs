@@ -34,11 +34,20 @@ FORGE.HotspotDOM = function(viewer, config)
 
     /**
      * HotspotTransform object for the positioning and scaling (no rotation)
-     * @name  FORGE.Hotspot3D#_transform
+     * @name  FORGE.HotspotDOM#_transform
      * @type {FORGE.HotspotTransform}
      * @private
      */
     this._transform = null;
+
+    /**
+     * The offset applied to the DOM object from it's center.<br>
+     * Is expressed in pixels (x, y).
+     * @name FORGE.HotspotDOM#_offset
+     * @type {?HotspotDOMOffset}
+     * @private
+     */
+    this._offset = null;
 
     /**
      * The HTML element composing the hotspot
@@ -109,7 +118,12 @@ FORGE.HotspotDOM.DEFAULT_CONFIG =
         width: 320,
         height: 240,
         color: "white",
-        index: 10
+        index: 10,
+        offset:
+        {
+            x: 0,
+            y: 0
+        }
     }
 };
 
@@ -161,6 +175,9 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
         {
             id = this._uid;
         }
+
+        // store the offset values
+        this._offset = dom.offset;
 
         // get the already present hotspot in the dom, or create it
         var div = document.getElementById(id);
@@ -365,8 +382,8 @@ FORGE.HotspotDOM.prototype.update = function()
 
     if (position !== null)
     {
-        var x = position.x - this._dom.clientWidth / 2;
-        var y = position.y - this._dom.clientHeight / 2;
+        var x = position.x + this._offset.x - this._dom.clientWidth / 2;
+        var y = position.y + this._offset.y - this._dom.clientHeight / 2;
         this._dom.style.left = x + "px";
         this._dom.style.top = y + "px";
     }
@@ -384,6 +401,8 @@ FORGE.HotspotDOM.prototype.update = function()
 FORGE.HotspotDOM.prototype.destroy = function()
 {
     this._dom = null;
+
+    this._offset = null;
 
     this._transform.destroy();
     this._transform = null;
@@ -461,6 +480,29 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "interactive",
         else
         {
             this._dom.style.pointerEvents = "none";
+        }
+    }
+});
+
+/**
+ * Get/set the offset of the DOM object
+ * @name FORGE.HotspotDOM#offset
+ * @type {HotspotDOMOffset}
+ */
+Object.defineProperty(FORGE.HotspotDOM.prototype, "offset",
+{
+    /** @this {FORGE.HotspotDOM} */
+    get: function()
+    {
+        return this._offset;
+    },
+
+    /** @this {FORGE.HotspotDOM} */
+    set: function(value)
+    {
+        if (typeof value !== "undefined" && (typeof value.x === "number" || typeof value.y === "number"))
+        {
+            this._offset = value;
         }
     }
 });

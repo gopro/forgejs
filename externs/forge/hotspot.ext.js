@@ -17,12 +17,12 @@ var HotspotTransformScale;
 /**
  * @typedef {{x:number, y:number, z:number}}
  */
-var HotspotTransformOffset;
+var HotspotTransformValuesConfig;
 
 /**
- * @typedef {{x:number, y:number, z:number}}
+ * @typedef {{x:number, y:number}}
  */
-var HotspotTransformValuesConfig;
+var HotspotDOMOffset;
 
 /**
  * @typedef {{points:(Array<THREE.Vector2>|undefined)}}
