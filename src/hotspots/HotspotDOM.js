@@ -502,7 +502,7 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "offset",
     {
         if (typeof value !== "undefined" && (typeof value.x === "number" || typeof value.y === "number"))
         {
-            this._offset = value;
+            this._offset = /** @type {HotspotDOMOffset} */ FORGE.Utils.extendSimpleObject({ x:0, y: 0 }, value);
         }
     }
 });
