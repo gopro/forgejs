@@ -20,6 +20,14 @@
             "description": "Offset on y in word units.",
             "default": 0,
             "example": -50
+        },
+
+        "z": {
+            "type": "number",
+            "title": "Y",
+            "description": "Offset on z in word units.",
+            "default": 0,
+            "example": 5
         }
     }
 }

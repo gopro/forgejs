@@ -22,7 +22,7 @@ var HotspotTransformValuesConfig;
 /**
  * @typedef {{x:number, y:number}}
  */
-var HotspotDOMOffset;
+var HotspotDomOffset;
 
 /**
  * @typedef {{points:(Array<THREE.Vector2>|undefined)}}

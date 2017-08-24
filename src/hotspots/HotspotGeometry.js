@@ -30,12 +30,12 @@ FORGE.HotspotGeometry = function()
 
     /**
      * The offset applied to the geometry object from it's center.<br>
-     * Is expressed in pixels (x, y, z).
+     * Is expressed in world units (x, y, z).
      * @name FORGE.HotspotGeometry#_offset
-     * @type {?HotspotGeometryOffset}
+     * @type {HotspotGeometryOffset}
      * @private
      */
-    this._offset = null;
+    this._offset = FORGE.HotspotGeometry.DEFAULT_OFFSET;
 
     /**
      * Event dispatcher for the onLoadComplete
@@ -63,12 +63,19 @@ FORGE.HotspotGeometry.DEFAULT_CONFIG =
         heightSegments: 8
     },
 
-    offset:
-    {
-        x: 0,
-        y: 0,
-        z: 0
-    }
+    offset: FORGE.HotspotGeometry.DEFAULT_OFFSET
+};
+
+/**
+ * @name FORGE.HotspotGeometry.DEFAULT_OFFSET
+ * @type {HotspotGeometryOffset}
+ * @const
+ */
+FORGE.HotspotGeometry.DEFAULT_OFFSET =
+{
+    x: 0,
+    y: 0,
+    z: 0
 };
 
 /**
@@ -426,7 +433,7 @@ Object.defineProperty(FORGE.HotspotGeometry.prototype, "offset",
     {
         if (typeof value !== "undefined" && (typeof value.x === "number" || typeof value.y === "number" || typeof value.z === "number"))
         {
-            var offset = /** @type {HotspotGeometryOffset} */ FORGE.Utils.extendSimpleObject({ x:0, y: 0, z: 0 }, value);
+            var offset = /** @type {HotspotGeometryOffset} */ (FORGE.Utils.extendSimpleObject(FORGE.HotspotGeometry.DEFAULT_OFFSET, value));
             this._geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
 
             // update current offset values

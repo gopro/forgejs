@@ -44,10 +44,10 @@ FORGE.HotspotDOM = function(viewer, config)
      * The offset applied to the DOM object from it's center.<br>
      * Is expressed in pixels (x, y).
      * @name FORGE.HotspotDOM#_offset
-     * @type {?HotspotDOMOffset}
+     * @type {HotspotDomOffset}
      * @private
      */
-    this._offset = null;
+    this._offset = FORGE.HotspotDOM.DEFAULT_OFFSET;
 
     /**
      * The HTML element composing the hotspot
@@ -119,12 +119,18 @@ FORGE.HotspotDOM.DEFAULT_CONFIG =
         height: 240,
         color: "white",
         index: 10,
-        offset:
-        {
-            x: 0,
-            y: 0
-        }
+        offset: FORGE.HotspotDOM.DEFAULT_OFFSET
     }
+};
+
+/**
+ * @name FORGE.HotspotDOM.DEFAULT_OFFSET
+ * @type {HotspotDomOffset}
+ */
+FORGE.HotspotDOM.DEFAULT_OFFSET =
+{
+    x: 0,
+    y: 0
 };
 
 /**
@@ -292,7 +298,7 @@ FORGE.HotspotDOM.prototype._domOverHandler = function()
 };
 
 /**
- * DOM out handler
+ * DOM out handler.
  * @method FORGE.HotspotDOM#_domOutHandler
  * @private
  */
@@ -372,7 +378,7 @@ FORGE.HotspotDOM.prototype.hide = function()
 };
 
 /**
- * Update routine
+ * Update routine.
  * @method FORGE.HotspotDOM#update
  */
 FORGE.HotspotDOM.prototype.update = function()
@@ -395,14 +401,12 @@ FORGE.HotspotDOM.prototype.update = function()
 };
 
 /**
- * Destroy routine
+ * Destroy routine.
  * @method FORGE.HotspotDOM#destroy
  */
 FORGE.HotspotDOM.prototype.destroy = function()
 {
     this._dom = null;
-
-    this._offset = null;
 
     this._transform.destroy();
     this._transform = null;
@@ -414,7 +418,7 @@ FORGE.HotspotDOM.prototype.destroy = function()
 };
 
 /**
- * Get the DOM content of the hotspot
+ * Get the DOM content of the hotspot.
  * @name FORGE.HotspotDOM#dom
  * @readonly
  * @type {?Element|HTMLElement}
@@ -429,7 +433,7 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "dom",
 });
 
 /**
- * Get and set the visible flag
+ * Get and set the visible flag.
  * @name FORGE.HotspotDOM#visible
  * @type {boolean}
  */
@@ -457,7 +461,7 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "visible",
 });
 
 /**
- * Get and set the interactive flag for the main hotspot DOM container
+ * Get and set the interactive flag for the main hotspot DOM container.
  * @name FORGE.HotspotDOM#interactive
  * @type {boolean}
  */
@@ -485,9 +489,9 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "interactive",
 });
 
 /**
- * Get/set the offset of the DOM object
+ * Get/set the offset of the DOM object.
  * @name FORGE.HotspotDOM#offset
- * @type {HotspotDOMOffset}
+ * @type {HotspotDomOffset}
  */
 Object.defineProperty(FORGE.HotspotDOM.prototype, "offset",
 {
@@ -502,7 +506,7 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "offset",
     {
         if (typeof value !== "undefined" && (typeof value.x === "number" || typeof value.y === "number"))
         {
-            this._offset = /** @type {HotspotDOMOffset} */ FORGE.Utils.extendSimpleObject({ x:0, y: 0 }, value);
+            this._offset = /** @type {HotspotDomOffset} */ (FORGE.Utils.extendSimpleObject(FORGE.HotspotDOM.DEFAULT_OFFSET, value));
         }
     }
 });
