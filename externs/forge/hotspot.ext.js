@@ -48,3 +48,8 @@ var HotspotGeometrySphere;
  * @typedef {{radiusTop:(number|undefined), radiusBottom:(number|undefined), height:(number|undefined), radiusSegments:(number|undefined), heightSegments:(number|undefined), openEnded:(boolean|undefined), thetaStart:(number|undefined), thetaLength:(number|undefined)}}
  */
 var HotspotGeometryCylinder;
+
+/**
+ * @typedef {{x:number, y:number, z: number}}
+ */
+var HotspotGeometryOffset;
