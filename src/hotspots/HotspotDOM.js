@@ -183,7 +183,7 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
         }
 
         // store the offset values
-        this._offset = dom.offset;
+        this._offset = dom.offset || FORGE.HotspotDOM.DEFAULT_OFFSET;
 
         // get the already present hotspot in the dom, or create it
         var div = document.getElementById(id);
