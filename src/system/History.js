@@ -139,11 +139,11 @@ FORGE.History.prototype._addState = function()
 
     if (currentState === null)
     {
-        window.history.replaceState(newState, scene.name, this._generateHash(scene));
+        window.history.replaceState(newState, scene.name, this.generateHash(scene));
     }
     else if (currentState.scene.uid !== newState.scene.uid)
     {
-        window.history.pushState(newState, scene.name, this._generateHash(scene));
+        window.history.pushState(newState, scene.name, this.generateHash(scene));
     }
 };
 
@@ -162,36 +162,8 @@ FORGE.History.prototype._updateState = function()
     {
         var scene = FORGE.UID.get(currentState.scene.uid);
         currentState.locale = this._viewer.i18n.locale;
-        window.history.replaceState(currentState, scene.name, this._generateHash( /** @type {FORGE.Scene} */ (scene)));
+        window.history.replaceState(currentState, scene.name, this.generateHash( /** @type {FORGE.Scene} */ (scene)));
     }
-};
-
-/**
- * Generate a hash for the curretn scene with the i18n slug name and the scene uid.
- * @param  {FORGE.Scene|Object} scene - The scene for which you want to generate a hash.
- * @return {string} The generated hash.
- * @private
- */
-FORGE.History.prototype._generateHash = function(scene)
-{
-    // Search for other parameters in URL, beside the UID
-    var re = /(?:#|&)(\w+)=(\w+)/g;
-    var hash = window.location.hash;
-    var rr = re.exec(hash);
-    var result = "";
-
-    // Keep others parameters
-    while (rr !== null)
-    {
-        if (rr[1] !== "uid")
-        {
-            result += "&" + rr[1] + "=" + rr[2];
-        }
-
-        rr = re.exec(hash);
-    }
-
-    return "#" + scene.slug + "&uid=" + scene.uid + result;
 };
 
 /**
@@ -231,6 +203,39 @@ FORGE.History.prototype._isStateValid = function(state)
     var sceneValid = (typeof state.scene !== "undefined" && typeof state.scene.uid === "string");
 
     return (viewerValid === true && sceneValid === true);
+};
+
+/**
+ * Generate a hash for the curretn scene with the i18n slug name and the scene uid.
+ * @method FORGE.History#generateHash
+ * @param  {FORGE.Scene|Object} scene - The scene for which you want to generate a hash.
+ * @param {boolean} [keep=true] - Do we have to keep the existing URL parameters.
+ * @return {string} The generated hash.
+ */
+FORGE.History.prototype.generateHash = function(scene, keep)
+{
+    // Search for other parameters in URL, beside the UID
+    var result = "";
+
+    // Keep others parameters
+    if(keep !== false)
+    {
+         var re = /(?:#|&)(\w+)=(\w+)/g;
+        var hash = window.location.hash;
+        var rr = re.exec(hash);
+
+        while (rr !== null)
+        {
+            if (rr[1] !== "uid")
+            {
+                result += "&" + rr[1] + "=" + rr[2];
+            }
+
+            rr = re.exec(hash);
+        }
+    }
+
+    return "#" + scene.slug + "&uid=" + scene.uid + result;
 };
 
 /**
