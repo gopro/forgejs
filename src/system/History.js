@@ -220,18 +220,30 @@ FORGE.History.prototype.generateHash = function(scene, keep)
     // Keep others parameters
     if(keep !== false)
     {
-        var re = /(?:#|&)([\w\-]+)=([\w\-.]+)/g;
         var hash = window.location.hash;
-        var rr = re.exec(hash);
 
-        while (rr !== null)
+        // result for normal URL querystring (&yaw=0&pitch=0&roll=0&fov=0&view=rectilinear)
+        var re = /(?:#|&)([\w\-]+)=([\w\-.]+)/g;
+        var rr;
+        while ((rr = re.exec(hash)) !== null)
         {
             if (rr[1] !== "uid")
             {
                 result += "&" + rr[1] + "=" + rr[2];
             }
+        }
 
-            rr = re.exec(hash);
+        // result for Share plugin short URL support (&y0p0r0f0vrectilinear)
+        var reShort = /&?(y|p|r|f|v)([0-9\-.]+|rectilinear|gopro|flat)/gi;
+        var activeShort = false;
+        while ((rr = reShort.exec(hash)) !== null)
+        {
+            if (activeShort === false && result.slice(-1) !== "&")
+            {
+                result += "&";
+                activeShort = true;
+            }
+            result += rr[1] + rr[2];
         }
     }
 
