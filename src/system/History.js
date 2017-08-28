@@ -206,7 +206,7 @@ FORGE.History.prototype._isStateValid = function(state)
 };
 
 /**
- * Generate a hash for the curretn scene with the i18n slug name and the scene uid.
+ * Generate a hash for the current scene with the i18n slug name and the scene uid.
  * @method FORGE.History#generateHash
  * @param  {FORGE.Scene|Object} scene - The scene for which you want to generate a hash.
  * @param {boolean} [keep=true] - Do we have to keep the existing URL parameters.
@@ -220,7 +220,7 @@ FORGE.History.prototype.generateHash = function(scene, keep)
     // Keep others parameters
     if(keep !== false)
     {
-         var re = /(?:#|&)(\w+)=(\w+)/g;
+        var re = /(?:#|&)([\w\-]+)=([\w\-.]+)/g;
         var hash = window.location.hash;
         var rr = re.exec(hash);
 
