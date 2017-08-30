@@ -222,34 +222,15 @@ FORGE.History.prototype.generateHash = function(scene, keep)
     {
         var hash = window.location.hash;
 
-        // result for normal URL querystring (&uid=name&yaw=0&pitch=0&roll=0&fov=0&view=rectilinear)
-        var re = /(?:#|&)([\w\-]+)=([\w\-.]+)/g;
+        // result for normal URL querystring
+        var re = /[&#]([^&]+)/g;
         var rr;
         while ((rr = re.exec(hash)) !== null)
         {
-            if (rr[1] !== "uid")
+            if (rr[1].substr(0, 3) !== "uid" && rr[1] !== scene.slug)
             {
-                result += "&" + rr[1] + "=" + rr[2];
+                result += "&" + rr[1];
             }
-        }
-
-        // result for specific camera and view short URL support (&y0p0r0f0vrectilinear)
-        var reShort = /&?([0-9\-.]+|rectilinear|gopro|flat)(y|p|r|f|v)\,?/gi;
-        var activeShort = false;
-        while ((rr = reShort.exec(hash)) !== null)
-        {
-            if (activeShort === false && result.slice(-1) !== "&")
-            {
-                result += "&";
-                activeShort = true;
-            }
-            result += rr[1] + rr[2] + ',';
-        }
-
-        if (result.substr(-1) === ",")
-        {
-            // remove last comma
-            result = result.slice(0, -1);
         }
     }
 
