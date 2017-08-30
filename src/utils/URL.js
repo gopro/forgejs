@@ -136,8 +136,6 @@ FORGE.URL.parse = function(url)
     return result;
 };
 
-
-
 /**
  * Check if a given url exists.
  * Beware of cross domain, work only on the same domain.
@@ -320,7 +318,7 @@ Object.defineProperty(FORGE.URL.prototype, "hash",
  * Get the hash parameters of the URL.
  * @name FORGE.URL#hashParameters
  * @readonly
- * @type {string}
+ * @type {Object}
  */
 Object.defineProperty(FORGE.URL.prototype, "hashParameters",
 {
