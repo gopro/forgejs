@@ -98,6 +98,30 @@ FORGE.HotspotDOM = function(viewer, config)
      */
     this._cursor = "pointer";
 
+    /**
+     * Event handler for a click on the hotspot.
+     * @name FORGE.HotspotDOM#_domClickHandlerBind
+     * @type {Function}
+     * @private
+     */
+    this._domClickHandlerBind = null;
+
+    /**
+     * Event handler for overing on the hotspot.
+     * @name FORGE.HotspotDOM#_domOverHandlerBind
+     * @type {Function}
+     * @private
+     */
+    this._domOverHandlerBind = null;
+
+    /**
+     * Event handler for getting out on the hotspot.
+     * @name FORGE.HotspotDOM#_domOutHandlerBind
+     * @type {Function}
+     * @private
+     */
+    this._domOutHandlerBind = null;
+
     FORGE.BaseObject.call(this, "HotspotDOM");
 
     this._boot();
@@ -250,9 +274,12 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
     }
 
     this._dom.style.pointerEvents = "auto";
-    this._dom.addEventListener("click", this._domClickHandler.bind(this));
-    this._dom.addEventListener("mouseover", this._domOverHandler.bind(this));
-    this._dom.addEventListener("mouseout", this._domOutHandler.bind(this));
+    this._domClickHandlerBind = this._domClickHandler.bind(this);
+    this._domOverHandlerBind = this._domOverHandler.bind(this);
+    this._domOutHandlerBind = this._domOutHandler.bind(this);
+    this._dom.addEventListener("click", this._domClickHandlerBind);
+    this._dom.addEventListener("mouseover", this._domOverHandlerBind);
+    this._dom.addEventListener("mouseout", this._domOutHandlerBind);
 
     if (config.transform !== null && typeof config.transform !== "undefined")
     {
@@ -406,13 +433,24 @@ FORGE.HotspotDOM.prototype.update = function()
  */
 FORGE.HotspotDOM.prototype.destroy = function()
 {
+    this._dom.removeEventListener("click", this._domClickHandlerBind);
+    this._dom.removeEventListener("mouseover", this._domOverHandlerBind);
+    this._dom.removeEventListener("mouseout", this._domOutHandlerBind);
+
+    this._domClickHandlerBind = null;
+    this._domOverHandlerBind = null;
+    this._domOutHandlerBind = null;
+
+    this._clearEvents();
+    this._events = null;
+
+    // Hide dom, don't destroy it, as it may be used later
+    this._dom.style.left = "99999px";
+    this._dom.style.top = "99999px";
     this._dom = null;
 
     this._transform.destroy();
     this._transform = null;
-
-    this._clearEvents();
-    this._events = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
