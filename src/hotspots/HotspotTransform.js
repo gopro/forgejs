@@ -47,6 +47,11 @@ FORGE.HotspotTransform = function()
 FORGE.HotspotTransform.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.HotspotTransform.prototype.constructor = FORGE.HotspotTransform;
 
+/**
+ * Init HotspotTransform.
+ * @method  FORGE.HotspotTransform#_boot
+ * @private
+ */
 FORGE.HotspotTransform.prototype._boot = function()
 {
     this._register();
@@ -128,10 +133,6 @@ FORGE.HotspotTransform.prototype._parsePosition = function(config)
 
     if (typeof config !== "undefined" && config !== null)
     {
-        position.x = (typeof config.x === "number") ? config.x : 0;
-        position.y = (typeof config.y === "number") ? config.y : 0;
-        position.z = (typeof config.z === "number") ? config.z : -200;
-
         if (typeof config.radius === "number" || typeof config.theta === "number" || typeof config.phi === "number")
         {
             var radius = (typeof config.radius === "number") ? config.radius : 200;
@@ -139,6 +140,12 @@ FORGE.HotspotTransform.prototype._parsePosition = function(config)
             var phi = (typeof config.phi === "number") ? FORGE.Math.degToRad(config.phi) : 0;
 
             position = FORGE.Math.sphericalToCartesian(radius, theta, phi);
+        }
+        else
+        {
+            position.x = (typeof config.x === "number") ? config.x : 0;
+            position.y = (typeof config.y === "number") ? config.y : 0;
+            position.z = (typeof config.z === "number") ? config.z : -200;
         }
     }
 

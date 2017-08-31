@@ -9,9 +9,13 @@
         "type": {
             "type": "string",
             "title": "Type",
-            "description": "The type of geometry to create. There are all derivate of THREE.JS geometries. Available values are :<ul><li><code>plane</code> for <a class=\"out\" href=\"https://threejs.org/docs/#Reference/Geometries/PlaneBufferGeometry\">PlaneBufferGeometry</a></li></ul>",
+            "description": "The type of geometry to create. There are all derivate of THREE.JS geometries. Available values are :<ul><li><code>plane</code> for <a class=\"out\" href=\"https://threejs.org/docs/#Reference/Geometries/PlaneBufferGeometry\">PlaneBufferGeometry</a></li><li><code>box</code> for <a class=\"out\" href=\"https://threejs.org/docs/#Reference/Geometries/BoxBufferGeometry\">BoxBufferGeometry</a></li><li><code>sphere</code> for <a class=\"out\" href=\"https://threejs.org/docs/#Reference/Geometries/SphereBufferGeometry\">SphereBufferGeometry</a></li><li><code>cylinder</code> for <a class=\"out\" href=\"https://threejs.org/docs/#Reference/Geometries/CylinderBufferGeometry\">CylinderBufferGeometry</a></li><li><code>shape</code> for <a class=\"out\" href=\"https://threejs.org/docs/#Reference/Geometries/ShapeBufferGeometry\">ShapeBufferGeometry</a></li></ul>",
             "default": "plane",
             "example": "plane"
+        },
+
+        "offset": {
+            "$ref": "hotspot-geometry-offset"
         },
 
         "options": {
@@ -19,9 +23,6 @@
             "title": "Options",
             "description": "The options of the geometry, specific and different for each geometry. See the list of available geometry above and their list of parameters.",
             "example": {
-                "width": 30,
-                "height": 42,
-                "depth": 21,
                 "points":
                 [
                     [ 0, 0],

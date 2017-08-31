@@ -1266,8 +1266,15 @@ THREE.Frustum.prototype.intersectsObject = function(arg1) {};
  */
 THREE.Geometry = function() {};
 
-/** @type {Array<THREE.Vector3>} */
+/**
+ * @type {Array<THREE.Vector3>}
+ */
 THREE.Geometry.prototype.vertices;
+
+/**
+ * @param  {THREE.Matrix4} arg1
+ */
+THREE.Geometry.prototype.applyMatrix = function(arg1) {};
 
 /**
  */
@@ -1281,6 +1288,11 @@ THREE.BufferGeometry = function() {};
 
 /** @type {{position:(THREE.BufferAttribute|undefined), normal:(THREE.BufferAttribute|undefined), color:(THREE.BufferAttribute|undefined), index:(THREE.BufferAttribute|undefined), uv:(THREE.BufferAttribute|undefined)}} */
 THREE.BufferGeometry.prototype.attributes;
+
+/**
+ * @param  {THREE.Matrix4} arg1
+ */
+THREE.BufferGeometry.prototype.applyMatrix = function(arg1) {};
 
 /**
  * @param  {number} arg1
