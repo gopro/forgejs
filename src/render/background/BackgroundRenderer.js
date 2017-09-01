@@ -202,6 +202,7 @@ FORGE.BackgroundRenderer.prototype.update = function()
 {
     if (this._mesh === null || !(this._mesh.material instanceof THREE.ShaderMaterial))
     {
+        this._viewer.renderer.view.current.updateUniforms();
         return;
     }
 
