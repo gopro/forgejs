@@ -222,12 +222,18 @@ FORGE.History.prototype.generateHash = function(scene, keep)
     {
         var hash = window.location.hash;
 
+        // get all slugs
+        var slugs = this._viewer.story.scenes.map(function(s)
+        {
+            return s.slug;
+        });
+
         // result for normal URL querystring
         var re = /[&#]([^&]+)/g;
         var rr;
         while ((rr = re.exec(hash)) !== null)
         {
-            if (rr[1].substr(0, 3) !== "uid" && rr[1] !== scene.slug)
+            if (rr[1].substr(0, 3) !== "uid" && !slugs.includes(rr[1]))
             {
                 result += "&" + rr[1];
             }
