@@ -1065,7 +1065,7 @@ FORGE.Camera.prototype._getFovBoundaries = function()
     // on max level of resolution available and stored in JSON
     if (this._viewer.renderer.backgroundRenderer !== null && "fovMin" in this._viewer.renderer.backgroundRenderer)
     {
-        min = this._viewer.renderer.backgroundRenderer.fovMin;
+        min = Math.max(this._viewer.renderer.backgroundRenderer.fovMin, this._fovMin);
     }
     else if (this._fovMin !== 0)
     {
