@@ -378,7 +378,7 @@ FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
 {
     var previousScene = this.scene;
     var nextScene = event.emitter;
-    var time = 0;
+    var time = NaN;
 
     //Unload the previous scene
     if(previousScene !== null)
