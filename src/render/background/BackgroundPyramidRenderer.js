@@ -221,7 +221,8 @@ FORGE.BackgroundPyramidRenderer.prototype._parseConfig = function(config)
  */
 FORGE.BackgroundPyramidRenderer.prototype._clear = function()
 {
-    //@todo
+    // Draw to clear screen, then clear display object / texture
+    this._viewer.renderer.webGLRenderer.clearColor();
 };
 
 
@@ -231,7 +232,11 @@ FORGE.BackgroundPyramidRenderer.prototype._clear = function()
  */
 FORGE.BackgroundPyramidRenderer.prototype.updateAfterViewChange = function()
 {
-    //@todo
+    if (this._viewer.view.type !== FORGE.ViewType.RECTILINEAR)
+    {
+        this.warn("Only Rectilinear view is supported for multi resolution scene");
+        this._viewer.view.type = FORGE.ViewType.RECTILINEAR;
+    }
 };
 
 /**
@@ -627,6 +632,16 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
 FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
     this._viewer.camera.onCameraChange.remove(this._onCameraChange, this);
+
+    this._clear();
+
+    for (var level in this._tileCache)
+    {
+        this._tileCache[level].forEach(function(tile)
+        {
+            tile.destroy();
+        });
+    }
 
     this._limits = null;
     this._textureStore = null;
