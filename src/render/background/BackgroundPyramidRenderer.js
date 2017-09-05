@@ -635,12 +635,16 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 
     this._clear();
 
+    var tile;
     for (var level in this._tileCache)
     {
-        this._tileCache[level].forEach(function(tile)
+        while (this._tileCache[level].length)
         {
+            tile = this._tileCache[level].pop();
             tile.destroy();
-        });
+        }
+
+        this._tileCache[level] = null;
     }
 
     this._limits = null;
