@@ -278,6 +278,14 @@ FORGE.MediaStore.prototype._load = function(tile)
  */
 FORGE.MediaStore.prototype._onLoadComplete = function(image)
 {
+    if (this._textures === null)
+    {
+        image.emitter.destroy();
+        // stop it all, it means this mediastore has been destroyed and this is
+        // a late-coming tile
+        return;
+    }
+
     image = image.emitter;
     var tile = image.data.tile;
     var key = this._createKey(tile);
