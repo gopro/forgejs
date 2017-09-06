@@ -1144,7 +1144,7 @@ FORGE.Camera.prototype.load = function(config)
  * @param {?number=} fov Field of view (deg)
  * @param {number=} durationMS - Rotation animation duration ms (undefined or zero means immediat effect)
  * @param {boolean=} [cancelRoll=false] - If set to true, roll will be cancelled (always at 0).<br> If false an auto roll movement will be done by the camera for a more natural movement effect.
- * @param {string=} easing - Easing method (default to {@link FORGE.Easing.LINEAR}).
+ * @param {string=} easing - Easing method name (default to {@link FORGE.Easing.LINEAR}).
  */
 FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, cancelRoll, easing)
 {
@@ -1163,6 +1163,8 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
                 default: easing || "LINEAR",
                 start: 0
             },
+
+            cancelRoll: Boolean(cancelRoll),
 
             keyframes:
             [
