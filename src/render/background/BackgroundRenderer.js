@@ -58,7 +58,7 @@ FORGE.BackgroundRenderer = function(viewer, target, options, type)
      * @type {THREE.WebGLRenderTarget}
      * @private
      */
-    this._renderTarget = target || null;
+    this._renderTarget = target || null;
 
     FORGE.BaseObject.call(this, type || "BackgroundRenderer");
 

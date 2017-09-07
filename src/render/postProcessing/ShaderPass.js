@@ -42,7 +42,7 @@ FORGE.ShaderPass = function(uid, type, shader, textureID)
      */
     this._deltaSum = 0;
 
-    THREE.ShaderPass.call(this, shader, textureID || "tDiffuse");
+    THREE.ShaderPass.call(this, shader, textureID || "tDiffuse");
 };
 
 FORGE.ShaderPass.prototype = Object.create(THREE.ShaderPass.prototype);
