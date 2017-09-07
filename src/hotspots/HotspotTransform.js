@@ -161,10 +161,13 @@ FORGE.HotspotTransform.prototype.updateFromObject3D = function(object)
 {
     this._position.load(object.position);
 
-    var rotation = object.rotation;
-    rotation.x = -FORGE.Math.radToDeg(rotation.x);
-    rotation.y = FORGE.Math.radToDeg(rotation.y);
-    rotation.z = FORGE.Math.radToDeg(rotation.z);
+    var rotation =
+    {
+        x: -FORGE.Math.radToDeg(object.rotation.x),
+        y: FORGE.Math.radToDeg(object.rotation.y),
+        z: FORGE.Math.radToDeg(object.rotation.z)
+    };
+
     this._rotation.load(rotation);
 
     this._scale.load(object.scale);
