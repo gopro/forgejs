@@ -159,31 +159,32 @@ FORGE.Media.prototype._parseConfig = function(config)
         return;
     }
 
-    // Load the preview
     var preview = config.preview;
-    if (typeof preview === "string")
-    {
-        var re = /\{[lfxy].*\}/;
-        if (preview.match(re) !== null)
-        {
-            this._preview = preview;
-        }
-        else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
-            source.format === FORGE.MediaFormat.CUBE ||
-            source.format === FORGE.MediaFormat.FLAT)
-        {
-            var previewConfig = {
-                key: this._uid + "-preview",
-                url: preview
-            };
-
-            this._preview = new FORGE.Image(this._viewer, previewConfig);
-            this._preview.onLoadComplete.addOnce(this._onImageLoadComplete, this);
-        }
-    }
 
     if (this._type === FORGE.MediaType.IMAGE)
     {
+        // Load the preview
+        if (typeof preview === "string")
+        {
+            var re = /\{[lfxy].*\}/;
+            if (preview.match(re) !== null)
+            {
+                this._preview = preview;
+            }
+            else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
+                source.format === FORGE.MediaFormat.CUBE ||
+                source.format === FORGE.MediaFormat.FLAT)
+            {
+                var previewConfig = {
+                    key: this._uid + "-preview",
+                    url: preview
+                };
+
+                this._preview = new FORGE.Image(this._viewer, previewConfig);
+                this._preview.onLoadComplete.addOnce(this._onImageLoadComplete, this);
+            }
+        }
+
         var imageConfig;
 
         // If there isn't an URL set, it means that this is a multi resolution image.
@@ -336,15 +337,22 @@ FORGE.Media.prototype._onLoadedMetaDataHandler = function()
  */
 FORGE.Media.prototype._notifyLoadComplete = function()
 {
-    this._loaded = this._displayObject.loaded && (this._preview !== null && this._preview.loaded);
+    if (this._type === FORGE.MediaType.IMAGE)
+    {
+        this._loaded = this._displayObject.loaded && (this._preview !== null && this._preview.loaded);
 
-    if (this._preview === null || this._displayObject.loaded === false || this._preview.loaded === false)
+        if (this._preview === null || this._displayObject.loaded === false || this._preview.loaded === false)
+        {
+            this._onLoadComplete.dispatch();
+        }
+        else if (this._viewer.renderer.backgroundRenderer !== null)
+        {
+            this._viewer.renderer.backgroundRenderer.displayObject = this._displayObject;
+        }
+    }
+    else
     {
         this._onLoadComplete.dispatch();
-    }
-    else if (this._viewer.renderer.backgroundRenderer !== null)
-    {
-        this._viewer.renderer.backgroundRenderer.displayObject = this._displayObject;
     }
 };
 
