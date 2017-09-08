@@ -476,12 +476,17 @@ Object.defineProperty(FORGE.Media.prototype, "displayObject",
     /** @this {FORGE.Media} */
     get: function()
     {
-        if (this._displayObject.loaded === true)
+        if (this._type === FORGE.MediaType.IMAGE)
         {
-            return this._displayObject;
+            if (this._displayObject.loaded === true)
+            {
+                return this._displayObject;
+            }
+
+            return this._preview;
         }
 
-        return this._preview;
+        return this._displayObject;
     }
 });
 
