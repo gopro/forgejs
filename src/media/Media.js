@@ -58,6 +58,15 @@ FORGE.Media = function(viewer, config)
     this._store = null;
 
     /**
+     * A preview of the media: it is always an image, never a video (so, a
+     * preview for a video would be an image).
+     * @name FORGE.Media#_preview
+     * @type {FORGE.Image}
+     * @private
+     */
+    this._preview = null;
+
+    /**
      * Loaded flag
      * @name FORGE.Media#_loaded
      * @type {boolean}
@@ -150,6 +159,29 @@ FORGE.Media.prototype._parseConfig = function(config)
         return;
     }
 
+    // Load the preview
+    var preview = config.preview;
+    if (typeof preview === "string")
+    {
+        var re = /\{[lfxy].*\}/;
+        if (preview.match(re) !== null)
+        {
+            this._preview = preview;
+        }
+        else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
+            source.format === FORGE.MediaFormat.CUBE ||
+            source.format === FORGE.MediaFormat.FLAT)
+        {
+            var previewConfig = {
+                key: this._uid + "-preview",
+                url: preview
+            };
+
+            this._preview = new FORGE.Image(this._viewer, previewConfig);
+            this._preview.onLoadComplete.addOnce(this._onImageLoadComplete, this);
+        }
+    }
+
     if (this._type === FORGE.MediaType.IMAGE)
     {
         var imageConfig;
@@ -157,7 +189,7 @@ FORGE.Media.prototype._parseConfig = function(config)
         // If there isn't an URL set, it means that this is a multi resolution image.
         if (!source.url)
         {
-            this._store = new FORGE.MediaStore(this._viewer, source);
+            this._store = new FORGE.MediaStore(this._viewer, source, this._preview);
             this._notifyLoadComplete();
         }
         else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
@@ -304,8 +336,16 @@ FORGE.Media.prototype._onLoadedMetaDataHandler = function()
  */
 FORGE.Media.prototype._notifyLoadComplete = function()
 {
-    this._loaded = true;
-    this._onLoadComplete.dispatch();
+    this._loaded = this._displayObject.loaded && (this._preview !== null && this._preview.loaded);
+
+    if (this._preview === null || this._displayObject.loaded === false || this._preview.loaded === false)
+    {
+        this._onLoadComplete.dispatch();
+    }
+    else if (this._viewer.renderer.backgroundRenderer !== null)
+    {
+        this._viewer.renderer.backgroundRenderer.displayObject = this._displayObject;
+    }
 };
 
 /**
@@ -436,7 +476,12 @@ Object.defineProperty(FORGE.Media.prototype, "displayObject",
     /** @this {FORGE.Media} */
     get: function()
     {
-        return this._displayObject;
+        if (this._displayObject.loaded === true)
+        {
+            return this._displayObject;
+        }
+
+        return this._preview;
     }
 });
 

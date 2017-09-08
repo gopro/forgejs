@@ -164,7 +164,7 @@ FORGE.MediaStore.prototype._boot = function()
 FORGE.MediaStore.prototype._parseConfig = function(config)
 {
     // a pattern should contains at least {f}, {l}, {x} or {y}
-    var re = /\{[lfxy]\}/;
+    var re = /\{[lfxy].*\}/;
 
     // Check if there is a global pattern
     if (typeof config.pattern === "string")
