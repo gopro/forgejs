@@ -154,6 +154,12 @@ FORGE.Tile.prototype.constructor = FORGE.Tile;
 FORGE.Tile.FACES = ["front", "right", "back", "left", "up", "down"];
 
 /**
+ * Preview tile
+ * @type {number}
+ */
+FORGE.Tile.PREVIEW = Infinity;
+
+/**
  * Opacity increment [unit per render cycle]
  * @type {number}
  */
@@ -237,7 +243,7 @@ FORGE.Tile.prototype._boot = function()
 
     // Always ensure a new tile has a parent tile
     // This will prevent from zomming out into some empty area
-    if (this._level > 0 && this._parent === null)
+    if (this._level !== FORGE.Tile.PREVIEW && this._level > 0 && this._parent === null)
     {
         this._checkParent();
     }
@@ -250,7 +256,7 @@ FORGE.Tile.prototype._boot = function()
     this._setGeometry();
 
     // Level 0 objects are opaque to be rendered first
-    var transparent = this._level > 0;
+    var transparent = (this._level !== FORGE.Tile.PREVIEW);
     this._opacity = transparent ? 0.001 : 1.0;
 
     this.material = new THREE.MeshBasicMaterial(
@@ -287,6 +293,12 @@ FORGE.Tile.prototype._onBeforeRender = function()
 {
     // Add to renderer render list
     this._renderer.addToRenderList(this);
+
+    if (this._level === FORGE.Tile.PREVIEW)
+    {
+        this._setOpacity(1);
+        return;
+    }
 
     // Update tile opacity if in transition
     if (this._renderer.level !== this._level)
@@ -344,8 +356,8 @@ FORGE.Tile.prototype._queryTexture = function()
     if (this.material !== null && this.material.map === null && this._texturePending === false)
     {
         // Check if predelay since creation has been respected (except for level 0)
-        if (this._level !== this._renderer.level ||
-            (this._level > 0 && this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS))
+        if ((this._level !== FORGE.Tile.PREVIEW && this._level !== this._renderer.level) ||
+            (this._level !== FORGE.Tile.PREVIEW && this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS))
         {
             return;
         }
@@ -673,6 +685,7 @@ FORGE.Tile.prototype._checkParent = function()
 {
     if (this._parent !== null ||
         this._parentNeedsCheck === false ||
+        this._level === FORGE.Tile.PREVIEW ||
         this._level === 0 ||
         this._level !== this._renderer.level)
     {
@@ -697,6 +710,7 @@ FORGE.Tile.prototype._checkParent = function()
 FORGE.Tile.prototype._checkNeighbours = function()
 {
     if (this._neighborsNeedCheck === false ||
+        this._level === FORGE.Tile.PREVIEW ||
         this._level !== this._renderer.level)
     {
         return;
@@ -814,7 +828,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
  */
 FORGE.Tile.prototype.getParentName = function()
 {
-    if (this._level === 0)
+    if (this._level === FORGE.Tile.PREVIEW || this._level === 0)
     {
         return null;
     }

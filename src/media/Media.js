@@ -164,10 +164,9 @@ FORGE.Media.prototype._parseConfig = function(config)
     if (this._type === FORGE.MediaType.IMAGE)
     {
         // Load the preview
-        if (typeof preview === "string")
+        if (typeof preview !== "undefined")
         {
-            var re = /\{[lfxy].*\}/;
-            if (preview.match(re) !== null)
+            if (typeof preview.url !== "undefined")
             {
                 this._preview = preview;
             }
@@ -339,19 +338,29 @@ FORGE.Media.prototype._notifyLoadComplete = function()
 {
     if (this._type === FORGE.MediaType.IMAGE)
     {
-        this._loaded = this._displayObject.loaded && (this._preview !== null && this._preview.loaded);
-
-        if (this._preview === null || this._displayObject.loaded === false || this._preview.loaded === false)
+        if (this._store !== null)
         {
+            this._loaded = true;
             this._onLoadComplete.dispatch();
         }
-        else if (this._viewer.renderer.backgroundRenderer !== null)
+        else
         {
-            this._viewer.renderer.backgroundRenderer.displayObject = this._displayObject;
+            this._loaded = this._displayObject !== null && this._displayObject.loaded && this._preview !== null && this._preview.loaded;
+
+            if (this._preview === null || (this._displayObject !== null && this._displayObject.loaded === false) || this._preview.loaded === false)
+            {
+                this._onLoadComplete.dispatch();
+            }
+            else if (this._viewer.renderer.backgroundRenderer !== null)
+            {
+                this._viewer.renderer.backgroundRenderer.displayObject = this._displayObject;
+            }
+
         }
     }
     else
     {
+        this._loaded = true;
         this._onLoadComplete.dispatch();
     }
 };
@@ -484,9 +493,9 @@ Object.defineProperty(FORGE.Media.prototype, "displayObject",
     /** @this {FORGE.Media} */
     get: function()
     {
-        if (this._type === FORGE.MediaType.IMAGE)
+        if (this._type === FORGE.MediaType.IMAGE && this._store === null)
         {
-            if (this._displayObject.loaded === true)
+            if (this._displayObject !== null && this._displayObject.loaded === true)
             {
                 return this._displayObject;
             }

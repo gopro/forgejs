@@ -10,9 +10,10 @@
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {SceneMediaSourceConfig} config - the config given by a media to know
  *                                          how to load each tile
+ * @param {string=} preview - the pattern of the preview
  * @extends {FORGE.BaseObject}
  */
-FORGE.MediaStore = function(viewer, config)
+FORGE.MediaStore = function(viewer, config, preview)
 {
     /**
      * The viewer reference.
@@ -29,6 +30,14 @@ FORGE.MediaStore = function(viewer, config)
      * @private
      */
     this._config = config;
+
+    /**
+     * Pattern of the preview
+     * @name FORGE.MediaStore#_preview
+     * @type {string}
+     * @private
+     */
+    this._preview = preview;
 
     /**
      * A map containing all {@link FORGE.MediaTexture}, with the key being constitued
@@ -175,6 +184,18 @@ FORGE.MediaStore.prototype._parseConfig = function(config)
         }
 
         this._pattern = config.pattern;
+    }
+
+    if (this._preview !== null)
+    {
+        if (typeof this._preview.url !== "string" || this._preview.url.match(re) === null)
+        {
+            this.warn("no preview for this panorama");
+        }
+        else
+        {
+            this._patterns[FORGE.Tile.PREVIEW] = this._preview.url;
+        }
     }
 
     // Then check if each resolution level has its own pattern
@@ -406,9 +427,16 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
         entry.cancelled = true;
     }
 
-    this._textureStack.push(tile);
+    if (tile.level === FORGE.Tile.PREVIEW)
+    {
+        this._load(tile);
+    }
+    else
+    {
+        this._textureStack.push(tile);
 
-    this._textureStackInterval = window.setTimeout(this._textureStackPop.bind(this), FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS);
+        this._textureStackInterval = window.setTimeout(this._textureStackPop.bind(this), FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS);
+    }
 };
 
 /**
@@ -495,7 +523,7 @@ FORGE.MediaStore.prototype.get = function(tile)
 
 /**
  * Ask store if it has a texture already available
- * @method FORGE.MediaStore#get
+ * @method FORGE.MediaStore#has
  * @param {string} key - texture key
  */
 FORGE.MediaStore.prototype.has = function(key)
