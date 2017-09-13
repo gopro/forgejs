@@ -409,7 +409,6 @@ FORGE.Camera.prototype._parseConfig = function(config)
     }
 
     this._updateFromEuler();
-    this._updateComplete();
 
     this._updateMainCamera();
     this._updateFlatCamera();
@@ -630,6 +629,9 @@ FORGE.Camera.prototype._updateFromEuler = function()
     this._modelViewInverse = this._modelView.clone().transpose();
 
     this._quaternion = FORGE.Quaternion.fromEuler(this._yaw, this._pitch, this._roll);
+
+    // complete camera update
+    this._updateComplete();
 };
 
 /**
@@ -829,24 +831,10 @@ FORGE.Camera.prototype._getYawBoundaries = function()
     }
     else
     {
-        if (this._yawMin !== -Infinity || this._yawMax !== Infinity)
+        if (this._yawMin === -Infinity && this._yawMax === Infinity && view !== null)
         {
-            if (this._yawMin !== -Infinity)
-            {
-                min = this._yawMin;
-            }
-            else if (this._yawMax !== Infinity)
-            {
-                min = this._yawMax;
-            }
-        }
-        else
-        {
-            if (view !== null)
-            {
-                min = Math.max(view.yawMin, min);
-                max = Math.min(view.yawMax, max);
-            }
+            min = Math.max(view.yawMin, min);
+            max = Math.min(view.yawMax, max);
         }
     }
 
@@ -929,24 +917,10 @@ FORGE.Camera.prototype._getPitchBoundaries = function()
     }
     else
     {
-        if (this._pitchMin !== -Infinity || this._pitchMax !== Infinity)
+        if (this._pitchMin === -Infinity && this._pitchMax === Infinity && view !== null)
         {
-            if (this._pitchMin !== -Infinity)
-            {
-                min = this._pitchMin;
-            }
-            else if (this._pitchMax !== Infinity)
-            {
-                min = this._pitchMax;
-            }
-        }
-        else
-        {
-            if (view !== null)
-            {
-                min = Math.max(view.pitchMin, min);
-                max = Math.min(view.pitchMax, max);
-            }
+            min = Math.max(view.pitchMin, min);
+            max = Math.min(view.pitchMax, max);
         }
     }
 
@@ -1042,7 +1016,6 @@ FORGE.Camera.prototype._setFov = function(value, unit)
     {
         this._setYaw(this._yaw);
         this._setPitch(this._pitch);
-        this._updateFromEuler();
     }
 
     return changed;
@@ -1117,7 +1090,6 @@ FORGE.Camera.prototype._updateInternals = function()
     if (changed === true)
     {
         this._updateFromEuler();
-        this._updateComplete();
     }
 };
 
@@ -1152,7 +1124,6 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
     {
         this._setAll(yaw, pitch, roll, fov, FORGE.Math.DEGREES);
         this._updateFromEuler();
-        this._updateComplete();
     }
     else
     {
@@ -1294,7 +1265,6 @@ Object.defineProperty(FORGE.Camera.prototype, "yaw",
         if (yawChanged === true)
         {
             this._updateFromEuler();
-            this._updateComplete();
         }
     }
 });
@@ -1354,7 +1324,6 @@ Object.defineProperty(FORGE.Camera.prototype, "pitch",
         if (pitchChanged)
         {
             this._updateFromEuler();
-            this._updateComplete();
         }
     }
 });
@@ -1414,7 +1383,6 @@ Object.defineProperty(FORGE.Camera.prototype, "roll",
         if (rollChanged === true)
         {
             this._updateFromEuler();
-            this._updateComplete();
         }
     }
 });
@@ -1473,7 +1441,7 @@ Object.defineProperty(FORGE.Camera.prototype, "fov",
 
         if (fovChanged === true)
         {
-            this._updateComplete();
+            this._updateFromEuler();
         }
     }
 });
