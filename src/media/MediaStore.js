@@ -319,7 +319,7 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
     var size = image.element.height * image.element.width;
     this._size += size;
 
-    var mediaTexture = new FORGE.MediaTexture(texture, (tile.level === 0), size);
+    var mediaTexture = new FORGE.MediaTexture(texture, (tile.level === FORGE.Tile.PREVIEW), size);
     this._textures.set(key, mediaTexture);
 
     // destroy the image, it is no longer needed

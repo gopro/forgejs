@@ -268,7 +268,7 @@ FORGE.Tile.prototype._boot = function()
         side: THREE.FrontSide
     });
 
-    if (this._level === 0)
+    if (this._level === 0 || this._level === FORGE.Tile.PREVIEW)
     {
         this._queryTexture();
     }
@@ -277,7 +277,6 @@ FORGE.Tile.prototype._boot = function()
     {
         this._addDebugLayer();
     }
-
 
     this._createTS = Date.now();
 };
@@ -339,10 +338,7 @@ FORGE.Tile.prototype._onAfterRender = function()
     // Get all neighbour tiles references
     this._checkNeighbours();
 
-    if (this._level > 0)
-    {
-        this._queryTexture();
-    }
+    this._queryTexture();
 };
 
 /**
@@ -356,8 +352,9 @@ FORGE.Tile.prototype._queryTexture = function()
     if (this.material !== null && this.material.map === null && this._texturePending === false)
     {
         // Check if predelay since creation has been respected (except for level 0)
-        if ((this._level !== FORGE.Tile.PREVIEW && this._level !== this._renderer.level) ||
-            (this._level !== FORGE.Tile.PREVIEW && this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS))
+        if (this._level !== FORGE.Tile.PREVIEW &&
+            (this._level !== this._renderer.level ||
+            this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS))
         {
             return;
         }

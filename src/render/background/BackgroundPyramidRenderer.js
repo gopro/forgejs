@@ -142,7 +142,10 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     this._camera = this._viewer.renderer.camera.main;
     this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
 
-    this._createPreview();
+    if (typeof this._config.preview !== "undefined")
+    {
+        this._createPreview();
+    }
 
     this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
@@ -295,20 +298,6 @@ FORGE.BackgroundPyramidRenderer.prototype._onCameraChange = function(event)
     {
         this.selectLevel(level);
     }
-};
-
-/**
- * Is tile in frustum
- * @method FORGE.BackgroundPyramidRenderer#getVisibleTiles
- * @return {Boolean} true if tile is in frustum, false otherwise
- * @private
- */
-FORGE.BackgroundPyramidRenderer.prototype._isTileInFrustum = function(tile)
-{
-    var camera = this._viewer.camera.main;
-    var frustum = new THREE.Frustum();
-    frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-    return frustum.intersectsObject(tile);
 };
 
 /**
