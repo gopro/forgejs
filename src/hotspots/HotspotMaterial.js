@@ -1,6 +1,6 @@
 /**
  * Hotspot material handles the parse of the material config and the loading of the needed ressource.<br>
- * In the end it provides a THREE.MeshBasicMaterial when the ressources are loaded.
+ * In the end it provides a THREE.RawShaderMaterial when the ressources are loaded.
  *
  * @constructor FORGE.HotspotMaterial
  * @param {FORGE.Viewer} viewer - The viewer reference.
@@ -531,7 +531,7 @@ FORGE.HotspotMaterial.prototype._setupComplete = function()
 };
 
 /**
- * Create the THREE.MeshBasicMaterial that will be used on a THREE.Mesh
+ * Create the THREE.RawShaderMaterial that will be used on a THREE.Mesh
  * @method FORGE.HotspotMaterial#_createShaderMaterial
  * @private
  */
@@ -573,7 +573,7 @@ FORGE.HotspotMaterial.prototype._createShaderMaterial = function()
         vertexShader: vertexShader,
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
         side: side,
-        name: "HotspotMaterial"
+        name: FORGE.NAME+".HotspotMaterial"
     });
 
     this._material.transparent = this._transparent;
@@ -743,10 +743,10 @@ Object.defineProperty(FORGE.HotspotMaterial.prototype, "texture",
 });
 
 /**
- * Get the THREE.MeshBasicMaterial used for this hotspot material.
+ * Get the THREE.RawShaderMaterial used for this hotspot material.
  * @name FORGE.HotspotMaterial#material
  * @readonly
- * @type {THREE.MeshBasicMaterial}
+ * @type {THREE.RawShaderMaterial}
  */
 Object.defineProperty(FORGE.HotspotMaterial.prototype, "material",
 {
