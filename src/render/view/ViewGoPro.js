@@ -48,35 +48,38 @@ FORGE.ViewGoPro.prototype._boot = function()
  */
 FORGE.ViewGoPro.prototype._updateViewParams = function()
 {
-    var projFovLow = 90;
-    var projFovHigh = 180;
-    var distance = 0;
-
-    var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
-
-    var fn = 0;
-
-    if (fov < projFovLow)
+    if (this._viewer !== null)
     {
-        distance = 0;
-        fn = 0;
-    }
-    else if (fov > projFovHigh)
-    {
-        distance = 1;
-        fn = 1;
-    }
-    else
-    {
-        // Apply sinus in out interpolation to smooth the transition
-        fn = (fov - projFovLow) / (projFovHigh - projFovLow);
-        distance = 0.5 * (1.0 + Math.sin(Math.PI / 2.0 * (2.0 * fn - 1)));
-    }
+        var projFovLow = 90;
+        var projFovHigh = 180;
+        var distance = 0;
 
-    this._projectionDistance = distance;
+        var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
 
-    var fovRad = 0.5 * FORGE.Math.degToRad(fov);
-    this._projectionScale = (distance + 1) * Math.sin(fovRad) / (distance + Math.cos(fovRad));
+        var fn = 0;
+
+        if (fov < projFovLow)
+        {
+            distance = 0;
+            fn = 0;
+        }
+        else if (fov > projFovHigh)
+        {
+            distance = 1;
+            fn = 1;
+        }
+        else
+        {
+            // Apply sinus in out interpolation to smooth the transition
+            fn = (fov - projFovLow) / (projFovHigh - projFovLow);
+            distance = 0.5 * (1.0 + Math.sin(Math.PI / 2.0 * (2.0 * fn - 1)));
+        }
+
+        this._projectionDistance = distance;
+
+        var fovRad = 0.5 * FORGE.Math.degToRad(fov);
+        this._projectionScale = (distance + 1) * Math.sin(fovRad) / (distance + Math.cos(fovRad));
+    }
 };
 
 /**

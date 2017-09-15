@@ -60,44 +60,47 @@ FORGE.ViewFlat.prototype._boot = function()
  */
 FORGE.ViewFlat.prototype._updateViewParams = function()
 {
-    var vfov = FORGE.Math.degToRad(this._viewer.camera.fov);
-
-    // When repeat is ON, set yaw and pitch min and max depending on
-    // texture and screen ratios
-
-    if (this._viewer.renderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer)
+    if (this._viewer !== null)
     {
-        if (this._options.repeatX === false)
+        // When repeat is ON, set yaw and pitch min and max depending on
+        // texture and screen ratios
+
+        if (this._viewer.renderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer)
         {
-            var hfov = vfov * this._viewer.renderer.displayResolution.ratio;
-            var texRatio = this._viewer.renderer.backgroundRenderer.textureSize.ratio;
-            this._yawMax = Math.min(360, Math.max(0, (Math.PI * texRatio - hfov) * 0.5)); // image
-            this._yawMin = -this._yawMax;
+            var vfov = FORGE.Math.degToRad(this._viewer.camera.fov);
+
+            if (this._options.repeatX === false)
+            {
+                var hfov = vfov * this._viewer.renderer.displayResolution.ratio;
+                var texRatio = this._viewer.renderer.backgroundRenderer.textureSize.ratio;
+                this._yawMax = Math.min(360, Math.max(0, (Math.PI * texRatio - hfov) * 0.5)); // image
+                this._yawMin = -this._yawMax;
+            }
+            else
+            {
+                this._yawMin = FORGE.Math.degToRad(-360);
+                this._yawMax = FORGE.Math.degToRad(360);
+            }
+
+            if (this._options.repeatY === false)
+            {
+                this._pitchMax = 0.5 * Math.max(0, Math.PI - vfov);
+                this._pitchMin = -this._pitchMax;
+            }
+            else
+            {
+                this._pitchMin = FORGE.Math.degToRad(-180);
+                this._pitchMax = FORGE.Math.degToRad(180);
+            }
         }
+
+        // Mesh rendering in flat view is limited around -+ 20 degrees
         else
         {
-            this._yawMin = FORGE.Math.degToRad(-360);
-            this._yawMax = FORGE.Math.degToRad(360);
-        }
-
-        if (this._options.repeatY === false)
-        {
-            this._pitchMax = 0.5 * Math.max(0, Math.PI - vfov);
+            this._yawMax = this._pitchMax = FORGE.Math.degToRad(20);
+            this._yawMin = -this._yawMax;
             this._pitchMin = -this._pitchMax;
         }
-        else
-        {
-            this._pitchMin = FORGE.Math.degToRad(-180);
-            this._pitchMax = FORGE.Math.degToRad(180);
-        }
-    }
-
-    // Mesh rendering in flat view is limited around -+ 20 degrees
-    else
-    {
-        this._yawMax = this._pitchMax = FORGE.Math.degToRad(20);
-        this._yawMin = -this._yawMax;
-        this._pitchMin = -this._pitchMax;
     }
 };
 
