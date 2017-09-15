@@ -192,7 +192,7 @@ FORGE.Story.prototype._parseConfig = function(config)
 {
     if(FORGE.UID.validate(config) !== true)
     {
-        throw "Story configuration is not valid!";
+        throw "Story configuration is not valid, you have duplicate uids";
     }
 
     this._config = config;

@@ -153,6 +153,27 @@ FORGE.HotspotTransform.prototype._parsePosition = function(config)
 };
 
 /**
+ * Update all the transform values from the mesh.
+ * @method FORGE.HotspotTransform#updateFromObject3D
+ * @param {THREE.Object3D} object - The 3D object to read data from.
+ */
+FORGE.HotspotTransform.prototype.updateFromObject3D = function(object)
+{
+    this._position.load(object.position);
+
+    var rotation =
+    {
+        x: -FORGE.Math.radToDeg(object.rotation.x),
+        y: FORGE.Math.radToDeg(object.rotation.y),
+        z: FORGE.Math.radToDeg(object.rotation.z)
+    };
+
+    this._rotation.load(rotation);
+
+    this._scale.load(object.scale);
+};
+
+/**
  * Notify the transform that a value has changed.
  * @method FORGE.HotspotTransform#notifyChange
  */

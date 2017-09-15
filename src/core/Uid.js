@@ -57,13 +57,10 @@ FORGE.UID = (function(c)
 
                     if (typeof uid === "string")
                     {
-                        if (FORGE.UID.exists(uid))
+                        if (FORGE.UID.exists(uid) || uids.indexOf(uid) !== -1)
                         {
-                            throw "UID configuration not valid, uid " + uid + " already have an object binded to!";
-                        }
-                        else if (uids.indexOf(uid) !== -1)
-                        {
-                            throw "UID configuration not valid, uid " + uid + " is in double in config file!";
+                            this.warn("UID configuration not valid, uid " + uid + " already exists!");
+                            return false;
                         }
                         else
                         {
@@ -72,19 +69,20 @@ FORGE.UID = (function(c)
                     }
                     else
                     {
-                        throw "Found a uid in configuration that is not a string!";
+                        this.warn("Found a uid in configuration that is not a string!");
+                        return false;
                     }
                 }
                 else if (typeof(object[i]) === "object")
                 {
-                    validateRecursive(object[i]);
+                    return validateRecursive.apply(this, [object[i]]);
                 }
             }
 
             return true;
         };
 
-        return validateRecursive(object);
+        return validateRecursive.apply(this, [object]);
     };
 
 
