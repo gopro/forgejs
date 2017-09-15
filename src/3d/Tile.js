@@ -157,7 +157,7 @@ FORGE.Tile.FACES = ["front", "right", "back", "left", "up", "down"];
  * Preview tile
  * @type {number}
  */
-FORGE.Tile.PREVIEW = Infinity;
+FORGE.Tile.PREVIEW = -Infinity;
 
 /**
  * Opacity increment [unit per render cycle]
@@ -241,14 +241,14 @@ FORGE.Tile.prototype._boot = function()
     this._neighbours = [];
     this._children = [];
 
+    this.name = FORGE.Tile.createName(this._face, this._level, this._x, this._y);
+
     // Always ensure a new tile has a parent tile
     // This will prevent from zomming out into some empty area
-    if (this._level !== FORGE.Tile.PREVIEW && this._level > 0 && this._parent === null)
+    if (this._level > 0 && this._parent === null)
     {
         this._checkParent();
     }
-
-    this.name = FORGE.Tile.createName(this._face, this._level, this._x, this._y);
 
     this.onBeforeRender = this._onBeforeRender.bind(this);
     this.onAfterRender = this._onAfterRender.bind(this);
@@ -257,7 +257,7 @@ FORGE.Tile.prototype._boot = function()
 
     // Level 0 objects are opaque to be rendered first
     var transparent = (this._level !== FORGE.Tile.PREVIEW);
-    this._opacity = transparent ? 0.001 : 1.0;
+    this._opacity = transparent ? 0 : 1;
 
     this.material = new THREE.MeshBasicMaterial(
     {
@@ -268,10 +268,7 @@ FORGE.Tile.prototype._boot = function()
         side: THREE.FrontSide
     });
 
-    if (this._level === 0 || this._level === FORGE.Tile.PREVIEW)
-    {
-        this._queryTexture();
-    }
+    this._queryTexture();
 
     if (FORGE.Tile.DEBUG === true)
     {
@@ -302,17 +299,14 @@ FORGE.Tile.prototype._onBeforeRender = function()
     // Update tile opacity if in transition
     if (this._renderer.level !== this._level)
     {
-        if (this._opacity > 0)
-        {
-            this._setOpacity(this._opacity - FORGE.Tile.OPACITY_DECREMENT);
-        }
+        this._setOpacity(0);
 
         return;
     }
 
     if (this._opacity < 1 && this.material.map !== null)
     {
-        this._setOpacity(this._opacity + FORGE.Tile.OPACITY_INCREMENT);
+        this._setOpacity(1);
     }
 };
 
@@ -351,10 +345,9 @@ FORGE.Tile.prototype._queryTexture = function()
     // Update texture mapping
     if (this.material !== null && this.material.map === null && this._texturePending === false)
     {
-        // Check if predelay since creation has been respected (except for level 0)
+        // Check if predelay since creation has been respected (except for preview)
         if (this._level !== FORGE.Tile.PREVIEW &&
-            (this._level !== this._renderer.level ||
-            this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS))
+            this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS)
         {
             return;
         }
@@ -682,9 +675,7 @@ FORGE.Tile.prototype._checkParent = function()
 {
     if (this._parent !== null ||
         this._parentNeedsCheck === false ||
-        this._level === FORGE.Tile.PREVIEW ||
-        this._level === 0 ||
-        this._level !== this._renderer.level)
+        this._level <= 0)
     {
         return;
     }
@@ -825,7 +816,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
  */
 FORGE.Tile.prototype.getParentName = function()
 {
-    if (this._level === FORGE.Tile.PREVIEW || this._level === 0)
+    if (this._level <= 0)
     {
         return null;
     }

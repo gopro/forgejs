@@ -142,7 +142,7 @@ FORGE.MediaStore.CUBE_FACE_CONFIG = {
  * @type {number}
  * @const
  */
-FORGE.MediaStore.MAX_SIZE = 31457280;
+FORGE.MediaStore.MAX_SIZE = 314572800;
 
 /**
  * Boot routine.

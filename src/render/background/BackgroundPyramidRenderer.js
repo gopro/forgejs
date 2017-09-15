@@ -161,8 +161,6 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
             }
         }
     }
-
-    window.scene = this._scene;
 };
 
 /**
@@ -350,26 +348,6 @@ FORGE.BackgroundPyramidRenderer.prototype._levelXnYnToXY = function(level, xnyn)
 };
 
 /**
- * Discard a tile. Removes from the cache and the scene
- * @method FORGE.BackgroundPyramidRenderer#_discardTile
- * @param {FORGE.Tile} tile - tile
- * @private
- */
-FORGE.BackgroundPyramidRenderer.prototype._discardTile = function(tile)
-{
-    if (typeof this._tileCache[tile.level] !== "undefined")
-    {
-        this._tileCache[tile.level].delete(tile);
-    }
-
-    this._scene.remove(tile);
-
-    this._textureStore.discardTileTexture(tile);
-
-    tile.destroy();
-};
-
-/**
  * Tile clearing routine.
  * Clear tile policy
  * Only applies to tiles with non zero level
@@ -395,7 +373,9 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
         var timeSinceCreate = now - tile.createTS;
         var timeSinceDisplay = now - tile.displayTS;
 
-        if (tile.level > 0 &&
+        if (tile.level !== this._level &&
+            tile.level !== FORGE.Tile.PREVIEW &&
+            tile.texturePending === true &&
             this._renderNeighborList.indexOf(tile) === -1 &&
             ((tile.displayTS === null && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS) ||
             (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS) ||
@@ -408,7 +388,7 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
 
     clearList.forEach(function(tile)
     {
-        this._discardTile(tile);
+        this._scene.remove(tile);
     }.bind(this));
 };
 
@@ -420,9 +400,14 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
  */
 FORGE.BackgroundPyramidRenderer.prototype.getParentTile = function(tile)
 {
-    if (tile.level === 0)
+    if (tile.level === FORGE.Tile.PREVIEW)
     {
         return null;
+    }
+
+    if (tile.level === 0)
+    {
+        return this.getTile(null, FORGE.Tile.PREVIEW, tile.face, 0, 0, "pyramid preview");
     }
 
     var xnyn = this._levelXYToXnYn(tile.level, new THREE.Vector2(tile.x, tile.y));
@@ -449,9 +434,9 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
 
     var tile = this._tileCache[level].get(name);
 
-    if (tile === undefined)
+    if (typeof tile === "undefined")
     {
-        tile = new FORGE.Tile(null, this, x, y, level, face, creator);
+        tile = new FORGE.Tile(parent, this, x, y, level, face, creator);
 
         tile.onDestroy.add(this._onTileDestroyed, this);
         this.log("Create tile " + tile.name + " (" + creator + ")");
