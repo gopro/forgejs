@@ -61,7 +61,7 @@ FORGE.Media = function(viewer, config)
      * A preview of the media: it is always an image, never a video (so, a
      * preview for a video would be an image).
      * @name FORGE.Media#_preview
-     * @type {FORGE.Image}
+     * @type {(FORGE.Image|SceneMediaPreviewConfig)}
      * @private
      */
     this._preview = null;
@@ -168,11 +168,12 @@ FORGE.Media.prototype._parseConfig = function(config)
         {
             if (typeof preview.url !== "undefined")
             {
-                this._preview = preview;
+                this._preview = /** @type {SceneMediaPreviewConfig} */ (preview);
             }
-            else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
+            else if ((source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
                 source.format === FORGE.MediaFormat.CUBE ||
                 source.format === FORGE.MediaFormat.FLAT)
+                && typeof preview === "string")
             {
                 var previewConfig = {
                     key: this._uid + "-preview",

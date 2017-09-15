@@ -250,6 +250,7 @@ FORGE.Tile.prototype._boot = function()
         this._checkParent();
     }
 
+    this.renderOrder = this._level === FORGE.Tile.PREVIEW ? 0 : this._level + 1;
     this.onBeforeRender = this._onBeforeRender.bind(this);
     this.onAfterRender = this._onAfterRender.bind(this);
 
@@ -290,23 +291,13 @@ FORGE.Tile.prototype._onBeforeRender = function()
     // Add to renderer render list
     this._renderer.addToRenderList(this);
 
-    if (this._level === FORGE.Tile.PREVIEW)
+    if (this._texturePending === true)
     {
         this._setOpacity(1);
-        return;
     }
-
-    // Update tile opacity if in transition
-    if (this._renderer.level !== this._level)
+    else
     {
         this._setOpacity(0);
-
-        return;
-    }
-
-    if (this._opacity < 1 && this.material.map !== null)
-    {
-        this._setOpacity(1);
     }
 };
 

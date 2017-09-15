@@ -10,7 +10,7 @@
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {SceneMediaSourceConfig} config - the config given by a media to know
  *                                          how to load each tile
- * @param {string=} preview - the pattern of the preview
+ * @param {(FORGE.Image|SceneMediaPreviewConfig)} preview - the pattern of the preview
  * @extends {FORGE.BaseObject}
  */
 FORGE.MediaStore = function(viewer, config, preview)
@@ -34,7 +34,7 @@ FORGE.MediaStore = function(viewer, config, preview)
     /**
      * Pattern of the preview
      * @name FORGE.MediaStore#_preview
-     * @type {string}
+     * @type {(FORGE.Image|SceneMediaSourceConfig)}
      * @private
      */
     this._preview = preview;

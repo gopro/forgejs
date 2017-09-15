@@ -119,7 +119,7 @@ FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS = 2000;
  * Max allowed time since a tile has been displayed before discarding it
  * @type {number}
  */
-FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS = 30000;
+FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS = 3000;
 
 /**
  * Boot routine.
@@ -147,17 +147,15 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
         this._createPreview();
     }
 
-    this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
-
     for (var f = 0; f < 6; f++)
     {
         var face = Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[f];
 
-        for (var y = 0, ty = this.nbTilesPerAxis(this._level, "y"); y < ty; y++)
+        for (var y = 0, ty = this.nbTilesPerAxis(0, "y"); y < ty; y++)
         {
-            for (var x = 0, tx = this.nbTilesPerAxis(this._level, "x"); x < tx; x++)
+            for (var x = 0, tx = this.nbTilesPerAxis(0, "x"); x < tx; x++)
             {
-                this.getTile(null, this._level, face, x, y, "pyramid init");
+                this.getTile(null, 0, face, x, y, "pyramid init");
             }
         }
     }
@@ -375,11 +373,9 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
 
         if (tile.level !== this._level &&
             tile.level !== FORGE.Tile.PREVIEW &&
-            tile.texturePending === true &&
             this._renderNeighborList.indexOf(tile) === -1 &&
             ((tile.displayTS === null && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS) ||
-            (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS) ||
-            tile.opacity === 0))
+            (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS)))
         {
             clearList.push(tile);
         }
@@ -535,13 +531,13 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
     var levelConfig;
     if (level === FORGE.Tile.PREVIEW)
     {
-        var levelConfig = this._config.preview;
+        levelConfig = this._config.preview;
         levelConfig.width = levelConfig.tile;
         levelConfig.height = levelConfig.tile;
     }
     else
     {
-        var levelConfig = this._config.source.levels[level];
+        levelConfig = this._config.source.levels[level];
     }
 
     // Compute pixels count
