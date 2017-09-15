@@ -373,6 +373,7 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
 
         if (tile.level !== this._level &&
             tile.level !== FORGE.Tile.PREVIEW &&
+            tile.texturePending === true &&
             this._renderNeighborList.indexOf(tile) === -1 &&
             ((tile.displayTS === null && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS) ||
             (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS)))

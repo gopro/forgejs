@@ -1008,3 +1008,17 @@ Object.defineProperty(FORGE.Tile.prototype, "neighbours",
         return this._neighbours;
     }
 });
+
+/**
+ * Is the texture pending ?
+ * @name FORGE.Tile#texturePending
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.Tile.prototype, "texturePending",
+{
+    /** @this {FORGE.Tile} */
+    get: function()
+    {
+        return this._texturePending;
+    }
+});
