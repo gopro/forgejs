@@ -569,6 +569,7 @@ FORGE.Tile.prototype._subdivide = function()
     }
 
     // get all other children in
+    var xn, yn, xn_in, yn_in;
     for (var i = 0; i < rx; i++)
     {
         for (var j = 0; j < ry; j++)
@@ -795,7 +796,7 @@ FORGE.Tile.prototype._checkNeighbours = function()
         // if edge but ty = 1
         if (edge && ty === 1)
         {
-            var log = "neighbour-bottom-edge of " + name;
+            log = "neighbour-bottom-edge of " + name;
             sequenceFn(this._renderer, this._level, "down", fx, fy, this._neighbours, log);
         }
     }
