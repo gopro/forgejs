@@ -697,7 +697,13 @@ FORGE.HotspotMaterial.prototype.destroy = function()
 
     if(this._displayObject !== null)
     {
-        this._displayObject.destroy();
+        // Don't destroy the texture from plugin.
+        // Let the plugin erase its own content.
+        if (this._type !== FORGE.HotspotMaterial.types.PLUGIN)
+        {
+            this._displayObject.destroy();
+        }
+
         this._displayObject = null;
     }
 
