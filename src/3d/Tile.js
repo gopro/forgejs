@@ -534,7 +534,7 @@ FORGE.Tile.prototype._getRotation = function()
 };
 
 /**
- * Subdivide tile into 4 tiles
+ * Subdivide tile into n tiles
  * @method FORGE.Tile#subdivide
  * @private
  */
@@ -545,55 +545,49 @@ FORGE.Tile.prototype._subdivide = function()
         return;
     }
 
-    // var halfSize = this.geometry.boundingBox.getSize().multiplyScalar(0.5);
     var tile;
     var level = this._level + 1;
 
-    var x0 = 2 * this._x;
-    var x1 = 2 * this._x + 1;
-    var y0 = 2 * this._y;
-    var y1 = 2 * this._y + 1;
+    if (this._level === FORGE.Tile.PREVIEW)
+    {
+        level = 0;
+    }
 
-    tile = this._renderer.getTile(this, level, this._face, x0, y0, "quarter NW of " + this.name);
+    // tiles per axis on children level
+    var tx = this._renderer.nbTilesPerAxis(level, "x");
+    var ty = this._renderer.nbTilesPerAxis(level, "y");
+    // ratio of tiles on this level compared to children level
+    var rx = Math.round(tx / this._renderer.nbTilesPerAxis(this._level, "x"));
+    var ry = Math.round(ty / this._renderer.nbTilesPerAxis(this._level, "y"));
+
+    // load first tile
+    tile = this._renderer.getTile(this, level, this._face, rx * this._x, ry * this._y, "top left quarter of " + this.name);
     if (this._children.indexOf(tile) === -1)
     {
         tile.onDestroy.add(this._onChildTileDestroyed, this);
         this._children.push(tile);
     }
 
-    var tx = this._renderer.nbTilesPerAxis(this._level + 1, "x");
-    var ty = this._renderer.nbTilesPerAxis(this._level + 1, "y");
-
-    var x1_in = x1 < tx;
-    var y1_in = y1 < ty;
-
-    if (x1_in === true)
+    // get all other children in
+    for (var i = 0; i < rx; i++)
     {
-        tile = this._renderer.getTile(this, level, this._face, x1, y0, "quarter NE of " + this.name);
-        if (this._children.indexOf(tile) === -1)
+        for (var j = 0; j < ry; j++)
         {
-            tile.onDestroy.add(this._onChildTileDestroyed, this);
-            this._children.push(tile);
-        }
-    }
+            xn = rx * this._x + i;
+            yn = ry * this._y + j;
 
-    if (y1_in === true)
-    {
-        tile = this._renderer.getTile(this, level, this._face, x0, y1, "quarter SW of " + this.name);
-        if (this._children.indexOf(tile) === -1)
-        {
-            tile.onDestroy.add(this._onChildTileDestroyed, this);
-            this._children.push(tile);
-        }
-    }
+            xn_in = xn < tx;
+            yn_in = yn < ty;
 
-    if (x1_in === true && y1_in === true)
-    {
-        tile = this._renderer.getTile(this, level, this._face, x1, y1, "quarter SE of " + this.name);
-        if (this._children.indexOf(tile) === -1)
-        {
-            tile.onDestroy.add(this._onChildTileDestroyed, this);
-            this._children.push(tile);
+            if (xn_in === true && yn_in === true)
+            {
+                tile = this._renderer.getTile(this, level, this._face, xn, yn, "children of " + this.name);
+                if (this._children.indexOf(tile) === -1)
+                {
+                    tile.onDestroy.add(this._onChildTileDestroyed, this);
+                    this._children.push(tile);
+                }
+            }
         }
     }
 };
