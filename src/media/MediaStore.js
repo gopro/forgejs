@@ -86,6 +86,14 @@ FORGE.MediaStore = function(viewer, config, preview)
     this._size = 0;
 
     /**
+     * The max size of the cache.
+     * @name FORGE.MediaStore#_maxSize
+     * @type {number}
+     * @private
+     */
+    this._maxSize = 0;
+
+    /**
      * The global pattern of texture file urls
      * @name FORGE.MediaStore#_pattern
      * @type {string}
@@ -136,15 +144,6 @@ FORGE.MediaStore.CUBE_FACE_CONFIG = {
 };
 
 /**
- * The maximum size of texture at once. It is set at 30Mb, as we assume the
- * median size of a cache is 32Mb, and we keep 2Mb for other texture.
- * @name FORGE.MediaStore.MAX_SIZE
- * @type {number}
- * @const
- */
-FORGE.MediaStore.MAX_SIZE = 314572800;
-
-/**
  * Boot routine.
  *
  * @method FORGE.MediaStore#_boot
@@ -161,6 +160,19 @@ FORGE.MediaStore.prototype._boot = function()
     this._patterns = {};
 
     this._parseConfig(this._config);
+
+    if (FORGE.Device.desktop === true)
+    {
+        this._maxSize = 150000000;
+    }
+    else if (FORGE.Device.iOS === true)
+    {
+        this._maxSize = 40000000;
+    }
+    else
+    {
+        this._maxSize = 50000000;
+    }
 };
 
 /**
@@ -364,7 +376,7 @@ FORGE.MediaStore.prototype._discardTexture = function(key)
  */
 FORGE.MediaStore.prototype._checkSize = function()
 {
-    if (this._size < FORGE.MediaStore.MAX_SIZE)
+    if (this._size < this._maxSize)
     {
         return;
     }
@@ -376,7 +388,7 @@ FORGE.MediaStore.prototype._checkSize = function()
 
     entries = FORGE.Utils.sortArrayByProperty(entries, "1.lastTime");
 
-    while (this._size > FORGE.MediaStore.MAX_SIZE)
+    while (this._size > this._maxSize)
     {
         // oldest are first
         texture = entries.shift();
@@ -410,21 +422,6 @@ FORGE.MediaStore.prototype._textureStackPush = function(tile)
     {
         window.clearTimeout(this._textureStackInterval);
         this._textureStackInterval = null;
-    }
-
-    // if a tile parent has asked for a texture, cancel it
-    var parentName = tile.getParentName();
-    var parentTile = this._textureStack.find(function(item)
-    {
-        return item.name === parentName;
-    });
-
-    if (parentTile !== undefined && parentTile.level !== 0)
-    {
-        this.log("Unstack pending parent texture and cancel it");
-        var parentKey = this._createKey(parentTile);
-        var entry = this._texturePromises.get(parentKey);
-        entry.cancelled = true;
     }
 
     if (tile.level === FORGE.Tile.PREVIEW)
