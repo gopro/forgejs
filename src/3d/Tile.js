@@ -791,6 +791,13 @@ FORGE.Tile.prototype._checkNeighbours = function()
         var log = "neighbour-" + (edge ? "top" : "bottom") + "-edge of " + name;
 
         sequenceFn(this._renderer, this._level, face, fx, fy, this._neighbours, log);
+
+        // if edge but ty = 1
+        if (edge && ty === 1)
+        {
+            var log = "neighbour-bottom-edge of " + name;
+            sequenceFn(this._renderer, this._level, "down", fx, fy, this._neighbours, log);
+        }
     }
 };
 
