@@ -183,26 +183,20 @@ FORGE.RenderManager.prototype._boot = function()
 {
     this._clock = new THREE.Clock();
 
-    this._viewer.onReady.add(this._onViewerReady, this, 1000);
+    this._viewer.onConfigLoadComplete.add(this._onViewerConfigLoadComplete, this, 1000);
 };
 
 /**
  * Viewer ready handler
- * @method FORGE.RenderManager#_onViewerReady
+ * @method FORGE.RenderManager#_onViewerConfigLoadComplete
  * @private
  */
-FORGE.RenderManager.prototype._onViewerReady = function()
+FORGE.RenderManager.prototype._onViewerConfigLoadComplete = function()
 {
     var canvas = this._viewer.canvas.dom;
 
-    var options =
-    {
-        antialias: true,
-        alpha: true,
-        premultipliedAlpha: false,
-        stencil: false,
-        canvas: canvas
-    };
+    var options = this._viewer.config.webgl;
+    options.canvas = canvas;
 
     // WebGLRenderer will draw any component supported by WebGL
     try
@@ -952,7 +946,7 @@ FORGE.RenderManager.prototype.destroy = function()
 {
     this._viewer.canvas.onResize.remove(this._canvasResizeHandler, this);
     this._viewer.story.onSceneLoadStart.remove(this._onSceneLoadStartHandler, this);
-    this._viewer.onReady.remove(this._onViewerReady, this);
+    this._viewer.onConfigLoadComplete.remove(this._onViewerConfigLoadComplete, this);
 
     if (this._pickingManager !== null)
     {
