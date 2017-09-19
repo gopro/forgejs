@@ -807,35 +807,15 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
  */
 FORGE.Camera.prototype._getYawBoundaries = function()
 {
-    var min = this._yawMin;
-    var max = this._yawMax;
+    var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
+    var min = this._yawMin + halfHFov;
+    var max = this._yawMax - halfHFov;
     var view = this._viewer.renderer.view.current;
 
-    // Check first if background renderer exposes its own limits for the current media
-    if (this._viewer.renderer.backgroundRenderer !== null &&
-        typeof this._viewer.renderer.backgroundRenderer.limits !== "undefined" &&
-        this._viewer.renderer.backgroundRenderer.limits !== null &&
-        typeof this._viewer.renderer.backgroundRenderer.limits.yaw !== "undefined")
+    if (view !== null)
     {
-        var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
-
-        if (typeof this._viewer.renderer.backgroundRenderer.limits.yaw.min !== "undefined")
-        {
-            min = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.yaw.min) + halfHFov;
-        }
-
-        if (typeof this._viewer.renderer.backgroundRenderer.limits.yaw.max !== "undefined")
-        {
-            max = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.yaw.max) - halfHFov;
-        }
-    }
-    else
-    {
-        if (this._yawMin === -Infinity && this._yawMax === Infinity && view !== null)
-        {
-            min = Math.max(view.yawMin, min);
-            max = Math.min(view.yawMax, max);
-        }
+        min = Math.max(view.yawMin, min);
+        max = Math.min(view.yawMax, max);
     }
 
     return { min: min, max: max };
@@ -893,35 +873,15 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
  */
 FORGE.Camera.prototype._getPitchBoundaries = function()
 {
-    var min = this._pitchMin;
-    var max = this._pitchMax;
+    var halfFov = 0.5 * this._fov;
+    var min = this._pitchMin + halfFov;
+    var max = this._pitchMax - halfFov;
     var view = this._viewer.renderer.view.current;
 
-    // Check first if background renderer exposes its own limits for the current media
-    if (this._viewer.renderer.backgroundRenderer !== null &&
-        typeof this._viewer.renderer.backgroundRenderer.limits !== "undefined" &&
-        this._viewer.renderer.backgroundRenderer.limits !== null &&
-        typeof this._viewer.renderer.backgroundRenderer.limits.pitch !== "undefined")
+    if (view !== null)
     {
-        var halfVFov = 0.5 * this._fov;
-
-        if (typeof this._viewer.renderer.backgroundRenderer.limits.pitch.min !== "undefined")
-        {
-            min = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.pitch.min) + halfVFov;
-        }
-
-        if (typeof this._viewer.renderer.backgroundRenderer.limits.pitch.max !== "undefined")
-        {
-            max = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.pitch.max) - halfVFov;
-        }
-    }
-    else
-    {
-        if (this._pitchMin === -Infinity && this._pitchMax === Infinity && view !== null)
-        {
-            min = Math.max(view.pitchMin, min);
-            max = Math.min(view.pitchMax, max);
-        }
+        min = Math.max(view.pitchMin, min);
+        max = Math.min(view.pitchMax, max);
     }
 
     return { min: min, max: max };

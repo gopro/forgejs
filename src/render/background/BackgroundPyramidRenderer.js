@@ -62,13 +62,6 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
     this._fovMin = 0;
 
     /**
-     * Media limits specified by the config
-     * @type {?SceneMediaLimitsConfig}
-     * @private
-     */
-    this._limits = null;
-
-    /**
      * Number of tiles for all levels
      * @type {Array<TilesOnLevel>}
      * @private
@@ -186,11 +179,6 @@ FORGE.BackgroundPyramidRenderer.prototype._parseConfig = function(config)
 
     // Set min fov to be used to reach max level of resolution
     this._fovMin = 1.01 * FORGE.Math.degToRad(this._pyramidLevelToCameraFov(config.source.levels.length - 1));
-
-    if (typeof config.source.limits === "object")
-    {
-        this._limits = config.source.limits;
-    }
 };
 
 /**
@@ -631,7 +619,6 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
         this._tileCache[level] = null;
     }
 
-    this._limits = null;
     this._textureStore = null;
     this._tileCache = null;
     this._renderNeighborList.length = 0;
@@ -738,20 +725,6 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "fovMin",
     get: function()
     {
         return this._fovMin;
-    }
-});
-
-/**
- * Get media limits.
- * @name FORGE.BackgroundPyramidRenderer#limits
- * @type {?SceneMediaLimitsConfig}
- */
-Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "limits",
-{
-    /** @this {FORGE.BackgroundPyramidRenderer} */
-    get: function()
-    {
-        return this._limits;
     }
 });
 
