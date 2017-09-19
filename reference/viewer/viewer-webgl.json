@@ -1,0 +1,57 @@
+{
+    "id": "viewer-webgl",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ViewerWebglConfig",
+    "description": "An instance of <a href=\"#viewer-webgl\">the viewer webgl configuration</a>.",
+    "type": "object",
+
+    "properties": {
+        "alpha": {
+            "type": "boolean",
+            "title": "Alpha",
+            "description": "Does the canvas has an alpha buffer?"
+        },
+
+        "depth": {
+            "type": "boolean",
+            "title": "Depth",
+            "description": "Does the drawing buffer has at least a 16bits depth buffer?"
+        },
+
+        "stencil": {
+            "type": "boolean",
+            "title": "Stencil",
+            "description": "Does the drawing buffer has at least a 8bits stencil buffer?"
+        },
+
+        "antialias": {
+            "type": "boolean",
+            "title": "Antialias",
+            "description": "Does anti-alising has to be done?"
+        },
+
+        "depth": {
+            "type": "boolean",
+            "title": "Depth",
+            "description": "Does the drawing buffer has at least 16bits depth."
+        },
+
+        "premultipliedAlpha": {
+            "type": "boolean",
+            "title": "Depth",
+            "description": "Does the drawing buffer contains colors with premultiplied alpha?"
+        },
+
+        "preserveDrawingBuffer": {
+            "type": "boolean",
+            "title": "Preserve Drawing Buffer",
+            "description": "Does the drawing buffer is preserved? Need to be activated for using toDataURL on the canvas."
+        },
+
+        "failIfMajorPerformanceCaveat": {
+            "type": "boolean",
+            "title": "Fail If Major Performance Caveat",
+            "description": "Does context will be created even if the performance are low."
+        }
+    }
+}

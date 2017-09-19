@@ -319,6 +319,14 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._onConfigLoadComplete = null;
 
     /**
+     * Event dispatcher for the on main config load complete event.
+     * @name  FORGE.Viewer#_onMainConfigLoadComplete
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onMainConfigLoadComplete = null;
+
+    /**
      * Callback function for the viewer.
      * @name FORGE.Viewer#_callbacks
      * @type {?ViewerCallbacks}
@@ -336,14 +344,22 @@ FORGE.Viewer.prototype.constructor = FORGE.Viewer;
 /**
  * Viewer default configuration
  * @name  FORGE.Viewer.DEFAULT_CONFIG
- * @type {MainConfig}
+ * @type {ViewerConfig}
  * @const
  */
 FORGE.Viewer.DEFAULT_CONFIG =
 {
     background: "#000",
     autoResume: true,
-    autoPause: true
+    autoPause: true,
+
+    webgl:
+    {
+        antialias: true,
+        alpha: true,
+        premultipliedAlpha: false,
+        stencil: false
+    }
 };
 
 /**
@@ -527,9 +543,9 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
 
     this._raf.start();
 
-    if (this._onConfigLoadComplete !== null)
+    if (this._onMainConfigLoadComplete !== null)
     {
-        this._onConfigLoadComplete.dispatch();
+        this._onMainConfigLoadComplete.dispatch();
     }
 };
 
@@ -542,6 +558,11 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
 FORGE.Viewer.prototype._parseConfig = function(config)
 {
     this._config = /** @type {ViewerConfig} */ (FORGE.Utils.extendSimpleObject(FORGE.Viewer.DEFAULT_CONFIG, config));
+
+    if (this._onConfigLoadComplete !== null)
+    {
+        this._onConfigLoadComplete.dispatch();
+    }
 };
 
 /**
@@ -925,6 +946,12 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._onConfigLoadComplete.destroy();
         this._onConfigLoadComplete = null;
+    }
+
+    if (this._onMainConfigLoadComplete !== null)
+    {
+        this._onMainConfigLoadComplete.destroy();
+        this._onMainConfigLoadComplete = null;
     }
 
     FORGE.VIEWERS.splice(this._uid, 1);
@@ -1572,3 +1599,24 @@ Object.defineProperty(FORGE.Viewer.prototype, "onConfigLoadComplete",
         return this._onConfigLoadComplete;
     }
 });
+
+/**
+ * Get the "onMainConfigLoadComplete" {@link FORGE.EventDispatcher} of the viewer.
+ * @name FORGE.Viewer#onMainConfigLoadComplete
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "onMainConfigLoadComplete",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        if (this._onMainConfigLoadComplete === null)
+        {
+            this._onMainConfigLoadComplete = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onMainConfigLoadComplete;
+    }
+});
+

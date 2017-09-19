@@ -33,6 +33,10 @@
             "title": "Update",
             "description": "The method used to call the update method",
             "example": "timeout"
+        },
+
+        "webgl": {
+            "$ref": "viewer-webgl"
         }
     }
 }
