@@ -166,18 +166,23 @@ FORGE.Media.prototype._parseConfig = function(config)
         // Load the preview
         if (typeof preview !== "undefined")
         {
-            if (typeof preview.url !== "undefined")
+            if (typeof preview === "string")
+            {
+                preview = { url: preview };
+            }
+
+            var re = /\{[lfxy].*\}/;
+            if (preview.url.match(re) !== null)
             {
                 this._preview = /** @type {SceneMediaPreviewConfig} */ (preview);
             }
-            else if ((source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
+            else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
                 source.format === FORGE.MediaFormat.CUBE ||
                 source.format === FORGE.MediaFormat.FLAT)
-                && typeof preview === "string")
             {
                 var previewConfig = {
                     key: this._uid + "-preview",
-                    url: preview
+                    url: preview.url
                 };
 
                 this._preview = new FORGE.Image(this._viewer, previewConfig);
