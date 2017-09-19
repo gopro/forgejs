@@ -147,14 +147,18 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
         this._createPreview();
     }
 
-    // Get the first tile from the lowest level to init the pyramid
-    var middleFrontTile = this._tilesLevel[this.levelMax];
-    this.getTile(null,
-            this.levelMax,
-            Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[0],
-            Math.floor(middleFrontTile.x / 2),
-            Math.floor(middleFrontTile.y / 2),
-            "pyramid init");
+    for (var f = 0; f < 6; f++)
+    {
+        var face = Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[f];
+
+        for (var y = 0, ty = this.nbTilesPerAxis(0, "y"); y < ty; y++)
+        {
+            for (var x = 0, tx = this.nbTilesPerAxis(0, "x"); x < tx; x++)
+            {
+                this.getTile(null, 0, face, x, y, "pyramid init");
+            }
+        }
+    }
 };
 
 /**
