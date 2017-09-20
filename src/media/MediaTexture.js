@@ -64,7 +64,7 @@ FORGE.MediaTexture.prototype.destroy = function()
     {
         this._texture.dispose();
     }
-    
+
     this._texture = null;
 };
 

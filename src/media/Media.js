@@ -58,6 +58,15 @@ FORGE.Media = function(viewer, config)
     this._store = null;
 
     /**
+     * A preview of the media: it is always an image, never a video (so, a
+     * preview for a video would be an image).
+     * @name FORGE.Media#_preview
+     * @type {(FORGE.Image|SceneMediaPreviewConfig)}
+     * @private
+     */
+    this._preview = null;
+
+    /**
      * Loaded flag
      * @name FORGE.Media#_loaded
      * @type {boolean}
@@ -150,14 +159,43 @@ FORGE.Media.prototype._parseConfig = function(config)
         return;
     }
 
+    var preview = config.preview;
+
     if (this._type === FORGE.MediaType.IMAGE)
     {
+        // Load the preview
+        if (typeof preview !== "undefined")
+        {
+            if (typeof preview === "string")
+            {
+                preview = { url: preview };
+            }
+
+            var re = /\{[lfxy].*\}/;
+            if (preview.url.match(re) !== null)
+            {
+                this._preview = /** @type {SceneMediaPreviewConfig} */ (preview);
+            }
+            else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
+                source.format === FORGE.MediaFormat.CUBE ||
+                source.format === FORGE.MediaFormat.FLAT)
+            {
+                var previewConfig = {
+                    key: this._uid + "-preview",
+                    url: preview.url
+                };
+
+                this._preview = new FORGE.Image(this._viewer, previewConfig);
+                this._preview.onLoadComplete.addOnce(this._onImageLoadComplete, this);
+            }
+        }
+
         var imageConfig;
 
         // If there isn't an URL set, it means that this is a multi resolution image.
         if (!source.url)
         {
-            this._store = new FORGE.MediaStore(this._viewer, source);
+            this._store = new FORGE.MediaStore(this._viewer, source, this._preview);
             this._notifyLoadComplete();
         }
         else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
@@ -304,8 +342,33 @@ FORGE.Media.prototype._onLoadedMetaDataHandler = function()
  */
 FORGE.Media.prototype._notifyLoadComplete = function()
 {
-    this._loaded = true;
-    this._onLoadComplete.dispatch();
+    if (this._type === FORGE.MediaType.IMAGE)
+    {
+        if (this._store !== null)
+        {
+            this._loaded = true;
+            this._onLoadComplete.dispatch();
+        }
+        else
+        {
+            this._loaded = this._displayObject !== null && this._displayObject.loaded && this._preview !== null && this._preview.loaded;
+
+            if (this._preview === null || (this._displayObject !== null && this._displayObject.loaded === false) || this._preview.loaded === false)
+            {
+                this._onLoadComplete.dispatch();
+            }
+            else if (this._viewer.renderer.backgroundRenderer !== null)
+            {
+                this._viewer.renderer.backgroundRenderer.displayObject = this._displayObject;
+            }
+
+        }
+    }
+    else
+    {
+        this._loaded = true;
+        this._onLoadComplete.dispatch();
+    }
 };
 
 /**
@@ -436,6 +499,16 @@ Object.defineProperty(FORGE.Media.prototype, "displayObject",
     /** @this {FORGE.Media} */
     get: function()
     {
+        if (this._type === FORGE.MediaType.IMAGE && this._store === null)
+        {
+            if (this._displayObject !== null && this._displayObject.loaded === true)
+            {
+                return this._displayObject;
+            }
+
+            return this._preview;
+        }
+
         return this._displayObject;
     }
 });

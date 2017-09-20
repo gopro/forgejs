@@ -13,7 +13,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
 {
     /**
      * Input scene and media config
-     * @name FORGE.Media#_config
+     * @name FORGE.BackgroundPyramidRenderer#_config
      * @type {?SceneMediaConfig}
      * @private
      */
@@ -119,7 +119,7 @@ FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS = 2000;
  * Max allowed time since a tile has been displayed before discarding it
  * @type {number}
  */
-FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS = 30000;
+FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS = 3000;
 
 /**
  * Boot routine.
@@ -137,49 +137,28 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
 
     this._tileCache = {};
-
     this._textureStore = this._viewer.story.scene.media.store;
 
     this._camera = this._viewer.renderer.camera.main;
-
     this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
 
-    // if we have a low res/not so big ground level, force its load (max 96 tiles)
-    var lowX = this.nbTilesPerAxis(0, "x"),
-        lowY = this.nbTilesPerAxis(0, "y");
-
-    if (lowX * lowY < 97)
+    if (typeof this._config.preview !== "undefined")
     {
-        for (var f = 0; f < 6; f++)
-        {
-            var face = Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[f];
-
-            for (var y = 0, ty = lowY; y < ty; y++)
-            {
-                for (var x = 0, tx = lowX; x < tx; x++)
-                {
-                    this.getTile(null, 0, face, x, y, "pyramid init ground level");
-                }
-            }
-        }
+        this._createPreview();
     }
-
-    this.selectLevel(this._cameraFovToPyramidLevel(this._viewer.camera.fov));
 
     for (var f = 0; f < 6; f++)
     {
         var face = Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[f];
 
-        for (var y = 0, ty = this.nbTilesPerAxis(this._level, "y"); y < ty; y++)
+        for (var y = 0, ty = this.nbTilesPerAxis(0, "y"); y < ty; y++)
         {
-            for (var x = 0, tx = this.nbTilesPerAxis(this._level, "x"); x < tx; x++)
+            for (var x = 0, tx = this.nbTilesPerAxis(0, "x"); x < tx; x++)
             {
-                this.getTile(null, this._level, face, x, y, "pyramid init");
+                this.getTile(null, 0, face, x, y, "pyramid init");
             }
         }
     }
-
-    window.scene = this._scene;
 };
 
 /**
@@ -211,6 +190,28 @@ FORGE.BackgroundPyramidRenderer.prototype._parseConfig = function(config)
     if (typeof config.source.limits === "object")
     {
         this._limits = config.source.limits;
+    }
+};
+
+/**
+ * Create the preview (sub zero level)
+ * @method FORGE.BackgroundPyramidRenderer.prototype._createPreview
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype._createPreview = function()
+{
+    for (var f = 0; f < 6; f++)
+    {
+        var face = Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[f];
+        this.getTile(null, FORGE.Tile.PREVIEW, face, 0, 0, "pyramid preview");
+    }
+
+    if (typeof(this._tileCache[FORGE.Tile.PREVIEW]) !== "undefined")
+    {
+        this._tileCache[FORGE.Tile.PREVIEW].forEach(function(tile)
+        {
+            this._scene.add(tile);
+        }.bind(this));
     }
 };
 
@@ -296,20 +297,6 @@ FORGE.BackgroundPyramidRenderer.prototype._onCameraChange = function(event)
 };
 
 /**
- * Is tile in frustum
- * @method FORGE.BackgroundPyramidRenderer#getVisibleTiles
- * @return {Boolean} true if tile is in frustum, false otherwise
- * @private
- */
-FORGE.BackgroundPyramidRenderer.prototype._isTileInFrustum = function(tile)
-{
-    var camera = this._viewer.camera.main;
-    var frustum = new THREE.Frustum();
-    frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-    return frustum.intersectsObject(tile);
-};
-
-/**
  * Tile destroyed event handler
  * @param {FORGE.Event} event - event
  * @method FORGE.BackgroundPyramidRenderer#_onTileDestroyed
@@ -359,26 +346,6 @@ FORGE.BackgroundPyramidRenderer.prototype._levelXnYnToXY = function(level, xnyn)
 };
 
 /**
- * Discard a tile. Removes from the cache and the scene
- * @method FORGE.BackgroundPyramidRenderer#_discardTile
- * @param {FORGE.Tile} tile - tile
- * @private
- */
-FORGE.BackgroundPyramidRenderer.prototype._discardTile = function(tile)
-{
-    if (typeof this._tileCache[tile.level] !== "undefined")
-    {
-        this._tileCache[tile.level].delete(tile);
-    }
-
-    this._scene.remove(tile);
-
-    this._textureStore.discardTileTexture(tile);
-
-    tile.destroy();
-};
-
-/**
  * Tile clearing routine.
  * Clear tile policy
  * Only applies to tiles with non zero level
@@ -404,11 +371,12 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
         var timeSinceCreate = now - tile.createTS;
         var timeSinceDisplay = now - tile.displayTS;
 
-        if (tile.level > 0 &&
+        if (tile.level > this._level ||
+            (tile.level !== this._level &&
+            tile.level !== FORGE.Tile.PREVIEW &&
             this._renderNeighborList.indexOf(tile) === -1 &&
             ((tile.displayTS === null && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS) ||
-            (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS) ||
-            tile.opacity === 0))
+            (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS))))
         {
             clearList.push(tile);
         }
@@ -417,7 +385,7 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
 
     clearList.forEach(function(tile)
     {
-        this._discardTile(tile);
+        this._scene.remove(tile);
     }.bind(this));
 };
 
@@ -429,9 +397,14 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
  */
 FORGE.BackgroundPyramidRenderer.prototype.getParentTile = function(tile)
 {
-    if (tile.level === 0)
+    if (tile.level === FORGE.Tile.PREVIEW)
     {
         return null;
+    }
+
+    if (tile.level === 0)
+    {
+        return this.getTile(null, FORGE.Tile.PREVIEW, tile.face, 0, 0, "pyramid preview");
     }
 
     var xnyn = this._levelXYToXnYn(tile.level, new THREE.Vector2(tile.x, tile.y));
@@ -458,9 +431,9 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
 
     var tile = this._tileCache[level].get(name);
 
-    if (tile === undefined)
+    if (typeof tile === "undefined")
     {
-        tile = new FORGE.Tile(null, this, x, y, level, face, creator);
+        tile = new FORGE.Tile(parent, this, x, y, level, face, creator);
 
         tile.onDestroy.add(this._onTileDestroyed, this);
         this.log("Create tile " + tile.name + " (" + creator + ")");
@@ -483,7 +456,7 @@ FORGE.BackgroundPyramidRenderer.prototype.getTile = function(parent, level, face
  */
 FORGE.BackgroundPyramidRenderer.prototype.nbTilesPerAxis = function(level, axis)
 {
-    if (this._tilesLevel === null)
+    if (this._tilesLevel === null || level === FORGE.Tile.PREVIEW)
     {
         return 1;
     }
@@ -556,8 +529,19 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
         }.bind(this));
     }
 
+    var levelConfig;
+    if (level === FORGE.Tile.PREVIEW)
+    {
+        levelConfig = this._config.preview;
+        levelConfig.width = levelConfig.tile;
+        levelConfig.height = levelConfig.tile;
+    }
+    else
+    {
+        levelConfig = this._config.source.levels[level];
+    }
+
     // Compute pixels count
-    var levelConfig = this._config.source.levels[level];
     var tilePixels = levelConfig.width * levelConfig.height;
 
     this._levelPixels = this.nbTiles(this._level) * tilePixels;
