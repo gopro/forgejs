@@ -14,6 +14,28 @@ FORGE.Canvas.prototype = Object.create(FORGE.DisplayObject.prototype);
 FORGE.Canvas.prototype.constructor = FORGE.Canvas;
 
 /**
+ * Canvas capture modes
+ * @name FORGE.Canvas.formats
+ * @type {Object}
+ * @const
+ */
+FORGE.Canvas.formats = {};
+
+/**
+ * @name FORGE.Canvas.formats.IMAGE
+ * @type {Image}
+ * @const
+ */
+FORGE.Canvas.formats.IMAGE = "image";
+
+/**
+ * @name FORGE.Canvas.formats.DATA
+ * @type {string}
+ * @const
+ */
+FORGE.Canvas.formats.DATA = "data";
+
+/**
  * Boot sequence.
  * @method FORGE.Canvas#_boot
  * @private
@@ -25,6 +47,28 @@ FORGE.Canvas.prototype._boot = function()
     this._viewer.display.register(this);
     this._notifyReady();
     this._applyPending(false);
+};
+
+/**
+ * Capture the canvas and return an image.
+ * @method FORGE.Canvas#capture
+ */
+FORGE.Canvas.prototype.capture = function(format)
+{
+    format = format || FORGE.Canvas.formats.IMAGE;
+
+    var data = this._dom.toDataURL();
+
+    switch(format)
+    {
+        case FORGE.Canvas.formats.DATA:
+            return data;
+
+        case FORGE.Canvas.formats.IMAGE:
+            var image = new Image();
+            image.src = data;
+            return image;
+    }
 };
 
 /**
