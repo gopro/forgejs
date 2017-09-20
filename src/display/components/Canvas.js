@@ -22,13 +22,15 @@ FORGE.Canvas.prototype.constructor = FORGE.Canvas;
 FORGE.Canvas.formats = {};
 
 /**
+ * Image format.
  * @name FORGE.Canvas.formats.IMAGE
- * @type {Image}
+ * @type {string}
  * @const
  */
 FORGE.Canvas.formats.IMAGE = "image";
 
 /**
+ * Data format.
  * @name FORGE.Canvas.formats.DATA
  * @type {string}
  * @const
@@ -50,8 +52,9 @@ FORGE.Canvas.prototype._boot = function()
 };
 
 /**
- * Capture the canvas and return an image.
+ * Capture the canvas and return an image or the DataURL.
  * @method FORGE.Canvas#capture
+ * @param {string} format
  */
 FORGE.Canvas.prototype.capture = function(format)
 {
