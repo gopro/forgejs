@@ -702,6 +702,11 @@ FORGE.Tile.prototype._checkNeighbours = function()
     {
         sequence.then(function()
         {
+            if (prenderer.isFaceIn(pface) === false)
+            {
+                return;
+            }
+
             var tile = prenderer.getTile(null, plevel, pface, px, py, plog);
             if (neighbours.indexOf(tile) === -1)
             {

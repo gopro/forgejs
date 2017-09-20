@@ -144,6 +144,11 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     {
         var face = Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[f];
 
+        if (this.isFaceIn(face) === false)
+        {
+            continue;
+        }
+
         for (var y = 0, ty = this.nbTilesPerAxis(0, "y"); y < ty; y++)
         {
             for (var x = 0, tx = this.nbTilesPerAxis(0, "x"); x < tx; x++)
@@ -191,7 +196,11 @@ FORGE.BackgroundPyramidRenderer.prototype._createPreview = function()
     for (var f = 0; f < 6; f++)
     {
         var face = Object.keys(FORGE.MediaStore.CUBE_FACE_CONFIG)[f];
-        this.getTile(null, FORGE.Tile.PREVIEW, face, 0, 0, "pyramid preview");
+
+        if (this.isFaceIn(face) === true)
+        {
+            this.getTile(null, FORGE.Tile.PREVIEW, face, 0, 0, "pyramid preview");
+        }
     }
 
     if (typeof(this._tileCache[FORGE.Tile.PREVIEW]) !== "undefined")
@@ -385,7 +394,7 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
  */
 FORGE.BackgroundPyramidRenderer.prototype.getParentTile = function(tile)
 {
-    if (tile.level === FORGE.Tile.PREVIEW)
+    if (this.isFaceIn(tile.face) === false || tile.level === FORGE.Tile.PREVIEW)
     {
         return null;
     }
@@ -483,6 +492,45 @@ FORGE.BackgroundPyramidRenderer.prototype.nbTiles = function(level)
 FORGE.BackgroundPyramidRenderer.prototype.tileSize = function(level)
 {
     return new FORGE.Size(this._size / this.nbTilesPerAxis(level, "x"), this._size / this.nbTilesPerAxis(level, "y"));
+};
+
+/**
+ * Does a face would ever be in the panorama ?
+ * @method FORGE.BackgroundPyramidRenderer#isFaceIn
+ * @param {string} face - the name of the face
+ * @return {boolean}
+ * @private
+ */
+FORGE.BackgroundPyramidRenderer.prototype.isFaceIn = function(face)
+{
+    if (typeof face !== "string")
+    {
+        return false;
+    }
+
+    var camera = this._viewer.camera;
+
+    switch(face)
+    {
+        case "front":
+            return camera.yawMin < 45
+                && camera.yawMax > -45;
+        case "right":
+            return camera.yawMin < 135
+                && camera.yawMax > 45;
+        case "left":
+            return camera.yawMin < -45
+                && camera.yawMax > -135;
+        case "back":
+            return camera.yawMin < -135
+                && camera.yawMax > 135;
+        case "down":
+            return camera.pitchMin < -45;
+        case "up":
+            return camera.pitchMax > 45;
+        default:
+            return false;
+    }
 };
 
 /**
