@@ -1,0 +1,23 @@
+{
+    "id": "scene-media-preview",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "SceneMediaPreviewConfig",
+    "description": "The preview object associated to the media. An instance of <a href=\"#scene-media-preview\">a scene media preview.</a>",
+    "type": "object",
+
+    "properties": {
+        "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "The URL for the preview of the media, with a <code>{face}</code> parameter to specify the face when parsing. Only one image per face is authorized, so no other parameter can be specified.",
+            "example": "multi/preview/{face}.jpg"
+        },
+
+        "tile": {
+            "type": "number",
+            "title": "Tile",
+            "description": "The size of a tile, which corresponds to the width and the height of a tile. It will be used with the width and height to compute the value of the <code>{x}</code> and <code>{y}</code> patterns.",
+            "example": 512
+        }
+    }
+}

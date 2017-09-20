@@ -21,6 +21,18 @@
             "example": "image"
         },
 
+        "preview": {
+            "anyOf": [
+                { "$ref": "scene-media-preview" },
+                {
+                    "type": "string",
+                    "title": "Preview",
+                    "description": "The URL for the preview of the media (only works for images, simple and multi-resolution, not video)",
+                    "example": "./images/preview/scene-0-preview.jpg"
+                }
+            ]
+        },
+
         "source": {
             "$ref": "scene-media-source"
         },

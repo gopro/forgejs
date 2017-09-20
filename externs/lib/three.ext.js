@@ -1078,6 +1078,9 @@ THREE.Mesh.prototype.material;
 /** @type {?string} */
 THREE.Mesh.prototype.name;
 
+/** @type {?number} */
+THREE.Mesh.prototype.renderOrder;
+
 /**
  * @param {number} arg1
  * @return {THREE.Mesh}
