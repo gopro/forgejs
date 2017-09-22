@@ -802,14 +802,22 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
 /**
  * Compute the yaw boundaries with yaw min and yaw max.
  * @method FORGE.Camera#_getYawBoundaries
+ * @param {boolean} fov - do we need to get the yaw relative to the current fov (default true)
  * @return {CameraBoundaries} Returns the min and max yaw computed from the camera configuration and the view limits.
  * @private
  */
-FORGE.Camera.prototype._getYawBoundaries = function()
+FORGE.Camera.prototype._getYawBoundaries = function(fov)
 {
-    var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
-    var min = this._yawMin + halfHFov;
-    var max = this._yawMax - halfHFov;
+    var min = this._yawMin;
+    var max = this._yawMax;
+
+    if (fov !== false)
+    {
+        var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
+        min += halfHFov;
+        max -= halfHFov;
+    }
+
     var view = this._viewer.renderer.view.current;
 
     if (view !== null)
@@ -868,14 +876,22 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
 /**
  * Compute the pitch boundaries with yaw min and yaw max.
  * @method FORGE.Camera#_getPitchBoundaries
+ * @param {boolean} fov - do we need to get the pitch relative to the current fov (default true)
  * @return {CameraBoundaries} Returns the min and max pitch computed from the camera configuration and the view limits.
  * @private
  */
-FORGE.Camera.prototype._getPitchBoundaries = function()
+FORGE.Camera.prototype._getPitchBoundaries = function(fov)
 {
-    var halfFov = 0.5 * this._fov;
-    var min = this._pitchMin + halfFov;
-    var max = this._pitchMax - halfFov;
+    var min = this._pitchMin;
+    var max = this._pitchMax;
+
+    if (fov !== false)
+    {
+        var halfFov = 0.5 * this._fov;
+        min += halfFov;
+        max -= halfFov;
+    }
+
     var view = this._viewer.renderer.view.current;
 
     if (view !== null)
@@ -1011,6 +1027,22 @@ FORGE.Camera.prototype._getFovBoundaries = function()
             min = Math.max(view.fovMin, min);
             max = Math.min(view.fovMax, max);
         }
+    }
+
+    // if there are limits, we may need to limit the maximum fov
+    var pitchBoundaries = this._getPitchBoundaries(false);
+    var pitchRange = pitchBoundaries.max - pitchBoundaries.min;
+    max = Math.min(pitchRange, max);
+
+    var yawBoundaries = this._getYawBoundaries(false);
+    var yawRange = yawBoundaries.max - yawBoundaries.min;
+    yawRange *= this._viewer.renderer.displayResolution.ratio;
+    max = Math.min(yawRange, max);
+
+    // get the tiniest
+    if (max < min)
+    {
+        min = max;
     }
 
     return { min: min, max: max };
