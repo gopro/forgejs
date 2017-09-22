@@ -802,7 +802,7 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
 /**
  * Compute the yaw boundaries with yaw min and yaw max.
  * @method FORGE.Camera#_getYawBoundaries
- * @param {boolean} fov - do we need to get the yaw relative to the current fov (default true)
+ * @param {boolean=} fov - do we need to get the yaw relative to the current fov (default true)
  * @return {CameraBoundaries} Returns the min and max yaw computed from the camera configuration and the view limits.
  * @private
  */
@@ -876,7 +876,7 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
 /**
  * Compute the pitch boundaries with yaw min and yaw max.
  * @method FORGE.Camera#_getPitchBoundaries
- * @param {boolean} fov - do we need to get the pitch relative to the current fov (default true)
+ * @param {boolean=} fov - do we need to get the pitch relative to the current fov (default true)
  * @return {CameraBoundaries} Returns the min and max pitch computed from the camera configuration and the view limits.
  * @private
  */

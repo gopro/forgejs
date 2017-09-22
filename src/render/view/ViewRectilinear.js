@@ -51,9 +51,7 @@ FORGE.ViewRectilinear.prototype._updateViewParams = function()
 {
     if (this._viewer !== null)
     {
-        var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
-
-        this._projectionScale = Math.tan(FORGE.Math.degToRad(fov / 2));
+        this._projectionScale = Math.tan(FORGE.Math.degToRad(this._viewer.camera.fov / 2));
     }
 };
 
