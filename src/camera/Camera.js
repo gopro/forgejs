@@ -348,6 +348,21 @@ FORGE.Camera.prototype._parseConfig = function(config)
         return;
     }
 
+    if (typeof config.fov.min === "number")
+    {
+        this._fovMin = FORGE.Math.degToRad(config.fov.min);
+    }
+
+    if (typeof config.fov.max === "number")
+    {
+        this._fovMax = FORGE.Math.degToRad(config.fov.max);
+    }
+
+    if (typeof config.fov.default === "number")
+    {
+        this._setFov(config.fov.default, FORGE.Math.DEGREES);
+    }
+
     if (typeof config.yaw.min === "number")
     {
         this._yawMin = FORGE.Math.degToRad(config.yaw.min);
@@ -391,21 +406,6 @@ FORGE.Camera.prototype._parseConfig = function(config)
     if (typeof config.roll.default === "number")
     {
         this._setRoll(config.roll.default, FORGE.Math.DEGREES);
-    }
-
-    if (typeof config.fov.min === "number")
-    {
-        this._fovMin = FORGE.Math.degToRad(config.fov.min);
-    }
-
-    if (typeof config.fov.max === "number")
-    {
-        this._fovMax = FORGE.Math.degToRad(config.fov.max);
-    }
-
-    if (typeof config.fov.default === "number")
-    {
-        this._setFov(config.fov.default, FORGE.Math.DEGREES);
     }
 
     this._updateFromEuler();
