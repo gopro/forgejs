@@ -1036,7 +1036,7 @@ FORGE.Camera.prototype._getFovBoundaries = function()
 
     var yawBoundaries = this._getYawBoundaries(false);
     var yawRange = yawBoundaries.max - yawBoundaries.min;
-    yawRange *= this._viewer.renderer.displayResolution.ratio;
+    yawRange /= this._viewer.renderer.displayResolution.ratio;
     max = Math.min(yawRange, max);
 
     // get the tiniest
