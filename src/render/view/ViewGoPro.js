@@ -54,7 +54,7 @@ FORGE.ViewGoPro.prototype._updateViewParams = function()
         var projFovHigh = 180;
         var distance = 0;
 
-        var fov = FORGE.Math.clamp(this._viewer.camera.fov, this._viewer.camera.fovMin, this._viewer.camera.fovMax);
+        var fov = this._viewer.camera.fov;
 
         var fn = 0;
 

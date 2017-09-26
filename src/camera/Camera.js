@@ -348,6 +348,21 @@ FORGE.Camera.prototype._parseConfig = function(config)
         return;
     }
 
+    if (typeof config.fov.min === "number")
+    {
+        this._fovMin = FORGE.Math.degToRad(config.fov.min);
+    }
+
+    if (typeof config.fov.max === "number")
+    {
+        this._fovMax = FORGE.Math.degToRad(config.fov.max);
+    }
+
+    if (typeof config.fov.default === "number")
+    {
+        this._setFov(config.fov.default, FORGE.Math.DEGREES);
+    }
+
     if (typeof config.yaw.min === "number")
     {
         this._yawMin = FORGE.Math.degToRad(config.yaw.min);
@@ -391,21 +406,6 @@ FORGE.Camera.prototype._parseConfig = function(config)
     if (typeof config.roll.default === "number")
     {
         this._setRoll(config.roll.default, FORGE.Math.DEGREES);
-    }
-
-    if (typeof config.fov.min === "number")
-    {
-        this._fovMin = FORGE.Math.degToRad(config.fov.min);
-    }
-
-    if (typeof config.fov.max === "number")
-    {
-        this._fovMax = FORGE.Math.degToRad(config.fov.max);
-    }
-
-    if (typeof config.fov.default === "number")
-    {
-        this._setFov(config.fov.default, FORGE.Math.DEGREES);
     }
 
     this._updateFromEuler();
@@ -802,40 +802,28 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
 /**
  * Compute the yaw boundaries with yaw min and yaw max.
  * @method FORGE.Camera#_getYawBoundaries
+ * @param {boolean=} fov - do we need to get the yaw relative to the current fov (default true)
  * @return {CameraBoundaries} Returns the min and max yaw computed from the camera configuration and the view limits.
  * @private
  */
-FORGE.Camera.prototype._getYawBoundaries = function()
+FORGE.Camera.prototype._getYawBoundaries = function(fov)
 {
     var min = this._yawMin;
     var max = this._yawMax;
-    var view = this._viewer.renderer.view.current;
 
-    // Check first if background renderer exposes its own limits for the current media
-    if (this._viewer.renderer.backgroundRenderer !== null &&
-        typeof this._viewer.renderer.backgroundRenderer.limits !== "undefined" &&
-        this._viewer.renderer.backgroundRenderer.limits !== null &&
-        typeof this._viewer.renderer.backgroundRenderer.limits.yaw !== "undefined")
+    if (fov !== false)
     {
         var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
-
-        if (typeof this._viewer.renderer.backgroundRenderer.limits.yaw.min !== "undefined")
-        {
-            min = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.yaw.min) + halfHFov;
-        }
-
-        if (typeof this._viewer.renderer.backgroundRenderer.limits.yaw.max !== "undefined")
-        {
-            max = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.yaw.max) - halfHFov;
-        }
+        min += halfHFov;
+        max -= halfHFov;
     }
-    else
+
+    var view = this._viewer.renderer.view.current;
+
+    if (view !== null)
     {
-        if (this._yawMin === -Infinity && this._yawMax === Infinity && view !== null)
-        {
-            min = Math.max(view.yawMin, min);
-            max = Math.min(view.yawMax, max);
-        }
+        min = Math.max(view.yawMin, min);
+        max = Math.min(view.yawMax, max);
     }
 
     return { min: min, max: max };
@@ -888,40 +876,28 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
 /**
  * Compute the pitch boundaries with yaw min and yaw max.
  * @method FORGE.Camera#_getPitchBoundaries
+ * @param {boolean=} fov - do we need to get the pitch relative to the current fov (default true)
  * @return {CameraBoundaries} Returns the min and max pitch computed from the camera configuration and the view limits.
  * @private
  */
-FORGE.Camera.prototype._getPitchBoundaries = function()
+FORGE.Camera.prototype._getPitchBoundaries = function(fov)
 {
     var min = this._pitchMin;
     var max = this._pitchMax;
+
+    if (fov !== false)
+    {
+        var halfFov = 0.5 * this._fov;
+        min += halfFov;
+        max -= halfFov;
+    }
+
     var view = this._viewer.renderer.view.current;
 
-    // Check first if background renderer exposes its own limits for the current media
-    if (this._viewer.renderer.backgroundRenderer !== null &&
-        typeof this._viewer.renderer.backgroundRenderer.limits !== "undefined" &&
-        this._viewer.renderer.backgroundRenderer.limits !== null &&
-        typeof this._viewer.renderer.backgroundRenderer.limits.pitch !== "undefined")
+    if (view !== null)
     {
-        var halfVFov = 0.5 * this._fov;
-
-        if (typeof this._viewer.renderer.backgroundRenderer.limits.pitch.min !== "undefined")
-        {
-            min = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.pitch.min) + halfVFov;
-        }
-
-        if (typeof this._viewer.renderer.backgroundRenderer.limits.pitch.max !== "undefined")
-        {
-            max = FORGE.Math.degToRad(this._viewer.renderer.backgroundRenderer.limits.pitch.max) - halfVFov;
-        }
-    }
-    else
-    {
-        if (this._pitchMin === -Infinity && this._pitchMax === Infinity && view !== null)
-        {
-            min = Math.max(view.pitchMin, min);
-            max = Math.min(view.pitchMax, max);
-        }
+        min = Math.max(view.pitchMin, min);
+        max = Math.min(view.pitchMax, max);
     }
 
     return { min: min, max: max };
@@ -1051,6 +1027,22 @@ FORGE.Camera.prototype._getFovBoundaries = function()
             min = Math.max(view.fovMin, min);
             max = Math.min(view.fovMax, max);
         }
+    }
+
+    // if there are limits, we may need to limit the maximum fov
+    var pitchBoundaries = this._getPitchBoundaries(false);
+    var pitchRange = pitchBoundaries.max - pitchBoundaries.min;
+    max = Math.min(pitchRange, max);
+
+    var yawBoundaries = this._getYawBoundaries(false);
+    var yawRange = yawBoundaries.max - yawBoundaries.min;
+    yawRange /= this._viewer.renderer.displayResolution.ratio;
+    max = Math.min(yawRange, max);
+
+    // get the tiniest
+    if (max < min)
+    {
+        min = max;
     }
 
     return { min: min, max: max };

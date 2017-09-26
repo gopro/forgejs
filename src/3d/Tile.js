@@ -328,7 +328,7 @@ FORGE.Tile.prototype._onAfterRender = function()
 
 /**
  * Query texture for the tile
- * @method FORGE.Tile#_addDebugLayer
+ * @method FORGE.Tile#_queryTexture
  * @private
  */
 FORGE.Tile.prototype._queryTexture = function()
@@ -337,7 +337,7 @@ FORGE.Tile.prototype._queryTexture = function()
     if (this.material !== null && this.material.map === null && this._texturePending === false)
     {
         // Check if predelay since creation has been respected (except for preview)
-        if (this._level !== FORGE.Tile.PREVIEW &&
+        if ((this._level !== FORGE.Tile.PREVIEW || this._level !== this._renderer.level) &&
             this._displayTS - this._createTS < FORGE.Tile.TEXTURE_LOADING_PREDELAY_MS)
         {
             return;
@@ -1008,19 +1008,5 @@ Object.defineProperty(FORGE.Tile.prototype, "neighbours",
     get: function()
     {
         return this._neighbours;
-    }
-});
-
-/**
- * Is the texture pending ?
- * @name FORGE.Tile#texturePending
- * @type {boolean}
- */
-Object.defineProperty(FORGE.Tile.prototype, "texturePending",
-{
-    /** @this {FORGE.Tile} */
-    get: function()
-    {
-        return this._texturePending;
     }
 });

@@ -49,10 +49,6 @@
             }
         },
 
-        "limits": {
-            "$ref": "scene-media-limits"
-        },
-
         "order": {
             "type": "string",
             "title": "Order",
