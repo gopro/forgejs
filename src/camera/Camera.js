@@ -874,7 +874,7 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
 };
 
 /**
- * Compute the pitch boundaries with yaw min and yaw max.
+ * Compute the pitch boundaries with pitch min and pitch max.
  * @method FORGE.Camera#_getPitchBoundaries
  * @param {boolean=} fov - do we need to get the pitch relative to the current fov (default true)
  * @return {CameraBoundaries} Returns the min and max pitch computed from the camera configuration and the view limits.
@@ -1061,10 +1061,10 @@ FORGE.Camera.prototype._getFovBoundaries = function()
  */
 FORGE.Camera.prototype._setAll = function(yaw, pitch, roll, fov, unit)
 {
+    var fovChanged = this._setFov(fov, unit);
     var yawChanged = this._setYaw(yaw, unit);
     var pitchChanged = this._setPitch(pitch, unit);
     var rollChanged = this._setRoll(roll, unit);
-    var fovChanged = this._setFov(fov, unit);
 
     return (yawChanged === true || pitchChanged === true || rollChanged === true || fovChanged === true);
 };
