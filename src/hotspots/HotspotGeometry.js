@@ -231,23 +231,27 @@ FORGE.HotspotGeometry.prototype._createShape = function(options)
         }
 
         options.points = res;
-    }
 
-    if (options.points.length < 3)
-    {
-        console.warn("FORGE.HotspotGeometry.SHAPE: the points given to draw the shape should be a least 3");
-        options.points = null;
+        if (options.points.length < 3)
+        {
+            console.warn("FORGE.HotspotGeometry.SHAPE: the points given to draw the shape should be a least 3");
+            options.points = null;
+        }
     }
 
     //Default points array that is a square
     if (Array.isArray(options.points) === false)
     {
+        //Arrow shape
         options.points =
         [
-            [-10, 10],
-            [10, 10],
-            [10, -10],
-            [-10, -10]
+            [ -10, 3 ],
+            [ 3, 3 ],
+            [ 3, 8 ],
+            [ 15, 0 ],
+            [ 3, -8 ],
+            [ 3, -3 ],
+            [ -10, -3 ]
         ];
     }
 
