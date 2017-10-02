@@ -167,6 +167,35 @@ FORGE.HotspotMaterial.types.PLUGIN = "plugin";
  */
 FORGE.HotspotMaterial.types.GRAPHICS = "graphics";
 
+/**
+ * Material sides list.
+ * @name FORGE.HotspotMaterial.sides
+ * @type {Object}
+ * @const
+ */
+FORGE.HotspotMaterial.sides = {};
+
+/**
+ * @name FORGE.HotspotMaterial.sides.FRONT
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotMaterial.sides.FRONT = "front";
+
+/**
+ * @name FORGE.HotspotMaterial.sides.BACK
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotMaterial.sides.BACK = "back";
+
+/**
+ * @name FORGE.HotspotMaterial.sides.DOUBLE
+ * @type {string}
+ * @const
+ */
+FORGE.HotspotMaterial.sides.DOUBLE = "double";
+
 
 /**
  * Materials presets.
@@ -212,6 +241,7 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
     this._transparent = (typeof config.transparent === "boolean") ? config.transparent : false;
     this._color = (typeof config.color === "string") ? config.color : 0xffffff;
     this._update = (typeof config.update === "boolean") ? config.update : false;
+    this._side = (typeof config.side === "string") ? config.side : FORGE.HotspotMaterial.sides.DOUBLE;
 
     // Hotspot with image as background
     if (typeof config.image !== "undefined" && config.image !== null)
@@ -563,21 +593,46 @@ FORGE.HotspotMaterial.prototype._createShaderMaterial = function()
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
 
-    // side is FrontSide, except if the geometry is a PLANE
-    var type = FORGE.UID.get(this._hotspotUid).geometry.type;
-    var side = (type === FORGE.HotspotGeometryType.PLANE) ? THREE.DoubleSide : THREE.FrontSide;
-
     this._material = new THREE.RawShaderMaterial(
     {
         fragmentShader: fragmentShader,
         vertexShader: vertexShader,
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
-        side: side,
+        side: this._getThreeSide(this._side),
         name: "HotspotMaterial"
     });
 
     this._material.transparent = this._transparent;
     this._material.needsUpdate = true;
+};
+
+/**
+ * Converts the side string to the side number of Three
+ * @method FORGE.HotspotMaterial#_getThreeSide
+ * @param {string} [side] the string that represents the side of the material from the HotspotMaterial.sides
+ * @return {number} [description]
+ * @private
+ */
+FORGE.HotspotMaterial.prototype._getThreeSide = function(side)
+{
+    var result = THREE.DoubleSide; // Default is double
+
+    switch(side)
+    {
+        case FORGE.HotspotMaterial.sides.FRONT:
+            result = THREE.FrontSide;
+            break;
+
+        case FORGE.HotspotMaterial.sides.BACK:
+            result = THREE.BackSide;
+            break;
+
+        case FORGE.HotspotMaterial.sides.DOUBLE:
+            result = THREE.DoubleSide;
+            break;
+    }
+
+    return result;
 };
 
 FORGE.HotspotMaterial.prototype.updateShader = function()
@@ -652,6 +707,7 @@ FORGE.HotspotMaterial.prototype.dump = function()
         color: this._color,
         opacity: this._opacity,
         transparent: this._transparent,
+        side: this._side,
         update: this._update
     };
 
@@ -805,6 +861,21 @@ Object.defineProperty(FORGE.HotspotMaterial.prototype, "color",
     get: function()
     {
         return this._color;
+    }
+});
+
+/**
+ * Get the side of this hotspot material.
+ * @name FORGE.HotspotMaterial#side
+ * @readonly
+ * @type {(string)}
+ */
+Object.defineProperty(FORGE.HotspotMaterial.prototype, "side",
+{
+    /** @this {FORGE.HotspotMaterial} */
+    get: function()
+    {
+        return this._side;
     }
 });
 
