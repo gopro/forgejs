@@ -609,30 +609,30 @@ FORGE.HotspotMaterial.prototype._createShaderMaterial = function()
 /**
  * Converts the side string to the side number of Three
  * @method FORGE.HotspotMaterial#_getThreeSide
- * @param {string} [side] the string that represents the side of the maeterial from the HotspotMaterial.sides
+ * @param {string} [side] the string that represents the side of the material from the HotspotMaterial.sides
  * @return {number} [description]
  * @private
  */
-FORGE.HotspotMaterial.prototype._getThreeSide = function()
+FORGE.HotspotMaterial.prototype._getThreeSide = function(side)
 {
-    var side = 2; // Default is double
+    var result = THREE.DoubleSide; // Default is double
 
-    switch(this._side)
+    switch(side)
     {
         case FORGE.HotspotMaterial.sides.FRONT:
-            side = 0;
+            result = THREE.FrontSide;
             break;
 
         case FORGE.HotspotMaterial.sides.BACK:
-            side = 1;
+            result = THREE.BackSide;
             break;
 
         case FORGE.HotspotMaterial.sides.DOUBLE:
-            side = 2;
+            result = THREE.DoubleSide;
             break;
     }
 
-    return side;
+    return result;
 };
 
 FORGE.HotspotMaterial.prototype.updateShader = function()
