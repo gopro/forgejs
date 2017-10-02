@@ -34,6 +34,14 @@
             "example": false
         },
 
+        "side": {
+            "type": "string",
+            "title": "Side",
+            "description": "The side of the material. Can be front, back or double. See FORGE.HotspotMaterial.sides constants",
+            "default": "double",
+            "example": "front"
+        },
+
         "image": {
             "type": "string",
             "title": "Image",
