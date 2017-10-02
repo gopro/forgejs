@@ -811,7 +811,7 @@ FORGE.Camera.prototype._getYawBoundaries = function(fov)
     var min = this._yawMin;
     var max = this._yawMax;
 
-    if (fov !== false)
+    if (fov !== false && min !== max)
     {
         var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
         min += halfHFov;
@@ -885,7 +885,7 @@ FORGE.Camera.prototype._getPitchBoundaries = function(fov)
     var min = this._pitchMin;
     var max = this._pitchMax;
 
-    if (fov !== false)
+    if (fov !== false && min !== max)
     {
         var halfFov = 0.5 * this._fov;
         min += halfFov;
@@ -1034,12 +1034,20 @@ FORGE.Camera.prototype._getFovBoundaries = function()
         // if there are limits, we may need to limit the maximum fov
         var pitchBoundaries = this._getPitchBoundaries(false);
         var pitchRange = pitchBoundaries.max - pitchBoundaries.min;
-        max = Math.min(pitchRange, max);
+
+        if (pitchRange > 0)
+        {
+            max = Math.min(pitchRange, max);
+        }
 
         var yawBoundaries = this._getYawBoundaries(false);
         var yawRange = yawBoundaries.max - yawBoundaries.min;
         yawRange /= this._viewer.renderer.displayResolution.ratio;
-        max = Math.min(yawRange, max);
+
+        if (yawRange > 0)
+        {
+            max = Math.min(yawRange, max);
+        }
 
         // get the tiniest
         if (max < min)
