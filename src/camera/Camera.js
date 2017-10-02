@@ -1029,20 +1029,23 @@ FORGE.Camera.prototype._getFovBoundaries = function()
         }
     }
 
-    // if there are limits, we may need to limit the maximum fov
-    var pitchBoundaries = this._getPitchBoundaries(false);
-    var pitchRange = pitchBoundaries.max - pitchBoundaries.min;
-    max = Math.min(pitchRange, max);
-
-    var yawBoundaries = this._getYawBoundaries(false);
-    var yawRange = yawBoundaries.max - yawBoundaries.min;
-    yawRange /= this._viewer.renderer.displayResolution.ratio;
-    max = Math.min(yawRange, max);
-
-    // get the tiniest
-    if (max < min)
+    if (view.type !== FORGE.ViewType.FLAT)
     {
-        min = max;
+        // if there are limits, we may need to limit the maximum fov
+        var pitchBoundaries = this._getPitchBoundaries(false);
+        var pitchRange = pitchBoundaries.max - pitchBoundaries.min;
+        max = Math.min(pitchRange, max);
+
+        var yawBoundaries = this._getYawBoundaries(false);
+        var yawRange = yawBoundaries.max - yawBoundaries.min;
+        yawRange /= this._viewer.renderer.displayResolution.ratio;
+        max = Math.min(yawRange, max);
+
+        // get the tiniest
+        if (max < min)
+        {
+            min = max;
+        }
     }
 
     return { min: min, max: max };
