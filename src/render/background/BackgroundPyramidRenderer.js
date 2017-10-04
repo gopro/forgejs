@@ -133,7 +133,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     this._textureStore = this._viewer.story.scene.media.store;
 
     this._camera = this._viewer.renderer.camera.main;
-    this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
+    this._viewer.camera.onChange.add(this._onCameraChange, this);
 
     if (typeof this._config.preview !== "undefined")
     {
@@ -604,7 +604,7 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
  */
 FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
-    this._viewer.camera.onCameraChange.remove(this._onCameraChange, this);
+    this._viewer.camera.onChange.remove(this._onCameraChange, this);
 
     this._clear();
 
