@@ -452,11 +452,15 @@ FORGE.Sound.prototype._boot = function()
         this._gainNode.gain.value = this._volume * this._viewer.audio.volume;
         this._gainNode.connect(this._inputNode);
     }
+
+    var loaded = false;
     if (this._viewer.audio.useAudioTag === true || this._isAmbisonic() === true)
     {
         if (this._viewer.cache.has(FORGE.Cache.types.SOUND, this._key) === true)
         {
-            this._loadComplete(this._viewer.cache.get(FORGE.Cache.types.SOUND, this._key));
+            // wait long enough so that a frame has passed (here at 24fps)
+            window.setTimeout(this._loadComplete.bind(this, this._viewer.cache.get(FORGE.Cache.types.SOUND, this._key)), 40);
+            loaded = true;
         }
 
         //Listen to the main volume change to adapt the sound volume accordingly.
@@ -467,7 +471,10 @@ FORGE.Sound.prototype._boot = function()
 
     if (this._url !== "")
     {
-        this._viewer.load.sound(this._key, this._url, this._loadComplete, this, this._isAmbisonic());
+        if (loaded === false)
+        {
+            this._viewer.load.sound(this._key, this._url, this._loadComplete, this, this._isAmbisonic());
+        }
 
         if (this._onLoadStart !== null)
         {
@@ -490,6 +497,11 @@ FORGE.Sound.prototype._loadComplete = function(file)
     if(this._alive === false)
     {
         return;
+    }
+
+    if (this._isAmbisonic() === true)
+    {
+        file.data = file.data.cloneNode(true);
     }
 
     this._soundFile = file;
