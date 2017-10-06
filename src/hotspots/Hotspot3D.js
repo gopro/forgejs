@@ -253,11 +253,6 @@ FORGE.Hotspot3D.prototype._stateLoadCompleteHandler = function()
 
     this._updatePosition();
 
-    if(this._autoScale === true)
-    {
-        this._viewer.camera.onFovChange.add(this._cameraFovChangeHandler, this);
-    }
-
     if (this._animation.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
     {
         this._animation.play();
@@ -317,12 +312,7 @@ FORGE.Hotspot3D.prototype._updatePosition = function()
     // Scale
     if(this._autoScale === true)
     {
-        var fovRef = this._viewer.camera.config.fov.default;
-        var factor = this._viewer.camera.fov / fovRef;
-
-        this._mesh.scale.x = FORGE.Math.clamp(this._transform.scale.x * factor, 0.000001, 100000);
-        this._mesh.scale.y = FORGE.Math.clamp(this._transform.scale.y * factor, 0.000001, 100000);
-        this._mesh.scale.z = FORGE.Math.clamp(this._transform.scale.z * factor, 0.000001, 100000);
+        this._updateAutoScale();
     }
     else
     {
@@ -332,10 +322,14 @@ FORGE.Hotspot3D.prototype._updatePosition = function()
     }
 };
 
-FORGE.Hotspot3D.prototype._cameraFovChangeHandler = function()
+/**
+ * Updates the mesh scale according to the fov to keep a constant screen size
+ * @method FORGE.Hotspot3D#_updateAutoScale
+ * @private
+ */
+FORGE.Hotspot3D.prototype._updateAutoScale = function()
 {
-    var fovRef = this._viewer.camera.config.fov.default;
-    var factor = this._viewer.camera.fov / fovRef;
+    var factor = this._viewer.camera.fov / this._viewer.camera.config.fov.default;
 
     this._mesh.scale.x = FORGE.Math.clamp(this._transform.scale.x * factor, 0.000001, 100000);
     this._mesh.scale.y = FORGE.Math.clamp(this._transform.scale.y * factor, 0.000001, 100000);
@@ -408,6 +402,11 @@ FORGE.Hotspot3D.prototype.update = function()
     if (this._sound !== null)
     {
         this._sound.update();
+    }
+
+    if(this._autoScale === true)
+    {
+        this._updateAutoScale();
     }
 };
 
