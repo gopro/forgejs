@@ -67,6 +67,13 @@
             "example": true
         },
 
+        "autoScale": {
+            "type": "boolean",
+            "title": "Auto Scale",
+            "description": "Does the hotspot auto changes its scale when the fov change?",
+            "exemple": true
+        },
+
         "transform": {
             "$ref": "hotspot-transform"
         },
