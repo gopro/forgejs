@@ -240,12 +240,12 @@ FORGE.Sound = function(viewer, key, url, ambisonic)
     this._z = 0;
 
     /**
-     * FOADecoder is a ready-made FOA decoder and binaural renderer.
-     * @name  FORGE.Sound#_decoder
-     * @type {?FOADecoder}
+     * FOARenderer is a ready-made FOA decoder and binaural renderer.
+     * @name  FORGE.Sound#_foaRenderer
+     * @type {?FOARenderer}
      * @private
      */
-    this._decoder = null;
+    this._foaRenderer = null;
 
     /**
      * Is it an ambisonical sound?
@@ -531,16 +531,17 @@ FORGE.Sound.prototype._decode = function(file)
 
             if (this._isAmbisonic() === true)
             {
+                // Source
+                this._soundElementSource = this._context.createMediaElementSource(file.data);
+
                 // FOA decoder and binaural renderer
-                this._decoder = Omnitone.createFOADecoder(this._context, file.data,
+                this._foaRenderer = Omnitone.createFOARenderer(this._context,
                 {
                     channelMap: this._defaultChannelMap
-                    // HRTFSetUrl: 'YOUR_HRTF_SET_URL', //Base URL for the cube HRTF sets.
-                    // postGainDB: 0, //Post-decoding gain compensation in dB.
                 });
 
                 // Initialize the decoder
-                this._decoder.initialize().then(this._decodeCompleteBind, this._decodeErrorBind);
+                this._foaRenderer.initialize().then(this._decodeCompleteBind, this._decodeErrorBind);
             }
             else
             {
@@ -591,7 +592,6 @@ FORGE.Sound.prototype._dispatchDecodedEvents = function()
  * Event handler for decode complete event, it stores decoding data into the sound file object.
  * @method FORGE.Sound#_decodeComplete
  * @private
- * @param  {?AudioBuffer} buffer - The raw binary data buffer.
  */
 FORGE.Sound.prototype._decodeComplete = function(buffer)
 {
@@ -604,6 +604,12 @@ FORGE.Sound.prototype._decodeComplete = function(buffer)
     if (buffer)
     {
         this._soundFile.data = buffer;
+    }
+
+    if (this._foaRenderer)
+    {
+        this._soundElementSource.connect(this._foaRenderer.input);
+        this._foaRenderer.output.connect(this._context.destination);
     }
 
     this._decoded = true;
@@ -775,11 +781,11 @@ FORGE.Sound.prototype.update = function()
         }
     }
 
-    if (this._decoder !== null && this._playing === true)
+    if (this._foaRenderer !== null && this._playing === true)
     {
         // Rotate the binaural renderer based on a Three.js camera object.
         var m4 = this._viewer.renderer.camera.modelViewInverse;
-        this._decoder.setRotationMatrixFromCamera(m4);
+        this._foaRenderer.setRotationMatrixFromCamera(m4);
     }
 };
 
