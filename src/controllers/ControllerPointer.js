@@ -333,7 +333,7 @@ FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
     var yaw = invertX * dx;
 
     var threshold = logZoomFactor * 0.05;
-    //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
+    //Do not move the camera anymore if the modifier is too low, this prevent the camera onChange event to be fired too much times
     if(Math.abs(yaw) > threshold)
     {
         this._camera.yaw += yaw;
@@ -341,7 +341,7 @@ FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
     }
 
     var pitch = invertY * dy;
-    //Do not move the camera anymore if the modifier is too low, this prevent onCameraChange to be fired too much times
+    //Do not move the camera anymore if the modifier is too low, this prevent the camera onChange to be fired too much times
     if(Math.abs(pitch) > threshold)
     {
         this._camera.pitch -= pitch;

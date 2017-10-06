@@ -225,12 +225,36 @@ FORGE.Camera = function(viewer)
     this._initialized = false;
 
     /**
+     * Log the camera changes between two updates.
+     * @name FORGE.Camera#_changelog
+     * @type {?CameraChangelog}
+     * @private
+     */
+    this._changelog = null;
+
+    /**
      * On camera change event dispatcher.
-     * @name FORGE.Camera#_onCameraChange
+     * @name FORGE.Camera#_onChange
      * @type {FORGE.EventDispatcher}
      * @private
      */
-    this._onCameraChange = null;
+    this._onChange = null;
+
+    /**
+     * On camera orientation change event dispatcher.
+     * @name FORGE.Camera#_onOrientationChange
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onOrientationChange = null;
+
+    /**
+     * On camera fov change event dispatcher.
+     * @name FORGE.Camera#_onFovChange
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onFovChange = null;
 
     FORGE.BaseObject.call(this, "Camera");
 
@@ -309,6 +333,8 @@ FORGE.Camera.DEFAULT_CONFIG =
  */
 FORGE.Camera.prototype._boot = function()
 {
+    this._resetChangelog();
+
     this._modelView = new THREE.Matrix4();
     this._modelViewInverse = new THREE.Matrix4();
     this._quaternion = new THREE.Quaternion();
@@ -414,6 +440,22 @@ FORGE.Camera.prototype._parseConfig = function(config)
     this._updateFlatCamera();
 
     this._gaze.load(/** @type {CameraGazeConfig} */ (config.gaze));
+};
+
+/**
+ * Reset the camera changelog.
+ * @method FORGE.Camera#_resetChangelog
+ * @private
+ */
+FORGE.Camera.prototype._resetChangelog = function()
+{
+    this._changelog =
+    {
+        yaw: false,
+        pitch: false,
+        roll: false,
+        fov: false
+    };
 };
 
 /**
@@ -740,9 +782,32 @@ FORGE.Camera.prototype._updateFlatCamera = function()
  */
 FORGE.Camera.prototype._updateComplete = function()
 {
-    if (this._onCameraChange !== null)
+    var changed = false;
+
+    if(this._changelog.yaw === true || this._changelog.pitch === true || this._changelog.roll === true)
     {
-        this._onCameraChange.dispatch(null, true);
+        changed = true;
+
+        if (this._onOrientationChange !== null)
+        {
+            this._onOrientationChange.dispatch(null, true);
+        }
+    }
+
+    if(this._changelog.fov === true)
+    {
+        changed = true;
+
+        if (this._onFovChange !== null)
+        {
+            this._onFovChange.dispatch(null, true);
+        }
+    }
+
+
+    if (changed === true && this._onChange !== null)
+    {
+        this._onChange.dispatch(null, true);
     }
 };
 
@@ -793,6 +858,8 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
     var yaw = FORGE.Math.clamp(value, boundaries.min, boundaries.max);
 
     var changed = this._yaw !== yaw;
+
+    this._changelog.yaw = changed;
 
     this._yaw = yaw;
 
@@ -868,6 +935,8 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
 
     var changed = this._pitch !== pitch;
 
+    this._changelog.pitch = changed;
+
     this._pitch = pitch;
 
     return changed;
@@ -933,6 +1002,8 @@ FORGE.Camera.prototype._setRoll = function(value, unit)
 
     var changed = this._roll !== roll;
 
+    this._changelog.roll = changed;
+
     this._roll = roll;
 
     return changed;
@@ -985,6 +1056,8 @@ FORGE.Camera.prototype._setFov = function(value, unit)
     var fov = FORGE.Math.clamp(value, boundaries.min, boundaries.max);
 
     var changed = this._fov !== fov;
+
+    this._changelog.fov = changed;
 
     this._fov = fov;
 
@@ -1125,8 +1198,12 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
 {
     if (typeof durationMS !== "number" || durationMS === 0)
     {
-        this._setAll(yaw, pitch, roll, fov, FORGE.Math.DEGREES);
-        this._updateFromEuler();
+        var changed =  this._setAll(yaw, pitch, roll, fov, FORGE.Math.DEGREES);
+
+        if (changed === true)
+        {
+            this._updateFromEuler();
+        }
     }
     else
     {
@@ -1175,6 +1252,8 @@ FORGE.Camera.prototype.update = function()
 
     this._updateMainCamera();
     this._updateFlatCamera();
+
+    this._resetChangelog();
 };
 
 /**
@@ -1195,10 +1274,22 @@ FORGE.Camera.prototype.destroy = function()
     this._viewer.renderer.view.onChange.remove(this._updateInternals, this);
     this._viewer.renderer.onBackgroundReady.remove(this._updateInternals, this);
 
-    if (this._onCameraChange !== null)
+    if (this._onChange !== null)
     {
-        this._onCameraChange.destroy();
-        this._onCameraChange = null;
+        this._onChange.destroy();
+        this._onChange = null;
+    }
+
+    if (this._onOrientationChange !== null)
+    {
+        this._onOrientationChange.destroy();
+        this._onOrientationChange = null;
+    }
+
+    if (this._onFovChange !== null)
+    {
+        this._onFovChange.destroy();
+        this._onFovChange = null;
     }
 
     if (this._cameraAnimation !== null)
@@ -1684,21 +1775,61 @@ Object.defineProperty(FORGE.Camera.prototype, "gaze",
 });
 
 /**
- * Get the "onCameraChange" {@link FORGE.EventDispatcher} of the camera.
- * @name FORGE.Camera#onCameraChange
+ * Get the "onChange" {@link FORGE.EventDispatcher} of the camera.
+ * @name FORGE.Camera#onChange
  * @readonly
  * @type {FORGE.EventDispatcher}
  */
-Object.defineProperty(FORGE.Camera.prototype, "onCameraChange",
+Object.defineProperty(FORGE.Camera.prototype, "onChange",
 {
     /** @this {FORGE.Camera} */
     get: function()
     {
-        if (this._onCameraChange === null)
+        if (this._onChange === null)
         {
-            this._onCameraChange = new FORGE.EventDispatcher(this);
+            this._onChange = new FORGE.EventDispatcher(this);
         }
 
-        return this._onCameraChange;
+        return this._onChange;
+    }
+});
+
+/**
+ * Get the "onOrientationChange" {@link FORGE.EventDispatcher} of the camera.
+ * @name FORGE.Camera#onOrientationChange
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "onOrientationChange",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        if (this._onOrientationChange === null)
+        {
+            this._onOrientationChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onOrientationChange;
+    }
+});
+
+/**
+ * Get the "onFovChange" {@link FORGE.EventDispatcher} of the camera.
+ * @name FORGE.Camera#onFovChange
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Camera.prototype, "onFovChange",
+{
+    /** @this {FORGE.Camera} */
+    get: function()
+    {
+        if (this._onFovChange === null)
+        {
+            this._onFovChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onFovChange;
     }
 });
