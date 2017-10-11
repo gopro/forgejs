@@ -1215,11 +1215,17 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
 
             fov = FORGE.Math.clamp(fov, FORGE.Math.radToDeg(fovBoundaries.min), FORGE.Math.radToDeg(fovBoundaries.max));
 
-            var yawBoundaries = this._getYawBoundaries(true, FORGE.Math.degToRad(fov));
-            var pitchBoundaries = this._getPitchBoundaries(true, FORGE.Math.degToRad(fov));
+            if (yaw !== null && typeof yaw !== "undefined")
+            {
+                var yawBoundaries = this._getYawBoundaries(true, FORGE.Math.degToRad(fov));
+                yaw = FORGE.Math.clamp(yaw, FORGE.Math.radToDeg(yawBoundaries.min), FORGE.Math.radToDeg(yawBoundaries.max));
+            }
 
-            yaw = FORGE.Math.clamp(yaw, FORGE.Math.radToDeg(yawBoundaries.min), FORGE.Math.radToDeg(yawBoundaries.max));
-            pitch = FORGE.Math.clamp(pitch, FORGE.Math.radToDeg(pitchBoundaries.min), FORGE.Math.radToDeg(pitchBoundaries.max));
+            if (pitch !== null && typeof pitch !== "undefined")
+            {
+                var pitchBoundaries = this._getPitchBoundaries(true, FORGE.Math.degToRad(fov));
+                pitch = FORGE.Math.clamp(pitch, FORGE.Math.radToDeg(pitchBoundaries.min), FORGE.Math.radToDeg(pitchBoundaries.max));
+            }
         }
 
         // before creating a track, set the goto point in future boundaries
