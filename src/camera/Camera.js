@@ -869,18 +869,21 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
 /**
  * Compute the yaw boundaries with yaw min and yaw max.
  * @method FORGE.Camera#_getYawBoundaries
- * @param {boolean=} fov - do we need to get the yaw relative to the current fov (default true)
+ * @param {boolean=} relative - do we need to get the yaw relative to the current fov (default true)
+ * @param {number=} fov - specify a fov if we do not want to use the current one (useful for simulation)
  * @return {CameraBoundaries} Returns the min and max yaw computed from the camera configuration and the view limits.
  * @private
  */
-FORGE.Camera.prototype._getYawBoundaries = function(fov)
+FORGE.Camera.prototype._getYawBoundaries = function(relative, fov)
 {
     var min = this._yawMin;
     var max = this._yawMax;
 
-    if (fov !== false && min !== max)
+    fov = fov || this._fov;
+
+    if (relative !== false && min !== max)
     {
-        var halfHFov = 0.5 * this._fov * this._viewer.renderer.displayResolution.ratio;
+        var halfHFov = 0.5 * fov * this._viewer.renderer.displayResolution.ratio;
         min += halfHFov;
         max -= halfHFov;
     }
@@ -945,18 +948,21 @@ FORGE.Camera.prototype._setPitch = function(value, unit)
 /**
  * Compute the pitch boundaries with pitch min and pitch max.
  * @method FORGE.Camera#_getPitchBoundaries
- * @param {boolean=} fov - do we need to get the pitch relative to the current fov (default true)
+ * @param {boolean=} relative - do we need to get the pitch relative to the current fov (default true)
+ * @param {number=} fov - specify a fov if we do not want to use the current one (useful for simulation)
  * @return {CameraBoundaries} Returns the min and max pitch computed from the camera configuration and the view limits.
  * @private
  */
-FORGE.Camera.prototype._getPitchBoundaries = function(fov)
+FORGE.Camera.prototype._getPitchBoundaries = function(relative, fov)
 {
     var min = this._pitchMin;
     var max = this._pitchMax;
 
-    if (fov !== false && min !== max)
+    fov = fov || this._fov;
+
+    if (relative !== false && min !== max)
     {
-        var halfFov = 0.5 * this._fov;
+        var halfFov = 0.5 * fov;
         min += halfFov;
         max -= halfFov;
     }
@@ -1087,13 +1093,9 @@ FORGE.Camera.prototype._getFovBoundaries = function()
     // on max level of resolution available and stored in JSON
     if (this._viewer.renderer.backgroundRenderer !== null && "fovMin" in this._viewer.renderer.backgroundRenderer)
     {
-        min = Math.max(this._viewer.renderer.backgroundRenderer.fovMin, this._fovMin);
+        min = Math.max(this._viewer.renderer.backgroundRenderer.fovMin, min);
     }
-    else if (this._fovMin !== 0)
-    {
-        min = this._fovMin;
-    }
-    else
+    else if (min === 0)
     {
         if (view !== null)
         {
@@ -1102,7 +1104,7 @@ FORGE.Camera.prototype._getFovBoundaries = function()
         }
     }
 
-    if (view.type !== FORGE.ViewType.FLAT)
+    if (view !== null && view.type !== FORGE.ViewType.FLAT)
     {
         // if there are limits, we may need to limit the maximum fov
         var pitchBoundaries = this._getPitchBoundaries(false);
@@ -1207,6 +1209,20 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
     }
     else
     {
+        if (fov !== null && typeof fov !== "undefined")
+        {
+            var fovBoundaries = this._getFovBoundaries();
+
+            fov = FORGE.Math.clamp(fov, FORGE.Math.radToDeg(fovBoundaries.min), FORGE.Math.radToDeg(fovBoundaries.max));
+
+            var yawBoundaries = this._getYawBoundaries(true, FORGE.Math.degToRad(fov));
+            var pitchBoundaries = this._getPitchBoundaries(true, FORGE.Math.degToRad(fov));
+
+            yaw = FORGE.Math.clamp(yaw, FORGE.Math.radToDeg(yawBoundaries.min), FORGE.Math.radToDeg(yawBoundaries.max));
+            pitch = FORGE.Math.clamp(pitch, FORGE.Math.radToDeg(pitchBoundaries.min), FORGE.Math.radToDeg(pitchBoundaries.max));
+        }
+
+        // before creating a track, set the goto point in future boundaries
         var track = new FORGE.DirectorTrack(
         {
             easing:
