@@ -165,12 +165,20 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._playbackRate = 1;
 
     /**
-     * FOADecoder is a ready-made FOA decoder and binaural renderer.
-     * @name  FORGE.VideoHTML5#_decoder
-     * @type {?FOADecoder}
+     * FOARenderer is a ready-made FOA decoder and binaural renderer.
+     * @name  FORGE.VideoHTML5#_foaRenderer
+     * @type {?FOARenderer}
      * @private
      */
-    this._decoder = null;
+    this._foaRenderer = null;
+
+    /**
+     * Media Element Audio souce node element.
+     * @name  FORGE.Sound#_soundElementSource
+     * @type {?MediaElementAudioSourceNode}
+     * @private
+     */
+    this._soundElementSource = null;
 
     /**
      * Is it an ambisonical video soundtrack?
@@ -486,20 +494,20 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._onEventBind = null;
 
     /**
-     * Event handler for FOA decoder initialized binded to this.
-     * @name FORGE.VideoHTML5#_decoderInitializedSuccessBind
+     * Event handler for FOA renderer initialized binded to this.
+     * @name FORGE.VideoHTML5#_foaRendererInitializedSuccessBind
      * @type {Function}
      * @private
      */
-    this._decoderInitializedSuccessBind = null;
+    this._foaRendererInitializedSuccessBind = null;
 
     /**
-     * Event handler for FOA decoder initailization error binded to this.
-     * @name FORGE.VideoHTML5#_decoderInitializedErrorBind
+     * Event handler for FOA renderer initialization error binded to this.
+     * @name FORGE.VideoHTML5#_foaRendererInitializedErrorBind
      * @type {Function}
      * @private
      */
-    this._decoderInitializedErrorBind = null;
+    this._foaRendererInitializedErrorBind = null;
 
     FORGE.VideoBase.call(this, viewer, "VideoHTML5");
 };
@@ -968,7 +976,7 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
 
     //Create a video tag and get the quality
     var requestedVideo = this._createVideoAt(this._requestIndex);
-    requestedVideo.requestCount++;
+    this._getRequestedVideo().requestCount++;
 
     //Get the requested quality
     var quality = this._qualities[this._requestIndex];
@@ -977,30 +985,33 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
     if (this._currentIndex > -1)
     {
         //Add listener to begins transition between qualities
-        requestedVideo.element.addEventListener("loadstart", this._onRequestLoadStartBind, false);
-        requestedVideo.element.addEventListener("error", this._onRequestErrorBind, false);
+        this._getRequestedVideo().element.addEventListener("loadstart", this._onRequestLoadStartBind, false);
+        this._getRequestedVideo().element.addEventListener("error", this._onRequestErrorBind, false);
     }
 
     //Create source tags according to quality
-    this._createSourceTags(requestedVideo, quality);
-
-    this._decoderInitializedSuccessBind = this._decoderInitializedSuccess.bind(this);
+    this._createSourceTags(this._getRequestedVideo(), quality);
 
     if (this._isAmbisonic() === true)
     {
         //get the global audio context
         this._context = this._viewer.audio.context;
 
+        // create source element
+        this._soundElementSource = this._context.createMediaElementSource(this._getRequestedVideo().element);
+
         //FOA decoder and binaural renderer
-        this._decoder = Omnitone.createFOADecoder(this._context, requestedVideo.element, {
+        this._foaRenderer = Omnitone.createFOARenderer(this._context, {
             channelMap: this._defaultChannelMap
-            //HRTFSetUrl: 'YOUR_HRTF_SET_URL', //Base URL for the cube HRTF sets.
-            //postGainDB: 0, //Post-decoding gain compensation in dB.
         });
 
-        //Initialize the decoder
-        this._decoderInitializedErrorBind = this._decoderInitializedError.bind(this);
-        this._decoder.initialize().then(this._decoderInitializedSuccessBind, this._decoderInitializedErrorBind);
+        this._foaRendererInitializedSuccessBind = this._foaRendererInitializedSuccess.bind(this);
+        this._foaRendererInitializedErrorBind = this._foaRendererInitializedError.bind(this);
+
+        //Initialize the renderer
+        this._foaRenderer.initialize().then(this._foaRendererInitializedSuccessBind, this._foaRendererInitializedErrorBind);
+
+        this._decoderInitializedSuccess();
     }
     else
     {
@@ -1041,13 +1052,28 @@ FORGE.VideoHTML5.prototype._decoderInitializedSuccess = function()
 };
 
 /**
- * The FOA decoder can't be initialized.
- * @method FORGE.VideoHTML5#_decoderInitializedError
+ * The FOA Renderer is initialized.
+ * @method FORGE.VideoHTML5#_foaRendererInitializedSuccess
  * @private
  */
-FORGE.VideoHTML5.prototype._decoderInitializedError = function()
+FORGE.VideoHTML5.prototype._foaRendererInitializedSuccess = function()
 {
-    this.log("FOA decoder could not be initialized");
+    this.log("FOA Renderer is initialized");
+    if (this._foaRenderer !== null)
+    {
+        this._soundElementSource.connect(this._foaRenderer.input);
+        this._foaRenderer.output.connect(this._context.destination);
+    }
+};
+
+/**
+ * The FOA Renderer can't be initialized.
+ * @method FORGE.VideoHTML5#_foaRendererInitializedError
+ * @private
+ */
+FORGE.VideoHTML5.prototype._foaRendererInitializedError = function()
+{
+    this.log("FOA Renderer could not be initialized");
 };
 
 /**
@@ -1908,11 +1934,11 @@ FORGE.VideoHTML5.prototype._isAmbisonic = function()
  */
 FORGE.VideoHTML5.prototype.update = function()
 {
-    if(this._decoder !== null && this._playing === true)
+    if(this._foaRenderer !== null && this._playing === true)
     {
         //Rotate the binaural renderer based on a Three.js camera object.
         var m4 = this._viewer.renderer.camera.modelViewInverse;
-        this._decoder.setRotationMatrixFromCamera(m4);
+        this._foaRenderer.setRotationMatrixFromCamera(m4);
     }
 };
 
@@ -2079,6 +2105,16 @@ FORGE.VideoHTML5.prototype.unmute = function(volume)
 FORGE.VideoHTML5.prototype.destroy = function()
 {
     this._clearRequestedVideo();
+
+    if (this._isAmbisonic() === true)
+    {
+        this._soundElementSource.disconnect();
+        this._foaRenderer.output.disconnect();
+        this._foaRendererInitializedSuccessBind = null;
+        this._foaRendererInitializedErrorBind = null;
+        this._foaRenderer = null;
+        this._soundElementSource = null;
+    }
 
     this._requestTimer.destroy();
     this._requestTimer = null;
@@ -2255,9 +2291,6 @@ FORGE.VideoHTML5.prototype.destroy = function()
     }
 
     //Nullify event listeners binded to this!
-    this._decoderInitializedSuccessBind = null;
-    this._decoderInitializedErrorBind = null;
-
     this._onRequestErrorBind = null;
     this._onRequestLoadStartBind = null;
     this._onRequestLoadedMetaDataBind = null;
