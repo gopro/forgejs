@@ -248,6 +248,14 @@ FORGE.Sound = function(viewer, key, url, ambisonic)
     this._foaRenderer = null;
 
     /**
+     * Media Element Audio souce node element.
+     * @name  FORGE.Sound#_soundElementSource
+     * @type {?MediaElementAudioSourceNode}
+     * @private
+     */
+    this._soundElementSource = null;
+
+    /**
      * Is it an ambisonical sound?
      * @name  FORGE.Sound#_ambisonic
      * @type {boolean}
@@ -552,7 +560,7 @@ FORGE.Sound.prototype._decode = function(file)
                     channelMap: this._defaultChannelMap
                 });
 
-                // Initialize the decoder
+                // Initialize the renderer
                 this._foaRenderer.initialize().then(this._decodeCompleteBind, this._decodeErrorBind);
             }
             else
@@ -618,7 +626,7 @@ FORGE.Sound.prototype._decodeComplete = function(buffer)
         this._soundFile.data = buffer;
     }
 
-    if (this._foaRenderer)
+    if (this._foaRenderer !== null)
     {
         this._soundElementSource.connect(this._foaRenderer.input);
         this._foaRenderer.output.connect(this._context.destination);
@@ -1189,6 +1197,14 @@ FORGE.Sound.prototype.destroy = function()
     if (this._viewer.audio.useAudioTag === true || this._isAmbisonic() === true)
     {
         this._viewer.audio.onVolumeChange.remove(this._mainVolumeChangeHandler, this);
+    }
+
+    if (this._isAmbisonic() === true)
+    {
+        this._soundElementSource.disconnect();
+        this._foaRenderer.output.disconnect();
+        this._foaRenderer = null;
+        this._soundElementSource = null;
     }
 
     this._viewer.audio.onDisable.remove(this._disableSoundHandler, this);
