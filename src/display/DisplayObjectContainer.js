@@ -260,44 +260,41 @@ FORGE.DisplayObjectContainer.prototype.update = function()
 /**
  * Add a child to this display object container.
  * @method  FORGE.DisplayObjectContainer#addChild
- * @param {FORGE.DisplayObject} child - The {@link FORGE.DisplayObject} you want to add to this display object container.
+ * @param {FORGE.DisplayObject|Element} child - The {@link FORGE.DisplayObject} you want to add to this display object container.
  */
 FORGE.DisplayObjectContainer.prototype.addChild = function(child)
 {
-    if(child === this)
+    if (child === this)
     {
         throw "You can't add a FORGE.DisplayObjectContainer to itself!";
     }
 
-    /** @type {FORGE.DisplayObject} */
     var c = child;
 
     // If a DOM Element is added, convert it to a display object.
-    if(child instanceof Element)
+    if (child instanceof Element)
     {
-        c = new FORGE.DisplayObject(child);
+        c = new FORGE.DisplayObject(this._viewer, child);
     }
 
-    //Add dom element to the container dom
+    // Add dom element to the container dom
     this._dom.appendChild(c.dom);
 
-    //Affect the parent value (it triigers the added to parent event so it is important to be in DOM before!)
+    // Affect the parent value (it triigers the added to parent event so it is important to be in DOM before!)
     c.parent = this;
 
-    //Set the index
-    var index = this._children.push(c) - 1;
-    if(c.index === null)
+    // Set the index
+    var index = this._children.push(/** @type {FORGE.DisplayObject} */ (c)) - 1;
+    if (c.index === null)
     {
         c.index = index;
     }
-
-    //this._fitToContent(this._children);
 };
 
 /**
  * Add a child to this display object container at a specific index.
  * @method  FORGE.DisplayObjectContainer#addChildAt
- * @param {FORGE.DisplayObject} child - The {@link FORGE.DisplayObject} you want to add to this display object container.
+ * @param {FORGE.DisplayObject|Element} child - The {@link FORGE.DisplayObject} you want to add to this display object container.
  * @param {number} index - The index you want to apply to your child.
  */
 FORGE.DisplayObjectContainer.prototype.addChildAt = function(child, index)
@@ -305,24 +302,22 @@ FORGE.DisplayObjectContainer.prototype.addChildAt = function(child, index)
     var c = child;
 
     // If a DOM Element is added, convert it to a display object.
-    if(child instanceof Element)
+    if (child instanceof Element)
     {
-        c = new FORGE.DisplayObject(child);
+        c = new FORGE.DisplayObject(this._viewer, child);
     }
 
-    //Add dom element to the container dom
+    // Add dom element to the container dom
     this._dom.appendChild(c.dom);
 
-    //Affect the parent value (it triggers the added to parent event so it is important to be in DOM before!)
+    // Affect the parent value (it triggers the added to parent event so it is important to be in DOM before!)
     c.parent = this;
 
-    //Set the index
-    this._children.splice(index, 0, c);
+    // Set the index
+    this._children.splice(index, 0, /** @type {FORGE.DisplayObject} */ (c));
     c.index = index;
 
     this._applyChildrenIndexes();
-
-    //this._fitToContent(this._children);
 };
 
 /**
