@@ -124,12 +124,12 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
     this._opacity = 0;
 
     /**
-     * Texture load pending flag
-     * @name FORGE.Tile#_texturePending
+     * Texture set flag
+     * @name FORGE.Tile#_textureIsSet
      * @type {boolean}
      * @private
      */
-    this._texturePending = false;
+    this._textureIsSet = false;
 
     /**
      * Event dispatcher for destroy.
@@ -291,7 +291,7 @@ FORGE.Tile.prototype._onBeforeRender = function()
     // Add to renderer render list
     this._renderer.addToRenderList(this);
 
-    if (this._texturePending === true)
+    if (this._textureIsSet === true)
     {
         this._setOpacity(1);
     }
@@ -334,7 +334,7 @@ FORGE.Tile.prototype._onAfterRender = function()
 FORGE.Tile.prototype._queryTexture = function()
 {
     // Update texture mapping
-    if (this.material !== null && this.material.map === null && this._texturePending === false)
+    if (this.material !== null && this.material.map === null && this._textureIsSet === false)
     {
         // Check if predelay since creation has been respected (except for preview)
         if ((this._level !== FORGE.Tile.PREVIEW || this._level !== this._renderer.level) &&
@@ -357,7 +357,7 @@ FORGE.Tile.prototype._queryTexture = function()
 
                 if (texture !== null && texture instanceof THREE.Texture)
                 {
-                    this._texturePending = true;
+                    this._textureIsSet = true;
 
                     texture.generateMipmaps = false;
                     texture.minFilter = THREE.LinearFilter;
@@ -1012,15 +1012,15 @@ Object.defineProperty(FORGE.Tile.prototype, "neighbours",
 });
 
 /**
- * Is the texture still pending
- * @name FORGE.Tile#texturePending
+ * Is the texture set
+ * @name FORGE.Tile#textureIsSet
  * @type {boolean}
  */
-Object.defineProperty(FORGE.Tile.prototype, "texturePending",
+Object.defineProperty(FORGE.Tile.prototype, "textureIsSet",
 {
     /** @this {FORGE.Tile} */
     get: function()
     {
-        return this._texturePending;
+        return this._textureIsSet;
     }
 });
