@@ -214,6 +214,11 @@ FORGE.Tile.FACE_NEXT = {
 FORGE.Tile.createName = function(face, level, x, y)
 {
     face = typeof face === "number" ? FORGE.Tile.FACES[face] : face.toLowerCase();
+    if (level === FORGE.Tile.PREVIEW) {
+        return face.substring(0, 1).toUpperCase() + "-preview";
+
+    }
+
     return face.substring(0, 1).toUpperCase() + "-" + level + "-" + y + "-" + x;
 };
 
@@ -250,7 +255,7 @@ FORGE.Tile.prototype._boot = function()
         this._checkParent();
     }
 
-    this.renderOrder = this._level === FORGE.Tile.PREVIEW ? 0 : this._level + 1;
+    this.renderOrder = this._level === FORGE.Tile.PREVIEW ? 0 : 2 * (this._level + 1);
     this.onBeforeRender = this._onBeforeRender.bind(this);
     this.onAfterRender = this._onAfterRender.bind(this);
 
@@ -387,7 +392,6 @@ FORGE.Tile.prototype._addDebugLayer = function()
     var canvas = document.createElement("canvas");
     canvas.width = canvas.height = 512;
     var ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#FF0000";
 
     var x = canvas.width / 2;
     var y = canvas.height / 2 - 25;
@@ -412,7 +416,12 @@ FORGE.Tile.prototype._addDebugLayer = function()
 
     ctx.textAlign = "left";
     ctx.font = "10px Courier";
-    ctx.fillText("Level " + this._level, 10, canvas.height - 10);
+    if (this._level === FORGE.Tile.PREVIEW) {
+        ctx.fillText("Preview", 10, canvas.height - 10);
+    }
+    else {
+        ctx.fillText("Level " + this._level, 10, canvas.height - 10);
+    }
 
     ctx.textAlign = "right";
     ctx.fillText(this._renderer.pixelsAtCurrentLevelHumanReadable, canvas.width - 10, canvas.height - 10);
@@ -429,6 +438,8 @@ FORGE.Tile.prototype._addDebugLayer = function()
     var mesh = new THREE.Mesh(this.geometry.clone(), material);
     mesh.name = this.name + "-debug-canvas";
     this.add(mesh);
+
+    mesh.renderOrder = this.renderOrder + 1;
 };
 
 /**
