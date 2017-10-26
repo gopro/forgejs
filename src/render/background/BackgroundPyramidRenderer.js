@@ -388,7 +388,7 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
         // Tile has been displayed a too long time ago
         var timeSinceDisplay = now - tile.displayTS;
         var tileNotDisplayedRecentlyEnough = tile.displayTS !== null
-            && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS
+            && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS;
 
         // Tile is out of delay and could be cleared
         // This flag will force clearing tiles with lower levels not displayed for a while
@@ -400,13 +400,7 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
         // OR
         // Clear tiles from lower levels (except preview or zero) AND out of delay
         // AND with a texture set AND out of the neighbour list
-        if (tileLevelHigher
-            || (    tileLevelClearable
-                &&  tileOutOfDelay
-                &&  tileHasATexture
-                && !isANeighbourTile
-                )
-            )
+        if (tileLevelHigher || (tileLevelClearable && tileOutOfDelay && tileHasATexture && !isANeighbourTile))
         {
             clearList.push(tile);
         }

@@ -214,9 +214,9 @@ FORGE.Tile.FACE_NEXT = {
 FORGE.Tile.createName = function(face, level, x, y)
 {
     face = typeof face === "number" ? FORGE.Tile.FACES[face] : face.toLowerCase();
-    if (level === FORGE.Tile.PREVIEW) {
+    if (level === FORGE.Tile.PREVIEW)
+    {
         return face.substring(0, 1).toUpperCase() + "-preview";
-
     }
 
     return face.substring(0, 1).toUpperCase() + "-" + level + "-" + y + "-" + x;
@@ -319,7 +319,8 @@ FORGE.Tile.prototype._onAfterRender = function()
     // Update last display timestamp
     this.refreshDisplayTS();
 
-    if (this._level !== FORGE.Tile.PREVIEW) {
+    if (this._level !== FORGE.Tile.PREVIEW)
+    {
         // Check if tile should be divided
         if (this._renderer.level > this._level)
         {
@@ -328,10 +329,12 @@ FORGE.Tile.prototype._onAfterRender = function()
             // Restoration process for required tiles previously removed from the scene
             // Check if children are intersecting the frustum and add them back to the
             // scene (with refreshed display timer)
-            for (var i=0, ii=this._children.length; i<ii; i++) {
+            for (var i=0, ii=this._children.length; i<ii; i++)
+            {
                 var child = this._children[i];
 
-                if (!this._renderer.isObjectInScene(child) && this._renderer.isObjectInFrustum(child)) {
+                if (!this._renderer.isObjectInScene(child) && this._renderer.isObjectInFrustum(child))
+                {
                     this._renderer.scene.add(child);
                     child.refreshDisplayTS();
                 }
@@ -430,10 +433,12 @@ FORGE.Tile.prototype._addDebugLayer = function()
 
     ctx.textAlign = "left";
     ctx.font = "10px Courier";
-    if (this._level === FORGE.Tile.PREVIEW) {
+    if (this._level === FORGE.Tile.PREVIEW)
+    {
         ctx.fillText("Preview", 10, canvas.height - 10);
     }
-    else {
+    else
+    {
         ctx.fillText("Level " + this._level, 10, canvas.height - 10);
     }
 

@@ -364,7 +364,7 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "scene",
  */
 Object.defineProperty(FORGE.BackgroundRenderer.prototype, "frustum",
 {
-    /** @this {FORGE.Frustum} */
+    /** @this {FORGE.BackgroundRenderer} */
     get: function()
     {
         return this._frustum;
