@@ -47,6 +47,13 @@ FORGE.BackgroundRenderer = function(viewer, target, options, type)
     this._camera = null;
 
     /**
+     * @name FORGE.BackgroundRenderer#_frustum
+     * @type {THREE.Frustum}
+     * @private
+     */
+    this._frustum = null;
+
+    /**
      * Media format (cubemap, equi...)
      * @type {string}
      * @private
@@ -93,6 +100,8 @@ FORGE.BackgroundRenderer.prototype._boot = function()
 
         this._renderTarget = new THREE.WebGLRenderTarget(width, height, rtParams);
     }
+
+    this._frustum = new THREE.Frustum();
 };
 
 /**
@@ -184,14 +193,29 @@ FORGE.BackgroundRenderer.prototype.render = function(camera)
 
     this._updateTexture();
 
-    if (camera !== null)
-    {
-        this._viewer.renderer.webGLRenderer.render ( this._scene, camera, this._renderTarget, true );
-    }
-    else
-    {
-        this._viewer.renderer.webGLRenderer.render ( this._scene, this._camera, this._renderTarget, true );
-    }
+    var renderCamera = (camera !== null) ? camera : this._camera;
+    this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( renderCamera.projectionMatrix, renderCamera.matrixWorldInverse ) );
+    this._viewer.renderer.webGLRenderer.render ( this._scene, renderCamera, this._renderTarget, true );
+};
+
+/**
+ * Check if some 3D object is interesecting the rendering frustum.
+ * @method FORGE.BackgroundRenderer#isObjectInFrustum
+ * @param {THREE.Object3D} object - 3D object
+ */
+FORGE.BackgroundRenderer.prototype.isObjectInFrustum = function(object)
+{
+    return this._frustum.intersectsObject(object);
+};
+
+/**
+ * Check if some 3D object is in the scene
+ * @method FORGE.BackgroundRenderer#isObjectInScene
+ * @param {THREE.Object3D} object - 3D object
+ */
+FORGE.BackgroundRenderer.prototype.isObjectInScene = function(object)
+{
+    return this._scene.getObjectByName(object.name) !== undefined;
 };
 
 /**
@@ -233,6 +257,7 @@ FORGE.BackgroundRenderer.prototype.update = function()
 FORGE.BackgroundRenderer.prototype.destroy = function()
 {
     this._camera = null;
+    this._frustum = null;
 
     if (this._renderTarget !== null)
     {
@@ -329,5 +354,19 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "scene",
     get: function()
     {
         return this._scene;
+    }
+});
+
+/**
+ * Get camera frustum.
+ * @name FORGE.BackgroundRenderer#frustum
+ * @type {THREE.Frustum}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "frustum",
+{
+    /** @this {FORGE.Frustum} */
+    get: function()
+    {
+        return this._frustum;
     }
 });

@@ -317,16 +317,30 @@ FORGE.Tile.prototype._onBeforeRender = function()
 FORGE.Tile.prototype._onAfterRender = function()
 {
     // Update last display timestamp
-    this._displayTS = Date.now();
+    this.refreshDisplayTS();
 
-    // Check if tile should be divided
-    if (this._renderer.level > this._level)
-    {
-        this._subdivide();
+    if (this._level !== FORGE.Tile.PREVIEW) {
+        // Check if tile should be divided
+        if (this._renderer.level > this._level)
+        {
+            this._subdivide();
+
+            // Restoration process for required tiles previously removed from the scene
+            // Check if children are intersecting the frustum and add them back to the
+            // scene (with refreshed display timer)
+            for (var i=0, ii=this._children.length; i<ii; i++) {
+                var child = this._children[i];
+
+                if (!this._renderer.isObjectInScene(child) && this._renderer.isObjectInFrustum(child)) {
+                    this._renderer.scene.add(child);
+                    child.refreshDisplayTS();
+                }
+            }
+        }
+
+        // Get all neighbour tiles references
+        this._checkNeighbours();
     }
-
-    // Get all neighbour tiles references
-    this._checkNeighbours();
 
     this._queryTexture();
 };
@@ -551,7 +565,7 @@ FORGE.Tile.prototype._getRotation = function()
  */
 FORGE.Tile.prototype._subdivide = function()
 {
-    if (this._children.length === 4)
+    if (this._children.length > 0)
     {
         return;
     }
@@ -827,6 +841,15 @@ FORGE.Tile.prototype.getParentName = function()
 
     var coords = FORGE.Tile.getParentTileCoordinates(this);
     return FORGE.Tile.createName(this._face, this._level - 1, coords.x, coords.y);
+};
+
+/**
+ * Refresh display timestamp with current date
+ * @method FORGE.Tile#refreshDisplayTS
+ */
+FORGE.Tile.prototype.refreshDisplayTS = function()
+{
+    this._displayTS = Date.now();
 };
 
 /**

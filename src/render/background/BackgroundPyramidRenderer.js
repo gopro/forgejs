@@ -528,16 +528,6 @@ FORGE.BackgroundPyramidRenderer.prototype.tileSize = function(level)
 };
 
 /**
- * Remove tile from the scene
- * @method FORGE.BackgroundPyramidRenderer#removeFromScene
- * @param {FORGE.Tile} tile
- */
-FORGE.BackgroundPyramidRenderer.prototype.removeFromScene = function(tile)
-{
-    this._scene.remove(tile);
-};
-
-/**
  * Select current level for the pyramid
  * @method FORGE.BackgroundPyramidRenderer#selectLevel
  * @param {number} level pyramid level
