@@ -124,12 +124,12 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
     this._opacity = 0;
 
     /**
-     * Texture load pending flag
-     * @name FORGE.Tile#_texturePending
+     * Texture set flag
+     * @name FORGE.Tile#_textureIsSet
      * @type {boolean}
      * @private
      */
-    this._texturePending = false;
+    this._textureIsSet = false;
 
     /**
      * Event dispatcher for destroy.
@@ -214,6 +214,11 @@ FORGE.Tile.FACE_NEXT = {
 FORGE.Tile.createName = function(face, level, x, y)
 {
     face = typeof face === "number" ? FORGE.Tile.FACES[face] : face.toLowerCase();
+    if (level === FORGE.Tile.PREVIEW)
+    {
+        return face.substring(0, 1).toUpperCase() + "-preview";
+    }
+
     return face.substring(0, 1).toUpperCase() + "-" + level + "-" + y + "-" + x;
 };
 
@@ -250,7 +255,7 @@ FORGE.Tile.prototype._boot = function()
         this._checkParent();
     }
 
-    this.renderOrder = this._level === FORGE.Tile.PREVIEW ? 0 : this._level + 1;
+    this.renderOrder = this._level === FORGE.Tile.PREVIEW ? 0 : 2 * (this._level + 1);
     this.onBeforeRender = this._onBeforeRender.bind(this);
     this.onAfterRender = this._onAfterRender.bind(this);
 
@@ -291,7 +296,7 @@ FORGE.Tile.prototype._onBeforeRender = function()
     // Add to renderer render list
     this._renderer.addToRenderList(this);
 
-    if (this._texturePending === true)
+    if (this._textureIsSet === true)
     {
         this._setOpacity(1);
     }
@@ -312,16 +317,33 @@ FORGE.Tile.prototype._onBeforeRender = function()
 FORGE.Tile.prototype._onAfterRender = function()
 {
     // Update last display timestamp
-    this._displayTS = Date.now();
+    this.refreshDisplayTS();
 
-    // Check if tile should be divided
-    if (this._renderer.level > this._level)
+    if (this._level !== FORGE.Tile.PREVIEW)
     {
-        this._subdivide();
-    }
+        // Check if tile should be divided
+        if (this._renderer.level > this._level)
+        {
+            this._subdivide();
 
-    // Get all neighbour tiles references
-    this._checkNeighbours();
+            // Restoration process for required tiles previously removed from the scene
+            // Check if children are intersecting the frustum and add them back to the
+            // scene (with refreshed display timer)
+            for (var i=0, ii=this._children.length; i<ii; i++)
+            {
+                var child = this._children[i];
+
+                if (!this._renderer.isObjectInScene(child) && this._renderer.isObjectInFrustum(child))
+                {
+                    this._renderer.scene.add(child);
+                    child.refreshDisplayTS();
+                }
+            }
+        }
+
+        // Get all neighbour tiles references
+        this._checkNeighbours();
+    }
 
     this._queryTexture();
 };
@@ -334,7 +356,7 @@ FORGE.Tile.prototype._onAfterRender = function()
 FORGE.Tile.prototype._queryTexture = function()
 {
     // Update texture mapping
-    if (this.material !== null && this.material.map === null && this._texturePending === false)
+    if (this.material !== null && this.material.map === null && this._textureIsSet === false)
     {
         // Check if predelay since creation has been respected (except for preview)
         if ((this._level !== FORGE.Tile.PREVIEW || this._level !== this._renderer.level) &&
@@ -357,7 +379,7 @@ FORGE.Tile.prototype._queryTexture = function()
 
                 if (texture !== null && texture instanceof THREE.Texture)
                 {
-                    this._texturePending = true;
+                    this._textureIsSet = true;
 
                     texture.generateMipmaps = false;
                     texture.minFilter = THREE.LinearFilter;
@@ -387,7 +409,6 @@ FORGE.Tile.prototype._addDebugLayer = function()
     var canvas = document.createElement("canvas");
     canvas.width = canvas.height = 512;
     var ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#FF0000";
 
     var x = canvas.width / 2;
     var y = canvas.height / 2 - 25;
@@ -412,7 +433,14 @@ FORGE.Tile.prototype._addDebugLayer = function()
 
     ctx.textAlign = "left";
     ctx.font = "10px Courier";
-    ctx.fillText("Level " + this._level, 10, canvas.height - 10);
+    if (this._level === FORGE.Tile.PREVIEW)
+    {
+        ctx.fillText("Preview", 10, canvas.height - 10);
+    }
+    else
+    {
+        ctx.fillText("Level " + this._level, 10, canvas.height - 10);
+    }
 
     ctx.textAlign = "right";
     ctx.fillText(this._renderer.pixelsAtCurrentLevelHumanReadable, canvas.width - 10, canvas.height - 10);
@@ -429,6 +457,8 @@ FORGE.Tile.prototype._addDebugLayer = function()
     var mesh = new THREE.Mesh(this.geometry.clone(), material);
     mesh.name = this.name + "-debug-canvas";
     this.add(mesh);
+
+    mesh.renderOrder = this.renderOrder + 1;
 };
 
 /**
@@ -540,7 +570,7 @@ FORGE.Tile.prototype._getRotation = function()
  */
 FORGE.Tile.prototype._subdivide = function()
 {
-    if (this._children.length === 4)
+    if (this._children.length > 0)
     {
         return;
     }
@@ -819,6 +849,15 @@ FORGE.Tile.prototype.getParentName = function()
 };
 
 /**
+ * Refresh display timestamp with current date
+ * @method FORGE.Tile#refreshDisplayTS
+ */
+FORGE.Tile.prototype.refreshDisplayTS = function()
+{
+    this._displayTS = Date.now();
+};
+
+/**
  * Destroy sequence
  * @method FORGE.Tile#destroy
  */
@@ -1012,15 +1051,15 @@ Object.defineProperty(FORGE.Tile.prototype, "neighbours",
 });
 
 /**
- * Is the texture still pending
- * @name FORGE.Tile#texturePending
+ * Is the texture set
+ * @name FORGE.Tile#textureIsSet
  * @type {boolean}
  */
-Object.defineProperty(FORGE.Tile.prototype, "texturePending",
+Object.defineProperty(FORGE.Tile.prototype, "textureIsSet",
 {
     /** @this {FORGE.Tile} */
     get: function()
     {
-        return this._texturePending;
+        return this._textureIsSet;
     }
 });
