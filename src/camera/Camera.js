@@ -1200,7 +1200,7 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
 {
     if (typeof durationMS !== "number" || durationMS === 0)
     {
-        var changed =  this._setAll(yaw, pitch, roll, fov, FORGE.Math.DEGREES);
+        var changed = this._setAll(yaw, pitch, roll, fov, FORGE.Math.DEGREES);
 
         if (changed === true)
         {
