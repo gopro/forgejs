@@ -1,5 +1,5 @@
 /**
- * Hotspot sound handles the parse of the sound config and the loading of the needed sound ressource.
+ * Hotspot sound handles the parse of the sound config and the loading of the needed sound resource.
  * It also ajusts the volume of the sound depending of your camera position.
  *
  * @constructor FORGE.HotspotSound
