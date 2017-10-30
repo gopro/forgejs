@@ -6,9 +6,9 @@
 ForgeJS is a modern web-based engine built on standard technologies (HTML5, Javascript and WebGL) that runs on every modern browser to unleash immersive VR content experiences.
 It's not only a VR engine, it's a framework for authoring VR content. You can use ForgeJS even if you do not have advanced programming skills: ForgeJS is able to read a configuration file and create the experience from it.
 
-## Ressources
+## Resources
 
-Many documentation ressources are available online:
+Many documentation resources are available online:
 - [API Documentation ](https://releases.forgejs.org/latest/doc/jsdoc) describes all public methods, interfaces, properties and events.
 - [JSON reference](https://releases.forgejs.org/latest/doc/json) explains how to describe your project in the json configuration file.
 - [Samples](https://forgejs.org/samples) demonstrates how to build your experience in the config.json file.

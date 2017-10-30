@@ -282,7 +282,7 @@ FORGE.Button.prototype._applySkin = function(name)
  */
 FORGE.Button.prototype._applyState = function(state)
 {
-    //The button is not loaded the time to apply its skin and load its ressources
+    //The button is not loaded the time to apply its skin and load its resources
     this._loaded = false;
 
     //Set the current state (out, over, down)

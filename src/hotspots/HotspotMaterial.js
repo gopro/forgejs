@@ -1,6 +1,6 @@
 /**
- * Hotspot material handles the parse of the material config and the loading of the needed ressource.<br>
- * In the end it provides a THREE.MeshBasicMaterial when the ressources are loaded.
+ * Hotspot material handles the parse of the material config and the loading of the needed resource.<br>
+ * In the end it provides a THREE.MeshBasicMaterial when the resources are loaded.
  *
  * @constructor FORGE.HotspotMaterial
  * @param {FORGE.Viewer} viewer - The viewer reference.
