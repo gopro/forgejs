@@ -436,6 +436,24 @@ FORGE.Hotspot3D.prototype.dump = function()
 };
 
 /**
+ * Show the hotspot.
+ * @method FORGE.Hotspot3D#show
+ */
+FORGE.Hotspot3D.prototype.show = function()
+{
+    this.visible = true;
+};
+
+/**
+ * Hide the hotspot.
+ * @method FORGE.Hotspot3D#hide
+ */
+FORGE.Hotspot3D.prototype.hide = function()
+{
+    this.visible = false;
+};
+
+/**
  * Destroy routine
  * @method FORGE.Hotspot3D#destroy
  */

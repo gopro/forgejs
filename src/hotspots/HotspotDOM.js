@@ -82,21 +82,28 @@ FORGE.HotspotDOM = function(viewer, config)
     this._interactive = true;
 
     /**
-     * Does the hotspot is facing the camera ? Useful for a flat hotspot we want
-     * to always be facing to the camera.
-     * @name FORGE.HotspotDOM#_facingCenter
-     * @type {boolean}
-     * @private
-     */
-    this._facingCenter = false;
-
-    /**
      * The pointer cursor when pointer is over the hotspot zone
      * @name FORGE.HotspotDOM#_cursor
      * @type {string}
      * @private
      */
     this._cursor = "pointer";
+
+    /**
+     * Is in prevented state?
+     * @name FORGE.HotspotDOM#_prevented
+     * @type {boolean}
+     * @private
+     */
+    this._prevented = false;
+
+    /**
+     * Prevented object configuration.
+     * @name FORGE.HotspotDOM#_preventedConfig
+     * @type {Object}
+     * @private
+     */
+    this._preventedConfig = { visible: undefined };
 
     /**
      * Event handler for a click on the hotspot.
@@ -286,12 +293,10 @@ FORGE.HotspotDOM.prototype._parseConfig = function(config)
         this._transform.load(config.transform, false);
     }
 
-    this._visible = (typeof config.visible === "boolean") ? config.visible : true;
-    // this._facingCenter = (typeof config.facingCenter === "boolean") ? config.facingCenter : false;
     this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
     this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
 
-    this.show();
+    this.visible = (typeof config.visible === "boolean") ? config.visible : true;
 };
 
 /**
@@ -378,11 +383,28 @@ FORGE.HotspotDOM.prototype._clearEvents = function()
  */
 FORGE.HotspotDOM.prototype._viewChangeHandler = function()
 {
-    this._dom.style.display = "block";
-
-    if ((this._viewer.view.type !== FORGE.ViewType.RECTILINEAR && this._viewer.view.type !== FORGE.ViewType.GOPRO) || this._visible === false)
+    if (this._viewer.view.type !== FORGE.ViewType.RECTILINEAR && this._viewer.view.type !== FORGE.ViewType.GOPRO)
     {
-        this._dom.style.display = "none";
+        this._prevented = true;
+        this._preventedConfig.visible = this._visible;
+
+        this.hide();
+    }
+    else
+    {
+        if (this._prevented === true)
+        {
+            this._prevented = false;
+
+            if(this._preventedConfig.visible === true)
+            {
+                this.show();
+            }
+            else
+            {
+                this.hide();
+            }
+        }
     }
 };
 
@@ -392,12 +414,14 @@ FORGE.HotspotDOM.prototype._viewChangeHandler = function()
  */
 FORGE.HotspotDOM.prototype.show = function()
 {
-    //force the display if a "display:none" property was set into css
-    if (this._visible == true)
+    this._visible = true;
+
+    this._dom.style.display = "block";
+
+    if (this._viewer.domHotspotContainer.dom.contains(this._dom) === false)
     {
-        this._viewChangeHandler();
+        this._viewer.domHotspotContainer.dom.appendChild(this._dom);
     }
-    this._viewer.domHotspotContainer.dom.appendChild(this._dom);
 };
 
 /**
@@ -406,7 +430,14 @@ FORGE.HotspotDOM.prototype.show = function()
  */
 FORGE.HotspotDOM.prototype.hide = function()
 {
-    this._viewer.domHotspotContainer.dom.removeChild(this._dom, false);
+    this._visible = false;
+
+    this._dom.style.display = "none";
+
+    if (this._viewer.domHotspotContainer.dom.contains(this._dom) === true)
+    {
+        this._viewer.domHotspotContainer.dom.removeChild(this._dom, false);
+    }
 };
 
 /**
@@ -438,6 +469,8 @@ FORGE.HotspotDOM.prototype.update = function()
  */
 FORGE.HotspotDOM.prototype.destroy = function()
 {
+    this._viewer.renderer.view.onChange.remove(this._viewChangeHandler, this);
+
     this._dom.removeEventListener("click", this._domClickHandlerBind);
     this._dom.removeEventListener("mouseover", this._domOverHandlerBind);
     this._dom.removeEventListener("mouseout", this._domOutHandlerBind);
@@ -490,15 +523,13 @@ Object.defineProperty(FORGE.HotspotDOM.prototype, "visible",
     /** @this {FORGE.HotspotDOM} */
     set: function(value)
     {
-        this._visible = Boolean(value);
-
-        if (this._visible === true)
+        if (Boolean(value) === true)
         {
-            this._viewChangeHandler();
+            this.show();
         }
         else
         {
-            this._dom.style.display = "none";
+            this.hide();
         }
     }
 });
