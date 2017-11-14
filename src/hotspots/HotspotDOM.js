@@ -392,6 +392,11 @@ FORGE.HotspotDOM.prototype._viewChangeHandler = function()
  */
 FORGE.HotspotDOM.prototype.show = function()
 {
+    //force the display if a "display:none" property was set into css
+    if (this._visible == true)
+    {
+        this._viewChangeHandler();
+    }
     this._viewer.domHotspotContainer.dom.appendChild(this._dom);
 };
 
