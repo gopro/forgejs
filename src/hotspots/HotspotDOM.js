@@ -388,31 +388,23 @@ FORGE.HotspotDOM.prototype._viewChangeHandler = function()
         this._prevented = true;
         this._preventedConfig.visible = this._visible;
 
-        this.hide();
+        this._hide();
     }
     else
     {
         if (this._prevented === true)
         {
             this._prevented = false;
-
-            if(this._preventedConfig.visible === true)
-            {
-                this.show();
-            }
-            else
-            {
-                this.hide();
-            }
+            this.visible = this._preventedConfig.visible;
         }
     }
 };
 
 /**
  * Show the hotspot by appending it to the DOM container.
- * @method FORGE.HotspotDOM#show
+ * @method FORGE.HotspotDOM#_show
  */
-FORGE.HotspotDOM.prototype.show = function()
+FORGE.HotspotDOM.prototype._show = function()
 {
     this._visible = true;
 
@@ -426,9 +418,9 @@ FORGE.HotspotDOM.prototype.show = function()
 
 /**
  * Hide the hotspot by removing it to the DOM container.
- * @method FORGE.HotspotDOM#hide
+ * @method FORGE.HotspotDOM#_hide
  */
-FORGE.HotspotDOM.prototype.hide = function()
+FORGE.HotspotDOM.prototype._hide = function()
 {
     this._visible = false;
 
@@ -438,6 +430,35 @@ FORGE.HotspotDOM.prototype.hide = function()
     {
         this._viewer.domHotspotContainer.dom.removeChild(this._dom, false);
     }
+};
+
+/**
+ * Show the hotspot.
+ * @method FORGE.HotspotDOM#show
+ */
+FORGE.HotspotDOM.prototype.show = function()
+{
+    if (this._prevented === true)
+    {
+        this._preventedConfig.visible = true;
+        return;
+    }
+
+    this._show();
+};
+
+/**
+ * Hide the hotspot.
+ * @method FORGE.HotspotDOM#hide
+ */
+FORGE.HotspotDOM.prototype.hide = function()
+{
+    if (this._prevented === true)
+    {
+        this._preventedConfig.visible = false;
+    }
+
+    this._hide();
 };
 
 /**
