@@ -1022,7 +1022,7 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
         {
             //HOA decoder and binaural renderer (for 2nd and 3rd order)
             this._ambisonicsRenderer = Omnitone.createHOARenderer(this._context, {
-                ambisonicOrder: this._defaultAmbisonicOrder, // can be 2 or 3_
+                ambisonicOrder: (this._ambisonicOrder > 1 ? this._ambisonicOrder : this._defaultAmbisonicOrder), // can be 2 or 3_
                 hrirPathList: null,
                 renderingMode: 'ambisonic'
             });
