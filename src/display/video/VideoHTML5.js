@@ -9,15 +9,14 @@
  * @param {string} key - The video file id reference.
  * @param {?(string|FORGE.VideoQuality|Array<(string|FORGE.VideoQuality)>)=} config - Either a {@link FORGE.VideoQuality} or a String URL, or an array of strings or {@link FORGE.VideoQuality} if multiquality.
  * @param {?string=} qualityMode - The default quality mode.
- * @param {?boolean=} ambisonic - Is the video sound ambisonic?
+ * @param {?number=} ambisonicOrder - Is it a video with ambisonic order sound?
  * @extends {FORGE.VideoBase}
  *
- * @todo  Define a config object for videos, maybe a class like VideoConfig to describe this porperly.
+ * @todo  Define a config object for videos, maybe a class like VideoConfig to describe this properly.
  * @todo  Make it work with several sources if the user wants to pass a mp4 + webm + ogg for example.
- * @todo  Deal with playback speeds.
  * @todo  Add subtitles management with <track> and VTT/TTML(EBU-TT-D) files
  */
-FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
+FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonicOrder)
 {
     /**
      * The video identifier.
@@ -62,7 +61,7 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     /**
      * Array of videos objects thaht handle the dom and some stats about each videos.
      * @name FORGE.VideoHTML5#_videos
-     * @type {Array<VideoHTML5Object>}
+     * @type {?Array<VideoHTML5Object>}
      * @private
      */
     this._videos = null;
@@ -165,12 +164,12 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._playbackRate = 1;
 
     /**
-     * FOARenderer is a ready-made FOA decoder and binaural renderer.
-     * @name  FORGE.VideoHTML5#_foaRenderer
-     * @type {?FOARenderer}
+     * FOARenderer or HOARenderer are ready-made FOA/HOA decoder and binaural renderer.
+     * @name  FORGE.VideoHTML5#_ambisonicsRenderer
+     * @type {?(FOARenderer|HOARenderer)}
      * @private
      */
-    this._foaRenderer = null;
+    this._ambisonicsRenderer = null;
 
     /**
      * Media Element Audio souce node element.
@@ -181,21 +180,28 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._soundElementSource = null;
 
     /**
-     * Is it an ambisonical video soundtrack?
-     * @name  FORGE.VideoHTML5#_ambisonic
-     * @type {boolean}
+     * Is it a video with ambisonic order soundtrack?
+     * @name  FORGE.VideoHTML5#_ambisonicOrder
+     * @type {number}
      * @private
      */
-    this._ambisonic = ambisonic || false;
+    this._ambisonicOrder = ambisonicOrder || 0;
 
     /**
-     * Default channel map for ambisonic sound.
+     * Default channel map for FOA renderer.
      * @name  FORGE.VideoHTML5#_defaultChannelMap
      * @type {Array<number>}
      * @private
      */
     this._defaultChannelMap = [0, 1, 2, 3]; //AMBIX
-    //this._defaultChannelMap = [0, 3, 1, 2]; //FUMA
+
+    /**
+     * Default ambisonics order for HOA renderer.
+     * @name  FORGE.VideoHTML5#_defaultAmbisonicOrder
+     * @type {number}
+     * @private
+     */
+    this._defaultAmbisonicOrder = 3;
 
     /**
      * Does the video have received its metaData?
@@ -494,20 +500,20 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonic)
     this._onEventBind = null;
 
     /**
-     * Event handler for FOA renderer initialized binded to this.
-     * @name FORGE.VideoHTML5#_foaRendererInitializedSuccessBind
+     * Event handler for ambisonics renderer initialized binded to this.
+     * @name FORGE.VideoHTML5#_ambisonicsRendererInitializedSuccessBind
      * @type {Function}
      * @private
      */
-    this._foaRendererInitializedSuccessBind = null;
+    this._ambisonicsRendererInitializedSuccessBind = null;
 
     /**
-     * Event handler for FOA renderer initialization error binded to this.
-     * @name FORGE.VideoHTML5#_foaRendererInitializedErrorBind
+     * Event handler for ambisonics renderer initialization error binded to this.
+     * @name FORGE.VideoHTML5#_ambisonicsRendererInitializedErrorBind
      * @type {Function}
      * @private
      */
-    this._foaRendererInitializedErrorBind = null;
+    this._ambisonicsRendererInitializedErrorBind = null;
 
     FORGE.VideoBase.call(this, viewer, "VideoHTML5");
 };
@@ -524,10 +530,10 @@ FORGE.VideoHTML5.prototype._boot = function()
 {
     FORGE.VideoBase.prototype._boot.call(this);
 
-    if (this._ambisonic === true && this._isAmbisonic() === false)
+    if (this._ambisonicOrder > 0 && this._isAmbisonic() === false)
     {
         this.log("FORGE.VideoHTML5: can't manage ambisonic sound without Google Chrome Omnitone library and WebAudio API.");
-        this._ambisonic = false;
+        this._ambisonicOrder = 0;
     }
 
     //register the uid
@@ -839,25 +845,28 @@ FORGE.VideoHTML5.prototype._createVideoAt = function(index)
  * Create the source tag into the video tag.
  * @method FORGE.VideoHTML5#_createSourceTags
  * @private
- * @param {VideoHTML5Object} video - Video object to add the quality to.
+ * @param {?VideoHTML5Object} video - Video object to add the quality to.
  * @param {FORGE.VideoQuality} quality - The quality video source to attach to the video element.
- * @return {VideoHTML5Object} The video object that contains the HTML5 Video Element in which the source is append to.
+ * @return {?VideoHTML5Object} The video object that contains the HTML5 Video Element in which the source is append to.
  */
 FORGE.VideoHTML5.prototype._createSourceTags = function(video, quality)
 {
-    if (FORGE.Device.edge === true)
+    if (video !== null)
     {
-        // EDGE is not able to restore the currentTime with source tag
-        video.element.src = quality.url;
-    }
-    else
-    {
-        var source = document.createElement("source");
-        source.addEventListener("error", this._onRequestErrorBind, false);
-        source.src = quality.url;
-        source.type = quality.mimeType;
+        if (FORGE.Device.edge === true)
+        {
+            // EDGE is not able to restore the currentTime with source tag
+            video.element.src = quality.url;
+        }
+        else
+        {
+            var source = document.createElement("source");
+            source.addEventListener("error", this._onRequestErrorBind, false);
+            source.src = quality.url;
+            source.type = quality.mimeType;
 
-        video.element.appendChild(source);
+            video.element.appendChild(source);
+        }
     }
 
     return video;
@@ -1000,16 +1009,30 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
         // create source element
         this._soundElementSource = this._context.createMediaElementSource(this._getRequestedVideo().element);
 
-        //FOA decoder and binaural renderer
-        this._foaRenderer = Omnitone.createFOARenderer(this._context, {
-            channelMap: this._defaultChannelMap
-        });
+        if (this._isFOAAmbisonic() === true)
+        {
+            //FOA decoder and binaural renderer (for 1st order)
+            this._ambisonicsRenderer = Omnitone.createFOARenderer(this._context, {
+                channelMap: this._defaultChannelMap, // [0, 1, 2, 3]; for AMBIX & [0, 3, 1, 2] for FUMA
+                hrirPathList: null,
+                renderingMode: 'ambisonic'
+            });
+        }
+        else
+        {
+            //HOA decoder and binaural renderer (for 2nd and 3rd order)
+            this._ambisonicsRenderer = Omnitone.createHOARenderer(this._context, {
+                ambisonicOrder: this._defaultAmbisonicOrder, // can be 2 or 3_
+                hrirPathList: null,
+                renderingMode: 'ambisonic'
+            });
+        }
 
-        this._foaRendererInitializedSuccessBind = this._foaRendererInitializedSuccess.bind(this);
-        this._foaRendererInitializedErrorBind = this._foaRendererInitializedError.bind(this);
+        this._ambisonicsRendererInitializedSuccessBind = this._ambisonicsRendererInitializedSuccess.bind(this);
+        this._ambisonicsRendererInitializedErrorBind = this._ambisonicsRendererInitializedError.bind(this);
 
-        //Initialize the renderer
-        this._foaRenderer.initialize().then(this._foaRendererInitializedSuccessBind, this._foaRendererInitializedErrorBind);
+        //Initialize the ambisonic renderer
+        this._ambisonicsRenderer.initialize().then(this._ambisonicsRendererInitializedSuccessBind, this._ambisonicsRendererInitializedErrorBind);
 
         this._decoderInitializedSuccess();
     }
@@ -1034,7 +1057,7 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
 };
 
 /**
- * The FOA decoder has been initialized.
+ * The decoder has been initialized.
  * @method FORGE.VideoHTML5#_decoderInitializedSuccess
  * @private
  */
@@ -1043,37 +1066,39 @@ FORGE.VideoHTML5.prototype._decoderInitializedSuccess = function()
     if (this._requestIndex === -1)
     {
         //get the current video if requested index is set
-        this._getCurrentVideo().element.load();
+        // this._getCurrentVideo().element.load();
+        this._getCurrentVideo().element.play();
     }
     else
     {
-        this._getRequestedVideo().element.load();
+        // this._getRequestedVideo().element.load();
+        this._getRequestedVideo().element.play();
     }
 };
 
 /**
- * The FOA Renderer is initialized.
- * @method FORGE.VideoHTML5#_foaRendererInitializedSuccess
+ * The Ambisonics renderer is initialized.
+ * @method FORGE.VideoHTML5#_ambisonicsRendererInitializedSuccess
  * @private
  */
-FORGE.VideoHTML5.prototype._foaRendererInitializedSuccess = function()
+FORGE.VideoHTML5.prototype._ambisonicsRendererInitializedSuccess = function()
 {
-    this.log("FOA Renderer is initialized");
-    if (this._foaRenderer !== null)
+    this.log("Ambisonics renderer is initialized");
+    if (this._ambisonicsRenderer !== null)
     {
-        this._soundElementSource.connect(this._foaRenderer.input);
-        this._foaRenderer.output.connect(this._context.destination);
+        this._soundElementSource.connect(this._ambisonicsRenderer.input);
+        this._ambisonicsRenderer.output.connect(this._context.destination);
     }
 };
 
 /**
- * The FOA Renderer can't be initialized.
- * @method FORGE.VideoHTML5#_foaRendererInitializedError
+ * The Ambisonics renderer can't be initialized.
+ * @method FORGE.VideoHTML5#_ambisonicsRendererInitializedError
  * @private
  */
-FORGE.VideoHTML5.prototype._foaRendererInitializedError = function()
+FORGE.VideoHTML5.prototype._ambisonicsRendererInitializedError = function()
 {
-    this.log("FOA Renderer could not be initialized");
+    this.log("Ambisonics renderer could not be initialized");
 };
 
 /**
@@ -1925,7 +1950,18 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
  */
 FORGE.VideoHTML5.prototype._isAmbisonic = function()
 {
-    return (this._ambisonic === true && this._viewer.audio.useWebAudio === true && typeof Omnitone !== "undefined");
+    return (this._ambisonicOrder > 0 && this._viewer.audio.useWebAudio === true && typeof Omnitone !== "undefined");
+};
+
+/**
+ * Does the video sound must be considered as FOA ambisonic?
+ * @method FORGE.VideoHTML5#_isFOAAmbisonic
+ * @return {boolean} Is a FOA ambisonic?
+ * @private
+ */
+FORGE.VideoHTML5.prototype._isFOAAmbisonic = function()
+{
+    return (this._ambisonicOrder === 1 && this._viewer.audio.useWebAudio === true && typeof Omnitone !== "undefined");
 };
 
 /**
@@ -1934,11 +1970,11 @@ FORGE.VideoHTML5.prototype._isAmbisonic = function()
  */
 FORGE.VideoHTML5.prototype.update = function()
 {
-    if(this._foaRenderer !== null && this._playing === true)
+    if(this._ambisonicsRenderer !== null && this._playing === true)
     {
         //Rotate the binaural renderer based on a Three.js camera object.
-        var m4 = this._viewer.renderer.camera.modelViewInverse;
-        this._foaRenderer.setRotationMatrixFromCamera(m4);
+        var m4 = this._viewer.renderer.camera.modelView;
+        this._ambisonicsRenderer.setRotationMatrix4(m4.elements);
     }
 };
 
@@ -2109,10 +2145,10 @@ FORGE.VideoHTML5.prototype.destroy = function()
     if (this._isAmbisonic() === true)
     {
         this._soundElementSource.disconnect();
-        this._foaRenderer.output.disconnect();
-        this._foaRendererInitializedSuccessBind = null;
-        this._foaRendererInitializedErrorBind = null;
-        this._foaRenderer = null;
+        this._ambisonicsRenderer.output.disconnect();
+        this._ambisonicsRendererInitializedSuccessBind = null;
+        this._ambisonicsRendererInitializedErrorBind = null;
+        this._ambisonicsRenderer = null;
         this._soundElementSource = null;
     }
 
@@ -2432,7 +2468,7 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "currentIndex",
  * Get the video object array.
  * @name  FORGE.VideoHTML5#videos
  * @readonly
- * @type {Array<Object>}
+ * @type {?Array<VideoHTML5Object>}
  */
 Object.defineProperty(FORGE.VideoHTML5.prototype, "videos",
 {
@@ -2767,7 +2803,7 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "ambisonic",
     /** @this {FORGE.VideoHTML5} */
     get: function ()
     {
-        return this._ambisonic;
+        return (this._ambisonicOrder > 0);
     }
 });
 
