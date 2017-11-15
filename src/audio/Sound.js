@@ -5,14 +5,14 @@
  * @param {FORGE.Viewer} viewer - The {@link FORGE.Viewer} reference.
  * @param {string} key - The sound file id reference.
  * @param {string} url - The sound file url.
- * @param {boolean=} ambisonic - Is the sound ambisonic and need binaural rendering?
+ * @param {number=} ambisonicOrder - Is it an ambisonic order sound?
  * @extends {FORGE.BaseObject}
  *
  * @todo  Ability to force audio type into config
  * @todo  Make a test plugin that creates sound, add sound to the PluginObjectFactory
  * @todo  Loop during x steps (parameter) only if loop is true
  */
-FORGE.Sound = function(viewer, key, url, ambisonic)
+FORGE.Sound = function(viewer, key, url, ambisonicOrder)
 {
     /**
      * The viewer reference.
@@ -240,12 +240,12 @@ FORGE.Sound = function(viewer, key, url, ambisonic)
     this._z = 0;
 
     /**
-     * FOARenderer is a ready-made FOA decoder and binaural renderer.
-     * @name  FORGE.Sound#_foaRenderer
-     * @type {?FOARenderer}
+     * Ambisonic renderer is a ready-made FOA or HOA decoder and binaural renderer.
+     * @name  FORGE.Sound#_ambisonicsRenderer
+     * @type {?(FOARenderer|HOARenderer)}
      * @private
      */
-    this._foaRenderer = null;
+    this._ambisonicsRenderer = null;
 
     /**
      * Media Element Audio souce node element.
@@ -256,21 +256,28 @@ FORGE.Sound = function(viewer, key, url, ambisonic)
     this._soundElementSource = null;
 
     /**
-     * Is it an ambisonical sound?
-     * @name  FORGE.Sound#_ambisonic
-     * @type {boolean}
+     * Is it a an ambisonic order soundtrack?
+     * @name  FORGE.Sound#_ambisonicOrder
+     * @type {number}
      * @private
      */
-    this._ambisonic = ambisonic || false;
+    this._ambisonicOrder = ambisonicOrder || 0;
 
     /**
-     * Default channel map for ambisonic sound.
+     * Default channel map for FOA ambisonic sound.
      * @name  FORGE.Sound#_defaultChannelMap
      * @type {Array<number>}
      * @private
      */
     this._defaultChannelMap = [0, 1, 2, 3]; //AMBIX
-    // this._defaultChannelMap = [0, 3, 1, 2]; //FUMA
+
+    /**
+     * Default ambisonics order for HOA renderer.
+     * @name  FORGE.VideoHTML5#_defaultAmbisonicOrder
+     * @type {number}
+     * @private
+     */
+    this._defaultAmbisonicOrder = 3;
 
     /**
      * To save the pending state to be applied after the sound object will be ready.
@@ -432,10 +439,10 @@ FORGE.Sound.prototype.constructor = FORGE.Sound;
  */
 FORGE.Sound.prototype._boot = function()
 {
-    if (this._ambisonic === true && this._isAmbisonic() === false)
+    if (this._isAmbisonic() === false)
     {
         this.log("FORGE.Sound: can't manage ambisonic sound without Google Chrome Omnitone library and WebAudio API.");
-        this._ambisonic = false;
+        this._ambisonicOrder = 0;
     }
 
     //register the uid
@@ -554,14 +561,27 @@ FORGE.Sound.prototype._decode = function(file)
                 // Source
                 this._soundElementSource = this._context.createMediaElementSource(file.data);
 
-                // FOA decoder and binaural renderer
-                this._foaRenderer = Omnitone.createFOARenderer(this._context,
+                if (this._ambisonicOrder > 1)
                 {
-                    channelMap: this._defaultChannelMap
-                });
+                    //FOA decoder and binaural renderer (for 1st order)
+                    this._ambisonicsRenderer = Omnitone.createFOARenderer(this._context, {
+                        channelMap: this._defaultChannelMap, // [0, 1, 2, 3]; for AMBIX & [0, 3, 1, 2] for FUMA
+                        hrirPathList: null,
+                        renderingMode: 'ambisonic'
+                    });
+                }
+                else
+                {
+                    //HOA decoder and binaural renderer (for 2nd and 3rd order)
+                    this._ambisonicsRenderer = Omnitone.createHOARenderer(this._context, {
+                        ambisonicOrder: (this._ambisonicOrder > 1 ? this._ambisonicOrder : this._defaultAmbisonicOrder), // can be 2 or 3
+                        hrirPathList: null,
+                        renderingMode: 'ambisonic'
+                    });
+                }
 
-                // Initialize the renderer
-                this._foaRenderer.initialize().then(this._decodeCompleteBind, this._decodeErrorBind);
+                // Initialize the ambisonics renderer
+                this._ambisonicsRenderer.initialize().then(this._decodeCompleteBind, this._decodeErrorBind);
             }
             else
             {
@@ -615,7 +635,7 @@ FORGE.Sound.prototype._dispatchDecodedEvents = function()
  */
 FORGE.Sound.prototype._decodeComplete = function(buffer)
 {
-    if (this._soundFile === null)
+    if (this._ambisonicsRenderer === null)
     {
         this.log("FORGE.Sound._decodeComplete error, sound file is null");
         return;
@@ -626,10 +646,10 @@ FORGE.Sound.prototype._decodeComplete = function(buffer)
         this._soundFile.data = buffer;
     }
 
-    if (this._foaRenderer !== null)
+    if (this._ambisonicsRenderer !== null)
     {
-        this._soundElementSource.connect(this._foaRenderer.input);
-        this._foaRenderer.output.connect(this._context.destination);
+        this._soundElementSource.connect(this._ambisonicsRenderer.input);
+        this._ambisonicsRenderer.output.connect(this._context.destination);
     }
 
     this._decoded = true;
@@ -762,7 +782,7 @@ FORGE.Sound.prototype._applyPanner = function(connect)
  */
 FORGE.Sound.prototype._isAmbisonic = function()
 {
-    return (this._ambisonic === true && this._viewer.audio.useWebAudio === true && typeof Omnitone !== "undefined");
+    return (this._ambisonicOrder > 0 && this._viewer.audio.useWebAudio === true && typeof Omnitone !== "undefined");
 };
 
 /**
@@ -801,11 +821,11 @@ FORGE.Sound.prototype.update = function()
         }
     }
 
-    if (this._foaRenderer !== null && this._playing === true)
+    if (this._ambisonicsRenderer !== null && this._playing === true)
     {
         // Rotate the binaural renderer based on a Three.js camera object.
         var m4 = this._viewer.renderer.camera.modelView;
-        this._foaRenderer.setRotationMatrix4(m4.elements);
+        this._ambisonicsRenderer.setRotationMatrix4(m4.elements);
     }
 };
 
@@ -1202,8 +1222,8 @@ FORGE.Sound.prototype.destroy = function()
     if (this._isAmbisonic() === true)
     {
         this._soundElementSource.disconnect();
-        this._foaRenderer.output.disconnect();
-        this._foaRenderer = null;
+        this._ambisonicsRenderer.output.disconnect();
+        this._ambisonicsRenderer = null;
         this._soundElementSource = null;
     }
 
@@ -1397,7 +1417,7 @@ Object.defineProperty(FORGE.Sound.prototype, "ambisonic",
     /** @this {FORGE.Sound} */
     get: function()
     {
-        return this._ambisonic;
+        return this._isAmbisonic();
     }
 });
 
