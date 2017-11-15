@@ -468,19 +468,24 @@ FORGE.Scene.prototype.hasSoundTarget = function(uid)
 };
 
 /**
- * Know if an ambisonic sound is attached to the scene?
+ * Know if an ambisonic order sound is attached to the scene?
  * @method FORGE.Scene#isAmbisonic
- * @return {boolean} Returns true if the scene has an ambisonic sound source, false if not.
+ * @return {number} Returns the ambisonic order number if the scene has an ambisonic sound source, 0 if not.
  */
 FORGE.Scene.prototype.isAmbisonic = function()
 {
     //@todo real check of the UID target object rather then the isAmbisonic method of the FORGE.Scene
     if (this.hasSoundSource() === true && this._config.sound.type === FORGE.SoundType.AMBISONIC)
     {
-        return true;
+        if (typeof this._config.sound.order !== "undefined" && this._config.sound.type !== null && this._config.sound.type > 1)
+        {
+            return this._config.sound.order;
+        }
+
+        return 1;
     }
 
-    return false;
+    return 0;
 };
 
 /**

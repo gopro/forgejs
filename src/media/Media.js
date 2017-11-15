@@ -252,7 +252,12 @@ FORGE.Media.prototype._parseConfig = function(config)
             var scene = this._viewer.story.scene;
 
             // check of the ambisonic state of the video sound prior to the video instanciation
-            this._displayObject = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
+            var ambisonicOrder = 0;
+            if (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() > 0)
+            {
+                ambisonicOrder = scene.isAmbisonic();
+            }
+            this._displayObject = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, ambisonicOrder);
         }
 
         // At this point, source.url is either a streaming address, a simple
