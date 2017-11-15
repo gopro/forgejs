@@ -46,7 +46,7 @@ FORGE.Image = function(viewer, config, className)
     this._i18n = false;
 
     /**
-     * The i18n key associated to the image ressource in cache.
+     * The i18n key associated to the image resource in cache.
      * @name  FORGE.Image#_i18nImageKey
      * @type {string}
      * @private
@@ -120,7 +120,7 @@ FORGE.Image = function(viewer, config, className)
     this._framesLoaded = false;
 
     /**
-     * Is the current ressource is loaded.
+     * Is the current resource is loaded.
      * @name FORGE.Image#_loaded
      * @type {boolean}
      * @private

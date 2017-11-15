@@ -83,6 +83,14 @@ FORGE.Hotspot3D = function(viewer, config)
     this._facingCenter = false;
 
     /**
+     * Does the hotspot changes its scale according to the fov ?
+     * @name FORGE.Hotspot3D#_autoScale
+     * @type {boolean}
+     * @private
+     */
+    this._autoScale = false;
+
+    /**
      * The pointer cursor when pointer is over the Object3D
      * @name FORGE.Hotspot3D#_cursor
      * @type {string}
@@ -160,6 +168,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
     this._name = (typeof config.name === "string") ? config.name : "";
     this._visible = (typeof config.visible === "boolean") ? config.visible : true;
     this._facingCenter = (typeof config.facingCenter === "boolean") ? config.facingCenter : false;
+    this._autoScale = (typeof config.autoScale === "boolean") ? config.autoScale : false;
     this._interactive = (typeof config.interactive === "boolean") ? config.interactive : true;
     this._cursor = (typeof config.cursor === "string") ? config.cursor : "pointer";
 
@@ -301,9 +310,30 @@ FORGE.Hotspot3D.prototype._updatePosition = function()
     }
 
     // Scale
-    this._mesh.scale.x = FORGE.Math.clamp(this._transform.scale.x, 0.000001, 100000);
-    this._mesh.scale.y = FORGE.Math.clamp(this._transform.scale.y, 0.000001, 100000);
-    this._mesh.scale.z = FORGE.Math.clamp(this._transform.scale.z, 0.000001, 100000);
+    if(this._autoScale === true)
+    {
+        this._updateAutoScale();
+    }
+    else
+    {
+        this._mesh.scale.x = FORGE.Math.clamp(this._transform.scale.x, 0.000001, 100000);
+        this._mesh.scale.y = FORGE.Math.clamp(this._transform.scale.y, 0.000001, 100000);
+        this._mesh.scale.z = FORGE.Math.clamp(this._transform.scale.z, 0.000001, 100000);
+    }
+};
+
+/**
+ * Updates the mesh scale according to the fov to keep a constant screen size
+ * @method FORGE.Hotspot3D#_updateAutoScale
+ * @private
+ */
+FORGE.Hotspot3D.prototype._updateAutoScale = function()
+{
+    var factor = this._viewer.camera.fov / this._viewer.camera.config.fov.default;
+
+    this._mesh.scale.x = FORGE.Math.clamp(this._transform.scale.x * factor, 0.000001, 100000);
+    this._mesh.scale.y = FORGE.Math.clamp(this._transform.scale.y * factor, 0.000001, 100000);
+    this._mesh.scale.z = FORGE.Math.clamp(this._transform.scale.z * factor, 0.000001, 100000);
 };
 
 /**
@@ -373,6 +403,11 @@ FORGE.Hotspot3D.prototype.update = function()
     {
         this._sound.update();
     }
+
+    if(this._autoScale === true)
+    {
+        this._updateAutoScale();
+    }
 };
 
 /**
@@ -398,6 +433,24 @@ FORGE.Hotspot3D.prototype.dump = function()
     };
 
     return dump;
+};
+
+/**
+ * Show the hotspot.
+ * @method FORGE.Hotspot3D#show
+ */
+FORGE.Hotspot3D.prototype.show = function()
+{
+    this.visible = true;
+};
+
+/**
+ * Hide the hotspot.
+ * @method FORGE.Hotspot3D#hide
+ */
+FORGE.Hotspot3D.prototype.hide = function()
+{
+    this.visible = false;
 };
 
 /**

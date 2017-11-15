@@ -102,9 +102,9 @@ FORGE.Raycaster.prototype._startGaze = function()
 {
     this.log("Raycating start gaze");
 
-    if (this._viewer.renderer.camera.onCameraChange.has(this._cameraChangeHandler, this) === false)
+    if (this._viewer.renderer.camera.onChange.has(this._cameraChangeHandler, this) === false)
     {
-        this._viewer.renderer.camera.onCameraChange.add(this._cameraChangeHandler, this);
+        this._viewer.renderer.camera.onChange.add(this._cameraChangeHandler, this);
     }
 };
 
@@ -128,9 +128,9 @@ FORGE.Raycaster.prototype.stop = function()
     }
 
     //Remove gaze handlers
-    if (this._viewer.renderer.camera.onCameraChange.has(this._cameraChangeHandler, this))
+    if (this._viewer.renderer.camera.onChange.has(this._cameraChangeHandler, this))
     {
-        this._viewer.renderer.camera.onCameraChange.remove(this._cameraChangeHandler, this);
+        this._viewer.renderer.camera.onChange.remove(this._cameraChangeHandler, this);
     }
 
     this._out();

@@ -755,26 +755,19 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
     {
         this._backgroundRendererType = FORGE.BackgroundType.MESH;
     }
-    else if (typeof mediaConfig.source === "undefined" ||
-        mediaConfig.source.format === FORGE.MediaFormat.CUBE ||
-        mediaConfig.source.format === FORGE.MediaFormat.FLAT ||
-        typeof mediaConfig.source === "undefined" ||
-        typeof mediaConfig.source.format === "undefined")
+    else if (typeof mediaConfig.source !== "undefined")
     {
-        if (typeof mediaConfig.source.levels !== "undefined")
+        if (typeof mediaConfig.source.levels !== "undefined" && media.type === FORGE.MediaType.IMAGE)
         {
             this._backgroundRendererType = FORGE.BackgroundType.PYRAMID;
         }
+        else if (mediaConfig.source.format === FORGE.MediaFormat.CUBE)
+        {
+            this._backgroundRendererType = FORGE.BackgroundType.MESH;
+        }
         else
         {
-            if (this._viewManager.current.type === FORGE.ViewType.FLAT)
-            {
-                this._backgroundRendererType = FORGE.BackgroundType.SHADER;
-            }
-            else
-            {
-                this._backgroundRendererType = FORGE.BackgroundType.MESH;
-            }
+            this._backgroundRendererType = FORGE.BackgroundType.SHADER;
         }
     }
     else

@@ -1201,6 +1201,11 @@ THREE.Raycaster.prototype.intersectObjects = function(arg1) {};
 THREE.Scene = function() {};
 
 /**
+ * @param {THREE.Object3D} arg1
+ */
+THREE.Scene.prototype.getObjectByName = function(arg1) {};
+
+/**
  * @constructor
  * @param {(Element|HTMLElement)=} arg1
  * @return {!THREE.Texture}

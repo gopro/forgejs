@@ -133,7 +133,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     this._textureStore = this._viewer.story.scene.media.store;
 
     this._camera = this._viewer.renderer.camera.main;
-    this._viewer.camera.onCameraChange.add(this._onCameraChange, this);
+    this._viewer.camera.onChange.add(this._onCameraChange, this);
 
     if (typeof this._config.preview !== "undefined")
     {
@@ -357,16 +357,50 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
 
     this._scene.children.forEach(function(tile)
     {
-        var timeSinceCreate = now - tile.createTS;
-        var timeSinceDisplay = now - tile.displayTS;
+        // Tile with level greater than renderer level -> always removed
+        var tileLevelHigher = tile.level > this._level;
 
-        if (tile.level > this._level ||
-            (tile.level !== this._level &&
-            tile.level > 0 &&
-            tile.texturePending === true &&
-            this._renderNeighborList.indexOf(tile) === -1 &&
-            ((tile.displayTS === null && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS) ||
-            (tile.displayTS !== null && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS))))
+        // Tile with level different than renderer level
+        var tileLevelEqualsCurrent = tile.level === this._level;
+
+        // Tile with level different than renderer level
+        var tileLevelPreview = tile.level === FORGE.Tile.PREVIEW;
+
+        // Tile with level different than renderer level
+        var tileLevelZero = tile.level === 0;
+
+        // Only clear tiles from level different from current and higher than preview and zero
+        var tileLevelClearable = !tileLevelEqualsCurrent && !tileLevelPreview && !tileLevelZero;
+
+        // Tile has a texture set in its material map
+        // Never clear a tile without a texture set to keep parents of the current displayed tile
+        // available (with their texture) when the user quickly zooms out
+        var tileHasATexture = tile.textureIsSet === true;
+
+        // Tile is part of the neighbour list
+        var isANeighbourTile = this._renderNeighborList.indexOf(tile) !== -1;
+
+        // Tile has never been displayed and time to live delay has been exceeded
+        var timeSinceCreate = now - tile.createTS;
+        var tileNeverDisplayedAndTTLExceeded = tile.displayTS === null
+            && timeSinceCreate > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_CREATION_MS;
+
+        // Tile has been displayed a too long time ago
+        var timeSinceDisplay = now - tile.displayTS;
+        var tileNotDisplayedRecentlyEnough = tile.displayTS !== null
+            && timeSinceDisplay > FORGE.BackgroundPyramidRenderer.MAX_ALLOWED_TIME_SINCE_DISPLAY_MS;
+
+        // Tile is out of delay and could be cleared
+        // This flag will force clearing tiles with lower levels not displayed for a while
+        // Tiles at lower level (parents) rendered but hidden by current level tiles should not
+        // be cleared to keep them available immediatly when zooming out 
+        var tileOutOfDelay = tileNeverDisplayedAndTTLExceeded || tileNotDisplayedRecentlyEnough;
+
+        // Always clear all tiles from higher levels (performance and aliasing issues)
+        // OR
+        // Clear tiles from lower levels (except preview or zero) AND out of delay
+        // AND with a texture set AND out of the neighbour list
+        if (tileLevelHigher || (tileLevelClearable && tileOutOfDelay && tileHasATexture && !isANeighbourTile))
         {
             clearList.push(tile);
         }
@@ -488,16 +522,6 @@ FORGE.BackgroundPyramidRenderer.prototype.tileSize = function(level)
 };
 
 /**
- * Remove tile from the scene
- * @method FORGE.BackgroundPyramidRenderer#removeFromScene
- * @param {FORGE.Tile} tile
- */
-FORGE.BackgroundPyramidRenderer.prototype.removeFromScene = function(tile)
-{
-    this._scene.remove(tile);
-};
-
-/**
  * Select current level for the pyramid
  * @method FORGE.BackgroundPyramidRenderer#selectLevel
  * @param {number} level pyramid level
@@ -605,7 +629,7 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
  */
 FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
-    this._viewer.camera.onCameraChange.remove(this._onCameraChange, this);
+    this._viewer.camera.onChange.remove(this._onCameraChange, this);
 
     this._clear();
 
