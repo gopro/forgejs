@@ -357,8 +357,22 @@ FORGE.RenderManager.prototype._initSound = function(sceneConfig)
 
         if (typeof soundConfig.source.url !== "undefined" && soundConfig.source.url !== "")
         {
+            // check of the ambisonic state of the video sound prior to the video instanciation
+            var ambisonicOrder = 0;
+            if (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC)
+            {
+                if (typeof sceneConfig.sound.order !== "undefined" && sceneConfig.sound.order !== null && sceneConfig.sound.order > 1)
+                {
+                    ambisonicOrder = sceneConfig.sound.order; // HOA
+                }
+                else
+                {
+                    ambisonicOrder = 1; // FOA
+                }
+            }
+
             // Warning : UID is not registered and applied to the FORGE.Sound object for registration
-            this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, (sceneConfig.sound.type === FORGE.SoundType.AMBISONIC));
+            this._mediaSound = new FORGE.Sound(this._viewer, sceneConfig.sound.uid, sceneConfig.sound.source.url, ambisonicOrder);
 
             if (typeof soundConfig.options !== "undefined" && soundConfig.options !== null)
             {
