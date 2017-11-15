@@ -477,7 +477,7 @@ FORGE.Scene.prototype.isAmbisonic = function()
     //@todo real check of the UID target object rather then the isAmbisonic method of the FORGE.Scene
     if (this.hasSoundSource() === true && this._config.sound.type === FORGE.SoundType.AMBISONIC)
     {
-        if (typeof this._config.sound.order !== "undefined" && this._config.sound.type !== null && this._config.sound.type > 1)
+        if (typeof this._config.sound.order !== "undefined" && this._config.sound.order !== null && this._config.sound.order > 1)
         {
             return this._config.sound.order;
         }
