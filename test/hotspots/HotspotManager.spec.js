@@ -7,7 +7,7 @@ describe("HotspotManager", function() {
 
     beforeAll(function(done) {
         this.viewer = new FORGE.Viewer("container", {});
-        this.viewer.onReady.add(done, this);
+        this.viewer.onConfigLoadComplete.add(done, this);
     });
 
     afterAll(function() {
