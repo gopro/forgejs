@@ -804,8 +804,8 @@ FORGE.Sound.prototype.update = function()
     if (this._foaRenderer !== null && this._playing === true)
     {
         // Rotate the binaural renderer based on a Three.js camera object.
-        var m4 = this._viewer.renderer.camera.modelViewInverse;
-        this._foaRenderer.setRotationMatrixFromCamera(m4);
+        var m4 = this._viewer.renderer.camera.modelView;
+        this._foaRenderer.setRotationMatrix4(m4.elements);
     }
 };
 
