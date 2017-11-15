@@ -28,7 +28,7 @@ ForgeJS has the following dependencies:
 
 - [three.js](https://threejs.org/) r83 ([MIT license](https://github.com/mrdoob/three.js/blob/dev/LICENSE))
 - [hammer.js](http://hammerjs.github.io/) 2.0.8 ([MIT license](https://github.com/hammerjs/hammer.js/blob/master/LICENSE.md))
-- [omnitone](http://googlechrome.github.io/omnitone/#home) 0.2.2 ([Apache 2.0 license](https://github.com/GoogleChrome/omnitone/blob/master/LICENSE))
+- [omnitone](http://googlechrome.github.io/omnitone/#home) 1.0.6 ([Apache 2.0 license](https://github.com/GoogleChrome/omnitone/blob/master/LICENSE))
 - [dash.js](https://github.com/Dash-Industry-Forum/dash.js) 2.3.0 ([BSD license](https://github.com/Dash-Industry-Forum/dash.js/blob/development/LICENSE.md))
 
 > NOTE: We made a custom build of three.js with some classes concatenated to it. These classes are included in the original three.js repository but not concatenated in the main build. We added EffectComposer, RenderPass, ClearPass, MaskPass, ShaderPass, TexturePass and CopyShader in our three.custom.min.js.
