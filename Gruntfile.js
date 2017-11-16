@@ -168,6 +168,7 @@ module.exports = function(grunt)
         "src/display/video/VideoBase.js",
         "src/display/video/VideoHTML5.js",
         "src/display/video/VideoDash.js",
+        "src/display/video/VideoHls.js",
         "src/display/video/VideoTimeRanges.js",
         "src/display/video/VideoQuality.js",
         "src/display/video/VideoQualityMode.js",
