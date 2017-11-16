@@ -24,6 +24,14 @@ FORGE.Clock = function(viewer)
     this._time = 0;
 
     /**
+     * The last interval between consecutive updates.
+     * @name FORGE.Timer#_deltaTime
+     * @type {number}
+     * @private
+     */
+    this._deltaTime = 0;
+
+    /**
      * Time from raf
      * @name FORGE.Clock#_rafTime
      * @type {number}
@@ -146,8 +154,11 @@ FORGE.Clock.prototype.update = function(time)
 {
     this._rafTime = time;
 
-    //Current TimeStamp
-    this._time = Date.now();
+    var currentTime = Date.now();
+    
+    this._deltaTime = currentTime - this._time;
+
+    this._time = currentTime;
 
     for(var i = 0, ii = this._timers.length; i < ii; i++)
     {
@@ -184,5 +195,35 @@ Object.defineProperty(FORGE.Clock.prototype, "time",
     get: function()
     {
         return this._time;
+    }
+});
+
+/**
+ * Get the interval between started and now.
+ * @name FORGE.Clock#elapsedTime
+ * @readonly
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Clock.prototype, "elapsedTime",
+{
+    /** @this {FORGE.Clock} */
+    get: function()
+    {
+        return Date.now() - this._started;
+    }
+});
+
+/**
+ * Get the last update interval.
+ * @name FORGE.Clock#deltaTime
+ * @readonly
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Clock.prototype, "deltaTime",
+{
+    /** @this {FORGE.Clock} */
+    get: function()
+    {
+        return this._deltaTime;
     }
 });
