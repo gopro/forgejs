@@ -274,7 +274,7 @@ FORGE.RenderManager.prototype._setupMedia = function()
     media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
 
     // If media is a video, listen to the quality change event
-    if (FORGE.Utils.isTypeOf(media.displayObject, ["VideoHTML5", "VideoDash"]))
+    if (FORGE.Utils.isTypeOf(media.displayObject, ["VideoHTML5", "VideoDash", "VideoHls"]))
     {
         media.displayObject.onQualityChange.add(this._mediaQualityChangeHandler, this);
     }

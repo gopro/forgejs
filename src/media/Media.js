@@ -129,7 +129,7 @@ FORGE.Media.prototype._parseConfig = function(config)
         return;
     }
 
-    // Warning : UID is not registered and applied to the FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
+    // Warning : UID is not registered and applied to the FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash|FORGE.VideoHls objects for registration
     this._uid = config.uid;
 
     this._options = (typeof config.options !== "undefined") ? config.options : null;
@@ -246,6 +246,10 @@ FORGE.Media.prototype._parseConfig = function(config)
         if (typeof source.streaming !== "undefined" && source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
         {
             this._displayObject = new FORGE.VideoDash(this._viewer, this._uid);
+        }
+        else if (typeof source.streaming !== "undefined" && source.streaming.toLowerCase() === FORGE.VideoFormat.HLS)
+        {
+            this._displayObject = new FORGE.VideoHls(this._viewer, this._uid);
         }
         else
         {

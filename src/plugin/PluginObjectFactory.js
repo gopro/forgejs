@@ -235,7 +235,7 @@ FORGE.PluginObjectFactory.prototype.button = function(config)
  * @param {string=} streaming - The video streaming format. Can be "HTML5" or "DASH".
  * @param {string=} qualityMode - The video quality mode. Can be "auto" or "manual".
  * @param {boolean=} ambisonic - 3D sound including ambisonics. For "HTML5" video only.
- * @return {(FORGE.VideoHTML5|FORGE.VideoDash)} Returns the created FORGE.Video object.
+ * @return {(FORGE.VideoHTML5|FORGE.VideoDash|FORGE.VideoHls)} Returns the created FORGE.Video object.
  */
 FORGE.PluginObjectFactory.prototype.video = function(key, config, streaming, qualityMode, ambisonic)
 {
@@ -244,6 +244,10 @@ FORGE.PluginObjectFactory.prototype.video = function(key, config, streaming, qua
     if(typeof streaming !== "undefined" && streaming.toLowerCase() === FORGE.VideoFormat.DASH)
     {
         video = new FORGE.VideoDash(this._viewer, key, config, qualityMode);
+    }
+    else if(typeof streaming !== "undefined" && streaming.toLowerCase() === FORGE.VideoFormat.HLS)
+    {
+        video = new FORGE.VideoHls(this._viewer, key, config, qualityMode);
     }
     else
     {
