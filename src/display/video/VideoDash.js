@@ -833,7 +833,7 @@ FORGE.VideoDash.prototype._getCurrentVideoElementProperty = function(property, d
 
 /**
  * Create instance of the dash.js Media Player.
- * @method FORGE.VideoDash#_instanciateDashMediaPlayer
+ * @method FORGE.VideoDash#_initDashMediaPlayer
  * @private
  */
 FORGE.VideoDash.prototype._initDashMediaPlayer = function()
