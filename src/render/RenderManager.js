@@ -605,10 +605,10 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
         if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
         {
             var source = mediaConfig.source;
+            config.mediaFormat = mediaConfig.source.format || FORGE.MediaFormat.CUBE;
 
             if (typeof source.levels === "undefined")
             {
-                config.mediaFormat = mediaConfig.source.format;
                 var ratio = media.displayObject.element.width / media.displayObject.element.height || 1;
 
                 if (typeof source.fov !== "undefined")
