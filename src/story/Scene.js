@@ -102,6 +102,7 @@ FORGE.Scene = function(viewer)
      * @private
      */
     this._media = null;
+    this._transition = null;
 
     /**
      * Load request event dispatcher.
@@ -158,6 +159,7 @@ FORGE.Scene = function(viewer)
      * @private
      */
     this._onMediaCreate = null;
+    this._onTransitionCreate = null;
 
     FORGE.BaseObject.call(this, "Scene");
 };
@@ -287,6 +289,21 @@ FORGE.Scene.prototype._createMedia = function(media)
     }
 };
 
+FORGE.Scene.prototype._createTransition = function(transition)
+{
+    this.log("create transition");
+
+    if(this._transition === null)
+    {
+        this._transition = new FORGE.Media(this._viewer, transition);
+
+        if(this.onTransitionCreate !== null)
+        {
+            this.onTransitionCreate.dispatch({ media: this._transition });
+        }
+    }
+};
+
 /**
  * Add a scene configuration object.
  * @method  FORGE.Scene#addConfig
@@ -339,6 +356,7 @@ FORGE.Scene.prototype.loadStart = function(time)
     }
 
     this._createMedia(this._config.media);
+    this._createTransition(this._config.transition);
 
     if (this._onLoadStart !== null)
     {
@@ -381,6 +399,9 @@ FORGE.Scene.prototype.unload = function()
     {
         this._events.onUnloadStart.dispatch();
     }
+
+    this._transition.destroy();
+    this._transition = null;
 
     this._media.destroy();
     this._media = null;
@@ -504,6 +525,12 @@ FORGE.Scene.prototype.destroy = function()
     {
         this._media.destroy();
         this._media = null;
+    }
+
+    if (this._transition !== null)
+    {
+        this._transition.destroy();
+        this._transition = null;
     }
 
     if (this._onLoadStart !== null)
@@ -733,6 +760,21 @@ Object.defineProperty(FORGE.Scene.prototype, "media",
 });
 
 /**
+ * Get the scene transition.
+ * @name  FORGE.Scene#transition
+ * @readonly
+ * @type {FORGE.Media}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "transition",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._transition;
+    }
+});
+
+/**
  * Get the background of the scene.
  * @name  FORGE.Scene#background
  * @readonly
@@ -884,5 +926,25 @@ Object.defineProperty(FORGE.Scene.prototype, "onMediaCreate",
         }
 
         return this._onMediaCreate;
+    }
+});
+
+/**
+ * Get the onTransitionCreate {@link FORGE.EventDispatcher}.
+ * @name  FORGE.Scene#onTransitionCreate
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "onTransitionCreate",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        if (this._onTransitionCreate === null)
+        {
+            this._onTransitionCreate = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onTransitionCreate;
     }
 });

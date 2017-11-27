@@ -344,6 +344,25 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "displayObject",
 });
 
 /**
+ * Get/Set background renderer transition display object.
+ * @name FORGE.BackgroundRenderer#transitionDisplayObject
+ * @type {string}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "transitionDisplayObject",
+{
+    /** @this {FORGE.BackgroundRenderer} */
+    get: function()
+    {
+        return this._transitionDisplayObject;
+    },
+    /** @this {FORGE.BackgroundRenderer} */
+    set: function(value)
+    {
+        this._setTransitionDisplayObject(value);
+    }
+});
+
+/**
  * Get background scene.
  * @name FORGE.BackgroundRenderer#scene
  * @type {THREE.Scene}

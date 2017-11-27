@@ -5,6 +5,11 @@
 
 #include <defines>
 
+uniform int tTransition;
+uniform float tTime;
+uniform float tMixRatio;
+uniform sampler2D tTransitionTexture;
+
 uniform sampler2D tTexture;
 uniform vec2 tViewportResolution;
 uniform float tViewportResolutionRatio;
@@ -14,22 +19,23 @@ uniform float tProjectionScale;
 #include <helpers>
 #include <coordinates>
 #include <texcoords>
+#include <fibonacci>
+#include <transition>
 
-vec2 projection() {
-    // [-1 .. 1 , -1 .. 1]
-    vec2 frag = tProjectionScale * getFragment();
-
-    // Screen point is on the zn plane, expressed it in clip space
-    vec4 screenPT = vec4(frag, -1.0, 1.0);
+vec3 projection(vec2 screenPT) {
+    // Screen point is on the zn plane, expressed it in clip space [-1 .. 1 , -1 .. 1]
+    vec4 clipPT = vec4(tProjectionScale * screenToNDC(screenPT), -1.0, 1.0);
 
     // World space point
-    vec4 worldPT = tModelViewMatrixInverse * screenPT;
+    vec4 worldPT = tModelViewMatrixInverse * clipPT;
 
     // Spherical point for texture lookup
-    return toSpherical(worldPT.xyz).yz;
+    return worldPT.xyz;
 }
 
 void main() {
-    vec2 texCoords = toEquirectangularTexCoords(projection());
-    gl_FragColor = vec4(texture2D(tTexture, texCoords).rgb, 1.0);
+    vec2 screenPT = getScreenPt();
+    vec3 spherePT = normalize(projection(screenPT));
+    vec2 texCoords = toEquirectangularTexCoords(toSpherical(spherePT).yz);
+    gl_FragColor = getFragColor(spherePT, screenPT, texCoords);
 }

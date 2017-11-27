@@ -6,6 +6,6 @@
  */
 vec2 toEquirectangularTexCoords(in vec2 thetaphi) {
     thetaphi.x = wrap(thetaphi.x + PI, -PI, PI);
-    vec2 coords = 0.5 + thetaphi / vec2(PI2, PI);
+    vec2 coords = 0.5 + thetaphi / vec2(TWO_PI, PI);
     return coords;
 }

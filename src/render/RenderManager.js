@@ -278,6 +278,10 @@ FORGE.RenderManager.prototype._setupMedia = function()
     {
         media.displayObject.onQualityChange.add(this._mediaQualityChangeHandler, this);
     }
+
+    var transition = this._viewer.story.scene.transition;
+
+    transition.onLoadComplete.addOnce(this._transitionLoadCompleteHandler, this);
 };
 
 /**
@@ -421,6 +425,26 @@ FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
     }
 
     this._setupRenderPipeline();
+};
+
+/**
+ * Handler of transition load complete event
+ * @method FORGE.RenderManager#_transitionLoadCompleteHandler
+ * @param {FORGE.Event} event - Event object
+ * @private
+ */
+FORGE.RenderManager.prototype._transitionLoadCompleteHandler = function(event)
+{
+    this.log("Transition load is complete");
+
+    var displayObject = event.emitter.displayObject;
+
+    var backgroundReady = FORGE.Utils.watchObjectProperty(this, "_backgroundRenderer");
+    backgroundReady.then(function(value) {
+        this.log("Load transition");
+        this._backgroundRenderer.transitionDisplayObject = displayObject;
+    }.bind(this));
+
 };
 
 /**

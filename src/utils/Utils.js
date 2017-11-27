@@ -616,3 +616,40 @@ FORGE.Utils.makePromise = function()
     return promise;
 };
 
+/**
+ * Return a promise resolved once some object property is set
+ * @return {Promise} extended promise
+ */
+FORGE.Utils.watchObjectProperty = function(object, property, timeout, interval) {
+    timeout = timeout || 10000;
+    interval = interval || 500;
+    var rejectTime = Date.now() + timeout;
+
+    return new Promise((resolve, reject) => {
+        console.log('Watch property ' + property);
+
+        var checkProp = function(obj, prop) {
+            return typeof object[property] !== "undefined" && object[property] !== null;
+        };
+
+        (function checkPropAsync(obj, prop) {
+            if (checkProp(obj, prop)) {
+                resolve(obj[prop]);
+                return;
+            }
+
+            if (Date.now >= rejectTime) {
+                reject("Timeout reached for getting property " + prop);
+                return;
+            }
+            
+            console.log("Property still not set, try again");
+
+            window.setTimeout(function() {
+                checkPropAsync(obj, prop);
+            }, interval);
+
+        })(object, property);
+    });
+};
+

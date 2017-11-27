@@ -25,6 +25,7 @@ FORGE.BackgroundShaderRenderer = function(viewer, target, options)
      * @private
      */
     this._texture = null;
+    this._transitionTexture = null;
 
     /**
      * Texture canvas used for video rendering
@@ -73,6 +74,32 @@ FORGE.BackgroundShaderRenderer.prototype._boot = function()
 
     // Debug: attach scene to window context to expose it into Three.js Inspector
     // window.scene = this._scene;
+};
+
+/**
+ * Set transition display object.
+ * @method FORGE.BackgroundShaderRenderer#_setTransitionDisplayObject
+ * @private
+ */
+FORGE.BackgroundShaderRenderer.prototype._setTransitionDisplayObject = function(displayObject)
+{
+    var materialReady = FORGE.Utils.watchObjectProperty(this._mesh, "material");
+    materialReady.then(function(value) {
+        this.log("Set Transition texture");
+
+        this._transitionTexture = new THREE.Texture();
+        this._transitionTexture.image = displayObject.element;
+
+        this._transitionTexture.format = THREE.RGBFormat;
+        this._transitionTexture.mapping = THREE.Texture.DEFAULT_MAPPING;
+        this._transitionTexture.minFilter = THREE.LinearFilter;
+        this._transitionTexture.magFilter = THREE.LinearFilter;
+        this._transitionTexture.wrapS = THREE.ClampToEdgeWrapping;
+        this._transitionTexture.wrapT = THREE.ClampToEdgeWrapping;
+        this._transitionTexture.needsUpdate = true;
+
+        this._mesh.material.uniforms.tTransitionTexture.value = this._transitionTexture;
+    }.bind(this));
 };
 
 /**
@@ -186,6 +213,12 @@ FORGE.BackgroundShaderRenderer.prototype._updateInternals = function()
         material.uniforms.tTexture.value = this._texture;
     }
 
+    if (this._transitionTexture !== null)
+    {
+        material.uniforms.tTransitionTexture.value = this._transitionTexture;
+        this._transitionTexture.needsUpdate = true;
+    }
+
     if (this._scene.children.length === 0)
     {
         var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
@@ -199,6 +232,8 @@ FORGE.BackgroundShaderRenderer.prototype._updateInternals = function()
     }
 
     this._mesh.material = material;
+    this._mesh.material.uniforms.tTransition.value = 5;
+
     material.needsUpdate = true;
 };
 
@@ -226,6 +261,13 @@ FORGE.BackgroundShaderRenderer.prototype.render = function(camera)
     }
 
     camera = null; //@closure
+
+    var periodMS = 15 * 1000;
+
+    var tn = (this._viewer.clock.elapsedTime % periodMS) / periodMS;
+    var ramp = tn < 0.5 ? 2 * tn : 2 - 2 * tn;
+    // var smoothRamp = THREE.Math.smoothstep(ramp, 0.1, 0.9);
+    this._mesh.material.uniforms.tMixRatio.value = ramp;
 
     FORGE.BackgroundRenderer.prototype.render.call(this, camera);
 };
@@ -278,6 +320,40 @@ FORGE.BackgroundShaderRenderer.prototype.destroy = function()
 
     FORGE.BackgroundRenderer.prototype.destroy.call(this);
 };
+
+/**
+ * Get background renderer transition texture.
+ * @name FORGE.BackgroundShaderRenderer#transitionTexture
+ * @type {string}
+ */
+Object.defineProperty(FORGE.BackgroundShaderRenderer.prototype, "transitionTexture",
+{
+    /** @this {FORGE.BackgroundShaderRenderer} */
+    get: function()
+    {
+        return this._transitionTexture;
+    }
+});
+
+/**
+ * Get or set background renderer transition type.
+ * @name FORGE.BackgroundShaderRenderer#transition
+ * @type {string}
+ */
+Object.defineProperty(FORGE.BackgroundShaderRenderer.prototype, "transition",
+{
+    /** @this {FORGE.BackgroundShaderRenderer} */
+    get: function()
+    {
+        return this._mesh.material.uniforms.tTransition.value;
+    },
+
+    /** @this {FORGE.BackgroundShaderRenderer} */
+    set: function(value)
+    {
+        return this._mesh.material.uniforms.tTransition.value = value;
+    }
+});
 
 /**
  * Get background renderer texture.

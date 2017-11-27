@@ -13,6 +13,10 @@ FORGE.ShaderLib = {
             /** @type {FORGEUniform} */
             uniforms:
             {
+                tTime: { type: "f", value: 0.0 },
+                tTransition: { type: "i", value: 0 },
+                tTransitionTexture: { type: "t", value: null },
+                tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
                 tViewportResolution: { type: "v2", value: new THREE.Vector2() },
                 tViewportResolutionRatio: { type: "f", value: 1.0 },
@@ -49,6 +53,10 @@ FORGE.ShaderLib = {
             /** @type {FORGEUniform} */
             uniforms:
             {
+                tTime: { type: "f", value: 0.0 },
+                tTransition: { type: "i", value: 0 },
+                tTransitionTexture: { type: "t", value: null },
+                tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
                 tViewportResolution: { type: "v2", value: new THREE.Vector2() },
                 tViewportResolutionRatio: { type: "f", value: 1.0 },
