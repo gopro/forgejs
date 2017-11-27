@@ -658,7 +658,7 @@ FORGE.Viewer.prototype._updateRendering = function()
 {
     if (this._callbacks !== null && typeof this._callbacks.beforeRender === "function")
     {
-        this._callbacks.beforeRender.call();
+        this._callbacks.beforeRender.call(this);
     }
 
     if (this._renderManager !== null)
@@ -668,7 +668,7 @@ FORGE.Viewer.prototype._updateRendering = function()
 
     if (this._callbacks !== null && typeof this._callbacks.afterRender === "function")
     {
-        this._callbacks.afterRender.call();
+        this._callbacks.afterRender.call(this);
     }
 };
 
