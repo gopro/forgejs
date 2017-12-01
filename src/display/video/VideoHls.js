@@ -144,12 +144,20 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
     this._hlsMediaPlayer = null;
 
     /**
+     * Is the hls.js Media Player ready?
+     * @name  FORGE.VideoHls#_isReady
+     * @type {Hls.MediaPlayer}
+     * @private
+     */
+    this._isReady = false;
+
+    /**
      * The hls stream info object.
      * @name  FORGE.VideoHls#_streamInfo
      * @type {StreamInfo}
      * @private
      */
-    this._streamInfo = null;
+    // this._streamInfo = null;
 
     /**
      * The current index for video.
@@ -157,7 +165,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {number}
      * @private
      */
-    this._currentVideoIndex = 0;
+    // this._currentVideoIndex = 0;
 
     /**
      * The current pending index for video.
@@ -165,7 +173,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {number}
      * @private
      */
-    this._currentVideoPendingIndex = 0;
+    // this._currentVideoPendingIndex = 0;
 
     /**
      * The current index for audio.
@@ -173,7 +181,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {number}
      * @private
      */
-    this._currentAudioIndex = 0;
+    // this._currentAudioIndex = 0;
 
     /**
      * The current pending index for audio.
@@ -181,7 +189,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {number}
      * @private
      */
-    this._currentAudioPendingIndex = 0;
+    // this._currentAudioPendingIndex = 0;
 
     /**
      * The hls media player video metrics object.
@@ -189,7 +197,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {Object}
      * @private
      */
-    this._playerVideoMetrics = null;
+    // this._playerVideoMetrics = null;
 
     /**
      * The hls media player audio metrics object.
@@ -197,7 +205,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {Object}
      * @private
      */
-    this._playerAudioMetrics = null;
+    // this._playerAudioMetrics = null;
 
     /**
      * The hls stream metrics object.
@@ -205,7 +213,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {hlsMetrics}
      * @private
      */
-    this._hlsMetrics = null;
+    // this._hlsMetrics = null;
 
     /**
      * The monitoring object.
@@ -213,7 +221,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {Object}
      * @private
      */
-    this._monitoring = null;
+    // this._monitoring = null;
 
     /**
      * On load start event dispatcher.
@@ -344,6 +352,14 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
     this._onError = null;
 
     /**
+     * On waiting event dispatcher.
+     * @name  FORGE.VideoHTML5#_onWaiting
+     * @type {?FORGE.EventDispatcher}
+     * @private
+     */
+    this._onWaiting = null;
+
+    /**
      * On stalled event dispatcher.
      * @name  FORGE.VideoHls#_onStalled
      * @type {?FORGE.EventDispatcher}
@@ -429,151 +445,13 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {?FORGE.EventDispatcher}
      * @private
      */
-    this._onMetricsChanged = null;
+    // this._onMetricsChanged = null;
 
-    /**
-     * Event handler for current video load start binded to this.
-     * @name FORGE.VideoHls#_onLoadStartBind
-     * @type {Function}
-     * @private
-     */
-    this._onLoadStartBind = null;
 
-    /**
-     * Event handler for current video loaded meta data binded to this.
-     * @name FORGE.VideoHls#_onLoadedMetaDataBind
-     * @type {Function}
-     * @private
-     */
-    this._onLoadedMetaDataBind = null;
 
-    /**
-     * Event handler for current video loaded data binded to this.
-     * @name FORGE.VideoHls#_onLoadedDataBind
-     * @type {Function}
-     * @private
-     */
-    this._onLoadedDataBind = null;
 
-    /**
-     * Event handler for current video progress binded to this.
-     * @name FORGE.VideoHls#_onProgressBind
-     * @type {Function}
-     * @private
-     */
-    this._onProgressBind = null;
 
-    /**
-     * Event handler for current video duration change binded to this.
-     * @name FORGE.VideoHls#_onDurationChangeBind
-     * @type {Function}
-     * @private
-     */
-    this._onDurationChangeBind = null;
 
-    /**
-     * Event handler for current video can play binded to this.
-     * @name FORGE.VideoHls#_onCanPlayBind
-     * @type {Function}
-     * @private
-     */
-    this._onCanPlayBind = null;
-
-    /**
-     * Event handler for current video can play throught binded to this.
-     * @name FORGE.VideoHls#_onCanPlayThroughBind
-     * @type {Function}
-     * @private
-     */
-    this._onCanPlayThroughBind = null;
-
-    /**
-     * Event handler for current video play binded to this.
-     * @name FORGE.VideoHls#_onPlayBind
-     * @type {Function}
-     * @private
-     */
-    this._onPlayBind = null;
-
-    /**
-     * Event handler for current video pause binded to this.
-     * @name FORGE.VideoHls#_onPauseBind
-     * @type {Function}
-     * @private
-     */
-    this._onPauseBind = null;
-
-    /**
-     * Event handler for current video time update binded to this.
-     * @name FORGE.VideoHls#_onTimeUpdateBind
-     * @type {Function}
-     * @private
-     */
-    this._onTimeUpdateBind = null;
-
-    /**
-     * Event handler for current video volume change binded to this.
-     * @name FORGE.VideoHls#_onVolumeChangeBind
-     * @type {Function}
-     * @private
-     */
-    this._onVolumeChangeBind = null;
-
-    /**
-     * Event handler for current video seeking binded to this.
-     * @name FORGE.VideoHls#_onSeekingBind
-     * @type {Function}
-     * @private
-     */
-    this._onSeekingBind = null;
-
-    /**
-     * Event handler for current video seeked binded to this.
-     * @name FORGE.VideoHls#_onSeekedBind
-     * @type {Function}
-     * @private
-     */
-    this._onSeekedBind = null;
-
-    /**
-     * Event handler for current video ended binded to this.
-     * @name FORGE.VideoHls#_onEndedBind
-     * @type {Function}
-     * @private
-     */
-    this._onEndedBind = null;
-
-    /**
-     * Event handler for current video error binded to this.
-     * @name FORGE.VideoHls#_onErrorBind
-     * @type {Function}
-     * @private
-     */
-    this._onErrorBind = null;
-
-    /**
-     * Event handler for current video stalled binded to this.
-     * @name FORGE.VideoHls#_onStalledBind
-     * @type {Function}
-     * @private
-     */
-    this._onStalledBind = null;
-
-    /**
-     * Event handler for current video rate change binded to this.
-     * @name FORGE.VideoHls#_onRateChangeBind
-     * @type {Function}
-     * @private
-     */
-    this._onRateChangeBind = null;
-
-    /**
-     * Event handler for current video playing binded to this.
-     * @name FORGE.VideoHls#_onPlayingBind
-     * @type {Function}
-     * @private
-     */
-    this._onPlayingBind = null;
 
     /**
      * Event handler for current video quality request binded to this.
@@ -613,7 +491,15 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @type {Function}
      * @private
      */
-    this._onMetricsChangedBind = null;
+    // this._onMetricsChangedBind = null;
+
+    /**
+     * Event handler for all events fired by the HTMLVideoElement. See https://developer.mozilla.org/en/docs/Web/Guide/Events/Media_events for a list of available events.
+     * @name FORGE.VideoHls#_onEventBind
+     * @type {Function}
+     * @private
+     */
+    this._onEventBind = null;
 
     FORGE.VideoBase.call(this, viewer, "VideoHls");
 };
@@ -667,32 +553,34 @@ FORGE.VideoHls.prototype._boot = function()
     this._register();
 
     this._loadHlsMediaPlayerSourceBind = this._loadHlsMediaPlayerSource.bind(this);
+    this._launchHlsMediaPlayerBind = this._launchHlsMediaPlayer.bind(this);
 
-    this._onLoadStartBind = this._onLoadStartHandler.bind(this);
-    this._onDurationChangeBind = this._onDurationChangeHandler.bind(this);
-    this._onLoadedMetaDataBind = this._onLoadedMetaDataHandler.bind(this);
-    this._onLoadedDataBind = this._onLoadedDataHandler.bind(this);
-    this._onProgressBind = this._onProgressHandler.bind(this);
-    this._onCanPlayBind = this._onCanPlayHandler.bind(this);
-    this._onCanPlayThroughBind = this._onCanPlayThroughHandler.bind(this);
-    this._onPlayBind = this._onPlayHandler.bind(this);
-    this._onPauseBind = this._onPauseHandler.bind(this);
-    this._onTimeUpdateBind = this._onTimeUpdateHandler.bind(this);
-    this._onVolumeChangeBind = this._onVolumeChangeHandler.bind(this);
-    this._onSeekingBind = this._onSeekingHandler.bind(this);
-    this._onSeekedBind = this._onSeekedHandler.bind(this);
-    this._onEndedBind = this._onEndedHandler.bind(this);
-    this._onErrorBind = this._onErrorHandler.bind(this);
-    this._onStalledBind = this._onStalledHandler.bind(this);
-    this._onRateChangeBind = this._onRateChangeHandler.bind(this);
-    this._onPlayingBind = this._onPlayingHandler.bind(this);
-    this._onQualityRequestBind = this._onQualityRequestHandler.bind(this);
-    this._onQualityChangeBind = this._onQualityChangeHandler.bind(this);
-    //this._onQualityAbortBind = this._onQualityAbortHandler.bind(this);
+    this._onEventBind = this._onEventHandler.bind(this);
+
+    // this._onLoadStartBind = this._onLoadStartHandler.bind(this);
+    // this._onDurationChangeBind = this._onDurationChangeHandler.bind(this);
+    // this._onLoadedMetaDataBind = this._onLoadedMetaDataHandler.bind(this);
+    // this._onLoadedDataBind = this._onLoadedDataHandler.bind(this);
+    // this._onProgressBind = this._onProgressHandler.bind(this);
+    // this._onCanPlayBind = this._onCanPlayHandler.bind(this);
+    // this._onCanPlayThroughBind = this._onCanPlayThroughHandler.bind(this);
+    // this._onPlayBind = this._onPlayHandler.bind(this);
+    // this._onPauseBind = this._onPauseHandler.bind(this);
+    // this._onTimeUpdateBind = this._onTimeUpdateHandler.bind(this);
+    // this._onVolumeChangeBind = this._onVolumeChangeHandler.bind(this);
+    // this._onSeekingBind = this._onSeekingHandler.bind(this);
+    // this._onSeekedBind = this._onSeekedHandler.bind(this);
+    // this._onErrorBind = this._onErrorHandler.bind(this);
+    // this._onStalledBind = this._onStalledHandler.bind(this);
+    // this._onRateChangeBind = this._onRateChangeHandler.bind(this);
+    // this._onPlayingBind = this._onPlayingHandler.bind(this);
+    // this._onQualityRequestBind = this._onQualityRequestHandler.bind(this);
+    // this._onQualityChangeBind = this._onQualityChangeHandler.bind(this);
+    // //this._onQualityAbortBind = this._onQualityAbortHandler.bind(this);
 
     // HLS specific
-    this._onSwitchCompletedBind = this._onSwitchCompletedHandler.bind(this);
-    this._onMetricsChangedBind = this._onMetricsChangedHandler.bind(this);
+    // this._onSwitchCompletedBind = this._onSwitchCompletedHandler.bind(this);
+    // this._onMetricsChangedBind = this._onMetricsChangedHandler.bind(this);
 
     //Listen to the main volume change to adapt the video volume accordingly.
     this._viewer.audio.onVolumeChange.add(this._mainVolumeChangeHandler, this);
@@ -755,12 +643,12 @@ FORGE.VideoHls.prototype._parseConfig = function(config)
  */
 FORGE.VideoHls.prototype._notifyResize = function(data)
 {
-    var video = this._video;
+    var v = this._video;
 
-    if (video !== null && video.element !== null)
+    if (v !== null && v.element !== null)
     {
-        video.element.setAttribute("width", this.pixelWidth);
-        video.element.setAttribute("height", this.pixelHeight);
+        v.element.setAttribute("width", this.pixelWidth);
+        v.element.setAttribute("height", this.pixelHeight);
     }
 
     FORGE.DisplayObject.prototype._notifyResize.call(this, data);
@@ -774,16 +662,16 @@ FORGE.VideoHls.prototype._notifyResize = function(data)
  */
 FORGE.VideoHls.prototype._createVideoObject = function()
 {
-    var video = {
+    var v = {
         index: 0,
         element: null,
         buffer: null,
         played: null
     };
 
-    this._video = video;
+    this._video = v;
 
-    return video;
+    return v;
 };
 
 /**
@@ -808,13 +696,13 @@ FORGE.VideoHls.prototype._createVideoTag = function()
     var played = new FORGE.VideoTimeRanges(element, "played");
 
     //Update the video object with the element and fresh buffer and played
-    var video = this._video;
-    video.element = element;
-    video.buffer = buffer;
-    video.played = played;
-    video.lastTimeStamp = 0;
+    var v = this._video;
+    v.element = element;
+    v.buffer = buffer;
+    v.played = played;
+    v.lastTimeStamp = 0;
 
-    return video;
+    return v;
 };
 
 /**
@@ -827,11 +715,11 @@ FORGE.VideoHls.prototype._createVideoTag = function()
  */
 FORGE.VideoHls.prototype._getCurrentVideoElementProperty = function(property, defaultReturnValue)
 {
-    var video = this._video;
+    var v = this._video;
 
-    if (video !== null && video.element !== null)
+    if (v !== null && v.element !== null)
     {
-        return video.element[property];
+        return v.element[property];
     }
 
     return defaultReturnValue;
@@ -845,7 +733,7 @@ FORGE.VideoHls.prototype._getCurrentVideoElementProperty = function(property, de
 FORGE.VideoHls.prototype._initHlsMediaPlayer = function()
 {
     var hlsConfig = {
-        autoStartLoad: false, // start after Hls.Events.MANIFEST_PARSED
+        autoStartLoad: true, // start after Hls.Events.MANIFEST_PARSED
         startPosition : -1, // startTime
         debug: true,
         startLevel: undefined,
@@ -878,15 +766,24 @@ FORGE.VideoHls.prototype._initHlsMediaPlayer = function()
  */
 FORGE.VideoHls.prototype._loadHlsMediaPlayerSource = function()
 {
-    console.log("video and hls.js are now bound together !");
+    this.log("video and hls.js are now bound together !");
     this._hlsMediaPlayer.loadSource(this._manifestUrl);
-    // this._hlsMediaPlayer.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-    //     console.log("manifest loaded, found " + data.levels.length + " quality level");
-    // });
+    this._hlsMediaPlayer.on(Hls.Events.MANIFEST_PARSED, this._launchHlsMediaPlayerBind);
 
     this._installEvents();
 
     this._addVideoToDom();
+};
+
+/**
+ * Play video file once the manifest is loaded.
+ * @method FORGE.VideoHls#_launchHlsMediaPlayer
+ * @private
+ */
+FORGE.VideoHls.prototype._launchHlsMediaPlayer = function(event, data)
+{
+    this.log("manifest loaded, found " + data.levels.length + " quality level");
+    this._isReady = true;
 };
 
 /**
@@ -909,10 +806,6 @@ FORGE.VideoHls.prototype._addVideoToDom = function()
  */
 FORGE.VideoHls.prototype._installEvents = function()
 {
-    this._hlsMediaPlayer.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-        console.log("manifest loaded, found " + data.levels.length + " quality level");
-    });
-
     // this._hlsMediaPlayer.on(Hls.MediaPlayer.events["CAN_PLAY"], this._onCanPlayBind);
     // this._hlsMediaPlayer.on(Hls.MediaPlayer.events["ERROR"], this._onErrorBind);
     // this._hlsMediaPlayer.on(Hls.MediaPlayer.events["PLAYBACK_ENDED"], this._onEndedBind);
@@ -930,14 +823,38 @@ FORGE.VideoHls.prototype._installEvents = function()
     // this._hlsMediaPlayer.on(Hls.MediaPlayer.events["PLAYBACK_PLAYING"], this._onPlayingBind);
     // this._hlsMediaPlayer.on(Hls.MediaPlayer.events["BUFFER_EMPTY"], this._onStalledBind);
     // this._hlsMediaPlayer.on(Hls.MediaPlayer.events["PLAYBACK_RATE_CHANGED"], this._onRateChangeBind);
-
     // this._hlsMediaPlayer.on(Hls.MediaPlayer.events["PERIOD_SWITCH_COMPLETED"], this._onSwitchCompletedBind);
     // this._hlsMediaPlayer.on(Hls.MediaPlayer.events["METRIC_CHANGED"], this._onMetricsChangedBind);
 
-    this._video.element.addEventListener("loadeddata", this._onLoadedDataBind, false);
-    this._video.element.addEventListener("durationchange", this._onDurationChangeBind, false);
-    this._video.element.addEventListener("canplaythrough", this._onCanPlayThroughBind, false);
-    this._video.element.addEventListener("volumechange", this._onVolumeChangeBind, false);
+    var element = this._video.element;
+
+    element.addEventListener("loadstart", this._onEventBind, false);
+    element.addEventListener("durationchange", this._onEventBind, false);
+    element.addEventListener("loadedmetadata", this._onEventBind, false);
+    element.addEventListener("loadeddata", this._onEventBind, false);
+    element.addEventListener("progress", this._onEventBind, false);
+    element.addEventListener("canplay", this._onEventBind, false);
+    element.addEventListener("canplaythrough", this._onEventBind, false);
+    element.addEventListener("play", this._onEventBind, false);
+    element.addEventListener("pause", this._onEventBind, false);
+    element.addEventListener("timeupdate", this._onEventBind, false);
+    element.addEventListener("volumechange", this._onEventBind, false);
+    element.addEventListener("seeking", this._onEventBind, false);
+    element.addEventListener("seeked", this._onEventBind, false);
+    element.addEventListener("ended", this._onEventBind, false);
+    element.addEventListener("error", this._onEventBind, false);
+    element.addEventListener("waiting", this._onEventBind, false);
+    element.addEventListener("stalled", this._onEventBind, false);
+    element.addEventListener("playing", this._onEventBind, false);
+    element.addEventListener("ratechange", this._onEventBind, false);
+
+
+
+
+    // this._video.element.addEventListener("loadeddata", this._onLoadedDataBind, false);
+    // this._video.element.addEventListener("durationchange", this._onDurationChangeBind, false);
+    // this._video.element.addEventListener("canplaythrough", this._onCanPlayThroughBind, false);
+    // this._video.element.addEventListener("volumechange", this._onVolumeChangeBind, false);
 };
 
 /**
@@ -947,6 +864,28 @@ FORGE.VideoHls.prototype._installEvents = function()
  */
 FORGE.VideoHls.prototype._uninstallEvents = function()
 {
+    var element = this._video.element;
+
+    element.removeEventListener("loadstart", this._onEventBind, false);
+    element.removeEventListener("durationchange", this._onEventBind, false);
+    element.removeEventListener("loadedmetadata", this._onEventBind, false);
+    element.removeEventListener("loadeddata", this._onEventBind, false);
+    element.removeEventListener("progress", this._onEventBind, false);
+    element.removeEventListener("canplay", this._onEventBind, false);
+    element.removeEventListener("canplaythrough", this._onEventBind, false);
+    element.removeEventListener("play", this._onEventBind, false);
+    element.removeEventListener("pause", this._onEventBind, false);
+    element.removeEventListener("timeupdate", this._onEventBind, false);
+    element.removeEventListener("volumechange", this._onEventBind, false);
+    element.removeEventListener("seeking", this._onEventBind, false);
+    element.removeEventListener("seeked", this._onEventBind, false);
+    element.removeEventListener("ended", this._onEventBind, false);
+    element.removeEventListener("error", this._onEventBind, false);
+    element.removeEventListener("waiting", this._onEventBind, false);
+    element.removeEventListener("stalled", this._onEventBind, false);
+    element.removeEventListener("playing", this._onEventBind, false);
+    element.removeEventListener("ratechange", this._onEventBind, false);
+
     // this._hlsMediaPlayer.off(Hls.MediaPlayer.events["CAN_PLAY"], this._onCanPlayBind);
     // this._hlsMediaPlayer.off(Hls.MediaPlayer.events["ERROR"], this._onErrorBind);
     // this._hlsMediaPlayer.off(Hls.MediaPlayer.events["PLAYBACK_ENDED"], this._onEndedBind);
@@ -964,14 +903,211 @@ FORGE.VideoHls.prototype._uninstallEvents = function()
     // this._hlsMediaPlayer.off(Hls.MediaPlayer.events["PLAYBACK_PLAYING"], this._onPlayingBind);
     // this._hlsMediaPlayer.off(Hls.MediaPlayer.events["BUFFER_EMPTY"], this._onStalledBind);
     // this._hlsMediaPlayer.off(Hls.MediaPlayer.events["PLAYBACK_RATE_CHANGED"], this._onRateChangeBind);
-
     // this._hlsMediaPlayer.off(Hls.MediaPlayer.events["PERIOD_SWITCH_COMPLETED"], this._onSwitchCompletedBind);
     // this._hlsMediaPlayer.off(Hls.MediaPlayer.events["METRIC_CHANGED"], this._onMetricsChangedBind);
 
-    this._video.element.removeEventListener("loadeddata", this._onLoadedDataBind, false);
-    this._video.element.removeEventListener("durationchange", this._onDurationChangeBind, false);
-    this._video.element.removeEventListener("canplaythrough", this._onCanPlayThroughBind, false);
-    this._video.element.removeEventListener("volumechange", this._onVolumeChangeBind, false);
+    // this._video.element.removeEventListener("loadeddata", this._onLoadedDataBind, false);
+    // this._video.element.removeEventListener("durationchange", this._onDurationChangeBind, false);
+    // this._video.element.removeEventListener("canplaythrough", this._onCanPlayThroughBind, false);
+    // this._video.element.removeEventListener("volumechange", this._onVolumeChangeBind, false);
+};
+
+/**
+ * Global handler for all events fired by an HTMLVideoElement.
+ * @method FORGE.VideoHls#_onEventHandler
+ * @param  {Event} event - the fired event
+ * @private
+ */
+FORGE.VideoHls.prototype._onEventHandler = function(event)
+{
+    var element = this._video.element;
+    this.log(event.type + " [readyState: " + element.readyState + "]");
+
+    switch (event.type)
+    {
+        case "loadstart":
+            if (this._onLoadStart !== null)
+            {
+                this._onLoadStart.dispatch(event);
+            }
+
+            break;
+
+        case "durationchange":
+            //@firefox - FF dispatch durationchange twice on readystate HAVE_METADATA (1) & HAVE_ENOUGH_DATA (4)
+            //I will not dispatch this event if readystate is 4 !
+            if (this._onDurationChange !== null && element.readyState === HTMLMediaElement.HAVE_METADATA)
+            {
+                this._onDurationChange.dispatch(event);
+            }
+
+            break;
+
+        case "loadedmetadata":
+            this._metaDataLoaded = true;
+
+            if (this._onLoadedMetaData !== null)
+            {
+                this._onLoadedMetaData.dispatch(event);
+            }
+
+            break;
+
+        case "loadeddata":
+            if (this._onLoadedData !== null)
+            {
+                this._onLoadedData.dispatch(event);
+            }
+
+            break;
+
+        case "progress":
+            if (this._onProgress !== null)
+            {
+                this._onProgress.dispatch(event);
+            }
+
+            break;
+
+        case "canplay":
+            this._canPlay = true;
+
+            if (this._onCanPlay !== null)
+            {
+                this._onCanPlay.dispatch(event);
+            }
+
+            break;
+
+        case "canplaythrough":
+            this._canPlay = true;
+
+            if (this._onCanPlayThrough !== null)
+            {
+                this._onCanPlayThrough.dispatch(event);
+            }
+
+            break;
+
+        case "play":
+            if (this._onPlay !== null)
+            {
+                this._onPlay.dispatch(event);
+            }
+
+            break;
+
+        case "pause":
+            this._playing = false;
+
+            if (this._onPause !== null)
+            {
+                this._onPause.dispatch(event);
+            }
+
+            break;
+
+        case "timeupdate":
+            if (this._onTimeUpdate !== null)
+            {
+                this._onTimeUpdate.dispatch(event);
+            }
+
+            break;
+
+        case "volumechange":
+            //I do not dispatch the volume change if readyState is HAVE_NOTHING (0). Because
+            //I set the volume at 0 when I create the video element, it is
+            //not usefull to dispatch this internal volume change ?
+            if (this._onVolumeChange !== null && element.readyState !== HTMLMediaElement.HAVE_NOTHING)
+            {
+                this._onVolumeChange.dispatch(event);
+            }
+
+            break;
+
+        case "seeking":
+            this._canPlay = false;
+
+            if (this._onSeeking !== null)
+            {
+                this._onSeeking.dispatch(event);
+            }
+
+            break;
+
+        case "seeked":
+            this._canPlay = false;
+
+            if (this._onSeeked !== null)
+            {
+                this._onSeeked.dispatch(event);
+            }
+
+            break;
+
+        case "ended":
+            this._playing = false;
+            this.currentTime = 0;
+            this._endCount++;
+
+            if (this._loop === true)
+            {
+                this.play(0);
+            }
+
+            if (this._onEnded !== null)
+            {
+                this._onEnded.dispatch(event);
+            }
+
+            break;
+
+        case "error":
+            if (this._onError !== null)
+            {
+                this._onError.dispatch(event);
+            }
+
+            break;
+
+        case "waiting":
+            if (this._onWaiting !== null)
+            {
+                this._onWaiting.dispatch(event);
+            }
+
+            break;
+
+        case "stalled":
+            if (this._onStalled !== null)
+            {
+                this._onStalled.dispatch(event);
+            }
+
+            break;
+
+        case "playing":
+            if (this._onPlaying !== null)
+            {
+                this._onPlaying.dispatch(event);
+            }
+
+            break;
+
+        case "ratechange":
+            if (this._onRateChange !== null)
+            {
+                this._onRateChange.dispatch(event);
+            }
+
+            break;
+
+        default:
+            this.warn("The event \"" + event.type + "\" is not handled.");
+
+            break;
+    }
 };
 
 /**
@@ -980,19 +1116,19 @@ FORGE.VideoHls.prototype._uninstallEvents = function()
  * @param  {Event} event - The native video event.
  * @private
  */
-FORGE.VideoHls.prototype._onLoadStartHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onLoadStart [readyState: " + element.readyState + "]");
+// FORGE.VideoHls.prototype._onLoadStartHandler = function(event)
+// {
+//     var element = this._video.element;
+//     this.log("onLoadStart [readyState: " + element.readyState + "]");
 
-    //populate qualities array with the HLS bitrates info list
-    this._createQualitiesFromBitrateInfoList(this._manifestUrl, this._hlsMediaPlayer.getBitrateInfoListFor(FORGE.VideoHls.mediaType.VIDEO));
+//     //populate qualities array with the HLS bitrates info list
+//     this._createQualitiesFromBitrateInfoList(this._manifestUrl, this._hlsMediaPlayer.getBitrateInfoListFor(FORGE.VideoHls.mediaType.VIDEO));
 
-    if (this._onLoadStart !== null)
-    {
-        this._onLoadStart.dispatch(event);
-    }
-};
+//     if (this._onLoadStart !== null)
+//     {
+//         this._onLoadStart.dispatch(event);
+//     }
+// };
 
 /**
  * Create a qualities array from the bitrates info list.
@@ -1003,43 +1139,43 @@ FORGE.VideoHls.prototype._onLoadStartHandler = function(event)
  * @return {Array<FORGE.VideoQuality>} The qualities array.
  * @private
  */
-FORGE.VideoHls.prototype._createQualitiesFromBitrateInfoList = function(url, bitrates, checkURL)
-{
-    var qualities = [];
-    var quality;
+// FORGE.VideoHls.prototype._createQualitiesFromBitrateInfoList = function(url, bitrates, checkURL)
+// {
+//     var qualities = [];
+//     var quality;
 
-    if (bitrates !== null)
-    {
-        for (var i = 0, ii = bitrates.length; i < ii; i++)
-        {
-            if (checkURL === true && FORGE.URL.isValid(url) === false)
-            {
-                throw "FORGE.Video: URL " + url + " is invalid";
-            }
+//     if (bitrates !== null)
+//     {
+//         for (var i = 0, ii = bitrates.length; i < ii; i++)
+//         {
+//             if (checkURL === true && FORGE.URL.isValid(url) === false)
+//             {
+//                 throw "FORGE.Video: URL " + url + " is invalid";
+//             }
 
-            quality = new FORGE.VideoQuality(url);
-            quality.id = bitrates[i].qualityIndex;
-            quality.bitrate = bitrates[i].bitrate;
-            quality.width = bitrates[i].width;
-            quality.height = bitrates[i].height;
+//             quality = new FORGE.VideoQuality(url);
+//             quality.id = bitrates[i].qualityIndex;
+//             quality.bitrate = bitrates[i].bitrate;
+//             quality.width = bitrates[i].width;
+//             quality.height = bitrates[i].height;
 
-            qualities.push(quality);
-        }
+//             qualities.push(quality);
+//         }
 
-        this._qualities = /** @type {Array<FORGE.VideoQuality>} */ (qualities);
+//         this._qualities = /** @type {Array<FORGE.VideoQuality>} */ (qualities);
 
-        if (this._onQualitiesLoaded !== null)
-        {
-            this._onQualitiesLoaded.dispatch(qualities);
-        }
-    }
-    else
-    {
-        this.destroy();
-    }
+//         if (this._onQualitiesLoaded !== null)
+//         {
+//             this._onQualitiesLoaded.dispatch(qualities);
+//         }
+//     }
+//     else
+//     {
+//         this.destroy();
+//     }
 
-    return qualities;
-};
+//     return qualities;
+// };
 
 /**
  * Get the index of a {@link FORGE.VideoQuality} that is in the _videoQualities array.
@@ -1048,21 +1184,21 @@ FORGE.VideoHls.prototype._createQualitiesFromBitrateInfoList = function(url, bit
  * @param  {FORGE.VideoQuality} quality - The quality you need to get its index.
  * @return {number} Returns the index of the quality if found, -1 if not found.
  */
-FORGE.VideoHls.prototype._indexOfQuality = function(quality)
-{
-    var q;
-    for (var i = 0, ii = this._qualities.length; i < ii; i++)
-    {
-        q = this._qualities[i];
+// FORGE.VideoHls.prototype._indexOfQuality = function(quality)
+// {
+//     var q;
+//     for (var i = 0, ii = this._qualities.length; i < ii; i++)
+//     {
+//         q = this._qualities[i];
 
-        if (q === quality)
-        {
-            return i;
-        }
-    }
+//         if (q === quality)
+//         {
+//             return i;
+//         }
+//     }
 
-    return -1;
-};
+//     return -1;
+// };
 
 /**
  * Private event handler for period switch completed.
@@ -1070,13 +1206,13 @@ FORGE.VideoHls.prototype._indexOfQuality = function(quality)
  * @param  {SwitchEvents} event - The hls.js media player event.
  * @private
  */
-FORGE.VideoHls.prototype._onSwitchCompletedHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("_onSwitchCompleted [readyState: " + element.readyState + "]");
+// FORGE.VideoHls.prototype._onSwitchCompletedHandler = function(event)
+// {
+//     var element = this._video.element;
+//     this.log("_onSwitchCompleted [readyState: " + element.readyState + "]");
 
-    this._streamInfo = /** @type {StreamInfo} */ (event.toStreamInfo);
-};
+//     this._streamInfo = /** @type {StreamInfo} */ (event.toStreamInfo);
+// };
 
 /**
  * Private event handler for mertics changed.
@@ -1084,82 +1220,82 @@ FORGE.VideoHls.prototype._onSwitchCompletedHandler = function(event)
  * @param  {MetricChangedEvents} event - The hls.js media player event.
  * @private
  */
-FORGE.VideoHls.prototype._onMetricsChangedHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("_onMetricsChangedHandler [readyState: " + element.readyState + "]");
+// FORGE.VideoHls.prototype._onMetricsChangedHandler = function(event)
+// {
+//     var element = this._video.element;
+//     this.log("_onMetricsChangedHandler [readyState: " + element.readyState + "]");
 
-    if (this._playerVideoMetrics === null)
-    {
-        this._playerVideoMetrics = this._hlsMediaPlayer.getMetricsFor(FORGE.VideoHls.mediaType.VIDEO);
-    }
+//     if (this._playerVideoMetrics === null)
+//     {
+//         this._playerVideoMetrics = this._hlsMediaPlayer.getMetricsFor(FORGE.VideoHls.mediaType.VIDEO);
+//     }
 
-    if (this._playerAudioMetrics === null)
-    {
-        this._playerAudioMetrics = this._hlsMediaPlayer.getMetricsFor(FORGE.VideoHls.mediaType.AUDIO);
-    }
+//     if (this._playerAudioMetrics === null)
+//     {
+//         this._playerAudioMetrics = this._hlsMediaPlayer.getMetricsFor(FORGE.VideoHls.mediaType.AUDIO);
+//     }
 
-    if (this._hlsMetrics === null)
-    {
-        this._hlsMetrics = this._hlsMediaPlayer.gethlsMetrics();
-    }
+//     if (this._hlsMetrics === null)
+//     {
+//         this._hlsMetrics = this._hlsMediaPlayer.gethlsMetrics();
+//     }
 
-    //set the current quality index
-    // if (this._playerVideoMetrics !== null && this._hlsMetrics !== null)
-    // {
-    //     var repSwitch = /** @type {RepresentationSwitch} */ (this._hlsMetrics.getCurrentRepresentationSwitch(this._playerVideoMetrics));
-    //     if (repSwitch !== null)
-    //     {
-    //         this._currentQuality = this._hlsMetrics.getIndexForRepresentation(repSwitch.to, this._streamInfo.index);
-    //         if(this._qualityInitialized === false)
-    //         {
-    //             this._setRequestQuality(this._currentQuality);
-    //             this._qualityInitialized = true;
-    //         }
-    //     }
-    // }
+//     //set the current quality index
+//     // if (this._playerVideoMetrics !== null && this._hlsMetrics !== null)
+//     // {
+//     //     var repSwitch = /** @type {RepresentationSwitch} */ (this._hlsMetrics.getCurrentRepresentationSwitch(this._playerVideoMetrics));
+//     //     if (repSwitch !== null)
+//     //     {
+//     //         this._currentQuality = this._hlsMetrics.getIndexForRepresentation(repSwitch.to, this._streamInfo.index);
+//     //         if(this._qualityInitialized === false)
+//     //         {
+//     //             this._setRequestQuality(this._currentQuality);
+//     //             this._qualityInitialized = true;
+//     //         }
+//     //     }
+//     // }
 
-    if (this._onMetricsChanged !== null)
-    {
-        var metrics;
+//     if (this._onMetricsChanged !== null)
+//     {
+//         var metrics;
 
-        if (event.mediaType === FORGE.VideoHls.mediaType.VIDEO)
-        {
-            metrics = this._getMetricsFor(FORGE.VideoHls.mediaType.VIDEO, this._playerVideoMetrics, this._hlsMetrics);
-            if (metrics)
-            {
-                this._monitoring = {
-                    "videoBitrate": metrics.bitrate,
-                    "videoIndex": metrics.index,
-                    "videoPendingIndex": metrics.pendingIndex,
-                    "videoMaxIndex": metrics.maxIndex,
-                    "videoBufferLength": metrics.bufferLength,
-                    "videoDroppedFrames": metrics.droppedFrames
-                        //"videoRequestsQueue": metrics.requestsQueue
-                };
-            }
-        }
+//         if (event.mediaType === FORGE.VideoHls.mediaType.VIDEO)
+//         {
+//             metrics = this._getMetricsFor(FORGE.VideoHls.mediaType.VIDEO, this._playerVideoMetrics, this._hlsMetrics);
+//             if (metrics)
+//             {
+//                 this._monitoring = {
+//                     "videoBitrate": metrics.bitrate,
+//                     "videoIndex": metrics.index,
+//                     "videoPendingIndex": metrics.pendingIndex,
+//                     "videoMaxIndex": metrics.maxIndex,
+//                     "videoBufferLength": metrics.bufferLength,
+//                     "videoDroppedFrames": metrics.droppedFrames
+//                         //"videoRequestsQueue": metrics.requestsQueue
+//                 };
+//             }
+//         }
 
-        if (event.mediaType === FORGE.VideoHls.mediaType.AUDIO)
-        {
-            metrics = this._getMetricsFor(FORGE.VideoHls.mediaType.AUDIO, this._playerAudioMetrics, this._hlsMetrics);
-            if (metrics)
-            {
-                this._monitoring = {
-                    "audioBitrate": metrics.bitrate,
-                    "audioIndex": metrics.index,
-                    "audioPendingIndex": metrics.pendingIndex,
-                    "audioMaxIndex": metrics.maxIndex,
-                    "audioBufferLength": metrics.bufferLength,
-                    "audioDroppedFrames": metrics.droppedFrames
-                        //"audioRequestsQueue": metrics.requestsQueue
-                };
-            }
-        }
+//         if (event.mediaType === FORGE.VideoHls.mediaType.AUDIO)
+//         {
+//             metrics = this._getMetricsFor(FORGE.VideoHls.mediaType.AUDIO, this._playerAudioMetrics, this._hlsMetrics);
+//             if (metrics)
+//             {
+//                 this._monitoring = {
+//                     "audioBitrate": metrics.bitrate,
+//                     "audioIndex": metrics.index,
+//                     "audioPendingIndex": metrics.pendingIndex,
+//                     "audioMaxIndex": metrics.maxIndex,
+//                     "audioBufferLength": metrics.bufferLength,
+//                     "audioDroppedFrames": metrics.droppedFrames
+//                         //"audioRequestsQueue": metrics.requestsQueue
+//                 };
+//             }
+//         }
 
-        this._onMetricsChanged.dispatch(event);
-    }
-};
+//         this._onMetricsChanged.dispatch(event);
+//     }
+// };
 
 
 /**
@@ -1171,87 +1307,87 @@ FORGE.VideoHls.prototype._onMetricsChangedHandler = function(event)
  * @return {?Object} The monitoring object
  * @private
  */
-FORGE.VideoHls.prototype._getMetricsFor = function(type, metrics, hlsMetrics)
-{
-    if (metrics !== null && hlsMetrics !== null)
-    {
-        var streamIndex = this._streamInfo.index;
-        var repSwitch, maxIndex, bufferLevel, droppedFramesMetrics, bitrate, index, pendingIndex, bufferLength, droppedFrames; //httpRequests requestsQueue pendingValue
+// FORGE.VideoHls.prototype._getMetricsFor = function(type, metrics, hlsMetrics)
+// {
+//     if (metrics !== null && hlsMetrics !== null)
+//     {
+//         var streamIndex = this._streamInfo.index;
+//         var repSwitch, maxIndex, bufferLevel, droppedFramesMetrics, bitrate, index, pendingIndex, bufferLength, droppedFrames; //httpRequests requestsQueue pendingValue
 
-        repSwitch = /** @type {RepresentationSwitch} */ (hlsMetrics.getCurrentRepresentationSwitch(metrics));
-        if (repSwitch !== null)
-        {
-            // index = hlsMetrics.getIndexForRepresentation(repSwitch.to, streamIndex);
-            bitrate = Math.round(hlsMetrics.getBandwidthForRepresentation(repSwitch.to, streamIndex) / 1000);
-        }
-        if (isNaN(bitrate) || bitrate === undefined)
-        {
-            bitrate = 0;
-        }
+//         repSwitch = /** @type {RepresentationSwitch} */ (hlsMetrics.getCurrentRepresentationSwitch(metrics));
+//         if (repSwitch !== null)
+//         {
+//             // index = hlsMetrics.getIndexForRepresentation(repSwitch.to, streamIndex);
+//             bitrate = Math.round(hlsMetrics.getBandwidthForRepresentation(repSwitch.to, streamIndex) / 1000);
+//         }
+//         if (isNaN(bitrate) || bitrate === undefined)
+//         {
+//             bitrate = 0;
+//         }
 
-        if (type === FORGE.VideoHls.mediaType.VIDEO)
-        {
-            index = this._currentVideoIndex + 1;
-            pendingIndex = this._currentVideoPendingIndex + 1;
-        }
-        else if (type === FORGE.VideoHls.mediaType.AUDIO)
-        {
-            index = this._currentAudioIndex + 1;
-            pendingIndex = this._currentAudioPendingIndex + 1;
-        }
+//         if (type === FORGE.VideoHls.mediaType.VIDEO)
+//         {
+//             index = this._currentVideoIndex + 1;
+//             pendingIndex = this._currentVideoPendingIndex + 1;
+//         }
+//         else if (type === FORGE.VideoHls.mediaType.AUDIO)
+//         {
+//             index = this._currentAudioIndex + 1;
+//             pendingIndex = this._currentAudioPendingIndex + 1;
+//         }
 
-        if (isNaN(index) || index === undefined)
-        {
-            index = 0;
-        }
-        if (isNaN(pendingIndex) || pendingIndex === undefined)
-        {
-            pendingIndex = 0;
-        }
+//         if (isNaN(index) || index === undefined)
+//         {
+//             index = 0;
+//         }
+//         if (isNaN(pendingIndex) || pendingIndex === undefined)
+//         {
+//             pendingIndex = 0;
+//         }
 
-        maxIndex = hlsMetrics.getMaxIndexForBufferType(type, streamIndex);
-        if (isNaN(maxIndex) || maxIndex === undefined)
-        {
-            maxIndex = 0;
-        }
+//         maxIndex = hlsMetrics.getMaxIndexForBufferType(type, streamIndex);
+//         if (isNaN(maxIndex) || maxIndex === undefined)
+//         {
+//             maxIndex = 0;
+//         }
 
-        bufferLevel = hlsMetrics.getCurrentBufferLevel(metrics);
-        if (bufferLevel !== null)
-        {
-            bufferLength = bufferLevel.toPrecision(5);
-        }
-        if (isNaN(bufferLength) || bufferLength === undefined)
-        {
-            bufferLength = 0;
-        }
+//         bufferLevel = hlsMetrics.getCurrentBufferLevel(metrics);
+//         if (bufferLevel !== null)
+//         {
+//             bufferLength = bufferLevel.toPrecision(5);
+//         }
+//         if (isNaN(bufferLength) || bufferLength === undefined)
+//         {
+//             bufferLength = 0;
+//         }
 
-        //httpRequests = hlsMetrics.getHttpRequests(metrics);
+//         //httpRequests = hlsMetrics.getHttpRequests(metrics);
 
-        droppedFramesMetrics = /** @type {DroppedFrames} */ (hlsMetrics.getCurrentDroppedFrames(metrics));
-        if (droppedFramesMetrics !== null)
-        {
-            droppedFrames = droppedFramesMetrics.droppedFrames;
-        }
+//         droppedFramesMetrics = /** @type {DroppedFrames} */ (hlsMetrics.getCurrentDroppedFrames(metrics));
+//         if (droppedFramesMetrics !== null)
+//         {
+//             droppedFrames = droppedFramesMetrics.droppedFrames;
+//         }
 
-        //pendingValue = this._hlsMediaPlayer.getQualityFor(type);
+//         //pendingValue = this._hlsMediaPlayer.getQualityFor(type);
 
-        //requestsQueue = hlsMetrics.getRequestsQueue(metrics);
+//         //requestsQueue = hlsMetrics.getRequestsQueue(metrics);
 
-        var result = {
-            bitrate: bitrate,
-            index: index,
-            pendingIndex: pendingIndex,
-            maxIndex: maxIndex,
-            bufferLength: bufferLength,
-            droppedFrames: droppedFrames
-                //requestsQueue: requestsQueue
-        };
+//         var result = {
+//             bitrate: bitrate,
+//             index: index,
+//             pendingIndex: pendingIndex,
+//             maxIndex: maxIndex,
+//             bufferLength: bufferLength,
+//             droppedFrames: droppedFrames
+//                 //requestsQueue: requestsQueue
+//         };
 
-        return result;
-    }
+//         return result;
+//     }
 
-    return null;
-};
+//     return null;
+// };
 
 /**
  * Private event handler for quality change.
@@ -1259,27 +1395,27 @@ FORGE.VideoHls.prototype._getMetricsFor = function(type, metrics, hlsMetrics)
  * @private
  * @param  {QualityEvents} event - The hls.js media player event.
  */
-FORGE.VideoHls.prototype._onQualityChangeHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onQualityChange [readyState: " + element.readyState + "]");
+// FORGE.VideoHls.prototype._onQualityChangeHandler = function(event)
+// {
+//     var element = this._video.element;
+//     this.log("onQualityChange [readyState: " + element.readyState + "]");
 
-    if (event.mediaType === FORGE.VideoHls.mediaType.AUDIO)
-    {
-        this._currentAudioIndex = event.newQuality;
-        this._currentAudioPendingIndex = event.newQuality;
-    }
-    else if (event.mediaType === FORGE.VideoHls.mediaType.VIDEO)
-    {
-        this._currentVideoIndex = event.newQuality;
-        this._currentVideoPendingIndex = event.newQuality;
+//     if (event.mediaType === FORGE.VideoHls.mediaType.AUDIO)
+//     {
+//         this._currentAudioIndex = event.newQuality;
+//         this._currentAudioPendingIndex = event.newQuality;
+//     }
+//     else if (event.mediaType === FORGE.VideoHls.mediaType.VIDEO)
+//     {
+//         this._currentVideoIndex = event.newQuality;
+//         this._currentVideoPendingIndex = event.newQuality;
 
-        if (this._onQualityChange !== null)
-        {
-            this._onQualityChange.dispatch(this._currentVideoPendingIndex);
-        }
-    }
-};
+//         if (this._onQualityChange !== null)
+//         {
+//             this._onQualityChange.dispatch(this._currentVideoPendingIndex);
+//         }
+//     }
+// };
 
 /**
  * Private event handler for quality request.
@@ -1287,27 +1423,27 @@ FORGE.VideoHls.prototype._onQualityChangeHandler = function(event)
  * @private
  * @param  {QualityEvents} event - The hls.js media player event.
  */
-FORGE.VideoHls.prototype._onQualityRequestHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onQualityRequest [readyState: " + element.readyState + "]");
+// FORGE.VideoHls.prototype._onQualityRequestHandler = function(event)
+// {
+//     var element = this._video.element;
+//     this.log("onQualityRequest [readyState: " + element.readyState + "]");
 
-    if (event.mediaType === FORGE.VideoHls.mediaType.AUDIO)
-    {
-        this._currentAudioIndex = event.oldQuality;
-        this._currentAudioPendingIndex = event.newQuality;
-    }
-    else if (event.mediaType === FORGE.VideoHls.mediaType.VIDEO)
-    {
-        this._currentVideoIndex = event.oldQuality;
-        this._currentVideoPendingIndex = event.newQuality;
+//     if (event.mediaType === FORGE.VideoHls.mediaType.AUDIO)
+//     {
+//         this._currentAudioIndex = event.oldQuality;
+//         this._currentAudioPendingIndex = event.newQuality;
+//     }
+//     else if (event.mediaType === FORGE.VideoHls.mediaType.VIDEO)
+//     {
+//         this._currentVideoIndex = event.oldQuality;
+//         this._currentVideoPendingIndex = event.newQuality;
 
-        if (this._onQualityRequest !== null)
-        {
-            this._onQualityRequest.dispatch(this._currentVideoPendingIndex);
-        }
-    }
-};
+//         if (this._onQualityRequest !== null)
+//         {
+//             this._onQualityRequest.dispatch(this._currentVideoPendingIndex);
+//         }
+//     }
+// };
 
 /**
  * Private event handler for quality request aborted.
@@ -1327,320 +1463,6 @@ FORGE.VideoHls.prototype._onQualityRequestHandler = function(event)
 // };
 
 /**
- * Private event handler for durationChange.
- * @method  FORGE.VideoHls#_onDurationChangeHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onDurationChangeHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onDurationChange [readyState: " + element.readyState + "]");
-
-    //@firefox - FF disptach durationchange twice on readystate HAVE_METADATA (1) & HAVE_ENOUGH_DATA (4)
-    //I will not dispatch this event if readystate is HAVE_ENOUGH_DATA (4) !
-    if (this._onDurationChange !== null && element.readyState === HTMLMediaElement.HAVE_METADATA)
-    {
-        this._onDurationChange.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for loadedMetaData.
- * @method  FORGE.VideoHls#_onLoadedMetaDataHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onLoadedMetaDataHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onLoadedMetaData [readyState: " + element.readyState + "]");
-
-    this._metaDataLoaded = true;
-
-    if (this._onLoadedMetaData !== null)
-    {
-        this._onLoadedMetaData.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for loadedData.
- * @method  FORGE.VideoHls#_onLoadedDataHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onLoadedDataHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onLoadedData [readyState: " + element.readyState + "]");
-
-    if (this._onLoadedData !== null)
-    {
-        this._onLoadedData.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for progress.
- * @method  FORGE.VideoHls#_onProgressHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onProgressHandler = function(event)
-{
-    //var element = this._video.element;
-    //this.log("onProgress [readyState: "+element.readyState+"]");
-
-    if (this._onProgress !== null)
-    {
-        this._onProgress.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for canPlay.
- * @method  FORGE.VideoHls#_onCanPlayHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onCanPlayHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onCanPlay [readyState: " + element.readyState + "]");
-
-    this._canPlay = true;
-
-    if (this._onCanPlay !== null)
-    {
-        this._onCanPlay.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for canPlayThrough.
- * @method  FORGE.VideoHls#_onCanPlayThroughHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onCanPlayThroughHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onCanPlayThrough [readyState: " + element.readyState + "]");
-
-    this._canPlay = true;
-
-    if (this._onCanPlayThrough !== null)
-    {
-        this._onCanPlayThrough.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for play.
- * @method  FORGE.VideoHls#_onPlayHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onPlayHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onPlay [readyState: " + element.readyState + "]");
-
-    if (this._onPlay !== null)
-    {
-        this._onPlay.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for pause.
- * @method  FORGE.VideoHls#_onPauseHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onPauseHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onPause [readyState: " + element.readyState + "]");
-
-    this._playing = false;
-
-    if (this._onPause !== null)
-    {
-        this._onPause.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for timeUpdate.
- * @method  FORGE.VideoHls#_onTimeUpdateHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onTimeUpdateHandler = function(event)
-{
-    //var element = this._video.element;
-    //this.log("onTimeUpdate [readyState: "+element.readyState+"]");
-
-    if (this._onTimeUpdate !== null)
-    {
-        this._onTimeUpdate.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for volumeChange.
- * @method  FORGE.VideoHls#_onVolumeChangeHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onVolumeChangeHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onVolumeChange [readyState: " + element.readyState + "]");
-
-    //I do not dispatch the volume change if readyState is HAVE_NOTHING (0).
-    //because I set the volume at 0 when I create the video element, it is not usefull to dispatch this internal volume change ?
-    if (this._onVolumeChange !== null && element.readyState !== HTMLMediaElement.HAVE_NOTHING)
-    {
-        this._onVolumeChange.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for seeking.
- * @method  FORGE.VideoHls#_onSeekingHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onSeekingHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onSeeking [readyState: " + element.readyState + "]");
-
-    this._canPlay = false;
-
-    if (this._onSeeking !== null)
-    {
-        this._onSeeking.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for seeked.
- * @method  FORGE.VideoHls#_onSeekedHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onSeekedHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onSeeked [readyState: " + element.readyState + "]");
-
-    this._canPlay = false;
-
-    if (this._onSeeked !== null)
-    {
-        this._onSeeked.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for ended.
- * @method  FORGE.VideoHls#_onEndedHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onEndedHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onEnded [readyState: " + element.readyState + "]");
-
-    this._playing = false;
-    //this._dom.currentTime = 0;
-    this._endCount++;
-
-    if (this._loop === true)
-    {
-        this.play();
-    }
-
-    if (this._onEnded !== null)
-    {
-        this._onEnded.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for error.
- * @method  FORGE.VideoHls#_onErrorHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onErrorHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onError [readyState: " + element.readyState + "]");
-
-    if (this._onError !== null)
-    {
-        this._onError.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for stalled.
- * @method  FORGE.VideoHls#_onStalledHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onStalledHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onStalled [readyState: " + element.readyState + "]");
-
-    if (this._onStalled !== null)
-    {
-        this._onStalled.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for rate change.
- * @method  FORGE.VideoHls#_onRateChangeHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onRateChangeHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onRateChange [readyState: " + element.readyState + "]");
-
-    if (this._onRateChange !== null)
-    {
-        this._onRateChange.dispatch(event);
-    }
-};
-
-/**
- * Private event handler for playing.
- * @method  FORGE.VideoHls#_onPlayingHandler
- * @private
- * @param  {Event} event - The native video event.
- */
-FORGE.VideoHls.prototype._onPlayingHandler = function(event)
-{
-    var element = this._video.element;
-    this.log("onPlaying [readyState: " + element.readyState + "]");
-
-    if (this._onPlaying !== null)
-    {
-        this._onPlaying.dispatch(event);
-    }
-};
-
-/**
  * Destroy a video object at a specified index, wiil look at the video object into _videos array then detoy it.
  * @method FORGE.VideoHls#_destroyVideo
  * @private
@@ -1649,16 +1471,21 @@ FORGE.VideoHls.prototype._destroyVideo = function()
 {
     this.log("_destroyVideo");
 
-    if (this._hlsMediaPlayer !== null && this._hlsMediaPlayer.isReady() === true)
+    var v = this._video;
+    var element = v.element;
+
+    if (this._hlsMediaPlayer !== null && this._isReady === true && typeof element !== "undefined")
     {
         this._uninstallEvents();
 
-        this._hlsMediaPlayer.pause();
-        this._hlsMediaPlayer.reset();
+        element.pause();
+
+        this._hlsMediaPlayer.stopLoad();
+        this._hlsMediaPlayer.detachMedia();
+        this._hlsMediaPlayer.destroy();
     }
 
-    var video = this._video;
-    var element = video.element;
+    this._onEventBind = null;
 
     if (typeof element !== "undefined" && element !== null)
     {
@@ -1669,21 +1496,21 @@ FORGE.VideoHls.prototype._destroyVideo = function()
     }
 
     element = null;
-    video.element = null;
+    v.element = null;
 
-    if (video.buffer !== null)
+    if (v.buffer !== null)
     {
-        video.buffer.destroy();
-        video.buffer = null;
+        v.buffer.destroy();
+        v.buffer = null;
     }
 
-    if (video.played !== null)
+    if (v.played !== null)
     {
-        video.played.destroy();
-        video.played = null;
+        v.played.destroy();
+        v.played = null;
     }
 
-    video = null;
+    v = null;
 };
 
 /**
@@ -1697,7 +1524,7 @@ FORGE.VideoHls.prototype._disableSoundHandler = function()
 
     if (v !== null && v.element !== null && this._viewer.audio.enabled === false)
     {
-        this._hlsMediaPlayer.setVolume(0);
+        v.element.volume = 0;
     }
 };
 
@@ -1722,15 +1549,7 @@ FORGE.VideoHls.prototype._updateVolume = function()
 
     if (v !== null && v.element !== null && this._viewer.audio.enabled === true)
     {
-        this._hlsMediaPlayer.setVolume(this._volume * this._viewer.audio.volume);
-        if (this._muted === true)
-        {
-            this._hlsMediaPlayer.setMute(true);
-        }
-        else
-        {
-            this._hlsMediaPlayer.setMute(false);
-        }
+        v.element.volume = this._volume * this._viewer.audio.volume;
     }
 };
 
@@ -1740,44 +1559,44 @@ FORGE.VideoHls.prototype._updateVolume = function()
  * @param {number} index - The quality index.
  * @private
  */
-FORGE.VideoHls.prototype._setRequestQuality = function(index)
-{
-    this._currentVideoPendingIndex = index;
+// FORGE.VideoHls.prototype._setRequestQuality = function(index)
+// {
+//     this._currentVideoPendingIndex = index;
 
-    if (this._streamInfo !== null && this._hlsMediaPlayer !== null && this._hlsMediaPlayer.isReady() === true && this._hlsMetrics !== null)
-    {
-        var streamIndex = this._streamInfo.index;
-        var maxVideoIndex = this._hlsMetrics.getMaxIndexForBufferType(FORGE.VideoHls.mediaType.VIDEO, streamIndex);
-        var maxAudioIndex = this._hlsMetrics.getMaxIndexForBufferType(FORGE.VideoHls.mediaType.AUDIO, streamIndex);
+//     if (this._streamInfo !== null && this._hlsMediaPlayer !== null && this._isReady === true && this._hlsMetrics !== null)
+//     {
+//         var streamIndex = this._streamInfo.index;
+//         var maxVideoIndex = this._hlsMetrics.getMaxIndexForBufferType(FORGE.VideoHls.mediaType.VIDEO, streamIndex);
+//         var maxAudioIndex = this._hlsMetrics.getMaxIndexForBufferType(FORGE.VideoHls.mediaType.AUDIO, streamIndex);
 
-        var newVideoIndex = index,
-            newAudioIndex = index;
+//         var newVideoIndex = index,
+//             newAudioIndex = index;
 
-        // zero based indexes
-        if (newVideoIndex >= maxVideoIndex)
-        {
-            newVideoIndex = maxVideoIndex - 1;
-        }
-        if (newVideoIndex < 0)
-        {
-            newVideoIndex = 0;
-        }
-        if (newAudioIndex >= maxAudioIndex)
-        {
-            newAudioIndex = maxAudioIndex - 1;
-        }
-        if (newAudioIndex < 0)
-        {
-            newAudioIndex = 0;
-        }
+//         // zero based indexes
+//         if (newVideoIndex >= maxVideoIndex)
+//         {
+//             newVideoIndex = maxVideoIndex - 1;
+//         }
+//         if (newVideoIndex < 0)
+//         {
+//             newVideoIndex = 0;
+//         }
+//         if (newAudioIndex >= maxAudioIndex)
+//         {
+//             newAudioIndex = maxAudioIndex - 1;
+//         }
+//         if (newAudioIndex < 0)
+//         {
+//             newAudioIndex = 0;
+//         }
 
-        this._hlsMediaPlayer.setQualityFor(FORGE.VideoHls.mediaType.VIDEO, newVideoIndex);
-        this._hlsMediaPlayer.setQualityFor(FORGE.VideoHls.mediaType.AUDIO, newAudioIndex);
-    }
+//         this._hlsMediaPlayer.setQualityFor(FORGE.VideoHls.mediaType.VIDEO, newVideoIndex);
+//         this._hlsMediaPlayer.setQualityFor(FORGE.VideoHls.mediaType.AUDIO, newAudioIndex);
+//     }
 
-    // Update the volume for the requested video
-    this._updateVolume();
-};
+//     // Update the volume for the requested video
+//     this._updateVolume();
+// };
 
 /**
  * Sets the quality mode.<br>
@@ -1797,7 +1616,7 @@ FORGE.VideoHls.prototype._setQualityMode = function(mode)
     {
         this._qualityMode = mode;
 
-        // if (this._hlsMediaPlayer !== null && this._hlsMediaPlayer.isReady() === true)
+        // if (this._hlsMediaPlayer !== null && this._isReady === true)
         // {
         //     if (mode === FORGE.VideoQualityMode.MANUAL)
         //     {
@@ -1850,12 +1669,30 @@ FORGE.VideoHls.prototype.play = function(time, loop)
 {
     FORGE.VideoBase.prototype.play.call(this, time, loop);
 
-    if (this._hlsMediaPlayer !== null && this._hlsMediaPlayer.isReady() === true)
+    var currentVideo = this._video;
+
+    if (this._hlsMediaPlayer !== null && this._isReady === true && currentVideo !== null && currentVideo.element !== null)
     {
-        this._hlsMediaPlayer.play();
-        this._playing = true;
-        this._paused = false;
-        this._playCount++;
+        var p = currentVideo.element.play();
+        if (typeof p !== "undefined" && typeof Promise !== "undefined" && p instanceof Promise)
+        {
+            p.then(function()
+            {
+                this._playing = true;
+                this._paused = false;
+                this._playCount++;
+            }.bind(this))
+            .catch(function(error)
+            {
+                this.log("Error while playing the video : " + error);
+            }.bind(this));
+        }
+        else
+        {
+            this._playing = true;
+            this._paused = true;
+            this._playCount++;
+        }
     }
 };
 
@@ -1865,9 +1702,11 @@ FORGE.VideoHls.prototype.play = function(time, loop)
  */
 FORGE.VideoHls.prototype.pause = function()
 {
-    if (this._hlsMediaPlayer !== null && this._hlsMediaPlayer.isReady() === true)
+    var currentVideo = this._video;
+
+    if (this._hlsMediaPlayer !== null && this._isReady === true && currentVideo !== null && currentVideo.element !== null)
     {
-        this._hlsMediaPlayer.pause();
+        currentVideo.element.pause();
         this._playing = false;
         this._paused = true;
     }
@@ -1879,11 +1718,12 @@ FORGE.VideoHls.prototype.pause = function()
  */
 FORGE.VideoHls.prototype.stop = function()
 {
-    if (this._hlsMediaPlayer !== null && this._hlsMediaPlayer.isReady() === true)
+    var currentVideo = this._video;
+
+    if (this._hlsMediaPlayer !== null && this._isReady === true && currentVideo !== null && currentVideo.element !== null)
     {
-        this._hlsMediaPlayer.pause();
-        this._hlsMediaPlayer.seek(0);
-        this._video.element.currentTime = 0;
+        currentVideo.element.pause();
+        currentVideo.element.currentTime = 0;
         this._playing = false;
         this._paused = true;
     }
@@ -1949,20 +1789,6 @@ FORGE.VideoHls.prototype.unmute = function(volume)
     if (this._onUnmute !== null)
     {
         this._onUnmute.dispatch();
-    }
-};
-
-/**
- * Enable/Disable the buffer-occupancy-based (BOLA) ABR rule set.<br>
- * BOLA white paper: http://arxiv.org/abs/1601.06748.
- * @method  FORGE.VideoHls#enableBufferOccupancyABR
- * @param {boolean} bool - Is the BOLA rule set is activated?
- */
-FORGE.VideoHls.prototype.enableBufferOccupancyABR = function(bool)
-{
-    if (this._hlsMediaPlayer !== null && this._hlsMediaPlayer.isReady() === true)
-    {
-        this._hlsMediaPlayer.enableBufferOccupancyABR(bool);
     }
 };
 
@@ -2076,6 +1902,12 @@ FORGE.VideoHls.prototype.destroy = function()
         this._onStalled = null;
     }
 
+    if (this._onWaiting !== null)
+    {
+        this._onWaiting.destroy();
+        this._onWaiting = null;
+    }
+
     if (this._onRateChange !== null)
     {
         this._onRateChange.destroy();
@@ -2118,47 +1950,28 @@ FORGE.VideoHls.prototype.destroy = function()
         this._onQualityModeChange = null;
     }
 
-    if (this._onMetricsChanged !== null)
-    {
-        this._onMetricsChanged.destroy();
-        this._onMetricsChanged = null;
-    }
+    // if (this._onMetricsChanged !== null)
+    // {
+    //     this._onMetricsChanged.destroy();
+    //     this._onMetricsChanged = null;
+    // }
 
-    this._onLoadStartBind = null;
-    this._onLoadedMetaDataBind = null;
-    this._onLoadedDataBind = null;
-    this._onProgressBind = null;
-    this._onDurationChangeBind = null;
-    this._onCanPlayBind = null;
-    this._onCanPlayThroughBind = null;
-    this._onPlayBind = null;
-    this._onPauseBind = null;
-    this._onTimeUpdateBind = null;
-    this._onVolumeChangeBind = null;
-    this._onSeekingBind = null;
-    this._onSeekedBind = null;
-    this._onEndedBind = null;
-    this._onErrorBind = null;
-    this._onPlayingBind = null;
-    this._onStalledBind = null;
-    this._onRateChangeBind = null;
-    this._onQualityRequestBind = null;
-    this._onQualityChangeBind = null;
+    // this._onQualityRequestBind = null;
+    // this._onQualityChangeBind = null;
     //this._onQualityAbortBind = null;
-    this._onMetricsChangedBind = null;
+    // this._onMetricsChangedBind = null;
 
     //Unbind main volume event
     this._viewer.audio.onVolumeChange.remove(this._mainVolumeChangeHandler, this);
 
     this._viewer.audio.onDisable.remove(this._disableSoundHandler, this);
 
-    this._hlsMediaPlayer = null;
-    this._playerVideoMetrics = null;
-    this._playerAudioMetrics = null;
-    this._hlsMetrics = null;
+    // this._playerVideoMetrics = null;
+    // this._playerAudioMetrics = null;
+    // this._hlsMetrics = null;
 
-    this._monitoring = null;
-    this._streamInfo = null;
+    // this._monitoring = null;
+    // this._streamInfo = null;
 
     this._config = null;
 
@@ -2415,19 +2228,34 @@ Object.defineProperty(FORGE.VideoHls.prototype, "currentTime",
     /** @this {FORGE.VideoHls} */
     get: function()
     {
-        return this._hlsMediaPlayer.time();
+        // return this._hlsMediaPlayer.time();
+        return this._getCurrentVideoElementProperty("currentTime", 0);
     },
 
     /** @this {FORGE.VideoHls} */
     set: function(value)
     {
-        if (typeof value === "number") // && value < this.duration) //@todo see if we can put video currentTime in pending if no metadata received ?
-        {
-            this._hlsMediaPlayer.seek(value);
+        // if (typeof value === "number") // && value < this.duration) //@todo see if we can put video currentTime in pending if no metadata received ?
+        // {
+        //     this._hlsMediaPlayer.seek(value);
 
-            if (this._onCurrentTimeChange !== null)
+        //     if (this._onCurrentTimeChange !== null)
+        //     {
+        //         this._onCurrentTimeChange.dispatch(value);
+        //     }
+        // }
+        if (typeof value === "number") //@todo see if we can put video currentTime in pending if no metadata received ? (typeof value === "number" && value < this.duration)
+        {
+            var currentVideo = this._video;
+
+            if (currentVideo !== null && currentVideo.element !== null)
             {
-                this._onCurrentTimeChange.dispatch(value);
+                currentVideo.element.currentTime = value;
+
+                if (this._onCurrentTimeChange !== null)
+                {
+                    this._onCurrentTimeChange.dispatch(value);
+                }
             }
         }
     }
@@ -2957,6 +2785,26 @@ Object.defineProperty(FORGE.VideoHls.prototype, "onStalled",
 });
 
 /**
+ * Get the "onWaiting" event {@link FORGE.EventDispatcher} of the video.
+ * @name FORGE.VideoHls#onWaiting
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.VideoHls.prototype, "onWaiting",
+{
+    /** @this {FORGE.VideoHls} */
+    get: function()
+    {
+        if (this._onWaiting === null)
+        {
+            this._onWaiting = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onWaiting;
+    }
+});
+
+/**
  * Get the "onRateChange" event {@link FORGE.EventDispatcher} of the video.
  * @name FORGE.VideoHls#onRateChange
  * @readonly
@@ -2973,21 +2821,6 @@ Object.defineProperty(FORGE.VideoHls.prototype, "onRateChange",
         }
 
         return this._onRateChange;
-    }
-});
-
-/**
- * Get a copy of the "onStalled" event for the "onWaiting" event {@link FORGE.EventDispatcher} of the video.
- * @name FORGE.VideoHls#onWaiting
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.VideoHls.prototype, "onWaiting",
-{
-    /** @this {FORGE.VideoHls} */
-    get: function()
-    {
-        return this.onStalled;
     }
 });
 
