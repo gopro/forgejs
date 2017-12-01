@@ -342,7 +342,7 @@ FORGE.Media.prototype._onLoadedMetaDataHandler = function()
 
 /**
  * Method to dispatch the load complete event and set the media ready.
- * @method FORGE.Media#_onLoadedMetaDataHandler
+ * @method FORGE.Media#_notifyLoadComplete
  */
 FORGE.Media.prototype._notifyLoadComplete = function()
 {
