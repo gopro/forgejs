@@ -432,7 +432,10 @@ FORGE.RenderManager.prototype._mediaQualityChangeHandler = function(event)
 {
     this.log("Media quality has changed");
 
-    this._backgroundRenderer.displayObject = event.emitter;
+    if (this._backgroundRenderer !== null)
+    {
+        this._backgroundRenderer.displayObject = event.emitter;
+    }
 };
 
 /**
