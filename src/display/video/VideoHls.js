@@ -400,6 +400,14 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
     this._onSwitchCompletedBind = null;
 
     /**
+     * Event handler for error.
+     * @name  FORGE.VideoHls#_onErrorBind
+     * @type {Function}
+     * @private
+     */
+    this._onErrorBind = null;
+
+    /**
      * Event handler for all events fired by the HTMLVideoElement. See https://developer.mozilla.org/en/docs/Web/Guide/Events/Media_events for a list of available events.
      * @name FORGE.VideoHls#_onEventBind
      * @type {Function}
@@ -468,6 +476,7 @@ FORGE.VideoHls.prototype._boot = function()
     this._onQualityRequestBind = this._onQualityRequestHandler.bind(this);
     this._onQualityChangeBind = this._onQualityChangeHandler.bind(this);
     this._onSwitchCompletedBind = this._onSwitchCompletedHandler.bind(this);
+    this._onErrorBind = this._onErrorHandler.bind(this);
 
     //Listen to the main volume change to adapt the video volume accordingly.
     this._viewer.audio.onVolumeChange.add(this._mainVolumeChangeHandler, this);
@@ -704,6 +713,7 @@ FORGE.VideoHls.prototype._installEvents = function()
     this._hlsMediaPlayer.on(Hls.ErrorDetails.LEVEL_LOAD_ERROR, this._onQualityAbortBind);
     this._hlsMediaPlayer.on(Hls.ErrorDetails.LEVEL_LOAD_TIMEOUT, this._onQualityAbortBind);
     this._hlsMediaPlayer.on(Hls.ErrorDetails.LEVEL_SWITCH_ERROR, this._onQualityAbortBind);
+    this._hlsMediaPlayer.on(Hls.Events.ERROR, this._onErrorBind);
 
     var element = this._video.element;
 
@@ -757,6 +767,7 @@ FORGE.VideoHls.prototype._uninstallEvents = function()
     element.removeEventListener("playing", this._onEventBind, false);
     element.removeEventListener("ratechange", this._onEventBind, false);
 
+    this._hlsMediaPlayer.off(Hls.Events.ERROR, this._onErrorBind);
     this._hlsMediaPlayer.off(Hls.ErrorDetails.LEVEL_LOAD_ERROR, this._onQualityAbortBind);
     this._hlsMediaPlayer.off(Hls.ErrorDetails.LEVEL_LOAD_TIMEOUT, this._onQualityAbortBind);
     this._hlsMediaPlayer.off(Hls.ErrorDetails.LEVEL_SWITCH_ERROR, this._onQualityAbortBind);
@@ -960,6 +971,40 @@ FORGE.VideoHls.prototype._onEventHandler = function(event)
             this.warn("The event \"" + event.type + "\" is not handled.");
 
             break;
+    }
+};
+
+/**
+ * Private event handler for HLS errors.
+ * @method  FORGE.VideoHls#_onErrorHandler
+ * @param  {string} event - The hls.js media player event.
+ * @param  {Object} data - The hls.js media player event data.
+ * @private
+ */
+FORGE.VideoHls.prototype._onErrorHandler = function(event, data)
+{
+    var element = this._video.element;
+    this.log(event+" [readyState: " + element.readyState + "]");
+
+    if (data.fatal)
+    {
+        switch(data.type)
+        {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+                // try to recover network error
+                this.log("Fatal network error encountered, try to recover");
+                this._hlsMediaPlayer.startLoad();
+                break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+                // try to recover a media error
+                this.log("Fatal media error encountered, try to recover");
+                this._hlsMediaPlayer.recoverMediaError();
+                break;
+            default:
+                // cannot recover
+                this.destroy();
+                break;
+        }
     }
 };
 
@@ -1589,6 +1634,7 @@ FORGE.VideoHls.prototype.destroy = function()
         this._onQualityModeChange = null;
     }
 
+    this._onErrorBind = null;
     this._onQualityRequestBind = null;
     this._onQualityChangeBind = null;
     this._onQualityAbortBind = null;
