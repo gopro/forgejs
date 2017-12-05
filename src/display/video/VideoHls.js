@@ -122,7 +122,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * The hls.js Media Player library.<br>
      * The hls.js library must be loaded prior to the video instanciation!
      * @name  FORGE.VideoHls#_hlsMediaPlayer
-     * @type {Hls.MediaPlayer}
+     * @type {Hls}
      * @private
      */
     this._hlsMediaPlayer = null;
@@ -130,7 +130,7 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
     /**
      * Is the hls.js Media Player ready?
      * @name  FORGE.VideoHls#_isReady
-     * @type {Hls.MediaPlayer}
+     * @type {boolean}
      * @private
      */
     this._isReady = false;
@@ -366,6 +366,22 @@ FORGE.VideoHls = function(viewer, key, config, qualityMode)
      * @private
      */
     this._onQualityModeChange = null;
+
+    /**
+     * Event handler for HLS source binded to this.
+     * @name  FORGE.VideoHls#_loadHlsMediaPlayerSourceBind
+     * @type {Function}
+     * @private
+     */
+    this._loadHlsMediaPlayerSourceBind = null;
+
+    /**
+     * Event handler for hls manifest parsed binded to this.
+     * @name  FORGE.VideoHls#_launchHlsMediaPlayerBind
+     * @type {Function}
+     * @private
+     */
+    this._launchHlsMediaPlayerBind;
 
     /**
      * Event handler for current video quality request binded to this.
@@ -1012,30 +1028,30 @@ FORGE.VideoHls.prototype._onErrorHandler = function(event, data)
  * Create a qualities array from the levels info list.
  * @method FORGE.VideoHls#_createQualitiesFromBitrateInfoList
  * @param  {string} url - The manifest url.
- * @param  {Array<Level>} levels - The levels array.
+ * @param  {Array<Hls.Level>} levels - The levels array.
  * @param  {boolean=} checkURL - URL must be checked?
  * @return {Array<FORGE.VideoQuality>} The qualities array.
  * @private
  */
-FORGE.VideoHls.prototype._createQualitiesFromBitrateInfoList = function(url, bitrates, checkURL)
+FORGE.VideoHls.prototype._createQualitiesFromBitrateInfoList = function(url, levels, checkURL)
 {
     var qualities = [];
     var quality;
 
-    if (bitrates !== null)
+    if (levels !== null)
     {
-        for (var i = 0, ii = bitrates.length; i < ii; i++)
+        for (var i = 0, ii = levels.length; i < ii; i++)
         {
-            if (checkURL === true && typeof bitrates[i].url !== undefined && FORGE.URL.isValid(bitrates[i].url[0]) === false)
+            if (checkURL === true && typeof levels[i].url !== undefined && FORGE.URL.isValid(levels[i].url[0]) === false)
             {
                 throw "FORGE.Video: URL " + url + " is invalid";
             }
 
-            quality = new FORGE.VideoQuality(bitrates[i].url[0]);
+            quality = new FORGE.VideoQuality(levels[i].url[0]);
             quality.id = i;
-            quality.bitrate = bitrates[i].bitrate;
-            quality.width = bitrates[i].width;
-            quality.height = bitrates[i].height;
+            quality.bitrate = levels[i].bitrate;
+            quality.width = levels[i].width;
+            quality.height = levels[i].height;
 
             qualities.push(quality);
         }
@@ -1145,10 +1161,8 @@ FORGE.VideoHls.prototype._onQualityRequestHandler = function(event, data)
  * Private event handler for quality request aborted.
  * @method  FORGE.VideoHls#_onQualityAbortHandler
  * @private
- * @param  {string} event - The hls.js media player event.
- * @param  {Object} data - The hls.js media player event data.
  */
-FORGE.VideoHls.prototype._onQualityAbortHandler = function(event, data)
+FORGE.VideoHls.prototype._onQualityAbortHandler = function()
 {
     var element = this._video.element;
     this.log("onQualityAbort [readyState: "+element.readyState+"]");
@@ -1178,6 +1192,10 @@ FORGE.VideoHls.prototype._destroyVideo = function()
         element.pause();
 
         this._hlsMediaPlayer.stopLoad();
+
+        this._hlsMediaPlayer.off(Hls.Events.MEDIA_ATTACHED, this._loadHlsMediaPlayerSourceBind);
+        this._hlsMediaPlayer.off(Hls.Events.MANIFEST_PARSED, this._launchHlsMediaPlayerBind);
+
         this._hlsMediaPlayer.detachMedia();
         this._hlsMediaPlayer.destroy();
     }
@@ -1634,11 +1652,14 @@ FORGE.VideoHls.prototype.destroy = function()
         this._onQualityModeChange = null;
     }
 
+    this._onEventBind = null;
     this._onErrorBind = null;
     this._onQualityRequestBind = null;
     this._onQualityChangeBind = null;
     this._onQualityAbortBind = null;
     this._onSwitchCompletedBind = null;
+    this._loadHlsMediaPlayerSourceBind = null;
+    this._launchHlsMediaPlayerBind = null;
 
     //Unbind main volume event
     this._viewer.audio.onVolumeChange.remove(this._mainVolumeChangeHandler, this);
@@ -1653,20 +1674,6 @@ FORGE.VideoHls.prototype.destroy = function()
 
     FORGE.VideoBase.prototype.destroy.call(this);
 };
-
-/**
- * Get the monitoring object related to the video.
- * @name FORGE.VideoHls#monitoring
- * @type {Object}
- */
-Object.defineProperty(FORGE.VideoHls.prototype, "monitoring",
-{
-    /** @this {FORGE.VideoHls} */
-    get: function()
-    {
-        return this._monitoring;
-    }
-});
 
 /**
  * Get and set the quality index of the video.
@@ -1900,7 +1907,6 @@ Object.defineProperty(FORGE.VideoHls.prototype, "currentTime",
     /** @this {FORGE.VideoHls} */
     get: function()
     {
-        // return this._hlsMediaPlayer.time();
         return this._getCurrentVideoElementProperty("currentTime", 0);
     },
 
