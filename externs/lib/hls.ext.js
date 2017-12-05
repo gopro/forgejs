@@ -4,340 +4,618 @@
  */
 
 /**
- * @const
- */
-var Hls = {};
-
-
-/*
-.attachMedia(video)
-.on(event, function)
-.loadSource(url)
-
-Hls.Events.MEDIA_ATTACHED
-Hls.Events.MANIFEST_PARSED
-
-
-
-
-
-
- */
-
-
-/**
  * @constructor
- * @return {!MediaPlayer}
+ * @param {Hls.Config} config
+ * @return {!Hls}
  */
-// function MediaPlayer() {};
-
-/**
- * @param {HTMLMediaElement=} video
- * @param {HTMLSourceElement=} source
- * @param {Object=} context
- * @return {MediaPlayer|null}
- */
-// MediaPlayer.prototype.create = function(video, source, context) {};
-
-/**
- * @param {HTMLMediaElement=} view - Optional arg to set the video element.
- * @param {string=} source - Optional arg to set the media source.
- * @param {boolean=} AutoPlay - Optional arg to set auto play.
- */
-// MediaPlayer.prototype.initialize = function(view, source, AutoPlay) {};
-
-/**
- * @param {boolean} value
- */
-// MediaPlayer.prototype.setAutoPlay = function(value) {};
-
-/**
- * @param {Object} element
- */
-// MediaPlayer.prototype.attachView = function(element) {};
-
-/**
- * @param {(string|Object)} urlOrManifest
- */
-// MediaPlayer.prototype.attachSource = function(urlOrManifest) {};
+function Hls(config) {};
 
 /**
  * @return {boolean}
  */
-// MediaPlayer.prototype.isReady = function() {};
-
-// MediaPlayer.prototype.play = function() {};
-
-// MediaPlayer.prototype.pause = function() {};
-
-// MediaPlayer.prototype.reset = function() {};
+Hls.isSupported = function() {};
 
 /**
- * @param {boolean} value
+ * @type {string}
  */
-// MediaPlayer.prototype.setMute = function(value) {};
+Hls.version;
 
 /**
- * @param {number} value
+ * @type {Array}
  */
-// MediaPlayer.prototype.setVolume = function(value) {};
+Hls.DefaultConfig;
 
 /**
- * @param {number} value
+ * @return {undefined}
  */
-// MediaPlayer.prototype.seek = function(value) {};
+Hls.prototype.destroy = function() {};
 
 /**
- * @param {string=} streamId
+ * @param {HTMLVideoElement} media
+ * @return {undefined}
  */
-// MediaPlayer.prototype.time = function(streamId) {};
+Hls.prototype.attachMedia = function(media) {};
 
 /**
- * @return {number}
+ * @return {undefined}
  */
-// MediaPlayer.prototype.duration = function() {};
+Hls.prototype.detachMedia = function() {};
 
 /**
- * @param {string} type - {@link MediaPlayerEvents}
- * @param {Function} listener - callback method when the event fires.
- * @param {Object=} scope - context of the listener so it can be removed properly.
+ * @param {string} url
+ * @return {undefined}
  */
-// MediaPlayer.prototype.on = function(type, listener, scope) {};
+Hls.prototype.loadSource = function(url) {};
 
 /**
- * @param {string} type - {@link MediaPlayerEvents}
- * @param {Function} listener - callback method when the event fires.
- * @param {Object=} scope - context of the listener so it can be removed properly.
+ * @param {number=} startPosition
+ * @return {undefined}
  */
-// MediaPlayer.prototype.off = function(type, listener, scope) {};
+Hls.prototype.startLoad = function(startPosition) {};
 
 /**
- * @return {Debug}
+ * @return {undefined}
  */
-// MediaPlayer.prototype.getDebug = function() {};
+Hls.prototype.stopLoad = function() {};
 
 /**
- * @return {DashMetrics}
+ * @return {undefined}
  */
-// MediaPlayer.prototype.getDashMetrics = function() {};
+Hls.prototype.swapAudioCodec = function() {};
 
 /**
- * @param {string} type
- * @return {Object}
+ * @return {undefined}
  */
-// MediaPlayer.prototype.getMetricsFor = function(type) {};
+Hls.prototype.recoverMediaError = function() {};
 
 /**
- * @param {string} type
- * @return {number}
+ * @type {Array<Hls.Level>}
  */
-// MediaPlayer.prototype.getQualityFor = function(type) {};
+Hls.prototype.levels;
 
 /**
- * @param {string} type
- * @param {number} value
+ * @type {number}
  */
-// MediaPlayer.prototype.setQualityFor = function(type, value) {};
+Hls.prototype.currentLevel;
 
 /**
- * @param {string} type
- * @return {Array}
+ * @type {number}
  */
-// MediaPlayer.prototype.getBitrateInfoListFor = function(type) {};
+Hls.prototype.nextLevel;
 
 /**
- * @param {string} type - 'audio' | 'video'
- * @param {boolean} value
- * @default {boolean} true
+ * @type {number}
  */
-// MediaPlayer.prototype.setAutoSwitchQualityFor = function(type, value) {};
+Hls.prototype.loadLevel;
 
 /**
- * @param {boolean} value
- * @default false
+ * @type {number}
  */
-// MediaPlayer.prototype.setFastSwitchEnabled = function(value) {};
+Hls.prototype.nextLoadLevel;
 
 /**
- * @param {boolean} value
- * @default {boolean} true
+ * @type {number}
  */
-// MediaPlayer.prototype.setScheduleWhilePaused = function(value) {};
+Hls.prototype.firstLevel;
 
 /**
- * @param {boolean} value
- * @default false
+ * @type {number}
  */
-// MediaPlayer.prototype.enableBufferOccupancyABR = function(value) {};
+Hls.prototype.startLevel;
+
+/**
+ * @type {number}
+ */
+Hls.prototype.autoLevelCapping;
+
+/**
+ * @type {boolean}
+ */
+Hls.prototype.autoLevelEnabled;
+
+/**
+ * @type {number}
+ */
+Hls.prototype.manualLevel;
+
+/**
+ * @type {number}
+ */
+Hls.prototype.minAutoLevel;
+
+/**
+ * @type {number}
+ */
+Hls.prototype.maxAutoLevel;
+
+/**
+ * @type {number}
+ */
+Hls.prototype.nextAutoLevel;
+
+/**
+ * @type {Array}
+ */
+Hls.prototype.audioTracks;
+
+/**
+ * @type {number}
+ */
+Hls.prototype.audioTrack;
+
+/**
+ * @type {number}
+ */
+Hls.prototype.liveSyncPosition;
+
+/**
+ * @type {Array}
+ */
+Hls.prototype.subtitleTracks;
+
+/**
+ * @type {number}
+ */
+Hls.prototype.subtitleTrack;
+
+/**
+ * @typedef {{
+ *   url: string,
+ *   responseType: string,
+ *   type: string,
+ *   rangeStart: (number|undefined),
+ *   rangeEnd: (number|undefined),
+ *   progressData: (boolean|undefined)
+ * }}
+ */
+Hls.Context;
+
+/**
+ * @typedef {{
+ *   autoStartLoad: (boolean|undefined),
+ *   startPosition: (number|undefined),
+ *   debug: (boolean|undefined),
+ *   startLevel: (number|undefined),
+ *   enableWebVTT: (boolean|undefined),
+ *   enableCEA708Captions: (boolean|undefined),
+ *   stretchShortVideoTrack: (boolean|undefined),
+ *   maxAudioFramesDrift : (number|undefined),
+ *   forceKeyFrameOnDiscontinuity: (boolean|undefined)
+ * }}
+ */
+Hls.Config;
+
+/**
+ * @typedef {{
+ *   context: Hls.Context,
+ *   config: Hls.Config,
+ *   callbacks: {onSuccess: function(), onProgress: function(), onError: function(), onTimeout: function()},
+ *   load: function(Object, Object, Object),
+ *   abort: function(),
+ *   destroy: function()
+ * }}
+ */
+Hls.Loader;
+
+/**
+ * @typedef {{
+ *   type: string,
+ *   level: number,
+ *   loader: Hls.Loader,
+ *   autoLevel: boolean,
+ *   duration: number,
+ *   sn: (number|string),
+ *   bitrateTest: boolean,
+ *   loadCounter: number,
+ *   cc: number,
+ *   loadIdx: number,
+ *   decryptdata: ({uri: string, key: Object}|undefined),
+ *   start: number,
+ *   dropped: number,
+ *   startPTS: number,
+ *   endPTS: number,
+ *   startDTS: number,
+ *   endDTS: number,
+ *   deltaPTS: number,
+ *   backtracked: boolean,
+ *   trackId: number,
+ *   byteLength: number,
+ *   loaded: number,
+ *   byteRangeStartOffset: number,
+ *   byteRangeEndOffset: number,
+ *   lastByteRangeEndOffset: number,
+ *   rawByteRange: Array,
+ *   rawProgramDateTime: Array,
+ *   title: string,
+ *   tagList: Array,
+ *   levelkey: LevelKey,
+ *   baseurl: string,
+ *   relurl: string,
+ *   url: string
+ * }}
+ */
+Hls.Fragment;
+
+/**
+ * @typedef {{
+ *   url: Array<string>,
+ *   bitrate: (number|undefined),
+ *   name: (string|undefined),
+ *   codecs: (string|undefined),
+ *   width: (number|undefined),
+ *   height: (number|undefined)
+ * }}
+ */
+Hls.Level;
+
+/**
+ * @typedef {{
+ *   version: number,
+ *   type: (string|undefined),
+ *   startSN: number,
+ *   endSN: number,
+ *   totalduration: number,
+ *   targetduration: number,
+ *   fragments: Array<Hls.Fragment>,
+ *   live: boolean
+ * }}
+ */
+Hls.LevelDetails;
+
+/**
+ * @typedef {{
+ *   trequest: number,
+ *   tfirst: number,
+ *   tload: number,
+ *   loaded: number,
+ *   bw: (number|undefined),
+ *   total: (number|undefined)
+ * }}
+ */
+Hls.Stats;
+
+/**
+ * @typedef {{
+ *   code: number,
+ *   text: string
+ * }}
+ */
+Hls.Response;
+
+/**
+ * @typedef {{
+ *   type: (string|undefined),
+ *   details: (string|undefined),
+ *   fatal: (boolean|undefined),
+ *   url: (string|undefined),
+ *   reason: (string|undefined),
+ *   err: (Error|undefined),
+ *   mimeType: (string|undefined),
+ *   parent: (string|undefined),
+ *   content: (string|undefined),
+ *   hole: (number|undefined),
+ *   id: (string|number|undefined),
+ *   startOffset: (number|undefined),
+ *   endOffset: (number|undefined),
+ *   audioTracks: (Array|undefined),
+ *   subtitleTracks: (Array|undefined),
+ *   subtitles: (Array|undefined),
+ *   media: (Element|undefined),
+ *   pending: (number|undefined),
+ *   currentDropped: (number|undefined),
+ *   currentDecoded: (number|undefined),
+ *   totalDroppedFrames: (number|undefined),
+ *   level: (number|undefined),
+ *   droppedLevel: (number|undefined),
+ *   levels: (Array<Hls.Level>|undefined),
+ *   firstLevel: (number|undefined),
+ *   audio: (boolean|undefined),
+ *   video: (boolean|undefined),
+ *   altAudio: (boolean|undefined),
+ *   data: (?|undefined),
+ *   drift: (?|undefined),
+ *   start: (number|undefined),
+ *   end: (number|undefined),
+ *   buffer: (number|undefined),
+ *   previousState: (?|undefined),
+ *   nextState: (?|undefined),
+ *   success: (boolean|undefined),
+ *   payload: (?|undefined),
+ *   initPTS: (number|undefined),
+ *   bytes: (number|undefined),
+ *   response: (Hls.Response|undefined),
+ *   loader: (Hls.Loader|undefined),
+ *   frag: (Hls.Fragment|undefined),
+ *   context: (Hls.Context|undefined),
+ *   stats: (Hls.Stats|undefined)
+ * }}
+ */
+Hls.EventCallback;
+
+/**
+ * @param {string} event
+ * @param {?function(Object=, Hls.EventCallback=): void} callback
+ * @return {undefined}
+ */
+Hls.prototype.on = function(event, callback) {};
+
+/**
+ * @param {string} event
+ * @param {?function(Object=, Hls.EventCallback=): void} callback
+ * @return {undefined}
+ */
+Hls.prototype.off = function(event, callback) {};
+
 
 /**
  * @constructor
- * @return {!MediaPlayerEvents}
  */
-// function MediaPlayerEvents() {};
+Hls.Events = function () {};
 
-// MediaPlayerEvents.prototype.CAN_PLAY;
-// MediaPlayerEvents.prototype.ERROR;
-// MediaPlayerEvents.prototype.PLAYBACK_ENDED;
-// MediaPlayerEvents.prototype.PLAYBACK_ERROR;
-// MediaPlayerEvents.prototype.PLAYBACK_METADATA_LOADED;
-// MediaPlayerEvents.prototype.PLAYBACK_PAUSED;
-// MediaPlayerEvents.prototype.PLAYBACK_PROGRESS;
-// MediaPlayerEvents.prototype.PLAYBACK_SEEKED;
-// MediaPlayerEvents.prototype.PLAYBACK_STARTED;
-// MediaPlayerEvents.prototype.PLAYBACK_TIME_UPDATED;
-// MediaPlayerEvents.prototype.QUALITY_CHANGE_RENDERED;
-// MediaPlayerEvents.prototype.QUALITY_CHANGE_REQUESTED;
-// MediaPlayerEvents.prototype.STREAM_INITIALIZED;
-// MediaPlayerEvents.prototype.PERIOD_SWITCH_COMPLETED;
-// MediaPlayerEvents.prototype.METRIC_CHANGED;
+/** @const {string} */
+Hls.Events.MEDIA_ATTACHING;
+
+/** @const {string} */
+Hls.Events.MEDIA_ATTACHED;
+
+/** @const {string} */
+Hls.Events.MEDIA_DETACHING;
+
+/** @const {string} */
+Hls.Events.MEDIA_DETACHED;
+
+/** @const {string} */
+Hls.Events.BUFFER_RESET;
+
+/** @const {string} */
+Hls.Events.BUFFER_CODECS;
+
+/** @const {string} */
+Hls.Events.BUFFER_CREATED;
+
+/** @const {string} */
+Hls.Events.BUFFER_APPENDING;
+
+/** @const {string} */
+Hls.Events.BUFFER_APPENDED;
+
+/** @const {string} */
+Hls.Events.BUFFER_EOS;
+
+/** @const {string} */
+Hls.Events.BUFFER_FLUSHING;
+
+/** @const {string} */
+Hls.Events.BUFFER_FLUSHED;
+
+/** @const {string} */
+Hls.Events.MANIFEST_LOADING;
+
+/** @const {string} */
+Hls.Events.MANIFEST_LOADED;
+
+/** @const {string} */
+Hls.Events.MANIFEST_PARSED;
+
+/** @const {string} */
+Hls.Events.LEVEL_SWITCH;
+
+/** @const {string} */
+Hls.Events.LEVEL_SWITCHING;
+
+/** @const {string} */
+Hls.Events.LEVEL_SWITCHED;
+
+/** @const {string} */
+Hls.Events.LEVEL_LOADING;
+
+/** @const {string} */
+Hls.Events.LEVEL_LOADED;
+
+/** @const {string} */
+Hls.Events.LEVEL_UPDATED;
+
+/** @const {string} */
+Hls.Events.LEVEL_PTS_UPDATED;
+
+/** @const {string} */
+Hls.Events.AUDIO_TRACKS_UPDATED;
+
+/** @const {string} */
+Hls.Events.AUDIO_TRACK_SWITCH;
+
+/** @const {string} */
+Hls.Events.AUDIO_TRACK_SWITCHING;
+
+/** @const {string} */
+Hls.Events.AUDIO_TRACK_SWITCHED;
+
+/** @const {string} */
+Hls.Events.AUDIO_TRACK_LOADING;
+
+/** @const {string} */
+Hls.Events.AUDIO_TRACK_LOADED;
+
+/** @const {string} */
+Hls.Events.SUBTITLE_TRACKS_UPDATED;
+
+/** @const {string} */
+Hls.Events.SUBTITLE_TRACK_SWITCH;
+
+/** @const {string} */
+Hls.Events.SUBTITLE_TRACK_LOADING;
+
+/** @const {string} */
+Hls.Events.SUBTITLE_TRACK_LOADED;
+
+/** @const {string} */
+Hls.Events.SUBTITLE_FRAG_PROCESSED;
+
+/** @const {string} */
+Hls.Events.INIT_PTS_FOUND;
+
+/** @const {string} */
+Hls.Events.FRAG_LOADING;
+
+/** @const {string} */
+Hls.Events.FRAG_LOAD_PROGRESS;
+
+/** @const {string} */
+Hls.Events.FRAG_LOAD_EMERGENCY_ABORTED;
+
+/** @const {string} */
+Hls.Events.FRAG_LOADED;
+
+/** @const {string} */
+Hls.Events.FRAG_DECRYPTED;
+
+/** @const {string} */
+Hls.Events.FRAG_PARSING_INIT_SEGMENT;
+
+/** @const {string} */
+Hls.Events.FRAG_PARSING_USERDATA;
+
+/** @const {string} */
+Hls.Events.FRAG_PARSING_METADATA;
+
+/** @const {string} */
+Hls.Events.FRAG_PARSING_DATA;
+
+/** @const {string} */
+Hls.Events.FRAG_PARSED;
+
+/** @const {string} */
+Hls.Events.FRAG_BUFFERED;
+
+/** @const {string} */
+Hls.Events.FRAG_CHANGED;
+
+/** @const {string} */
+Hls.Events.FPS_DROP;
+
+/** @const {string} */
+Hls.Events.FPS_DROP_LEVEL_CAPPING;
+
+/** @const {string} */
+Hls.Events.ERROR;
+
+/** @const {string} */
+Hls.Events.DESTROYING;
+
+/** @const {string} */
+Hls.Events.KEY_LOADING;
+
+/** @const {string} */
+Hls.Events.KEY_LOADED;
+
+/** @const {string} */
+Hls.Events.STREAM_STATE_TRANSITION;
+
 
 /**
  * @constructor
- * @return {!DashMetrics}
  */
-// function DashMetrics() {};
+Hls.ErrorTypes = function () {};
 
-// DashMetrics.prototype.getBandwidthForRepresentation = function(representationId, periodId) {};
+/** @const {string} */
+Hls.ErrorTypes.NETWORK_ERROR;
 
-/**
- * @param {string} representationId
- * @param {number} periodIdx
- * @return {number}
- */
-// DashMetrics.prototype.getIndexForRepresentation = function(representationId, periodIdx) {};
+/** @const {string} */
+Hls.ErrorTypes.MEDIA_ERROR;
 
-/**
- * @param {string} bufferType - String 'audio' or 'video',
- * @param {number} periodIdx - Make sure this is the period index not id
- * @return {number}
- */
-// DashMetrics.prototype.getMaxIndexForBufferType = function(bufferType, periodIdx) {};
+/** @const {string} */
+Hls.ErrorTypes.MUX_ERROR;
 
-/**
- * @param {Object} metrics
- * @return {*}
- */
-// DashMetrics.prototype.getCurrentRepresentationSwitch = function(metrics) {};
+/** @const {string} */
+Hls.ErrorTypes.OTHER_ERROR;
 
-/**
- * @param {Object} metrics
- * @return {number}
- */
-// DashMetrics.prototype.getCurrentBufferLevel = function(metrics) {};
-
-/**
- * @param {Object} metrics
- * @return {null|*}
- */
-// DashMetrics.prototype.getRequestsQueue = function(metrics) {};
-
-/**
- * @param {Object} metrics
- * @return {*}
- */
-// DashMetrics.prototype.getHttpRequests = function(metrics) {};
-
-/**
- * @param {Object} metrics
- * @return
- */
-// DashMetrics.prototype.getCurrentDroppedFrames = function(metrics) {};
 
 /**
  * @constructor
- * @return {!Debug}
  */
-// function Debug() {};
+Hls.ErrorDetails = function () {};
 
-/**
- * @param {boolean} value Set to false if you want to turn off logging to the browser's console.
- * @default true
- */
-// Debug.prototype.setLogToBrowserConsole = function(value) {};
+/** @const {string} */
+Hls.ErrorDetails.MANIFEST_LOAD_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.MANIFEST_LOAD_TIMEOUT;
+
+/** @const {string} */
+Hls.ErrorDetails.MANIFEST_PARSING_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.MANIFEST_INCOMPATIBLE_CODECS_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.LEVEL_LOAD_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.LEVEL_LOAD_TIMEOUT;
+
+/** @const {string} */
+Hls.ErrorDetails.LEVEL_SWITCH_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.AUDIO_TRACK_LOAD_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.AUDIO_TRACK_LOAD_TIMEOUT;
+
+/** @const {string} */
+Hls.ErrorDetails.FRAG_LOAD_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.FRAG_LOOP_LOADING_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.FRAG_LOAD_TIMEOUT;
+
+/** @const {string} */
+Hls.ErrorDetails.FRAG_DECRYPT_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.FRAG_PARSING_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.REMUX_ALLOC_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.KEY_LOAD_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.KEY_LOAD_TIMEOUT;
+
+/** @const {string} */
+Hls.ErrorDetails.BUFFER_ADD_CODEC_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.BUFFER_APPEND_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.BUFFER_APPENDING_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.BUFFER_STALLED_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.BUFFER_FULL_ERROR;
+
+/** @const {string} */
+Hls.ErrorDetails.BUFFER_SEEK_OVER_HOLE;
+
+/** @const {string} */
+Hls.ErrorDetails.BUFFER_NUDGE_ON_STALL;
+
+/** @const {string} */
+Hls.ErrorDetails.INTERNAL_EXCEPTION;
+
+/** @const {string} */
+Hls.ErrorDetails.WEBVTT_EXCEPTION;
 
 /**
  * @constructor
- * @return {!MetricsList}
+ * @return {!LevelKey}
  */
-// function MetricsList() {};
+function LevelKey() {};
 
-/**
- * @constructor
- * @return {!StreamInfo}
- */
-// function StreamInfo() {};
-
-// StreamInfo.prototype.id;
-// StreamInfo.prototype.index;
-// StreamInfo.prototype.start;
-// StreamInfo.prototype.duration;
-// StreamInfo.prototype.manifestinfo;
-// StreamInfo.prototype.isLast;
-// StreamInfo.prototype.isFirst;
-
-/**
- * @constructor
- * @return {!BitrateInfo}
- */
-// function BitrateInfo() {};
-
-// BitrateInfo.prototype.qualityIndex;
-// BitrateInfo.prototype.bitrate;
-// BitrateInfo.prototype.width;
-// BitrateInfo.prototype.height;
-
-/**
- * @constructor
- * @return {!DroppedFrames}
- */
-// function DroppedFrames() {};
-
-// DroppedFrames.prototype.droppedFrames;
-
-/**
- * @constructor
- * @return {!MetricChangedEvents}
- */
-// function MetricChangedEvents() {};
-
-// MetricChangedEvents.prototype.mediaType;
-
-/**
- * @constructor
- * @return {!SwitchEvents}
- */
-// function SwitchEvents() {};
-
-// SwitchEvents.prototype.fromStreamInfo;
-// SwitchEvents.prototype.toStreamInfo;
-
-/**
- * @constructor
- * @return {!QualityEvents}
- */
-// function QualityEvents() {};
-
-// QualityEvents.prototype.mediaType;
-// QualityEvents.prototype.oldQuality;
-// QualityEvents.prototype.newQuality;
-
-/**
- * @constructor
- * @return {!RepresentationSwitch}
- */
-// function RepresentationSwitch() {};
-
-// RepresentationSwitch.prototype.mt;
-// RepresentationSwitch.prototype.t;
-// RepresentationSwitch.prototype.to;
-
-/**
- * @const
- */
-// Hls.MediaPlayer = MediaPlayer;
-
-/**
- * @const
- */
-// Hls.MediaPlayer.events = MediaPlayerEvents;
