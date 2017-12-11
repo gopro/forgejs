@@ -149,16 +149,6 @@ FORGE.Media.prototype._parseConfig = function(config)
         this._createEvents(config.events);
     }
 
-    if (this._source === null)
-    {
-        return;
-    }
-
-    // If no format is specified, set default format as flat
-    if (this._source.format === "undefined")
-    {
-        this._source.format = FORGE.MediaFormat.FLAT;
-    }
 
     switch(this._type)
     {
@@ -202,6 +192,7 @@ FORGE.Media.prototype._parseConfig = function(config)
 FORGE.Media.prototype._parseGrid = function()
 {
     // Parse grid do nothing at the moment.
+    this._notifyLoadComplete();
 };
 
 /**
@@ -211,6 +202,17 @@ FORGE.Media.prototype._parseGrid = function()
  */
 FORGE.Media.prototype._parseImage = function()
 {
+    if (this._source === null)
+    {
+        return;
+    }
+
+    // If no format is specified, set default format as flat
+    if (this._source.format === "undefined")
+    {
+        this._source.format = FORGE.MediaFormat.FLAT;
+    }
+
     // Load the preview
     if (typeof preview !== "undefined")
     {
@@ -271,6 +273,17 @@ FORGE.Media.prototype._parseImage = function()
  */
 FORGE.Media.prototype._parseVideo = function()
 {
+    if (this._source === null)
+    {
+        return;
+    }
+
+    // If no format is specified, set default format as flat
+    if (this._source.format === "undefined")
+    {
+        this._source.format = FORGE.MediaFormat.FLAT;
+    }
+
     // If the levels property is present, we get all urls from it and put it
     // inside source.url: it means that there is multi-quality. It is way
     // easier to handle for video than for image, as it can never be video
