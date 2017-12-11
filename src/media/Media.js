@@ -142,6 +142,7 @@ FORGE.Media.prototype._parseConfig = function(config)
     this._uid = config.uid;
     this._type = config.type;
     this._source = (typeof config.source !== "undefined") ? config.source : null;
+    this._preview = (typeof config.preview !== "undefined") ? config.preview : null;
     this._options = (typeof config.options !== "undefined") ? config.options : null;
 
     if (typeof config.events === "object" && config.events !== null)
@@ -193,6 +194,8 @@ FORGE.Media.prototype._parseImage = function()
     {
         this._source.format = FORGE.MediaFormat.FLAT;
     }
+
+    var preview = this._preview;
 
     // Load the preview
     if (typeof preview !== "undefined")
