@@ -149,7 +149,6 @@ FORGE.Media.prototype._parseConfig = function(config)
         this._createEvents(config.events);
     }
 
-
     switch(this._type)
     {
         case FORGE.MediaType.GRID:
@@ -164,24 +163,6 @@ FORGE.Media.prototype._parseConfig = function(config)
             this._parseVideo();
             break;
     }
-
-    // if (this._type === FORGE.MediaType.GRID)
-    // {
-    //     this._notifyLoadComplete();
-    //     return;
-    // }
-
-    // var preview = config.preview;
-
-    // if (this._type === FORGE.MediaType.IMAGE)
-    // {
-
-    // }
-
-    // if (this._type === FORGE.MediaType.VIDEO)
-    // {
-
-    // }
 };
 
 /**
