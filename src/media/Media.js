@@ -34,6 +34,14 @@ FORGE.Media = function(viewer, config)
     this._type = "";
 
     /**
+     * Source description of the media
+     * @name FORGE.Media#_source
+     * @type {SceneMediaSourceConfig}
+     * @private
+     */
+    this._source = null;
+
+    /**
      * Media options
      * @name  FORGE.Media#_options
      * @type {Object}
@@ -121,6 +129,7 @@ FORGE.Media.prototype._boot = function()
  */
 FORGE.Media.prototype._parseConfig = function(config)
 {
+    // If no configuration set the media type to undefined then return
     if (typeof config === "undefined" || config === null)
     {
         this._type = FORGE.MediaType.UNDEFINED;
@@ -131,143 +140,181 @@ FORGE.Media.prototype._parseConfig = function(config)
 
     // Warning : UID is not registered and applied to the FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
     this._uid = config.uid;
-
-    this._options = (typeof config.options !== "undefined") ? config.options : null;
-
     this._type = config.type;
-
-    var source = config.source;
-
-    if (typeof config.source !== "undefined" && typeof config.source.format === "undefined")
-    {
-        config.source.format = FORGE.MediaFormat.FLAT;
-    }
+    this._source = (typeof config.source !== "undefined") ? config.source : null;
+    this._options = (typeof config.options !== "undefined") ? config.options : null;
 
     if (typeof config.events === "object" && config.events !== null)
     {
         this._createEvents(config.events);
     }
 
-    if (this._type === FORGE.MediaType.GRID)
-    {
-        this._notifyLoadComplete();
-        return;
-    }
-
-    if (typeof config.source === "undefined" || config.source === null)
+    if (this._source === null)
     {
         return;
     }
 
-    var preview = config.preview;
-
-    if (this._type === FORGE.MediaType.IMAGE)
+    // If no format is specified, set default format as flat
+    if (this._source.format === "undefined")
     {
-        // Load the preview
-        if (typeof preview !== "undefined")
+        this._source.format = FORGE.MediaFormat.FLAT;
+    }
+
+    switch(this._type)
+    {
+        case FORGE.MediaType.GRID:
+            this._parseGrid();
+            break;
+
+        case FORGE.MediaType.IMAGE:
+            this._parseImage();
+            break;
+
+        case FORGE.MediaType.VIDEO:
+            this._parseVideo();
+            break;
+    }
+
+    // if (this._type === FORGE.MediaType.GRID)
+    // {
+    //     this._notifyLoadComplete();
+    //     return;
+    // }
+
+    // var preview = config.preview;
+
+    // if (this._type === FORGE.MediaType.IMAGE)
+    // {
+
+    // }
+
+    // if (this._type === FORGE.MediaType.VIDEO)
+    // {
+
+    // }
+};
+
+/**
+ * Parse the media grid.
+ * @method FORGE.Media#_parseGrid
+ * @private
+ */
+FORGE.Media.prototype._parseGrid = function()
+{
+    // Parse grid do nothing at the moment.
+};
+
+/**
+ * Parse the media image.
+ * @method FORGE.Media#_parseGrid
+ * @private
+ */
+FORGE.Media.prototype._parseImage = function()
+{
+    // Load the preview
+    if (typeof preview !== "undefined")
+    {
+        if (typeof preview === "string")
         {
-            if (typeof preview === "string")
-            {
-                preview = { url: preview };
-            }
-
-            var re = /\{[lfxy].*\}/;
-            if (preview.url.match(re) !== null)
-            {
-                this._preview = /** @type {SceneMediaPreviewConfig} */ (preview);
-            }
-            else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
-                source.format === FORGE.MediaFormat.CUBE ||
-                source.format === FORGE.MediaFormat.FLAT)
-            {
-                var previewConfig = {
-                    key: this._uid + "-preview",
-                    url: preview.url
-                };
-
-                this._preview = new FORGE.Image(this._viewer, previewConfig);
-                this._preview.onLoadComplete.addOnce(this._onImageLoadComplete, this);
-            }
+            preview = { url: preview };
         }
 
-        var imageConfig;
-
-        // If there isn't an URL set, it means that this is a multi resolution image.
-        if (!source.url)
+        var re = /\{[lfxy].*\}/;
+        if (preview.url.match(re) !== null)
         {
-            this._store = new FORGE.MediaStore(this._viewer, source, this._preview);
-            this._notifyLoadComplete();
+            this._preview = /** @type {SceneMediaPreviewConfig} */ (preview);
         }
-        else if (source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
-            source.format === FORGE.MediaFormat.CUBE ||
-            source.format === FORGE.MediaFormat.FLAT)
+        else if (this._source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
+            this._source.format === FORGE.MediaFormat.CUBE ||
+            this._source.format === FORGE.MediaFormat.FLAT)
         {
-            imageConfig = {
-                key: this._uid,
-                url: source.url
+            var previewConfig = {
+                key: this._uid + "-preview",
+                url: preview.url
             };
 
-            this._displayObject = new FORGE.Image(this._viewer, imageConfig);
-            this._displayObject.onLoadComplete.addOnce(this._onImageLoadComplete, this);
+            this._preview = new FORGE.Image(this._viewer, previewConfig);
+            this._preview.onLoadComplete.addOnce(this._onImageLoadComplete, this);
         }
-        else
-        {
-            throw "Media format not supported";
-        }
-
-        return;
     }
 
-    if (this._type === FORGE.MediaType.VIDEO)
+    var imageConfig;
+
+    // If there isn't an URL set, it means that this is a multi resolution image.
+    if (!this._source.url)
     {
-        // If the levels property is present, we get all urls from it and put it
-        // inside source.url: it means that there is multi-quality. It is way
-        // easier to handle for video than for image, as it can never be video
-        // tiles to display.
-        if (Array.isArray(source.levels))
+        this._store = new FORGE.MediaStore(this._viewer, this._source, this._preview);
+        this._notifyLoadComplete();
+    }
+    else if (this._source.format === FORGE.MediaFormat.EQUIRECTANGULAR ||
+        this._source.format === FORGE.MediaFormat.CUBE ||
+        this._source.format === FORGE.MediaFormat.FLAT)
+    {
+        imageConfig = {
+            key: this._uid,
+            url: this._source.url
+        };
+
+        this._displayObject = new FORGE.Image(this._viewer, imageConfig);
+        this._displayObject.onLoadComplete.addOnce(this._onImageLoadComplete, this);
+    }
+    else
+    {
+        throw "Media format not supported";
+    }
+};
+
+/**
+ * Parse the media video.
+ * @method FORGE.Media#_parseVideo
+ * @private
+ */
+FORGE.Media.prototype._parseVideo = function()
+{
+    // If the levels property is present, we get all urls from it and put it
+    // inside source.url: it means that there is multi-quality. It is way
+    // easier to handle for video than for image, as it can never be video
+    // tiles to display.
+    if (Array.isArray(this._source.levels))
+    {
+        this._source.url = [];
+        for (var i = 0, ii = this._source.levels.length; i < ii; i++)
         {
-            source.url = [];
-            for (var i = 0, ii = source.levels.length; i < ii; i++)
+            if(FORGE.Device.check(this._source.levels[i].device) === false)
             {
-                if(FORGE.Device.check(source.levels[i].device) === false)
-                {
-                    continue;
-                }
-
-                source.url.push(source.levels[i].url);
+                continue;
             }
+
+            this._source.url.push(this._source.levels[i].url);
         }
+    }
 
-        if (typeof source.url !== "string" && source.url.length === 0)
-        {
-            return;
-        }
-
-        if (typeof source.streaming !== "undefined" && source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
-        {
-            this._displayObject = new FORGE.VideoDash(this._viewer, this._uid);
-        }
-        else
-        {
-            var scene = this._viewer.story.scene;
-
-            // check of the ambisonic state of the video sound prior to the video instanciation
-            this._displayObject = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
-        }
-
-        // At this point, source.url is either a streaming address, a simple
-        // url, or an array of url
-        this._displayObject.load(source.url);
-
-        this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
-        this._displayObject.onPlay.add(this._onPlayHandler, this);
-        this._displayObject.onPause.add(this._onPauseHandler, this);
-        this._displayObject.onSeeked.add(this._onSeekedHandler, this);
-        this._displayObject.onEnded.add(this._onEndedHandler, this);
-
-
+    if (typeof this._source.url !== "string" && this._source.url.length === 0)
+    {
         return;
     }
+
+    if (typeof this._source.streaming !== "undefined" && this._source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
+    {
+        this._displayObject = new FORGE.VideoDash(this._viewer, this._uid);
+    }
+    else
+    {
+        var scene = this._viewer.story.scene;
+
+        // check of the ambisonic state of the video sound prior to the video instanciation
+        this._displayObject = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
+    }
+
+    // At this point, source.url is either a streaming address, a simple
+    // url, or an array of url
+    this._displayObject.load(this._source.url);
+
+    this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
+    this._displayObject.onPlay.add(this._onPlayHandler, this);
+    this._displayObject.onPause.add(this._onPauseHandler, this);
+    this._displayObject.onSeeked.add(this._onSeekedHandler, this);
+    this._displayObject.onEnded.add(this._onEndedHandler, this);
 };
 
 /**
@@ -485,6 +532,36 @@ Object.defineProperty(FORGE.Media.prototype, "type",
     get: function()
     {
         return this._type;
+    }
+});
+
+/**
+ * Get the media source.
+ * @name  FORGE.Media#source
+ * @type {SceneMediaSourceConfig}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Media.prototype, "source",
+{
+    /** @this {FORGE.Media} */
+    get: function()
+    {
+        return this._source;
+    }
+});
+
+/**
+ * Get the media options.
+ * @name  FORGE.Media#options
+ * @type {SceneMediaOptionsConfig}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Media.prototype, "options",
+{
+    /** @this {FORGE.Media} */
+    get: function()
+    {
+        return this._options;
     }
 });
 
