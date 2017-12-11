@@ -37,6 +37,7 @@ module.exports = function(grunt)
         "src/media/MediaStore.js",
         "src/media/MediaTexture.js",
         "src/media/Media.js",
+        "src/media/MediaManager.js",
 
         "src/render/RenderManager.js",
         "src/render/RenderScene.js",
