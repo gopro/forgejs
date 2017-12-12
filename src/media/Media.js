@@ -198,7 +198,7 @@ FORGE.Media.prototype._parseImage = function()
     var preview = this._preview;
 
     // Load the preview
-    if (typeof preview !== "undefined")
+    if (preview !== null)
     {
         if (typeof preview === "string")
         {
@@ -214,7 +214,8 @@ FORGE.Media.prototype._parseImage = function()
             this._source.format === FORGE.MediaFormat.CUBE ||
             this._source.format === FORGE.MediaFormat.FLAT)
         {
-            var previewConfig = {
+            var previewConfig =
+            {
                 key: this._uid + "-preview",
                 url: preview.url
             };
@@ -236,7 +237,8 @@ FORGE.Media.prototype._parseImage = function()
         this._source.format === FORGE.MediaFormat.CUBE ||
         this._source.format === FORGE.MediaFormat.FLAT)
     {
-        imageConfig = {
+        imageConfig =
+        {
             key: this._uid,
             url: this._source.url
         };
