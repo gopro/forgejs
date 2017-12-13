@@ -172,6 +172,14 @@ FORGE.VideoHTML5 = function(viewer, key, config, qualityMode, ambisonicOrder)
     this._ambisonicsRenderer = null;
 
     /**
+     * The AudioContext interface for ambisonics.
+     * @name FORGE.VideoHTML5#_context
+     * @type {?AudioContext}
+     * @private
+     */
+    this._context = null;
+
+    /**
      * Media Element Audio souce node element.
      * @name  FORGE.Sound#_soundElementSource
      * @type {?MediaElementAudioSourceNode}
@@ -1007,22 +1015,22 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
         this._context = this._viewer.audio.context;
 
         // create source element
-        this._soundElementSource = this._context.createMediaElementSource(this._getRequestedVideo().element);
+        this._soundElementSource = this._context.createMediaElementSource( /** @type {HTMLVideoElement} */ (this._getRequestedVideo().element));
 
-        if (this._isFOAAmbisonic() === true)
+        if (this._isHOAAmbisonic() === true)
         {
-            //FOA decoder and binaural renderer (for 1st order)
-            this._ambisonicsRenderer = Omnitone.createFOARenderer(this._context, {
-                channelMap: this._defaultChannelMap, // [0, 1, 2, 3]; for AMBIX & [0, 3, 1, 2] for FUMA
+            //HOA decoder and binaural renderer (for 2nd and 3rd order)
+            this._ambisonicsRenderer = Omnitone.createHOARenderer(this._context, {
+                ambisonicOrder: (this._ambisonicOrder > 1 ? this._ambisonicOrder : this._defaultAmbisonicOrder), // can be 2 or 3_
                 hrirPathList: null,
                 renderingMode: 'ambisonic'
             });
         }
         else
         {
-            //HOA decoder and binaural renderer (for 2nd and 3rd order)
-            this._ambisonicsRenderer = Omnitone.createHOARenderer(this._context, {
-                ambisonicOrder: (this._ambisonicOrder > 1 ? this._ambisonicOrder : this._defaultAmbisonicOrder), // can be 2 or 3_
+            //FOA decoder and binaural renderer (for 1st order)
+            this._ambisonicsRenderer = Omnitone.createFOARenderer(this._context, {
+                channelMap: this._defaultChannelMap, // [0, 1, 2, 3]; for AMBIX & [0, 3, 1, 2] for FUMA
                 hrirPathList: null,
                 renderingMode: 'ambisonic'
             });
@@ -1462,8 +1470,9 @@ FORGE.VideoHTML5.prototype._shouldAutoQualityDowngrade = function()
 {
     var currentVideo = this._getCurrentVideo();
     var time = currentVideo.element.currentTime;
+    this.log("current time is : "+time+" ("+currentVideo.lastTimeStamp+")");
 
-    if (currentVideo.element.playing === false)
+    if (this._playing === false) //currentVideo.element.playing
     {
         return false;
     }
@@ -1474,7 +1483,7 @@ FORGE.VideoHTML5.prototype._shouldAutoQualityDowngrade = function()
         if (currentVideo.downCount >= 3)
         {
             currentVideo.lastTimeStamp = 0;
-            return true;
+            // return true;
         }
     }
     else
@@ -1561,7 +1570,7 @@ FORGE.VideoHTML5.prototype._setQualityMode = function(mode)
         this._autoQualityTimer.stop(false);
 
         //If mode auto add and start a fresh timer
-        if (this._qualityMode === FORGE.VideoQualityMode.AUTO)
+        if (this._qualityMode === FORGE.VideoQualityMode.AUTO && this._qualities.length > 1)
         {
             this._autoQualityTimer.start();
         }
@@ -1959,9 +1968,9 @@ FORGE.VideoHTML5.prototype._isAmbisonic = function()
  * @return {boolean} Is a FOA ambisonic?
  * @private
  */
-FORGE.VideoHTML5.prototype._isFOAAmbisonic = function()
+FORGE.VideoHTML5.prototype._isHOAAmbisonic = function()
 {
-    return (this._ambisonicOrder === 1 && this._viewer.audio.useWebAudio === true && typeof Omnitone !== "undefined");
+    return (this._ambisonicOrder > 1 && this._viewer.audio.useWebAudio === true && typeof Omnitone !== "undefined");
 };
 
 /**
@@ -2144,12 +2153,13 @@ FORGE.VideoHTML5.prototype.destroy = function()
 
     if (this._isAmbisonic() === true)
     {
-        this._soundElementSource.disconnect();
         this._ambisonicsRenderer.output.disconnect();
+        this._soundElementSource.disconnect();
         this._ambisonicsRendererInitializedSuccessBind = null;
         this._ambisonicsRendererInitializedErrorBind = null;
         this._ambisonicsRenderer = null;
         this._soundElementSource = null;
+        this._context = null;
     }
 
     this._requestTimer.destroy();

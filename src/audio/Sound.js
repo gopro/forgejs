@@ -563,18 +563,18 @@ FORGE.Sound.prototype._decode = function(file)
 
                 if (this._ambisonicOrder > 1)
                 {
-                    //FOA decoder and binaural renderer (for 1st order)
-                    this._ambisonicsRenderer = Omnitone.createFOARenderer(this._context, {
-                        channelMap: this._defaultChannelMap, // [0, 1, 2, 3]; for AMBIX & [0, 3, 1, 2] for FUMA
+                    //HOA decoder and binaural renderer (for 2nd and 3rd order)
+                    this._ambisonicsRenderer = Omnitone.createHOARenderer(this._context, {
+                        ambisonicOrder: (this._ambisonicOrder > 1 ? this._ambisonicOrder : this._defaultAmbisonicOrder), // can be 2 or 3
                         hrirPathList: null,
                         renderingMode: 'ambisonic'
                     });
                 }
                 else
                 {
-                    //HOA decoder and binaural renderer (for 2nd and 3rd order)
-                    this._ambisonicsRenderer = Omnitone.createHOARenderer(this._context, {
-                        ambisonicOrder: (this._ambisonicOrder > 1 ? this._ambisonicOrder : this._defaultAmbisonicOrder), // can be 2 or 3
+                    //FOA decoder and binaural renderer (for 1st order)
+                    this._ambisonicsRenderer = Omnitone.createFOARenderer(this._context, {
+                        channelMap: this._defaultChannelMap, // [0, 1, 2, 3]; for AMBIX & [0, 3, 1, 2] for FUMA
                         hrirPathList: null,
                         renderingMode: 'ambisonic'
                     });
@@ -1221,8 +1221,8 @@ FORGE.Sound.prototype.destroy = function()
 
     if (this._isAmbisonic() === true)
     {
-        this._soundElementSource.disconnect();
         this._ambisonicsRenderer.output.disconnect();
+        this._soundElementSource.disconnect();
         this._ambisonicsRenderer = null;
         this._soundElementSource = null;
     }
