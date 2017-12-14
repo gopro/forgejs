@@ -167,7 +167,7 @@ FORGE.SceneRenderer.prototype._createObjectRenderer = function()
 FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
 {
     var media = event.emitter;
-    var sourceConfig, mediaConfig = this._scene.config.media;
+    var mediaConfig = this._scene.config.media;
 
     var backgroundRendererRef;
 
@@ -177,6 +177,8 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
     }
     else 
     {
+        var sourceConfig = mediaConfig.source;
+        
         if (mediaConfig.type === FORGE.MediaType.GRID)
         {
             backgroundRendererRef = FORGE.BackgroundGridRenderer;
