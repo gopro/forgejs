@@ -96,12 +96,12 @@ FORGE.Scene = function(viewer)
     this._events = {};
 
     /**
-     * The media of the scene
-     * @name FORGE.Scene#_media
-     * @type {FORGE.Media}
+     * The media uid of the scene
+     * @name FORGE.Scene#_mediaUid
+     * @type {string}
      * @private
      */
-    this._media = null;
+    this._mediaUid = "";
 
     /**
      * Load request event dispatcher.
@@ -150,14 +150,6 @@ FORGE.Scene = function(viewer)
      * @private
      */
     this._onConfigLoadComplete = null;
-
-    /**
-     * media create event dispatcher.
-     * @name  FORGE.Scene#_onMediaCreate
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onMediaCreate = null;
 
     FORGE.BaseObject.call(this, "Scene");
 };
@@ -221,7 +213,7 @@ FORGE.Scene.prototype._configLoadComplete = function(file)
         file.data = /** @type {Object} */ (JSON.parse(file.data));
     }
 
-    // extend init config
+    // extend initial config
     this._config = /** @type {SceneConfig} */ (FORGE.Utils.extendSimpleObject(this._config, file.data));
 
     this._viewer.story.notifySceneConfigLoadComplete(this);
@@ -264,26 +256,6 @@ FORGE.Scene.prototype._clearEvents = function()
     {
         this._events[e].destroy();
         this._events[e] = null;
-    }
-};
-
-/**
- * Create the scene media
- * @param  {SceneMediaConfig} media - media configuration
- * @private
- */
-FORGE.Scene.prototype._createMedia = function(media)
-{
-    this.log("create media");
-
-    if(this._media === null)
-    {
-        this._media = new FORGE.Media(this._viewer, media);
-
-        if(this._onMediaCreate !== null)
-        {
-            this._onMediaCreate.dispatch({ media: this._media });
-        }
     }
 };
 
@@ -338,7 +310,8 @@ FORGE.Scene.prototype.loadStart = function(time)
         this._config.media.options.startTime = time;
     }
 
-    this._createMedia(this._config.media);
+    this._mediaUid = this._viewer.media.add(this._config.media);
+    this._viewer.media.load(this._mediaUid);
 
     if (this._onLoadStart !== null)
     {
@@ -382,8 +355,7 @@ FORGE.Scene.prototype.unload = function()
         this._events.onUnloadStart.dispatch();
     }
 
-    this._media.destroy();
-    this._media = null;
+    this._viewer.media.unload(this._mediaUid);
 
     if (this._onUnloadComplete !== null)
     {
@@ -435,6 +407,16 @@ FORGE.Scene.prototype.hasGroups = function()
     }
 
     return false;
+};
+
+/**
+ * Know if the scene has a media?
+ * @method FORGE.Scene#hasMedia
+ * @return {boolean} Returns true if the scene has a media, false if not.
+ */
+FORGE.Scene.prototype.hasMedia = function()
+{
+    return this._mediaUid !== "";
 };
 
 /**
@@ -499,12 +481,6 @@ FORGE.Scene.prototype.destroy = function()
 
     this._description.destroy();
     this._description = null;
-
-    if (this._media !== null)
-    {
-        this._media.destroy();
-        this._media = null;
-    }
 
     if (this._onLoadStart !== null)
     {
@@ -728,7 +704,8 @@ Object.defineProperty(FORGE.Scene.prototype, "media",
     /** @this {FORGE.Scene} */
     get: function()
     {
-        return this._media;
+        var media = FORGE.UID.get(this._mediaUid);
+        return media;
     }
 });
 
@@ -867,22 +844,3 @@ Object.defineProperty(FORGE.Scene.prototype, "onConfigLoadComplete",
     }
 });
 
-/**
- * Get the onMediaCreate {@link FORGE.EventDispatcher}.
- * @name  FORGE.Scene#onMediaCreate
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.Scene.prototype, "onMediaCreate",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        if (this._onMediaCreate === null)
-        {
-            this._onMediaCreate = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onMediaCreate;
-    }
-});

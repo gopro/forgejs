@@ -28,50 +28,57 @@ FORGE.MediaManager = function(viewer)
 FORGE.MediaManager.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.MediaManager.prototype.constructor = FORGE.MediaManager;
 
-
-/**
- * Parse configuration object
- * @method FORGE.MediaManager#_parseConfig
- * @param {ControllersConfig} config - The config you want to add.
- * @private
- */
-FORGE.MediaManager.prototype._parseConfig = function(config)
-{
-
-};
-
-
 FORGE.MediaManager.prototype.add = function(config)
 {
-    if(FORGE.UID.exists(config.uid) === false)
+    var media = null;
+
+    if(typeof config === "undefined" || config === null)
     {
-        var media = new Media();
-        this._media.push(media);
+        config = { uid: "FORGE.MediaType.UNDEFINED" };
     }
+
+    if(FORGE.UID.exists(config.uid) === true)
+    {
+        this.warn("Media "+config.uid+" already exists");
+        return config.uid;
+    }
+
+    switch(config.type)
+    {
+        case FORGE.MediaType.GRID:
+            media = new FORGE.MediaGrid(this._viewer, config);
+            break;
+
+        case FORGE.MediaType.IMAGE:
+            media = new FORGE.MediaImage(this._viewer, config);
+            break;
+
+        case FORGE.MediaType.VIDEO:
+            media = new FORGE.MediaVideo(this._viewer, config);
+            break;
+
+        case FORGE.MediaType.TILED:
+            media = new FORGE.MediaTiled(this._viewer, config);
+            break;
+
+        default:
+            media = new FORGE.Media(this._viewer, config);
+            break;
+    }
+
+    this._media.push(media);
+
+    return media.uid;
 };
 
 FORGE.MediaManager.prototype.load = function(uid)
 {
-
+    var media = FORGE.UID.get(uid);
+    media.load();
 };
 
-
-/**
- * Get the "onControlEnd" {@link FORGE.EventDispatcher} of the camera controller.
- * @name FORGE.MediaManager#onControlEnd
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-// Object.defineProperty(FORGE.MediaManager.prototype, "onControlEnd",
-// {
-//     /** @this {FORGE.MediaManager} */
-//     get: function()
-//     {
-//         if(this._onControlEnd === null)
-//         {
-//             this._onControlEnd = new FORGE.EventDispatcher(this);
-//         }
-
-//         return this._onControlEnd;
-//     }
-// });
+FORGE.MediaManager.prototype.unload = function(uid)
+{
+    var media = FORGE.UID.get(uid);
+    media.unload();
+};

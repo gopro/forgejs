@@ -134,7 +134,8 @@ FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS = 250;
  * Table describing previous cube face
  * @type {CubeFaceObject}
  */
-FORGE.MediaStore.CUBE_FACE_CONFIG = {
+FORGE.MediaStore.CUBE_FACE_CONFIG =
+{
     "front": "front",
     "right": "right",
     "back": "back",

@@ -736,15 +736,13 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         return;
     }
 
-    // var mediaConfig = media.config;
-
     if (media.type === FORGE.MediaType.GRID)
     {
         this._backgroundRendererType = FORGE.BackgroundType.MESH;
     }
     else if (typeof media.source !== null)
     {
-        if (typeof media.source.levels !== "undefined" && media.type === FORGE.MediaType.IMAGE)
+        if (typeof media.source.levels !== "undefined" && media.type === FORGE.MediaType.TILED)
         {
             this._backgroundRendererType = FORGE.BackgroundType.PYRAMID;
         }
