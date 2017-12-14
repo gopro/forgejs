@@ -3,12 +3,13 @@
  *
  * @constructor FORGE.ViewBase
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {FORGE.ViewManager} viewManager - {@link FORGE.ViewManager} reference.
  * @param {?ViewOptionsConfig} options - The view options.
  * @param {string} className - object className.
  * @param {string} type - object view type.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ViewBase = function(viewer, options, className, type)
+FORGE.ViewBase = function(viewer, viewManager, options, className, type)
 {
     /**
      * The Viewer reference.
@@ -17,6 +18,14 @@ FORGE.ViewBase = function(viewer, options, className, type)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * The view manager reference.
+     * @name FORGE.ViewBase#_viewManager
+     * @type {FORGE.ViewManager}
+     * @private
+     */
+    this._viewManager = viewManager;
 
     /**
      * The view options
@@ -149,7 +158,7 @@ FORGE.ViewBase.prototype._boot = function()
  */
 FORGE.ViewBase.prototype._screenToFragment = function(screenPt)
 {
-    var resolution = this._viewer.renderer.displayResolution;
+    var resolution = this._viewManager.sceneRenderer.viewport.size;
     var fx = (2.0 * screenPt.x / resolution.width) - 1.0;
     var fy = (2.0 * screenPt.y / resolution.height) - 1.0;
     return new THREE.Vector2(fx * resolution.ratio, fy);
@@ -165,7 +174,7 @@ FORGE.ViewBase.prototype._screenToFragment = function(screenPt)
  */
 FORGE.ViewBase.prototype._fragmentToScreen = function(fragment)
 {
-    var resolution = this._viewer.renderer.displayResolution;
+    var resolution = this._viewManager.sceneRenderer.viewport.size;
     var sx = ((fragment.x / resolution.ratio) + 1.0) * (resolution.width / 2.0);
     var sy = (fragment.y + 1.0) * (resolution.height / 2.0);
     return new THREE.Vector2(Math.round(sx), resolution.height - Math.round(sy));
@@ -221,7 +230,7 @@ FORGE.ViewBase.prototype.screenToWorld = function(screenPt)
  */
 FORGE.ViewBase.prototype.getProjectionFov = function()
 {
-    return FORGE.Math.degToRad(this._viewer.renderer.camera.fov);
+    return FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.fov);
 };
 
 /**

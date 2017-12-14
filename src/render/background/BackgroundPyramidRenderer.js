@@ -5,20 +5,10 @@
  * @constructor FORGE.BackgroundPyramidRenderer
  * @extends {FORGE.BackgroundRenderer}
  *
- * @param {FORGE.Viewer} viewer - viewer reference
- * @param {THREE.WebGLRenderTarget} target - render target
- * @param {SceneMediaConfig} config - media config
+ * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  */
-FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
+FORGE.BackgroundPyramidRenderer = function(sceneRenderer)
 {
-    /**
-     * Input scene and media config
-     * @name FORGE.BackgroundPyramidRenderer#_config
-     * @type {?SceneMediaConfig}
-     * @private
-     */
-    this._config = config;
-
     /**
      * Current level of the pyramid
      * @type {number}
@@ -96,7 +86,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, target, config)
      */
     this._levelPixelsHumanReadable = "";
 
-    FORGE.BackgroundRenderer.call(this, viewer, target, config, "BackgroundPyramidRenderer");
+    FORGE.BackgroundRenderer.call(this, sceneRenderer, "BackgroundPyramidRenderer");
 };
 
 FORGE.BackgroundPyramidRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
@@ -127,13 +117,13 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this._parseConfig(this._config);
 
-    this._size = 2 * FORGE.RenderManager.DEPTH_FAR;
+    this._size = 2 * FORGE.Renderer.DEPTH_FAR;
 
     this._tileCache = {};
-    this._textureStore = this._viewer.story.scene.media.store;
+    this._textureStore = this._sceneRenderer.media.store;
 
-    this._camera = this._viewer.renderer.camera.main;
-    this._viewer.camera.onChange.add(this._onCameraChange, this);
+    this._camera = this._sceneRenderer.camera.main;
+    this._sceneRenderer.camera.onChange.add(this._onCameraChange, this);
 
     if (typeof this._config.preview !== "undefined")
     {
@@ -203,18 +193,6 @@ FORGE.BackgroundPyramidRenderer.prototype._createPreview = function()
         }.bind(this));
     }
 };
-
-/**
- * Clear routine.
- * @method FORGE.BackgroundPyramidRenderer#_clear
- * @private
- */
-FORGE.BackgroundPyramidRenderer.prototype._clear = function()
-{
-    // Draw to clear screen, then clear display object / texture
-    this._viewer.renderer.webGLRenderer.clearColor();
-};
-
 
 /**
  * Update after view change
@@ -606,20 +584,19 @@ FORGE.BackgroundPyramidRenderer.prototype.addToRenderList = function(tile)
 
 /**
  * Render routine.
- * Do preliminary job of specific background renderer, then summon superclass method
  * @method FORGE.BackgroundPyramidRenderer#render
- * @param {THREE.PerspectiveCamera} camera - perspective camera
+ * @param {THREE.WebGLRenderer} webGLRenderer - Three WebGL renderer
+ * @param {THREE.WebGLRenderTarget} target - render target
  */
-FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
+FORGE.BackgroundPyramidRenderer.prototype.render = function(webGLRenderer, target)
 {
     // Renderer should find if some tile at current level are currently rendered
     this._renderList = [];
     this._renderNeighborList = [];
 
-    FORGE.BackgroundRenderer.prototype.render.call(this, camera);
+    FORGE.BackgroundRenderer.prototype.render.call(this, webGLRenderer, target);
 
     this._renderNeighborList = FORGE.Utils.arrayUnique(this._renderNeighborList);
-
     this._clearTiles();
 };
 
@@ -630,8 +607,6 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(camera)
 FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
     this._viewer.camera.onChange.remove(this._onCameraChange, this);
-
-    this._clear();
 
     var tile;
     for (var level in this._tileCache)

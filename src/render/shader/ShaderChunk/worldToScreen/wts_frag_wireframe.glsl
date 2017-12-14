@@ -11,6 +11,7 @@
 // Set thickness to 1.5. Seems like 1.0 adds aliasing to the grid.
 #define WIRE_THICKNESS 1.50
 
+uniform vec3 tBackgroundColor;
 uniform vec3 tColor;
 
 varying vec2 vQuadrilateralCoords;
@@ -31,5 +32,5 @@ void main() {
     // Use amount to compute color and alpha and draw the texel
     float alpha = 1.0 - amount.x * amount.y;
 
-    gl_FragColor = vec4(tColor.rgb, alpha);
+    gl_FragColor = vec4(mix(tBackgroundColor, tColor, alpha), 1.);    
 }

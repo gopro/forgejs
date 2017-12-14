@@ -68,3 +68,17 @@ Object.defineProperty(FORGE.Size.prototype, "ratio",
         return this._width / this._height;
     }
 });
+
+/**
+ * Get size as THREE.Vector2.
+ * @name FORGE.Size#asVector
+ * @type {THREE.Vector2}
+ */
+Object.defineProperty(FORGE.Size.prototype, "asVector",
+{
+    /** @this {FORGE.Size} */
+    get: function()
+    {
+        return new THREE.Vector2(this._width, this._height);
+    }
+});

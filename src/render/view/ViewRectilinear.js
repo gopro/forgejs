@@ -3,12 +3,13 @@
  *
  * @constructor FORGE.ViewRectilinear
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {FORGE.ViewManager} viewManager - {@link FORGE.ViewManager} reference.
  * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewRectilinear = function(viewer, options)
+FORGE.ViewRectilinear = function(viewer, viewManager, options)
 {
-    FORGE.ViewBase.call(this, viewer, options, "ViewRectilinear", FORGE.ViewType.RECTILINEAR);
+    FORGE.ViewBase.call(this, viewer, viewManager, options, "ViewRectilinear", FORGE.ViewType.RECTILINEAR);
 
     this._boot();
 };
@@ -51,7 +52,7 @@ FORGE.ViewRectilinear.prototype._updateViewParams = function()
 {
     if (this._viewer !== null)
     {
-        this._projectionScale = Math.tan(FORGE.Math.degToRad(this._viewer.camera.fov / 2));
+        this._projectionScale = Math.tan(FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.fov / 2));
     }
 };
 
@@ -70,7 +71,7 @@ FORGE.ViewRectilinear.prototype.updateUniforms = function(uniforms)
         return;
     }
 
-    if (uniforms.hasOwnProperty("tProjectionScale"))
+    if ("tProjectionScale" in uniforms)
     {
         uniforms.tProjectionScale.value = this._projectionScale;
     }
@@ -92,7 +93,7 @@ FORGE.ViewRectilinear.prototype.worldToScreen = function(worldPt, parallaxFactor
 
     // Get point projected on unit sphere and apply camera rotation
     var worldPt4 = new THREE.Vector4(worldPt.x, worldPt.y, -worldPt.z, 1.0);
-    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewManager.sceneRenderer.camera.modelView);
     var rotation = FORGE.Math.eulerToRotationMatrix(camEuler.yaw, camEuler.pitch, -camEuler.roll, true);
     rotation = rotation.transpose();
     worldPt4.applyMatrix4(rotation);
@@ -144,7 +145,7 @@ FORGE.ViewRectilinear.prototype.screenToWorld = function(screenPt)
     var worldPt = new THREE.Vector4(fragment.x, fragment.y, -1, 0);
 
     // move the point in the world system
-    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewer.camera.modelView);
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewManager.sceneRenderer.camera.modelView);
     var rotation = FORGE.Math.eulerToRotationMatrix(-camEuler.yaw, camEuler.pitch, -camEuler.roll, true);
     worldPt.applyMatrix4(rotation);
 

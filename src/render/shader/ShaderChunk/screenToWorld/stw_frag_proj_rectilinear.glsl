@@ -11,8 +11,8 @@ uniform float tMixRatio;
 uniform sampler2D tTransitionTexture;
 
 uniform sampler2D tTexture;
-uniform vec2 tViewportResolution;
-uniform float tViewportResolutionRatio;
+uniform vec4 tViewport;
+uniform float tViewportRatio;
 uniform mat4 tModelViewMatrixInverse;
 uniform float tProjectionScale;
 

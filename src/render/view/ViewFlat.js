@@ -3,12 +3,13 @@
  *
  * @constructor FORGE.ViewFlat
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {FORGE.ViewManager} viewManager - {@link FORGE.ViewManager} reference.
  * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewFlat = function(viewer, options)
+FORGE.ViewFlat = function(viewer, viewManager, options)
 {
-    FORGE.ViewBase.call(this, viewer, options, "ViewFlat", FORGE.ViewType.FLAT);
+    FORGE.ViewBase.call(this, viewer, viewManager, options, "ViewFlat", FORGE.ViewType.FLAT);
 
     this._boot();
 };
@@ -67,7 +68,7 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
 
         if (this._viewer.renderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer)
         {
-            var vfov = FORGE.Math.degToRad(this._viewer.camera.fov);
+            var vfov = FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.fov);
 
             if (this._options.repeatX === false)
             {
@@ -119,29 +120,29 @@ FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
         return;
     }
 
-    if (uniforms.hasOwnProperty("tRepeatX"))
+    if ("tRepeatX" in uniforms)
     {
         uniforms.tRepeatX.value = this._options.repeatX ? 1 : 0;
     }
 
-    if (uniforms.hasOwnProperty("tRepeatY"))
+    if ("tRepeatY" in uniforms)
     {
         uniforms.tRepeatY.value = this._options.repeatY ? 1 : 0;
     }
 
-    if (uniforms.hasOwnProperty("tYaw"))
+    if ("tYaw" in uniforms)
     {
-        uniforms.tYaw.value = FORGE.Math.degToRad(this._viewer.camera.yaw);
+        uniforms.tYaw.value = FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.yaw);
     }
 
-    if (uniforms.hasOwnProperty("tPitch"))
+    if ("tPitch" in uniforms)
     {
-        uniforms.tPitch.value = FORGE.Math.degToRad(this._viewer.camera.pitch);
+        uniforms.tPitch.value = FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.pitch);
     }
 
-    if (uniforms.hasOwnProperty("tFov"))
+    if ("tFov" in uniforms)
     {
-        uniforms.tFov.value = FORGE.Math.degToRad(this._viewer.renderer.camera.fov);
+        uniforms.tFov.value = FORGE.Math.degToRad(this._viewer.camera.fov);
     }
 };
 

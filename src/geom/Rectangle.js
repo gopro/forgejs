@@ -45,7 +45,6 @@ FORGE.Rectangle = function(x, y, width, height)
 
 FORGE.Rectangle.prototype.constructor = FORGE.Rectangle;
 
-
 /**
  * Get and set x origin coordinate.
  * @name FORGE.Rectangle#x
@@ -223,4 +222,17 @@ Object.defineProperty(FORGE.Rectangle.prototype, "size",
     }
 });
 
+/**
+ * Get size as THREE.Vector4.
+ * @name FORGE.Rectangle#asVector
+ * @type {THREE.Vector4}
+ */
+Object.defineProperty(FORGE.Rectangle.prototype, "asVector",
+{
+    /** @this {FORGE.Rectangle} */
+    get: function()
+    {
+        return new THREE.Vector4(this._x, this._y, this._width, this._height);
+    }
+});
 

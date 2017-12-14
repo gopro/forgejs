@@ -6,8 +6,8 @@
 #include <defines>
 
 uniform sampler2D tTexture;
-uniform vec2 tViewportResolution;
-uniform float tViewportResolutionRatio;
+uniform vec4 tViewport;
+uniform float tViewportRatio;
 uniform float tTextureRatio;
 uniform float tFov;
 uniform float tYaw;
@@ -28,7 +28,7 @@ void main() {
     vec2 sReference = vec2(tYaw, tPitch) + sTexResolution / 2.0;
 
     // Get texel in spherical coordinates
-    vec2 sTexel = sReference + (tFov * 0.5) * getFragment();
+    vec2 sTexel = sReference + (tFov * 0.5) * screenToNDC(getScreenPt());
 
     // Get texture coordinates
     vec2 uv = sTexel / sTexResolution;

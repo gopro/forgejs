@@ -420,7 +420,7 @@ FORGE.RenderDisplay.prototype.getRenderParams = function()
 {
     var renderer = this._viewer.renderer.webGLRenderer;
     var canvas = renderer.domElement;
-    var camera = this._viewer.renderer.camera;
+    var camera = this._viewer.camera;
     var renderParams = [];
 
     if (typeof this._vrDisplay !== "undefined" && this._vrDisplay !== null && this._presentingVR === true)

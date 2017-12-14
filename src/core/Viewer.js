@@ -263,12 +263,28 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._i18n = null;
 
     /**
-     * Renderer reference.
-     * @name FORGE.Viewer#_renderManager
-     * @type {FORGE.RenderManager}
+     * WebGL Renderer
+     * @name FORGE.SceneRenderer#_webGLRenderer
+     * @type {?THREE.WebGLRenderer}
      * @private
      */
-    this._renderManager = null;
+    // this._webGLRenderer = null;
+
+    /**
+     * Main renderer reference.
+     * @name FORGE.Viewer#_renderer
+     * @type {FORGE.Renderer}
+     * @private
+     */
+    this._renderer = null;
+
+    /**
+     * Scene renderer reference.
+     * @name FORGE.Viewer#_sceneRenderer
+     * @type {FORGE.SceneRenderer}
+     * @private
+     */
+    this._sceneRenderer = null;
 
     /**
      * Paused state of the main loop.
@@ -398,13 +414,13 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._i18n = new FORGE.LocaleManager(this);
     this._story = new FORGE.Story(this);
     this._history = new FORGE.History(this);
-    this._renderManager = new FORGE.RenderManager(this);
-    this._controllers = new FORGE.ControllerManager(this);
-    this._playlists = new FORGE.PlaylistManager(this);
-    this._plugins = new FORGE.PluginManager(this);
+    this._renderer = new FORGE.Renderer(this);
+    // this._controllers = new FORGE.ControllerManager(this);
+    // this._playlists = new FORGE.PlaylistManager(this);
+    // this._plugins = new FORGE.PluginManager(this);
     this._hotspots = new FORGE.HotspotManager(this);
     this._actions = new FORGE.ActionManager(this);
-    this._director = new FORGE.Director(this);
+    // this._director = new FORGE.Director(this);
     this._postProcessing = new FORGE.PostProcessing(this);
 
     this._keyboard = new FORGE.Keyboard(this);
@@ -418,8 +434,8 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._audio.boot();
     this._raf.boot();
     this._story.boot();
-    this._playlists.boot();
-    this._plugins.boot();
+    // this._playlists.boot();
+    // this._plugins.boot();
     this._hotspots.boot();
 
     this.log("ForgeJS " + FORGE.VERSION);
@@ -529,12 +545,12 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
         this._postProcessing.addConfig(config.postProcessing);
     }
 
-    if (typeof config.plugins !== "undefined")
-    {
-        this._plugins.addConfig(config.plugins);
-    }
+    // if (typeof config.plugins !== "undefined")
+    // {
+    //     this._plugins.addConfig(config.plugins);
+    // }
 
-    this._controllers.addConfig(config.controllers);
+    // this._controllers.addConfig(config.controllers);
 
     if (typeof config.story !== "undefined")
     {
@@ -637,16 +653,29 @@ FORGE.Viewer.prototype._updateLogic = function()
     this._keyboard.update();
     this._gamepad.update();
     this._audio.update();
-    this._plugins.update();
+    // this._plugins.update();
     this._tween.update();
     this._hotspots.update();
-    this._controllers.update();
-    this._renderManager.update();
+    // this._controllers.update();
+    // this._sceneRenderer.update();
 
     if (this._callbacks !== null && typeof this._callbacks.update === "function")
     {
         this._callbacks.update.call();
     }
+};
+
+/**
+ * Get master scene and viewport camera.
+ * @method FORGE.Viewer#_getMasterCamera
+ * @private
+ */
+FORGE.Viewer.prototype._getMasterCamera = function()
+{
+    // @todo: rework with transition
+    var masterScene = this._story.scene;
+
+    return masterScene.camera;
 };
 
 /**
@@ -661,10 +690,15 @@ FORGE.Viewer.prototype._updateRendering = function()
         this._callbacks.beforeRender.call();
     }
 
-    if (this._renderManager !== null)
+    if (this._renderer !== null)
     {
-        this._renderManager.render();
+        this._renderer.render();
     }
+
+    // if (this._sceneRenderer !== null)
+    // {
+    //     this._sceneRenderer.render();
+    // }
 
     if (this._callbacks !== null && typeof this._callbacks.afterRender === "function")
     {
@@ -831,10 +865,16 @@ FORGE.Viewer.prototype.destroy = function()
         this._director = null;
     }
 
-    if(this._renderManager !== null)
+    if(this._renderer !== null)
     {
-        this._renderManager.destroy();
-        this._renderManager = null;
+        this._renderer.destroy();
+        this._renderer = null;
+    }
+
+    if(this._sceneRenderer !== null)
+    {
+        this._sceneRenderer.destroy();
+        this._sceneRenderer = null;
     }
 
     if(this._canvas !== null)
@@ -953,6 +993,8 @@ FORGE.Viewer.prototype.destroy = function()
         this._onMainConfigLoadComplete.destroy();
         this._onMainConfigLoadComplete = null;
     }
+
+    // this._webGLRenderer = null;
 
     FORGE.VIEWERS.splice(this._uid, 1);
 
@@ -1359,10 +1401,25 @@ Object.defineProperty(FORGE.Viewer.prototype, "i18n",
     }
 });
 
+// /**
+//  * Get WebGL renderer.
+//  * @name FORGE.Viewer#WebGLRenderer
+//  * @type {THREE.WebGLRenderer}
+//  * @readonly
+//  */
+// Object.defineProperty(FORGE.Viewer.prototype, "webGLRenderer",
+// {
+//     /** @this {FORGE.Viewer} */
+//     get: function()
+//     {
+//         return this._webGLRenderer;
+//     }
+// });
+
 /**
  * Get the viewer render manager.
  * @name FORGE.Viewer#renderer
- * @type {FORGE.RenderManager}
+ * @type {FORGE.SceneRenderer}
  * @readonly
  */
 Object.defineProperty(FORGE.Viewer.prototype, "renderer",
@@ -1370,7 +1427,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "renderer",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._renderManager;
+        return this._renderer;
     }
 });
 
@@ -1385,7 +1442,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "view",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._renderManager.view;
+        return undefined;//this._sceneRenderer.view;
     }
 });
 
@@ -1400,7 +1457,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "camera",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._renderManager.camera;
+        return this._getMasterCamera();
     }
 });
 
@@ -1516,6 +1573,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "height",
     set: function(value)
     {
         this._container.height = value;
+    }
+});
+
+
+/**
+ * Get viewer aspect ratio.
+ * @name FORGE.Viewer#aspect
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "aspect",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._container.width / this._container.height;
     }
 });
 

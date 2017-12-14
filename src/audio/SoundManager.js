@@ -640,10 +640,10 @@ FORGE.SoundManager.prototype._updateVolume = function()
  */
 FORGE.SoundManager.prototype._setContextListenerOrientation = function()
 {
-    if (this._useWebAudio === true && this._viewer.renderer.camera.main !== null)
+    if (this._useWebAudio === true && this._viewer.camera.main !== null)
     {
         var cameraDirection = new THREE.Vector3();
-        var qCamera = this._viewer.renderer.camera.main.quaternion;
+        var qCamera = this._viewer.camera.main.quaternion;
 
         // front vector indicating where the listener is facing to
         cameraDirection.set(0, 0, -1);

@@ -25,6 +25,7 @@ module.exports = function(grunt)
         "src/story/Group.js",
         "src/story/Scene.js",
         "src/story/SceneParser.js",
+        "src/story/SceneViewport.js",
 
         "src/math/Math.js",
         "src/math/Quaternion.js",
@@ -38,17 +39,22 @@ module.exports = function(grunt)
         "src/media/MediaTexture.js",
         "src/media/Media.js",
 
-        "src/render/RenderManager.js",
+        "src/render/Renderer.js",
+        "src/render/SceneRenderer2.js",
         "src/render/RenderScene.js",
         "src/render/RenderPipeline.js",
         "src/render/RenderDisplay.js",
         "src/render/RenderParams.js",
 
         "src/render/background/BackgroundRenderer.js",
-        "src/render/background/BackgroundType.js",
+        "src/render/background/BackgroundTextureRenderer.js",
         "src/render/background/BackgroundMeshRenderer.js",
-        "src/render/background/BackgroundPyramidRenderer.js",
+        "src/render/background/BackgroundGridRenderer.js",
+        "src/render/background/BackgroundCubeRenderer.js",
+        "src/render/background/BackgroundSphereRenderer.js",
+        "src/render/background/BackgroundPlaneRenderer.js",
         "src/render/background/BackgroundShaderRenderer.js",
+        "src/render/background/BackgroundPyramidRenderer.js",
 
         "src/render/postProcessing/PostProcessing.js",
         "src/render/postProcessing/EffectComposerType.js",

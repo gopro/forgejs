@@ -1,5 +1,4 @@
 /**
- * A FORGE.Scene is an object that represents a scene of a {@link FORGE.Story}.
  *
  * @constructor FORGE.Scene
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
@@ -14,6 +13,14 @@ FORGE.Scene = function(viewer)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * Array of scene viewports.
+     * @name FORGE.Scene#_viewer
+     * @type {Array<FORGE.SceneViewport>}
+     * @private
+     */
+    this._sceneViewports = null;
 
     /**
      * The scene config object.
@@ -102,7 +109,10 @@ FORGE.Scene = function(viewer)
      * @private
      */
     this._media = null;
+
     this._transition = null;
+
+    this._renderTarget = null;
 
     /**
      * Load request event dispatcher.
@@ -289,6 +299,65 @@ FORGE.Scene.prototype._createMedia = function(media)
     }
 };
 
+/**
+ * Get the master camera of the scene
+ * @method FORGE.Scene#_getMasterCamera
+ * @private
+ */
+FORGE.Scene.prototype._getMasterCamera = function()
+{
+    // @todo: define a policy for master camera (for example: viewport active with user focus)
+    return this._sceneViewports[0].camera;
+};
+
+/**
+ * Create viewports and renderers based on layout definition in config
+ * @method FORGE.Scene#_createViewports
+ * @private
+ * @param {!SceneConfig} config - Scene config
+ */
+FORGE.Scene.prototype._createViewports = function(config)
+{
+
+    if (this._renderTarget !== null)
+    {
+        this._renderTarget.dispose();
+        this._renderTarget = null;
+    }
+
+    var rtParams =
+    {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat,
+        stencilBuffer: false
+    };
+
+    // TODO : renderer should expose scene size for each frame, it could change during transitions
+    this._renderTarget = new THREE.WebGLRenderTarget(this._viewer.width, this._viewer.height, rtParams);
+ 
+    if (typeof config.layout === "undefined" || config.layout.length === 0)
+    {
+        // only on renderer with full viewport
+        var viewport = new FORGE.SceneViewport(this._viewer, this, null);
+        this._sceneViewports.push(viewport);
+    }
+    else
+    {
+        if (this._sceneViewports === null)
+        {
+            this._sceneViewports = [];   
+        }
+        
+        for (var i=0,ii=config.layout.length; i<ii; i++)
+        {
+            var viewportConfig = config.layout[i];
+            var viewport = new FORGE.SceneViewport(this._viewer, this, viewportConfig);
+            this._sceneViewports.push(viewport);
+        }        
+    }
+};
+
 FORGE.Scene.prototype._createTransition = function(transition)
 {
     this.log("create transition");
@@ -357,6 +426,7 @@ FORGE.Scene.prototype.loadStart = function(time)
 
     this._createMedia(this._config.media);
     this._createTransition(this._config.transition);
+    this._createViewports(this._config);
 
     if (this._onLoadStart !== null)
     {
@@ -505,6 +575,20 @@ FORGE.Scene.prototype.isAmbisonic = function()
 };
 
 /**
+ * Render routine.
+ * @method FORGE.Scene#render
+ * @private
+ */
+FORGE.Scene.prototype.render = function(webGLRenderer)
+{
+    for (var i=0, ii=this._sceneViewports.length; i<ii; i++)
+    {
+        this._sceneViewports[i].render(webGLRenderer, this._renderTarget);
+        // this._sceneViewports[i].render(webGLRenderer, null);
+    }
+};
+
+/**
  * Destroy method
  * @method FORGE.Scene#destroy
  */
@@ -620,6 +704,22 @@ Object.defineProperty(FORGE.Scene.prototype, "viewed",
     get: function()
     {
         return this._viewCount !== 0;
+    }
+});
+
+/**
+ * Camera property.
+ * Each scene viewport has a camera, and the scene knows what is the master
+ * @name FORGE.Scene#camera
+ * @readonly
+ * @type {FORGE.Camera}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "camera",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._getMasterCamera();
     }
 });
 
@@ -756,6 +856,21 @@ Object.defineProperty(FORGE.Scene.prototype, "media",
     get: function()
     {
         return this._media;
+    }
+});
+
+/**
+ * Get the scene render target.
+ * @name  FORGE.Scene#renderTarget
+ * @readonly
+ * @type {THREE.RenderTarget}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "renderTarget",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._renderTarget;
     }
 });
 

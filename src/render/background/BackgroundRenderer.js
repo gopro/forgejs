@@ -3,43 +3,39 @@
  * BackgroundRenderer class.
  *
  * @constructor FORGE.BackgroundRenderer
- * @param {FORGE.Viewer} viewer - viewer reference
- * @param {THREE.WebGLRenderTarget} target - render target
- * @param {SceneMediaOptionsConfig} options - the options for the cubemap
+ * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  * @param {string=} type - The type of the object as long as many other object inherits from this one.
  * @extends {FORGE.BaseObject}
  */
-FORGE.BackgroundRenderer = function(viewer, target, options, type)
+FORGE.BackgroundRenderer = function(sceneRenderer, type)
 {
     /**
-     * @name FORGE.BackgroundRenderer#_viewer
-     * @type {FORGE.Viewer}
+     * The scene renderer reference.
+     * @name FORGE.BackgroundRenderer#_sceneRenderer
+     * @type {FORGE.SceneRenderer}
      * @private
      */
-    this._viewer = viewer;
+    this._sceneRenderer = sceneRenderer;
 
     /**
-     * @name FORGE.BackgroundRenderer#_canvas
-     * @type {FORGE.Canvas}
+     * Scene media config
+     * @name FORGE.BackgroundRenderer#_config
+     * @type {?SceneMediaConfig}
      * @private
      */
-    this._canvas = null;
-
+    this._config = this._sceneRenderer.media.config;
+    
     /**
-     * The mesh (cube) the video is on.
-     * @type {THREE.Mesh}
+     * Background rendering media object
+     * @name FORGE.BackgroundRenderer#_media
+     * @type {FORGE.Media}
      * @private
      */
-    this._mesh = null;
+    this._media = null;
 
     /**
-     * @name FORGE.BackgroundRenderer#_scene
-     * @type {THREE.Scene}
-     * @private
-     */
-    this._scene = null;
-
-    /**
+     * THREE camera object
+     * It can be some perspective or orthographic camera depending on the renderer type
      * @name FORGE.BackgroundRenderer#_camera
      * @type {THREE.Camera}
      * @private
@@ -54,18 +50,27 @@ FORGE.BackgroundRenderer = function(viewer, target, options, type)
     this._frustum = null;
 
     /**
-     * Media format (cubemap, equi...)
+     * @name FORGE.BackgroundRenderer#_scene
+     * @type {THREE.Scene}
+     * @private
+     */
+    this._scene = null;
+
+    /**
+     * Media type (image, video, grid)
+     * Default: grid
      * @type {string}
      * @private
      */
-    this._mediaFormat = options.mediaFormat || FORGE.MediaFormat.CUBE;
+    this._mediaType = FORGE.MediaType.GRID;
 
     /**
-     * @name FORGE.BackgroundRenderer#_renderTarget
-     * @type {THREE.WebGLRenderTarget}
+     * Media format (cubemap, equirectangular, flat)
+     * Default: equirectangular
+     * @type {string}
      * @private
      */
-    this._renderTarget = target || null;
+    this._mediaFormat = FORGE.MediaFormat.EQUIRECTANGULAR;
 
     FORGE.BaseObject.call(this, type || "BackgroundRenderer");
 
@@ -85,117 +90,40 @@ FORGE.BackgroundRenderer.prototype._boot = function()
     this._scene = new THREE.Scene();
     this._scene.name = "Background scene";
 
-    if (this._renderTarget === null)
+    if (FORGE.BackgroundRenderer.DEBUG === true)
     {
-        var width = this._viewer.renderer.canvasResolution.width;
-        var height = this._viewer.renderer.canvasResolution.height;
+        window.scene = this._scene;
+    } 
 
-        var rtParams =
-        {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.LinearFilter,
-            format: THREE.RGBAFormat,
-            stencilBuffer: false
-        };
-
-        this._renderTarget = new THREE.WebGLRenderTarget(width, height, rtParams);
-    }
+    this._camera = this._sceneRenderer.camera.main;
 
     this._frustum = new THREE.Frustum();
-};
 
-/**
- * Abstract method that should be implemented by subclass.
- * @method FORGE.BackgroundRenderer#_setDisplayObject
- * @param {FORGE.DisplayObject} displayObject - The display object to set.
- * @private
- */
-FORGE.BackgroundRenderer.prototype._setDisplayObject = function(displayObject)
-{
-    this.log(displayObject); //@closure
-    throw "Please implement " + this._className + "::_setDisplayObject";
-};
+    this._media = this._sceneRenderer.media;
 
-/**
- * Abstract method that should be implemented by subclass.
- * @method FORGE.BackgroundRenderer#_clear
- * @private
- */
-FORGE.BackgroundRenderer.prototype._clear = function()
-{
-    throw "Please implement " + this._className + "::_clear";
-};
-
-/**
- * Update texture if needed (video only).
- * @method FORGE.BackgroundRenderer#_updateTexture
- * @private
- */
-FORGE.BackgroundRenderer.prototype._updateTexture = function()
-{
-    // doesn't refresh when there is no texture or texture container and when a video as WebGL texture is paused
-    if (this._texture === null || this._textureCanvas === null ||
-        this._textureContext === null || typeof this._displayObject === "undefined" || this._displayObject === null ||
-        this._displayObject.element === null || (FORGE.Utils.isTypeOf(this._displayObject, ["VideoHTML5", "VideoDash"]) === true && this._displayObject.playing === false))
+    if (typeof this._config !== "undefined")
     {
-        return;
-    }
-
-    var video = this._displayObject.element;
-    if (video instanceof HTMLVideoElement && video.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA)
-    {
-        if (this._textureContext)
+        // Override default value with config
+        if (typeof this._config.type !== "undefined")
         {
-            this._textureContext.drawImage(video,
-                0, 0, video.videoWidth, video.videoHeight,
-                0, 0, this._textureCanvas.width, this._textureCanvas.height);
-            this._texture.needsUpdate = true;
-            this.log("texture update done");
+            this._mediaType = this._config.type;
         }
+
+        if (typeof this._config.source !== "undefined" && typeof this._config.source.format !== "undefined")
+        {
+            this._mediaFormat = this._config.source.format;
+        }        
     }
 };
 
 /**
- * Update after view change
- * @todo change name of this method to be more generic (used by init and )
- * Should be overriden by subclass
- * @method FORGE.BackgroundRenderer#updateAfterViewChange
+ * Get the scene renderer resolution.
+ * @method FORGE.BackgroundRenderer#_getResolution
+ * @private
  */
-FORGE.BackgroundRenderer.prototype.updateAfterViewChange = function()
+FORGE.BackgroundRenderer.prototype._getViewport = function()
 {
-    throw new Error(this._className + "::updateAfterViewChange not implemented");
-};
-
-/**
- * Update size (resolution)
- * @method FORGE.BackgroundRenderer#setSize
- * @param {FORGE.Size} size - size [px]
- */
-FORGE.BackgroundRenderer.prototype.setSize = function(size)
-{
-    if (this.renderTarget !== null)
-    {
-        this.renderTarget.setSize(size.width, size.height);
-    }
-};
-
-/**
- * Render routine.
- * @method FORGE.BackgroundRenderer#render
- * @param {THREE.PerspectiveCamera} camera - perspective camera with mesh rendering, N/A with shader rendering (null)
- */
-FORGE.BackgroundRenderer.prototype.render = function(camera)
-{
-    if (this._viewer.renderer === null || this._renderTarget === null)
-    {
-        return;
-    }
-
-    this._updateTexture();
-
-    var renderCamera = (camera !== null) ? camera : this._camera;
-    this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( renderCamera.projectionMatrix, renderCamera.matrixWorldInverse ) );
-    this._viewer.renderer.webGLRenderer.render ( this._scene, renderCamera, this._renderTarget, true );
+    return this._sceneRenderer.viewport;
 };
 
 /**
@@ -219,35 +147,39 @@ FORGE.BackgroundRenderer.prototype.isObjectInScene = function(object)
 };
 
 /**
- * Update routine.
- * @method FORGE.BackgroundRenderer#update
+ * Render routine.
+ * @param {THREE.WebGLRenderer} webGLRenderer THREE WebGL renderer
+ * @param {THREE.WebGLRenderTarget} target WebGL render target
+ * @method FORGE.BackgroundRenderer#render
  */
-FORGE.BackgroundRenderer.prototype.update = function()
+FORGE.BackgroundRenderer.prototype.render = function(webGLRenderer, target)
 {
-    if (this._mesh === null || !(this._mesh.material instanceof THREE.ShaderMaterial))
+    if (typeof this._mesh !== "undefined")
     {
-        this._viewer.renderer.view.current.updateUniforms();
-        return;
+        // Update common shader material parameters
+        var uniforms = this._mesh.material.uniforms;
+
+        if ("tViewport" in uniforms)
+        {
+            uniforms.tViewport.value = this._getViewport().asVector;
+        }
+
+        if ("tViewportRatio" in uniforms)
+        {
+            uniforms.tViewportRatio.value = this._getViewport().size.ratio;
+        }
+
+        if ("tModelViewMatrixInverse" in uniforms)
+        {
+            uniforms.tModelViewMatrixInverse.value = this._sceneRenderer.camera.modelViewInverse;
+        }
+
+        this._sceneRenderer.view.current.updateUniforms(uniforms); 
     }
 
-    var resolution = this._viewer.renderer.displayResolution;
-
-    if (this._mesh.material.uniforms.hasOwnProperty("tViewportResolution"))
-    {
-        this._mesh.material.uniforms.tViewportResolution.value = new THREE.Vector2(resolution.width, resolution.height);
-    }
-
-    if (this._mesh.material.uniforms.hasOwnProperty("tViewportResolutionRatio"))
-    {
-        this._mesh.material.uniforms.tViewportResolutionRatio.value = resolution.ratio;
-    }
-
-    if (this._mesh.material.uniforms.hasOwnProperty("tModelViewMatrixInverse"))
-    {
-        this._mesh.material.uniforms.tModelViewMatrixInverse.value = this._viewer.renderer.camera.modelViewInverse;
-    }
-
-    this._viewer.renderer.view.current.updateUniforms(this._mesh.material.uniforms);
+    this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this._camera.projectionMatrix, this._camera.matrixWorldInverse ) );
+    
+    webGLRenderer.render(this._scene, this._camera, target, false);
 };
 
 /**
@@ -256,111 +188,18 @@ FORGE.BackgroundRenderer.prototype.update = function()
  */
 FORGE.BackgroundRenderer.prototype.destroy = function()
 {
-    this._camera = null;
-    this._frustum = null;
-
     if (this._renderTarget !== null)
     {
         this._renderTarget.dispose();
         this._renderTarget = null;
     }
 
-    while (this._scene.children.length > 0)
-    {
-        var mesh = this._scene.children.pop();
-
-        if (mesh.geometry !== null)
-        {
-            mesh.geometry.dispose();
-            mesh.geometry = null;
-        }
-
-        this._scene.remove(mesh);
-    }
-
     this._scene = null;
-    this._viewer = null;
+    this._camera = null;
+    this._frustum = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
-
-/**
- * Get texture size.
- * @name FORGE.BackgroundRenderer#textureSize
- * @type {FORGE.Size}
- */
-Object.defineProperty(FORGE.BackgroundRenderer.prototype, "textureSize",
-{
-    /** @this {FORGE.BackgroundRenderer} */
-    get: function()
-    {
-        if (this._texture === null || typeof this._texture.image === "undefined")
-        {
-            return null;
-        }
-
-        return new FORGE.Size(this._texture.image.width, this._texture.image.height);
-    }
-});
-
-/**
- * Get background render target.
- * @name FORGE.BackgroundRenderer#renderTarget
- * @type {THREE.WebGLRenderTarget}
- */
-Object.defineProperty(FORGE.BackgroundRenderer.prototype, "renderTarget",
-{
-    /** @this {FORGE.BackgroundRenderer} */
-    get: function()
-    {
-        return this._renderTarget;
-    }
-});
-
-/**
- * Get/Set background renderer displayObject.
- * @name FORGE.BackgroundRenderer#displayObject
- * @type {string}
- */
-Object.defineProperty(FORGE.BackgroundRenderer.prototype, "displayObject",
-{
-    /** @this {FORGE.BackgroundRenderer} */
-    get: function()
-    {
-        return this._displayObject;
-    },
-    /** @this {FORGE.BackgroundRenderer} */
-    set: function(value)
-    {
-        if (value === null)
-        {
-            this._clear();
-        }
-        else
-        {
-            this._setDisplayObject(value);
-        }
-    }
-});
-
-/**
- * Get/Set background renderer transition display object.
- * @name FORGE.BackgroundRenderer#transitionDisplayObject
- * @type {string}
- */
-Object.defineProperty(FORGE.BackgroundRenderer.prototype, "transitionDisplayObject",
-{
-    /** @this {FORGE.BackgroundRenderer} */
-    get: function()
-    {
-        return this._transitionDisplayObject;
-    },
-    /** @this {FORGE.BackgroundRenderer} */
-    set: function(value)
-    {
-        this._setTransitionDisplayObject(value);
-    }
-});
 
 /**
  * Get background scene.

@@ -3,9 +3,10 @@
  *
  * @constructor FORGE.ViewManager
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ViewManager = function(viewer)
+FORGE.ViewManager = function(viewer, sceneRenderer)
 {
     /**
      * The Viewer reference.
@@ -14,6 +15,14 @@ FORGE.ViewManager = function(viewer)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * The scene renderer reference.
+     * @name FORGE.ViewManager#_sceneRenderer
+     * @type {FORGE.SceneRenderer}
+     * @private
+     */
+    this._sceneRenderer = sceneRenderer;
 
     /**
      * The current view reference
@@ -84,16 +93,16 @@ FORGE.ViewManager.prototype._setView = function(type, options)
     switch (type)
     {
         case FORGE.ViewType.GOPRO:
-            this._view = new FORGE.ViewGoPro(this._viewer, options);
+            this._view = new FORGE.ViewGoPro(this._viewer, this, options);
             break;
 
         case FORGE.ViewType.FLAT:
-            this._view = new FORGE.ViewFlat(this._viewer, options);
+            this._view = new FORGE.ViewFlat(this._viewer, this, options);
             break;
 
         case FORGE.ViewType.RECTILINEAR:
         default:
-            this._view = new FORGE.ViewRectilinear(this._viewer, options);
+            this._view = new FORGE.ViewRectilinear(this._viewer, this, options);
             break;
     }
 
@@ -171,7 +180,7 @@ FORGE.ViewManager.prototype.disableVR = function()
     if(this._viewTypeBackup !== "")
     {
         this._setView(this._viewTypeBackup, this._viewOptionsBackup); // Restore the view as before the VR mode
-        this._viewer.camera.roll = 0; // Reset the roll to 0
+        this._sceneRenderer.camera.roll = 0; // Reset the roll to 0
     }
 };
 
@@ -237,6 +246,21 @@ Object.defineProperty(FORGE.ViewManager.prototype, "current",
     get: function()
     {
         return this._view;
+    }
+});
+
+/**
+ * Get the scene renderer.
+ * @name FORGE.ViewManager#sceneRenderer
+ * @type {FORGE.SceneRenderer}
+ * @readonly
+ */
+Object.defineProperty(FORGE.ViewManager.prototype, "sceneRenderer",
+{
+    /** @this {FORGE.ViewManager} */
+    get: function()
+    {
+        return this._sceneRenderer;
     }
 });
 

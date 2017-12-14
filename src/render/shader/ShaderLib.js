@@ -18,8 +18,8 @@ FORGE.ShaderLib = {
                 tTransitionTexture: { type: "t", value: null },
                 tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
-                tViewportResolution: { type: "v2", value: new THREE.Vector2() },
-                tViewportResolutionRatio: { type: "f", value: 1.0 },
+                tViewport: { type: "v4", value: new THREE.Vector2() },
+                tViewportRatio: { type: "f", value: 1.0 },
                 tModelViewMatrixInverse: { type: "m4", value: new THREE.Matrix4() },
                 tProjectionScale: { type: "f", value: 1.0 }
             },
@@ -35,8 +35,8 @@ FORGE.ShaderLib = {
             {
                 tTexture: { type: "t", value: null },
                 tTextureRatio: { type: "f", value: 1.0 },
-                tViewportResolution: { type: "v2", value: new THREE.Vector2() },
-                tViewportResolutionRatio: { type: "f", value: 1.0 },
+                tViewport: { type: "v4", value: new THREE.Vector2() },
+                tViewportRatio: { type: "f", value: 1.0 },
                 tFov: { type: "f", value: 0.0 },
                 tYaw: { type: "f", value: 0.0 },
                 tPitch: { type: "f", value: 0.0 },
@@ -58,8 +58,8 @@ FORGE.ShaderLib = {
                 tTransitionTexture: { type: "t", value: null },
                 tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
-                tViewportResolution: { type: "v2", value: new THREE.Vector2() },
-                tViewportResolutionRatio: { type: "f", value: 1.0 },
+                tViewport: { type: "v4", value: new THREE.Vector2() },
+                tViewportRatio: { type: "f", value: 1.0 },
                 tModelViewMatrixInverse: { type: "m4", value: new THREE.Matrix4() },
                 tProjectionDistance: { type: "f", value: 0.0 },
                 tProjectionScale: { type: "f", value: 1.0 }
@@ -91,6 +91,7 @@ FORGE.ShaderLib = {
                 /** @type {FORGEUniform} */
                 uniforms:
                 {
+                    tBackgroundColor: { type: "c", value: null },
                     tColor: { type: "c", value: null },
                     tModelViewMatrixInverse: { type: "m4", value: null }
                 },
@@ -118,6 +119,7 @@ FORGE.ShaderLib = {
                 /** @type {FORGEUniform} */
                 uniforms:
                 {
+                    tBackgroundColor: { type: "c", value: null },
                     tColor: { type: "c", value: null },
                     tModelViewMatrixInverse: { type: "m4", value: null }
                 },
@@ -146,6 +148,7 @@ FORGE.ShaderLib = {
                 /** @type {FORGEUniform} */
                 uniforms:
                 {
+                    tBackgroundColor: { type: "c", value: null },
                     tColor: { type: "c", value: null },
                     tProjectionDistance: { type: "f", value: 1 }
                 },
