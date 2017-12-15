@@ -1,18 +1,18 @@
 /**
- * SceneRenderer class.
+ * RenderManager class.
  *
- * @constructor FORGE.SceneRenderer
+ * @constructor FORGE.RenderManager
  * @param {FORGE.Viewer} viewer - viewer reference
  * @extends {FORGE.BaseObject}
  *
  * @todo think about how to render multiple scene at the same time, with blending / overlap / viewport layouting...
  * maybe add a layer object encapsulating background / foreground renderings to ease the process
  */
-FORGE.SceneRenderer = function(viewer,)
+FORGE.RenderManager = function(viewer,)
 {
     /**
      * The viewer reference.
-     * @name FORGE.SceneRenderer#_viewer
+     * @name FORGE.RenderManager#_viewer
      * @type {FORGE.Viewer}
      * @private
      */
@@ -20,7 +20,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Render pipeline managing composers
-     * @name FORGE.SceneRenderer#_renderPipeline
+     * @name FORGE.RenderManager#_renderPipeline
      * @type {FORGE.RenderPipeline}
      * @private
      */
@@ -28,7 +28,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Object managing screen/VR display
-     * @name FORGE.SceneRenderer#_renderDisplay
+     * @name FORGE.RenderManager#_renderDisplay
      * @type {FORGE.RenderDisplay}
      * @private
      */
@@ -36,7 +36,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * View manager reference
-     * @name FORGE.SceneRenderer#_viewManager
+     * @name FORGE.RenderManager#_viewManager
      * @type {FORGE.ViewManager}
      * @private
      */
@@ -44,7 +44,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * The sound reference linked to the media.
-     * @name FORGE.SceneRenderer#_mediaSound
+     * @name FORGE.RenderManager#_mediaSound
      * @type {?(FORGE.Sound|Object)}
      * @private
      */
@@ -52,7 +52,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Picking manager
-     * @name FORGE.SceneRenderer#_pickingManager
+     * @name FORGE.RenderManager#_pickingManager
      * @type {FORGE.PickingManager}
      * @private
      */
@@ -60,7 +60,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Background renderer.
-     * @name FORGE.SceneRenderer#_backgroundRenderer
+     * @name FORGE.RenderManager#_backgroundRenderer
      * @type {?(FORGE.BackgroundMeshRenderer|FORGE.BackgroundShaderRenderer|FORGE.BackgroundPyramidRenderer)}
      * @private
      */
@@ -68,7 +68,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Type of the background renderer.
-     * @name FORGE.SceneRenderer#_backgroundRendererType
+     * @name FORGE.RenderManager#_backgroundRendererType
      * @type {string}
      * @private
      */
@@ -76,7 +76,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Camera reference.
-     * @name FORGE.SceneRenderer#_camera
+     * @name FORGE.RenderManager#_camera
      * @type {?FORGE.Camera}
      * @private
      */
@@ -84,7 +84,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Canvas resolution (px)
-     * @name FORGE.SceneRenderer#_canvasResolution
+     * @name FORGE.RenderManager#_canvasResolution
      * @type {?FORGE.Size}
      * @private
      */
@@ -92,7 +92,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Display resolution (px)
-     * @name FORGE.SceneRenderer#_displayResolution
+     * @name FORGE.RenderManager#_displayResolution
      * @type {?FORGE.Size}
      * @private
      */
@@ -100,7 +100,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * objects renderer
-     * @name  FORGE.SceneRenderer#_objectRenderer
+     * @name  FORGE.RenderManager#_objectRenderer
      * @type {?FORGE.ObjectRenderer}
      * @private
      */
@@ -108,7 +108,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Background renderer ready flag
-     * @name FORGE.SceneRenderer#_backgroundReady
+     * @name FORGE.RenderManager#_backgroundReady
      * @type {boolean}
      * @private
      */
@@ -116,7 +116,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Render pipeline renderer ready flag
-     * @name FORGE.SceneRenderer#_renderPipelineReady
+     * @name FORGE.RenderManager#_renderPipelineReady
      * @type {boolean}
      * @private
      */
@@ -124,7 +124,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Event dispatcher for background renderer ready.
-     * @name FORGE.SceneRenderer#_onBackgroundReady
+     * @name FORGE.RenderManager#_onBackgroundReady
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -132,7 +132,7 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Event dispatcher for on before render.
-     * @name FORGE.SceneRenderer#_onBeforeRender
+     * @name FORGE.RenderManager#_onBeforeRender
      * @type {FORGE.EventDispatcher}
      * @private
      */
@@ -140,38 +140,38 @@ FORGE.SceneRenderer = function(viewer,)
 
     /**
      * Event dispatcher for on after render.
-     * @name FORGE.SceneRenderer#_onAfterRender
+     * @name FORGE.RenderManager#_onAfterRender
      * @type {FORGE.EventDispatcher}
      * @private
      */
     this._onAfterRender = null;
 
-    FORGE.BaseObject.call(this, "SceneRenderer");
+    FORGE.BaseObject.call(this, "RenderManager");
 
     this._boot();
 };
 
-FORGE.SceneRenderer.prototype = Object.create(FORGE.BaseObject.prototype);
-FORGE.SceneRenderer.prototype.constructor = FORGE.SceneRenderer;
+FORGE.RenderManager.prototype = Object.create(FORGE.BaseObject.prototype);
+FORGE.RenderManager.prototype.constructor = FORGE.RenderManager;
 
 /**
  * Render manager constant near depth
  * @type {number}
  */
-FORGE.SceneRenderer.DEPTH_NEAR = 0.01;
+FORGE.RenderManager.DEPTH_NEAR = 0.01;
 
 /**
  * Render manager constant far depth
  * @type {number}
  */
-FORGE.SceneRenderer.DEPTH_FAR = 10000;
+FORGE.RenderManager.DEPTH_FAR = 10000;
 
 /**
  * Boot sequence.
- * @method FORGE.SceneRenderer#_boot
+ * @method FORGE.RenderManager#_boot
  * @private
  */
-FORGE.SceneRenderer.prototype._boot = function()
+FORGE.RenderManager.prototype._boot = function()
 {
     this._clock = new THREE.Clock();
 
@@ -180,10 +180,10 @@ FORGE.SceneRenderer.prototype._boot = function()
 
 /**
  * Viewer ready handler
- * @method FORGE.SceneRenderer#_onViewerConfigLoadComplete
+ * @method FORGE.RenderManager#_onViewerConfigLoadComplete
  * @private
  */
-FORGE.SceneRenderer.prototype._onViewerConfigLoadComplete = function()
+FORGE.RenderManager.prototype._onViewerConfigLoadComplete = function()
 {
     var canvas = this._viewer.canvas.dom;
 
@@ -227,10 +227,10 @@ FORGE.SceneRenderer.prototype._onViewerConfigLoadComplete = function()
  * Init the view, the camera and the media
  * @todo create media / background renderer
  *
- * @method FORGE.SceneRenderer#_onSceneLoadStartHandler
+ * @method FORGE.RenderManager#_onSceneLoadStartHandler
  * @private
  */
-FORGE.SceneRenderer.prototype._onSceneLoadStartHandler = function()
+FORGE.RenderManager.prototype._onSceneLoadStartHandler = function()
 {
     // Listen to scene unload
     this._viewer.story.scene.onUnloadStart.addOnce(this._onSceneUnloadStartHandler, this);
@@ -256,10 +256,10 @@ FORGE.SceneRenderer.prototype._onSceneLoadStartHandler = function()
 
 /**
  * Bind event handlers on media.
- * @method FORGE.SceneRenderer#_setupMedia
+ * @method FORGE.RenderManager#_setupMedia
  * @private
  */
-FORGE.SceneRenderer.prototype._setupMedia = function()
+FORGE.RenderManager.prototype._setupMedia = function()
 {
     var media = this._viewer.story.scene.media;
 
@@ -280,10 +280,10 @@ FORGE.SceneRenderer.prototype._setupMedia = function()
  * Scene has started to unload
  * @todo clean media / background renderer
  *
- * @method FORGE.SceneRenderer#_onSceneUnloadStartHandler
+ * @method FORGE.RenderManager#_onSceneUnloadStartHandler
  * @private
  */
-FORGE.SceneRenderer.prototype._onSceneUnloadStartHandler = function()
+FORGE.RenderManager.prototype._onSceneUnloadStartHandler = function()
 {
     this._renderPipelineReady = false;
 
@@ -315,11 +315,11 @@ FORGE.SceneRenderer.prototype._onSceneUnloadStartHandler = function()
 
 /**
  * Init camera with info contained in configuration
- * @method FORGE.SceneRenderer#_initCamera
+ * @method FORGE.RenderManager#_initCamera
  * @param {SceneConfig} sceneConfig - scene configuration
  * @private
  */
-FORGE.SceneRenderer.prototype._initCamera = function(sceneConfig)
+FORGE.RenderManager.prototype._initCamera = function(sceneConfig)
 {
     var sceneCameraConfig = /** @type {CameraConfig} */ (sceneConfig.camera);
     var storyCameraConfig = /** @type {CameraConfig} */ (this._viewer.mainConfig.camera);
@@ -330,11 +330,11 @@ FORGE.SceneRenderer.prototype._initCamera = function(sceneConfig)
 
 /**
  * Init the scene sound with info contained in configuration
- * @method FORGE.SceneRenderer#_initSound
+ * @method FORGE.RenderManager#_initSound
  * @param {SceneConfig} sceneConfig - scene configuration
  * @private
  */
-FORGE.SceneRenderer.prototype._initSound = function(sceneConfig)
+FORGE.RenderManager.prototype._initSound = function(sceneConfig)
 {
     var soundConfig = /** @type {SoundConfig} */ (sceneConfig.sound);
 
@@ -374,10 +374,10 @@ FORGE.SceneRenderer.prototype._initSound = function(sceneConfig)
 
 /**
  * View change handler
- * @method FORGE.SceneRenderer#_onViewChangeHandler
+ * @method FORGE.RenderManager#_onViewChangeHandler
  * @private
  */
-FORGE.SceneRenderer.prototype._onViewChangeHandler = function()
+FORGE.RenderManager.prototype._onViewChangeHandler = function()
 {
     if (this._backgroundRenderer !== null)
     {
@@ -398,11 +398,11 @@ FORGE.SceneRenderer.prototype._onViewChangeHandler = function()
 
 /**
  * Handler of media load complete event
- * @method FORGE.SceneRenderer#_mediaLoadCompleteHandler
+ * @method FORGE.RenderManager#_mediaLoadCompleteHandler
  * @param {FORGE.Event} event - Event object
  * @private
  */
-FORGE.SceneRenderer.prototype._mediaLoadCompleteHandler = function(event)
+FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
 {
     this.log("Media load is complete");
 
@@ -421,11 +421,11 @@ FORGE.SceneRenderer.prototype._mediaLoadCompleteHandler = function(event)
 
 /**
  * Handler of transition load complete event
- * @method FORGE.SceneRenderer#_transitionLoadCompleteHandler
+ * @method FORGE.RenderManager#_transitionLoadCompleteHandler
  * @param {FORGE.Event} event - Event object
  * @private
  */
-FORGE.SceneRenderer.prototype._transitionLoadCompleteHandler = function(event)
+FORGE.RenderManager.prototype._transitionLoadCompleteHandler = function(event)
 {
     this.log("Transition load is complete");
 
@@ -441,10 +441,10 @@ FORGE.SceneRenderer.prototype._transitionLoadCompleteHandler = function(event)
 
 /**
  * Handler of media quality change event
- * @method FORGE.SceneRenderer#_mediaQualityChangeHandler
+ * @method FORGE.RenderManager#_mediaQualityChangeHandler
  * @private
  */
-FORGE.SceneRenderer.prototype._mediaQualityChangeHandler = function(event)
+FORGE.RenderManager.prototype._mediaQualityChangeHandler = function(event)
 {
     this.log("Media quality has changed");
 
@@ -453,10 +453,10 @@ FORGE.SceneRenderer.prototype._mediaQualityChangeHandler = function(event)
 
 /**
  * Setup render pipeline
- * @method FORGE.SceneRenderer#_setupRenderPipeline
+ * @method FORGE.RenderManager#_setupRenderPipeline
  * @private
  */
-FORGE.SceneRenderer.prototype._setupRenderPipeline = function()
+FORGE.RenderManager.prototype._setupRenderPipeline = function()
 {
     var fxSet = null;
 
@@ -485,11 +485,11 @@ FORGE.SceneRenderer.prototype._setupRenderPipeline = function()
 
 /**
  * Render background.
- * @method FORGE.SceneRenderer#_drawBackground
+ * @method FORGE.RenderManager#_drawBackground
  * @param {THREE.PerspectiveCamera} camera - perspective camera used to render mesh, N/A with shader rendering
  * @private
  */
-FORGE.SceneRenderer.prototype._drawBackground = function(camera)
+FORGE.RenderManager.prototype._drawBackground = function(camera)
 {
     // this.log("_drawBackground");
 
@@ -503,11 +503,11 @@ FORGE.SceneRenderer.prototype._drawBackground = function(camera)
 
 /**
  * Set renderer size and all objects aware of resolution
- * @method FORGE.SceneRenderer#_setRendererSize
+ * @method FORGE.RenderManager#_setRendererSize
  * @param {FORGE.Size} size - new renderer size
  * @private
  */
-FORGE.SceneRenderer.prototype._setRendererSize = function(size)
+FORGE.RenderManager.prototype._setRendererSize = function(size)
 {
     var vr = this._renderDisplay.presentingVR;
 
@@ -549,10 +549,10 @@ FORGE.SceneRenderer.prototype._setRendererSize = function(size)
 
 /**
  * Internal handler on canvas resize.
- * @method FORGE.SceneRenderer#_canvasResizeHandler
+ * @method FORGE.RenderManager#_canvasResizeHandler
  * @private
  */
-FORGE.SceneRenderer.prototype._canvasResizeHandler = function()
+FORGE.RenderManager.prototype._canvasResizeHandler = function()
 {
     this.log("canvas resize handler");
 
@@ -562,10 +562,10 @@ FORGE.SceneRenderer.prototype._canvasResizeHandler = function()
 
 /**
  * VR Renderer display change event handler
- * @method FORGE.SceneRenderer#_renderDisplayChangeHandler
+ * @method FORGE.RenderManager#_renderDisplayChangeHandler
  * @private
  */
-FORGE.SceneRenderer.prototype._renderDisplayChangeHandler = function()
+FORGE.RenderManager.prototype._renderDisplayChangeHandler = function()
 {
     this.log("render display change handler");
 
@@ -584,11 +584,11 @@ FORGE.SceneRenderer.prototype._renderDisplayChangeHandler = function()
 /**
  * Renderer set background renderer
  *
- * @method FORGE.SceneRenderer#_setBackgroundRenderer
+ * @method FORGE.RenderManager#_setBackgroundRenderer
  * @param {string} type - type of background renderer
  * @private
  */
-FORGE.SceneRenderer.prototype._setBackgroundRenderer = function(type)
+FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
 {
     this.log("set background renderer");
 
@@ -728,11 +728,11 @@ FORGE.SceneRenderer.prototype._setBackgroundRenderer = function(type)
 
 /**
  * Set the background renderer depending on current media format and view type.
- * @method FORGE.SceneRenderer#_setBackgroundRendererType
+ * @method FORGE.RenderManager#_setBackgroundRendererType
  * @param {boolean} vrEnabled - VR enabled flag
  * @private
  */
-FORGE.SceneRenderer.prototype._setBackgroundRendererType = function(vrEnabled)
+FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
 {
     this.log("set background renderer type");
 
@@ -791,10 +791,10 @@ FORGE.SceneRenderer.prototype._setBackgroundRendererType = function(vrEnabled)
 
 /**
  * Clear the background renderer.
- * @method FORGE.SceneRenderer#_clearBackgroundRenderer
+ * @method FORGE.RenderManager#_clearBackgroundRenderer
  * @private
  */
-FORGE.SceneRenderer.prototype._clearBackgroundRenderer = function()
+FORGE.RenderManager.prototype._clearBackgroundRenderer = function()
 {
     this.log("clear background renderer");
 
@@ -809,18 +809,18 @@ FORGE.SceneRenderer.prototype._clearBackgroundRenderer = function()
 
 /**
  * Update routine
- * @method FORGE.SceneRenderer#update
+ * @method FORGE.RenderManager#update
  */
-FORGE.SceneRenderer.prototype.update = function()
+FORGE.RenderManager.prototype.update = function()
 {
     this._camera.update();
 };
 
 /**
  * Render routine
- * @method FORGE.SceneRenderer#render
+ * @method FORGE.RenderManager#render
  */
-FORGE.SceneRenderer.prototype.render = function()
+FORGE.RenderManager.prototype.render = function()
 {
     if (this._viewManager === null ||
         this._renderPipelineReady === false ||
@@ -882,9 +882,9 @@ FORGE.SceneRenderer.prototype.render = function()
 
 /**
  * Enable VR display
- * @method FORGE.SceneRenderer#enableVR
+ * @method FORGE.RenderManager#enableVR
  */
-FORGE.SceneRenderer.prototype.enableVR = function()
+FORGE.RenderManager.prototype.enableVR = function()
 {
     if (this._renderDisplay.presentingVR === true || FORGE.Device.webVR !== true)
     {
@@ -905,9 +905,9 @@ FORGE.SceneRenderer.prototype.enableVR = function()
 
 /**
  * Disable VR display
- * @method FORGE.SceneRenderer#disableVR
+ * @method FORGE.RenderManager#disableVR
  */
-FORGE.SceneRenderer.prototype.disableVR = function()
+FORGE.RenderManager.prototype.disableVR = function()
 {
     if (this._renderDisplay.presentingVR === false || FORGE.Device.webVR !== true)
     {
@@ -932,9 +932,9 @@ FORGE.SceneRenderer.prototype.disableVR = function()
 
 /**
  * Toggle VR display
- * @method FORGE.SceneRenderer#toggleVR
+ * @method FORGE.RenderManager#toggleVR
  */
-FORGE.SceneRenderer.prototype.toggleVR = function()
+FORGE.RenderManager.prototype.toggleVR = function()
 {
     if(this._renderDisplay.presentingVR === true)
     {
@@ -949,9 +949,9 @@ FORGE.SceneRenderer.prototype.toggleVR = function()
 /**
  * Renderer destroy sequence
  *
- * @method FORGE.SceneRenderer#destroy
+ * @method FORGE.RenderManager#destroy
  */
-FORGE.SceneRenderer.prototype.destroy = function()
+FORGE.RenderManager.prototype.destroy = function()
 {
     this._viewer.canvas.onResize.remove(this._canvasResizeHandler, this);
     this._viewer.story.onSceneLoadStart.remove(this._onSceneLoadStartHandler, this);
@@ -1031,13 +1031,13 @@ FORGE.SceneRenderer.prototype.destroy = function()
 
 /**
  * Get viewer.
- * @name FORGE.SceneRenderer#viewer
+ * @name FORGE.RenderManager#viewer
  * @type {FORGE.Viewer}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "viewer",
+Object.defineProperty(FORGE.RenderManager.prototype, "viewer",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._viewer;
@@ -1046,13 +1046,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "viewer",
 
 /**
  * Get sound linked to the media.
- * @name FORGE.SceneRenderer#mediaSound
+ * @name FORGE.RenderManager#mediaSound
  * @type {(FORGE.Sound|Object)}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "mediaSound",
+Object.defineProperty(FORGE.RenderManager.prototype, "mediaSound",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._mediaSound;
@@ -1061,13 +1061,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "mediaSound",
 
 /**
  * Get FX Composer.
- * @name FORGE.SceneRenderer#renderPipeline
+ * @name FORGE.RenderManager#renderPipeline
  * @type {FORGE.RenderPipeline}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "renderPipeline",
+Object.defineProperty(FORGE.RenderManager.prototype, "renderPipeline",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._renderPipeline;
@@ -1076,13 +1076,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "renderPipeline",
 
 /**
  * Get background renderer.
- * @name FORGE.SceneRenderer#backgroundRenderer
+ * @name FORGE.RenderManager#backgroundRenderer
  * @type {(FORGE.BackgroundMeshRenderer|FORGE.BackgroundShaderRenderer)}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "backgroundRenderer",
+Object.defineProperty(FORGE.RenderManager.prototype, "backgroundRenderer",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._backgroundRenderer;
@@ -1091,12 +1091,12 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "backgroundRenderer",
 
 /**
  * Get picking manager.
- * @name FORGE.SceneRenderer#pickingManager
+ * @name FORGE.RenderManager#pickingManager
  * @type {FORGE.PickingManager}
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "pickingManager",
+Object.defineProperty(FORGE.RenderManager.prototype, "pickingManager",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._pickingManager;
@@ -1105,12 +1105,12 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "pickingManager",
 
 /**
  * Get the view manager.
- * @name FORGE.SceneRenderer#view
+ * @name FORGE.RenderManager#view
  * @type {FORGE.ViewManager}
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "view",
+Object.defineProperty(FORGE.RenderManager.prototype, "view",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._viewManager;
@@ -1119,13 +1119,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "view",
 
 /**
  * Get camera.
- * @name FORGE.SceneRenderer#camera
+ * @name FORGE.RenderManager#camera
  * @type {FORGE.Camera}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "camera",
+Object.defineProperty(FORGE.RenderManager.prototype, "camera",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._camera;
@@ -1134,13 +1134,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "camera",
 
 /**
  * Get canvas resolution in pixels.
- * @name FORGE.SceneRenderer#canvasResolution
+ * @name FORGE.RenderManager#canvasResolution
  * @type {FORGE.Size}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "canvasResolution",
+Object.defineProperty(FORGE.RenderManager.prototype, "canvasResolution",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._canvasResolution;
@@ -1149,13 +1149,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "canvasResolution",
 
 /**
  * Get display resolution in pixels.
- * @name FORGE.SceneRenderer#displayResolution
+ * @name FORGE.RenderManager#displayResolution
  * @type {FORGE.Size}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "displayResolution",
+Object.defineProperty(FORGE.RenderManager.prototype, "displayResolution",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._displayResolution;
@@ -1164,13 +1164,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "displayResolution",
 
 /**
  * VR presenting status.
- * @name FORGE.SceneRenderer#presentingVR
+ * @name FORGE.RenderManager#presentingVR
  * @type {boolean}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "presentingVR",
+Object.defineProperty(FORGE.RenderManager.prototype, "presentingVR",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._renderDisplay.presentingVR;
@@ -1179,13 +1179,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "presentingVR",
 
 /**
  * Get the render display.
- * @name FORGE.SceneRenderer#display
+ * @name FORGE.RenderManager#display
  * @type {FORGE.RenderDisplay}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "display",
+Object.defineProperty(FORGE.RenderManager.prototype, "display",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._renderDisplay;
@@ -1194,13 +1194,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "display",
 
 /**
  * Get the backgroundReady flag
- * @name FORGE.SceneRenderer#backgroundReady
+ * @name FORGE.RenderManager#backgroundReady
  * @type {boolean}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "backgroundReady",
+Object.defineProperty(FORGE.RenderManager.prototype, "backgroundReady",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._backgroundReady;
@@ -1209,13 +1209,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "backgroundReady",
 
 /**
  * Get the FORGE.ObjectRenderer instance
- * @name FORGE.SceneRenderer#objects
+ * @name FORGE.RenderManager#objects
  * @type {FORGE.ObjectRenderer}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "objects",
+Object.defineProperty(FORGE.RenderManager.prototype, "objects",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         return this._objectRenderer;
@@ -1224,13 +1224,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "objects",
 
 /**
  * Get the onBackgroundReady {@link FORGE.EventDispatcher}.
- * @name FORGE.SceneRenderer#onBackgroundReady
+ * @name FORGE.RenderManager#onBackgroundReady
  * @type {FORGE.EventDispatcher}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "onBackgroundReady",
+Object.defineProperty(FORGE.RenderManager.prototype, "onBackgroundReady",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         if (this._onBackgroundReady === null)
@@ -1244,13 +1244,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "onBackgroundReady",
 
 /**
  * Get the onBeforeRender {@link FORGE.EventDispatcher}.
- * @name FORGE.SceneRenderer#onBeforeRender
+ * @name FORGE.RenderManager#onBeforeRender
  * @type {FORGE.EventDispatcher}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "onBeforeRender",
+Object.defineProperty(FORGE.RenderManager.prototype, "onBeforeRender",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         if (this._onBeforeRender === null)
@@ -1264,13 +1264,13 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "onBeforeRender",
 
 /**
  * Get the onAfterRender {@link FORGE.EventDispatcher}.
- * @name FORGE.SceneRenderer#onAfterRender
+ * @name FORGE.RenderManager#onAfterRender
  * @type {FORGE.EventDispatcher}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "onAfterRender",
+Object.defineProperty(FORGE.RenderManager.prototype, "onAfterRender",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.RenderManager} */
     get: function()
     {
         if (this._onAfterRender === null)
