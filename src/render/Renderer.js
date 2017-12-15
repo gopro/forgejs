@@ -305,3 +305,24 @@ Object.defineProperty(FORGE.Renderer.prototype, "viewer",
         return this._viewer;
     }
 });
+
+/**
+ * Get and set VR status.
+ * @name FORGE.Renderer#vr
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "vr",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._webGLRenderer.vr;
+    },
+
+    /** @this {FORGE.Viewer} */
+    set: function(value)
+    {
+        this._webGLRenderer.vr = value;
+    }
+});
+

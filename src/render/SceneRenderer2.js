@@ -5,14 +5,12 @@
  * @param {FORGE.Viewer} viewer - viewer reference
  * @param {FORGE.Scene} scene - scene object
  * @param {FORGE.SceneViewport} sceneViewport - sceneViewport parent object
- * @param {SceneViewConfig} viewConfig - view configuration
- * @param {SceneCameraConfig} cameraConfig - camera configuration
  * @extends {FORGE.BaseObject}
  *
  * @todo think about how to render multiple scene at the same time, with blending / overlap / viewport layouting...
  * maybe add a layer object encapsulating background / foreground renderings to ease the process
  */
-FORGE.SceneRenderer = function(viewer, scene, sceneViewport, viewConfig, cameraConfig)
+FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
 {
     /**
      * The viewer reference.
@@ -37,22 +35,6 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport, viewConfig, cameraC
      * @private
      */
     this._sceneViewport = sceneViewport;
-
-    /**
-     * The view configuration.
-     * @name FORGE.SceneRenderer#_viewConfig
-     * @type {SceneViewConfig}
-     * @private
-     */
-    this._viewConfig = viewConfig;
-
-    /**
-     * The camera configuration.
-     * @name FORGE.SceneRenderer#_cameraConfig
-     * @type {SceneCameraConfig}
-     * @private
-     */
-    this._cameraConfig = cameraConfig;
 
     /**
      * Background renderer.
@@ -108,7 +90,15 @@ FORGE.SceneRenderer.prototype._boot = function()
     }
 
     this._viewManager = new FORGE.ViewManager(this._viewer, this);
-    this._viewManager.type = typeof this._viewConfig.type !== "undefined" ? this._viewConfig.type : "rectilinear";
+    var viewConfig = this._sceneViewport.config.view;
+    if (typeof viewConfig === "undefined" || viewConfig.type === "undefined")
+    {
+        this._viewManager.type = "rectilinear";
+    }
+    else
+    {
+        this._viewManager.type = viewConfig.type;
+    }
 
     this._createCamera();
 
@@ -129,7 +119,7 @@ FORGE.SceneRenderer.prototype._createCamera = function()
     var sceneCameraConfig = /** @type {CameraConfig} */ (this._scene.config.camera);
     var storyCameraConfig = /** @type {CameraConfig} */ (this._viewer.mainConfig.camera);
     var sceneOverStoryCameraConfig = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(storyCameraConfig, sceneCameraConfig));
-    var cameraConfig = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(sceneOverStoryCameraConfig, this._cameraConfig));
+    var cameraConfig = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(sceneOverStoryCameraConfig, this._sceneViewport.config.camera));
 
     this._camera.load(cameraConfig);
 };
@@ -178,7 +168,7 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
     else 
     {
         var sourceConfig = mediaConfig.source;
-        
+
         if (mediaConfig.type === FORGE.MediaType.GRID)
         {
             backgroundRendererRef = FORGE.BackgroundGridRenderer;
@@ -195,7 +185,14 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
             // Background shader or mesh with sphere geometry
             // Default choice: using a shader renderer allows spherical transitions between scenes
             // Performance fallback: mesh renderer
-            backgroundRendererRef = FORGE.BackgroundShaderRenderer;
+            if (this._sceneViewport.config.vr === true)
+            {
+                backgroundRendererRef = FORGE.BackgroundSphereRenderer;
+            }
+            else
+            {
+                backgroundRendererRef = FORGE.BackgroundShaderRenderer;
+            }
         }
 
         // Flat media format (beware: flat view is another thing)

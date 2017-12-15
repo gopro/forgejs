@@ -15,12 +15,12 @@ FORGE.Scene = function(viewer)
     this._viewer = viewer;
 
     /**
-     * Array of scene viewports.
-     * @name FORGE.Scene#_viewer
-     * @type {Array<FORGE.SceneViewport>}
+     * Scene viewports manager.
+     * @name FORGE.Scene#_viewportManager
+     * @type {FORGE.SceneViewportManager}
      * @private
      */
-    this._sceneViewports = null;
+    this._viewportManager = null;
 
     /**
      * The scene config object.
@@ -307,7 +307,7 @@ FORGE.Scene.prototype._createMedia = function(media)
 FORGE.Scene.prototype._getMasterCamera = function()
 {
     // @todo: define a policy for master camera (for example: viewport active with user focus)
-    return this._sceneViewports[0].camera;
+    return this._viewportManager.activeViewport.camera;
 };
 
 /**
@@ -318,7 +318,6 @@ FORGE.Scene.prototype._getMasterCamera = function()
  */
 FORGE.Scene.prototype._createViewports = function(config)
 {
-
     if (this._renderTarget !== null)
     {
         this._renderTarget.dispose();
@@ -335,27 +334,7 @@ FORGE.Scene.prototype._createViewports = function(config)
 
     // TODO : renderer should expose scene size for each frame, it could change during transitions
     this._renderTarget = new THREE.WebGLRenderTarget(this._viewer.width, this._viewer.height, rtParams);
- 
-    if (typeof config.layout === "undefined" || config.layout.length === 0)
-    {
-        // only on renderer with full viewport
-        var viewport = new FORGE.SceneViewport(this._viewer, this, null);
-        this._sceneViewports.push(viewport);
-    }
-    else
-    {
-        if (this._sceneViewports === null)
-        {
-            this._sceneViewports = [];   
-        }
-        
-        for (var i=0,ii=config.layout.length; i<ii; i++)
-        {
-            var viewportConfig = config.layout[i];
-            var viewport = new FORGE.SceneViewport(this._viewer, this, viewportConfig);
-            this._sceneViewports.push(viewport);
-        }        
-    }
+    this._viewportManager = new FORGE.SceneViewportManager(this._viewer, this);
 };
 
 FORGE.Scene.prototype._createTransition = function(transition)
@@ -581,11 +560,7 @@ FORGE.Scene.prototype.isAmbisonic = function()
  */
 FORGE.Scene.prototype.render = function(webGLRenderer)
 {
-    for (var i=0, ii=this._sceneViewports.length; i<ii; i++)
-    {
-        this._sceneViewports[i].render(webGLRenderer, this._renderTarget);
-        // this._sceneViewports[i].render(webGLRenderer, null);
-    }
+    this._viewportManager.render(webGLRenderer, this._renderTarget);
 };
 
 /**
@@ -604,6 +579,9 @@ FORGE.Scene.prototype.destroy = function()
 
     this._description.destroy();
     this._description = null;
+
+    this._viewportManager.destroy();
+    this._viewportManager = null;
 
     if (this._media !== null)
     {

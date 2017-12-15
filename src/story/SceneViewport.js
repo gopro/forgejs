@@ -3,7 +3,7 @@
  * @constructor FORGE.SceneViewport
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
  * @param {FORGE.Scene} scene {@link FORGE.Scene} reference.
- * @param {!SceneLayoutConfig} config scene layout config.
+ * @param {!SceneViewportConfig} config scene layout config.
  * @extends {FORGE.BaseObject}
  */
 FORGE.SceneViewport = function(viewer, scene, config)
@@ -27,7 +27,7 @@ FORGE.SceneViewport = function(viewer, scene, config)
     /**
      * Input layout configuration to setup the viewport.
      * @name FORGE.SceneViewport#_config
-     * @type {!SceneLayoutConfig}
+     * @type {!SceneViewportConfig}
      * @private
      */
     this._config = config;
@@ -69,7 +69,7 @@ FORGE.SceneViewport.prototype._boot = function()
     var y = ((100 - this._config.viewport.y) / 100) * this._viewer.height - h;
 
     this._viewport = new FORGE.Rectangle(x, y, w, h);
-    this._sceneRenderer = new FORGE.SceneRenderer(this._viewer, this._scene, this, this._config.view, this._config.camera);
+    this._sceneRenderer = new FORGE.SceneRenderer(this._viewer, this._scene, this);
 };
 
 /**
@@ -121,6 +121,21 @@ FORGE.SceneViewport.prototype.destroy = function()
     this._scene = null;
     this._viewer = null;
 };
+
+/**
+ * Get config.
+ * @name FORGE.SceneViewport#config
+ * @type {SceneViewportConfig}
+ * @readonly
+ */
+Object.defineProperty(FORGE.SceneViewport.prototype, "config",
+{
+    /** @this {FORGE.SceneViewport} */
+    get: function()
+    {
+        return this._config;
+    }
+});
 
 /**
  * Get camera.

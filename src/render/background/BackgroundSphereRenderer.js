@@ -9,20 +9,6 @@
  */
 FORGE.BackgroundSphereRenderer = function(sceneRenderer)
 {
-    /**
-     * The number of horizontal faces and vertical ones in the media.
-     * @type {THREE.Vector2}
-     * @private
-     */
-    this._faces = new THREE.Vector2();
-
-    /**
-     * The size of a tile (width = height)
-     * @type {number}
-     * @private
-     */
-    this._tile = 512;
-
     FORGE.BackgroundMeshRenderer.call(this, sceneRenderer, "BackgroundSphereRenderer");
 };
 

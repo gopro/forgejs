@@ -25,6 +25,7 @@ module.exports = function(grunt)
         "src/story/Group.js",
         "src/story/Scene.js",
         "src/story/SceneParser.js",
+        "src/story/SceneViewportManager.js",
         "src/story/SceneViewport.js",
 
         "src/math/Math.js",

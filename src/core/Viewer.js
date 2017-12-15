@@ -1576,21 +1576,25 @@ Object.defineProperty(FORGE.Viewer.prototype, "height",
     }
 });
 
-
 /**
- * Get viewer aspect ratio.
- * @name FORGE.Viewer#aspect
- * @type {number}
+ * Get and set the vr status.
+ * @name FORGE.Viewer#vr
+ * @type {boolean}
  */
-Object.defineProperty(FORGE.Viewer.prototype, "aspect",
+Object.defineProperty(FORGE.Viewer.prototype, "vr",
 {
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._container.width / this._container.height;
+        return this._renderer.vr;
+    },
+
+    /** @this {FORGE.Viewer} */
+    set: function(value)
+    {
+        this._renderer.vr = value;
     }
 });
-
 
 /**
  * Get the "onReady" {@link FORGE.EventDispatcher} of the viewer.
