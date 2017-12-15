@@ -41,7 +41,7 @@ module.exports = function(grunt)
         "src/media/Media.js",
 
         "src/render/Renderer.js",
-        "src/render/SceneRenderer2.js",
+        "src/render/SceneRenderer.js",
         "src/render/RenderScene.js",
         "src/render/RenderPipeline.js",
         "src/render/RenderDisplay.js",
