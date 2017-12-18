@@ -263,14 +263,6 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._i18n = null;
 
     /**
-     * WebGL Renderer
-     * @name FORGE.SceneRenderer#_webGLRenderer
-     * @type {?THREE.WebGLRenderer}
-     * @private
-     */
-    // this._webGLRenderer = null;
-
-    /**
      * Main renderer reference.
      * @name FORGE.Viewer#_renderer
      * @type {FORGE.Renderer}
@@ -415,7 +407,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._story = new FORGE.Story(this);
     this._history = new FORGE.History(this);
     this._renderer = new FORGE.Renderer(this);
-    // this._controllers = new FORGE.ControllerManager(this);
+    this._controllers = new FORGE.ControllerManager(this);
     // this._playlists = new FORGE.PlaylistManager(this);
     // this._plugins = new FORGE.PluginManager(this);
     this._hotspots = new FORGE.HotspotManager(this);
@@ -550,7 +542,7 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
     //     this._plugins.addConfig(config.plugins);
     // }
 
-    // this._controllers.addConfig(config.controllers);
+    this._controllers.addConfig(config.controllers);
 
     if (typeof config.story !== "undefined")
     {
@@ -656,26 +648,12 @@ FORGE.Viewer.prototype._updateLogic = function()
     // this._plugins.update();
     this._tween.update();
     this._hotspots.update();
-    // this._controllers.update();
-    // this._sceneRenderer.update();
+    this._controllers.update();
 
     if (this._callbacks !== null && typeof this._callbacks.update === "function")
     {
         this._callbacks.update.call();
     }
-};
-
-/**
- * Get master scene and viewport camera.
- * @method FORGE.Viewer#_getMasterCamera
- * @private
- */
-FORGE.Viewer.prototype._getMasterCamera = function()
-{
-    // @todo: rework with transition
-    var masterScene = this._story.scene;
-
-    return masterScene.camera;
 };
 
 /**
@@ -993,8 +971,6 @@ FORGE.Viewer.prototype.destroy = function()
         this._onMainConfigLoadComplete.destroy();
         this._onMainConfigLoadComplete = null;
     }
-
-    // this._webGLRenderer = null;
 
     FORGE.VIEWERS.splice(this._uid, 1);
 
@@ -1401,21 +1377,6 @@ Object.defineProperty(FORGE.Viewer.prototype, "i18n",
     }
 });
 
-// /**
-//  * Get WebGL renderer.
-//  * @name FORGE.Viewer#WebGLRenderer
-//  * @type {THREE.WebGLRenderer}
-//  * @readonly
-//  */
-// Object.defineProperty(FORGE.Viewer.prototype, "webGLRenderer",
-// {
-//     /** @this {FORGE.Viewer} */
-//     get: function()
-//     {
-//         return this._webGLRenderer;
-//     }
-// });
-
 /**
  * Get the viewer render manager.
  * @name FORGE.Viewer#renderer
@@ -1457,7 +1418,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "camera",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._getMasterCamera();
+        return this._story.scene.activeViewport.sceneRenderer.camera;
     }
 });
 

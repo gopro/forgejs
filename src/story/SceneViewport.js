@@ -138,17 +138,17 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "config",
 });
 
 /**
- * Get camera.
- * @name FORGE.SceneViewport#camera
- * @type {FORGE.Camera}
+ * Get sceneRenderer.
+ * @name FORGE.SceneViewport#sceneRenderer
+ * @type {FORGE.SceneRenderer}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "camera",
+Object.defineProperty(FORGE.SceneViewport.prototype, "sceneRenderer",
 {
     /** @this {FORGE.SceneViewport} */
     get: function()
     {
-        return this._sceneRenderer.camera;
+        return this._sceneRenderer;
     }
 });
 
@@ -164,6 +164,21 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "viewport",
     get: function()
     {
         return this._viewport;
+    }
+});
+
+/**
+ * Get size of the viewport.
+ * @name FORGE.SceneViewport#size
+ * @type {FORGE.Size}
+ * @readonly
+ */
+Object.defineProperty(FORGE.SceneViewport.prototype, "size",
+{
+    /** @this {FORGE.SceneViewport} */
+    get: function()
+    {
+        return new FORGE.Size(this._viewport.width, this._viewport.height);
     }
 });
 

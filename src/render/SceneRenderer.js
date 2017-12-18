@@ -89,22 +89,38 @@ FORGE.SceneRenderer.prototype._boot = function()
         return;
     }
 
+    this._createViewManager();
+    this._createCamera();
+    this._createObjectRenderer();
+
+    this._scene.media.onLoadComplete.add(this._createBackgroundRenderer, this);
+};
+
+/**
+ * Media load complete handler
+ * @method FORGE.SceneRenderer#_createCamera
+ * @private
+ */
+FORGE.SceneRenderer.prototype._onMediaLoadComplete = function()
+{
+};
+
+/**
+ * Create view manager
+ * @method FORGE.SceneRenderer#_createViewManager
+ * @private
+ */
+FORGE.SceneRenderer.prototype._createViewManager = function()
+{
     this._viewManager = new FORGE.ViewManager(this._viewer, this);
+
     var viewConfig = this._sceneViewport.config.view;
     if (typeof viewConfig === "undefined" || viewConfig.type === "undefined")
     {
         this._viewManager.type = "rectilinear";
     }
-    else
-    {
-        this._viewManager.type = viewConfig.type;
-    }
 
-    this._createCamera();
-
-    this._createObjectRenderer();
-
-    this._scene.media.onLoadComplete.addOnce(this._createBackgroundRenderer, this);
+    this._viewManager.load(viewConfig);
 };
 
 /**
@@ -156,6 +172,8 @@ FORGE.SceneRenderer.prototype._createObjectRenderer = function()
  */
 FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
 {
+    this._scene.media.onLoadComplete.remove(this._createBackgroundRenderer, this);
+
     var media = event.emitter;
     var mediaConfig = this._scene.config.media;
 
@@ -264,7 +282,6 @@ FORGE.SceneRenderer.prototype.render = function(webGLRenderer, target)
     // Get background and foreground textures and call pipeline render routine
     // this._pipeline.render();
 };
-
 
 /**
  * Destroy sequence.

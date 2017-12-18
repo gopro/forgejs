@@ -186,22 +186,6 @@ FORGE.Camera = function(viewer, sceneRenderer)
     this._flat = null;
 
     /**
-     * Left camera for VR rendering
-     * @name  FORGE.Camera._left
-     * @type {THREE.PerspectiveCamera}
-     * @private
-     */
-    this._left = null;
-
-    /**
-     * Right camera for VR rendering
-     * @name  FORGE.Camera._right
-     * @type {THREE.PerspectiveCamera}
-     * @private
-     */
-    this._right = null;
-
-    /**
      * Three Perspective Camera radius (depends on parallax)
      * @name FORGE.Camera#_radius
      * @type {number}
@@ -350,12 +334,10 @@ FORGE.Camera.prototype._boot = function()
 
     this._gaze = new FORGE.CameraGaze(this._viewer, FORGE.Camera.DEFAULT_CONFIG.gaze);
 
-    // this._sceneRenderer.view.onChange.add(this._updateInternals, this);
-    // this._sceneRenderer.onBackgroundReady.add(this._updateInternals, this);
+    this._sceneRenderer.view.onChange.add(this._updateInternals, this);
 
     this._createMainCamera();
     this._createFlatCamera();
-    this._createVRCameras();
 
     // Check config to allow default to be set if they were depending
     // on some parameter external to the camera. For example: multiresolution fovMin set
@@ -500,171 +482,6 @@ FORGE.Camera.prototype._createFlatCamera = function()
         this._flat.name = "CameraFlat";
         this._flat.matrixAutoUpdate = false;
     }
-};
-
-/**
- * Create the left and right THREE PerspectiveCamera for VR.
- * @method FORGE.Camera#_createVRCameras
- * @private
- */
-FORGE.Camera.prototype._createVRCameras = function()
-{
-    this._left = this._main.clone();
-    this._left.name = "CameraLeft";
-    this._left.layers.enable(1);
-
-    this._left.add(this._gaze.object);
-
-    this._right = this._main.clone();
-    this._right.name = "CameraRight";
-    this._right.layers.enable(2);
-};
-
-/**
- * Update VR cameras.
- * @method FORGE.Camera#_updateVRCameras
- * @private
- */
-FORGE.Camera.prototype._updateVRCameras = function()
-{
-    var display = this._sceneRenderer.display;
-
-    // Get frame data before pose to ensure pose values are up to date
-    var frameData = display.vrFrameData;
-    var quat = display.getQuaternionFromPose();
-
-    if (quat !== null)
-    {
-        this._quaternion = quat;
-        this._updateFromQuaternion();
-    }
-
-    var eyeParamsL = display.vrDisplay.getEyeParameters("left");
-    var eyeParamsR = display.vrDisplay.getEyeParameters("right");
-
-    this._main.matrixWorld.decompose(this._left.position, this._left.quaternion, this._left.scale);
-    this._left.matrixWorld = new THREE.Matrix4().makeRotationFromQuaternion(this._main.quaternion);
-
-    this._main.matrixWorld.decompose(this._right.position, this._right.quaternion, this._right.scale);
-    this._right.matrixWorld = new THREE.Matrix4().makeRotationFromQuaternion(this._main.quaternion);
-
-    // Get translation from central camera matrix
-    this._left.matrixWorld.elements[12] = this._main.matrixWorld.elements[12] + eyeParamsL.offset[0];
-    this._left.matrixWorld.elements[13] = this._main.matrixWorld.elements[13] + eyeParamsL.offset[1];
-    this._left.matrixWorld.elements[14] = this._main.matrixWorld.elements[14] + eyeParamsL.offset[2];
-
-    // Get translation from central camera matrix
-    this._right.matrixWorld.elements[12] = this._main.matrixWorld.elements[12] + eyeParamsR.offset[0];
-    this._right.matrixWorld.elements[13] = this._main.matrixWorld.elements[13] + eyeParamsR.offset[1];
-    this._right.matrixWorld.elements[14] = this._main.matrixWorld.elements[14] + eyeParamsR.offset[2];
-
-    // Setup camera projection matrix
-    if (frameData !== null)
-    {
-        this._left.projectionMatrix.elements = frameData.leftProjectionMatrix;
-        this._right.projectionMatrix.elements = frameData.rightProjectionMatrix;
-    }
-    else
-    {
-        var eyeFOVL = {
-            upDegrees: eyeParamsL.fieldOfView.upDegrees,
-            downDegrees: eyeParamsL.fieldOfView.downDegrees,
-            leftDegrees: eyeParamsL.fieldOfView.leftDegrees,
-            rightDegrees: eyeParamsL.fieldOfView.rightDegrees
-        };
-
-        this._left.projectionMatrix = this._fovToProjectionMatrix(eyeFOVL, this._main);
-
-        var eyeFOVR = {
-            upDegrees: eyeParamsR.fieldOfView.upDegrees,
-            downDegrees: eyeParamsR.fieldOfView.downDegrees,
-            leftDegrees: eyeParamsR.fieldOfView.leftDegrees,
-            rightDegrees: eyeParamsR.fieldOfView.rightDegrees
-        };
-
-        this._right.projectionMatrix = this._fovToProjectionMatrix(eyeFOVR, this._main);
-    }
-
-    this._updateComplete();
-};
-
-/**
- * Clone VR cameras objects.
- * @method FORGE.Camera#_cloneVRCamerasChildren
- * @private
- */
-FORGE.Camera.prototype._cloneVRCamerasChildren = function()
-{
-    //First clear all children from camera right
-    for (var i = 0, ii = this._right.children.length; i < ii; i++)
-    {
-        this._right.remove(this._right.children[i]);
-    }
-
-    //Then clone all children of camera left to camera right
-    var clone = null;
-    for (var j = 0, jj = this._left.children.length; j < jj; j++)
-    {
-        clone = this._left.children[j].clone();
-        this._right.add(clone);
-    }
-};
-
-/**
- * Get projection matrix from a VRFieldOfView
- * @method FORGE.Camera#_fovToProjectionMatrix
- * @param {VRFieldOfViewObject} fov - VRFieldOfView for an eye
- * @param {THREE.PerspectiveCamera} camera - reference camera
- * @return {THREE.Matrix4} projection matrix
- * @private
- */
-FORGE.Camera.prototype._fovToProjectionMatrix = function(fov, camera)
-{
-    // Get projections of field of views on zn plane
-    var fovUpTan = Math.tan(FORGE.Math.degToRad(fov.upDegrees));
-    var fovDownTan = Math.tan(FORGE.Math.degToRad(fov.downDegrees));
-    var fovLeftTan = Math.tan(FORGE.Math.degToRad(fov.leftDegrees));
-    var fovRightTan = Math.tan(FORGE.Math.degToRad(fov.rightDegrees));
-
-    // and with scale/offset info for normalized device coords
-    var pxscale = 2.0 / (fovLeftTan + fovRightTan);
-    var pxoffset = (fovLeftTan - fovRightTan) * pxscale * 0.5;
-    var pyscale = 2.0 / (fovUpTan + fovDownTan);
-    var pyoffset = (fovUpTan - fovDownTan) * pyscale * 0.5;
-
-    // start with an identity matrix
-    var matrix = new THREE.Matrix4();
-    var m = matrix.elements;
-
-    // X result, map clip edges to [-w,+w]
-    m[0 * 4 + 0] = pxscale;
-    m[0 * 4 + 1] = 0.0;
-    m[0 * 4 + 2] = -pxoffset;
-    m[0 * 4 + 3] = 0.0;
-
-    // Y result, map clip edges to [-w,+w]
-    // Y offset is negated because this proj matrix transforms from world coords with Y=up,
-    // but the NDC scaling has Y=down (thanks D3D?)
-    m[1 * 4 + 0] = 0.0;
-    m[1 * 4 + 1] = pyscale;
-    m[1 * 4 + 2] = pyoffset;
-    m[1 * 4 + 3] = 0.0;
-
-    // Z result (up to the app)
-    m[2 * 4 + 0] = 0.0;
-    m[2 * 4 + 1] = 0.0;
-    m[2 * 4 + 2] = camera.far / (camera.near - camera.far);
-    m[2 * 4 + 3] = (camera.far * camera.near) / (camera.near - camera.far);
-
-    // W result (= Z in)
-    m[3 * 4 + 0] = 0.0;
-    m[3 * 4 + 1] = 0.0;
-    m[3 * 4 + 2] = -1.0;
-    m[3 * 4 + 3] = 0.0;
-
-    matrix.transpose();
-
-    return matrix;
 };
 
 /**
@@ -819,7 +636,6 @@ FORGE.Camera.prototype._updateComplete = function()
     }
 };
 
-
 /**
  * Internal setter for yaw, take a value and a unit. Default unit is radians.
  * @method FORGE.Camera#_setYaw
@@ -842,11 +658,14 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
     value = (unit === FORGE.Math.DEGREES) ? FORGE.Math.degToRad(value) : value;
 
     // Wrap the value between -PI and +PI, except for FLAT view where we apply texture ratio
-    if (this._sceneRenderer.backgroundRenderer !== null &&
-        this._sceneRenderer.backgroundRenderer.displayObject !== null &&
-        this._sceneRenderer.view.type === FORGE.ViewType.FLAT)
+    if (this._sceneRenderer.view.type === FORGE.ViewType.FLAT)
     {
-        var displayObject = this._sceneRenderer.backgroundRenderer.displayObject;
+        if (this._sceneRenderer.media.loaded === false)
+        {
+            return false;
+        }
+        
+        var displayObject = this._sceneRenderer.media.displayObject;
         var ratio = displayObject.pixelWidth / displayObject.pixelHeight;
 
         if (displayObject.element instanceof HTMLVideoElement)
@@ -1273,11 +1092,9 @@ FORGE.Camera.prototype.lookAt = function(yaw, pitch, roll, fov, durationMS, canc
  */
 FORGE.Camera.prototype.update = function()
 {
-    if (this._sceneRenderer.display.presentingVR === true)
+    if (this._viewer.vr === true)
     {
         this._gaze.update();
-        this._updateVRCameras();
-        this._cloneVRCamerasChildren();
     }
 
     this._updateMainCamera();
@@ -1757,36 +1574,6 @@ Object.defineProperty(FORGE.Camera.prototype, "perspectiveCameraRadius",
     get: function()
     {
         return this._radius;
-    }
-});
-
-/**
- * Get the left camera.
- * @name FORGE.Camera#left
- * @type {THREE.PerspectiveCamera}
- * @readonly
- */
-Object.defineProperty(FORGE.Camera.prototype, "left",
-{
-    /** @this {FORGE.Camera} */
-    get: function()
-    {
-        return this._left;
-    }
-});
-
-/**
- * Get the right camera.
- * @name FORGE.Camera#right
- * @type {THREE.PerspectiveCamera}
- * @readonly
- */
-Object.defineProperty(FORGE.Camera.prototype, "right",
-{
-    /** @this {FORGE.Camera} */
-    get: function()
-    {
-        return this._right;
     }
 });
 

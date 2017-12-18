@@ -46,6 +46,20 @@ FORGE.Rectangle = function(x, y, width, height)
 FORGE.Rectangle.prototype.constructor = FORGE.Rectangle;
 
 /**
+ * Check if the rectangle contains some point.
+ * @name FORGE.Rectangle#contains
+ * @type {THREE.Vector2} point
+ * @return {boolean} true if rectangle contains given point
+ */
+FORGE.Rectangle.prototype.contains = function(point)
+{
+    return point.x >= this._x &&
+           point.x <= this._x + this._width &&
+           point.y >= this._y &&
+           point.y <= this._y + this._height;
+};
+
+/**
  * Get and set x origin coordinate.
  * @name FORGE.Rectangle#x
  * @type {number}

@@ -301,7 +301,7 @@ FORGE.ControllerPointer.prototype._updateCameraWithDrag = function()
  */
 FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
 {
-    var size = this._viewer.renderer.displayResolution;
+    var size = this._viewer.story.scene.activeViewport.size;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
 
     var logZoomFactor = Math.min(1, this._camera.fov / 90) / Math.LN2;

@@ -107,8 +107,8 @@ FORGE.ControllerGyroscope.prototype._boot = function()
  */
 FORGE.ControllerGyroscope.prototype._deviceReadyHandler = function()
 {
-    this._viewer.renderer.display.onDisplayChange.add(this._displayChangeHandler, this);
-    this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
+    // this._viewer.renderer.display.onDisplayChange.add(this._displayChangeHandler, this);
+    // this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
 
     if (this._enabled === true && FORGE.Device.gyroscope === true)
     {
@@ -136,14 +136,7 @@ FORGE.ControllerGyroscope.prototype._parseConfig = function(config)
  */
 FORGE.ControllerGyroscope.prototype._displayChangeHandler = function()
 {
-    if(this._viewer.renderer.display.presentingVR === true)
-    {
-        this._paused = true;
-    }
-    else
-    {
-        this._paused = false;
-    }
+    this._paused = this._viewer.vr;
 };
 
 /**
@@ -153,14 +146,7 @@ FORGE.ControllerGyroscope.prototype._displayChangeHandler = function()
  */
 FORGE.ControllerGyroscope.prototype._viewChangeHandler = function()
 {
-    if(this._viewer.renderer.view.type !== FORGE.ViewType.RECTILINEAR)
-    {
-        this._paused = true;
-    }
-    else
-    {
-        this._paused = false;
-    }
+    this._paused = this._viewer.story.scene.activeViewport.sceneRenderer.view.type !== FORGE.ViewType.RECTILINEAR;
 };
 
 /**

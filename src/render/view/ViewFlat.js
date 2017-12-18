@@ -61,19 +61,21 @@ FORGE.ViewFlat.prototype._boot = function()
  */
 FORGE.ViewFlat.prototype._updateViewParams = function()
 {
+    var sceneRenderer = this._viewManager.sceneRenderer;
+
     if (this._viewer !== null)
     {
         // When repeat is ON, set yaw and pitch min and max depending on
         // texture and screen ratios
 
-        if (this._viewer.renderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer)
+        if (sceneRenderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer)
         {
-            var vfov = FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.fov);
+            var vfov = FORGE.Math.degToRad(sceneRenderer.camera.fov);
 
             if (this._options.repeatX === false)
             {
-                var hfov = vfov * this._viewer.renderer.displayResolution.ratio;
-                var texRatio = this._viewer.renderer.backgroundRenderer.textureSize.ratio;
+                var hfov = vfov * sceneRenderer.viewport.ratio;
+                var texRatio = sceneRenderer.media.displayObject.originalWidth / sceneRenderer.media.displayObject.originalHeight;
                 this._yawMax = Math.min(360, Math.max(0, (Math.PI * texRatio - hfov) * 0.5)); // image
                 this._yawMin = -this._yawMax;
             }
@@ -114,6 +116,7 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
 FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
 {
     this._updateViewParams();
+    var camera = this._viewManager.sceneRenderer.camera;
 
     if (typeof uniforms === "undefined")
     {
@@ -132,17 +135,17 @@ FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
 
     if ("tYaw" in uniforms)
     {
-        uniforms.tYaw.value = FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.yaw);
+        uniforms.tYaw.value = FORGE.Math.degToRad(camera.yaw);
     }
 
     if ("tPitch" in uniforms)
     {
-        uniforms.tPitch.value = FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.pitch);
+        uniforms.tPitch.value = FORGE.Math.degToRad(camera.pitch);
     }
 
     if ("tFov" in uniforms)
     {
-        uniforms.tFov.value = FORGE.Math.degToRad(this._viewer.camera.fov);
+        uniforms.tFov.value = FORGE.Math.degToRad(camera.fov);
     }
 };
 
