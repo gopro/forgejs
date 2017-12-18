@@ -191,7 +191,7 @@ FORGE.BackgroundRenderer.prototype.render = function(camera)
         return;
     }
 
-    this._updateTexture();
+    // this._updateTexture();
 
     var renderCamera = (camera !== null) ? camera : this._camera;
     this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( renderCamera.projectionMatrix, renderCamera.matrixWorldInverse ) );
@@ -339,6 +339,32 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "displayObject",
         else
         {
             this._setDisplayObject(value);
+        }
+    }
+});
+
+/**
+ * Get/Set background renderer media.
+ * @name FORGE.BackgroundRenderer#media
+ * @type {string}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "media",
+{
+    /** @this {FORGE.BackgroundRenderer} */
+    get: function()
+    {
+        return this._media;
+    },
+    /** @this {FORGE.BackgroundRenderer} */
+    set: function(value)
+    {
+        if (value.displayObject === null)
+        {
+            this._clear();
+        }
+        else
+        {
+            this._setDisplayObject(value); //@todo refactor on going
         }
     }
 });

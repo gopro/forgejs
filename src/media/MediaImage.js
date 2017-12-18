@@ -13,6 +13,8 @@ FORGE.MediaImage = function(viewer, config)
     //@todo to replace the displayObject reference
     this._image = null;
 
+    this._texture = null;
+
     FORGE.Media.call(this, viewer, config, "MediaImage");
 };
 
@@ -78,6 +80,8 @@ FORGE.MediaImage.prototype._parseConfig = function(config)
  */
 FORGE.MediaImage.prototype._onImageLoadComplete = function()
 {
+    this._texture = new FORGE.MediaTexture(this._displayObject);
+
     this._notifyLoadComplete();
 };
 
@@ -128,6 +132,12 @@ FORGE.MediaImage.prototype.unload = function()
         this._displayObject = null;
     }
 
+    if(this._texture !== null)
+    {
+        this._texture.destroy();
+        this._texture = null;
+    }
+
     FORGE.Media.prototype.unload.call(this);
 };
 
@@ -141,3 +151,18 @@ FORGE.MediaImage.prototype.destroy = function()
 
     FORGE.Media.prototype.destroy.call(this);
 };
+
+/**
+ * Get the texture
+ * @name FORGE.MediaImage#texture
+ * @type {FORGE.MediaTexture}
+ * @readonly
+ */
+Object.defineProperty(FORGE.MediaImage.prototype, "texture",
+{
+    /** @this {FORGE.MediaImage} */
+    get: function()
+    {
+        return this._texture;
+    }
+});

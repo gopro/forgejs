@@ -310,29 +310,29 @@ FORGE.MediaStore.prototype._load = function(tile)
  * @param {FORGE.Image} image - the loaded image
  * @private
  */
-FORGE.MediaStore.prototype._onLoadComplete = function(image)
+FORGE.MediaStore.prototype._onLoadComplete = function(event)
 {
+    var image = event.emitter;
+
     if (this._textures === null)
     {
-        image.emitter.destroy();
+        image.destroy();
         // stop it all, it means this mediastore has been destroyed and this is
         // a late-coming tile
         return;
     }
 
-    image = image.emitter;
     var tile = image.data.tile;
     var key = this._createKey(tile);
 
     this.log("Texture load complete for tile " + tile.name);
 
-    var texture = new THREE.Texture();
-    texture.image = image.element;
 
     var size = image.element.height * image.element.width;
     this._size += size;
 
-    var mediaTexture = new FORGE.MediaTexture(texture, (tile.level === FORGE.Tile.PREVIEW), size);
+    var mediaTexture = new FORGE.MediaTexture(image, (tile.level === FORGE.Tile.PREVIEW));
+    this._size += mediaTexture.size;
     this._textures.set(key, mediaTexture);
 
     // destroy the image, it is no longer needed
@@ -342,9 +342,27 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
     entry.load.resolve(mediaTexture.texture);
     this._texturePromises.delete(key);
 
-    image.destroy();
-
     this._checkSize();
+
+    // var texture = new THREE.Texture();
+    // texture.image = image.element;
+
+    // var size = image.element.height * image.element.width;
+    // this._size += size;
+
+    // var mediaTexture = new FORGE.MediaTexture(texture, (tile.level === FORGE.Tile.PREVIEW), size);
+    // this._textures.set(key, mediaTexture);
+
+    // // destroy the image, it is no longer needed
+    // this._loadingTextures.splice(this._loadingTextures.indexOf(image.data.key), 1);
+
+    // var entry = this._texturePromises.get(key);
+    // entry.load.resolve(mediaTexture.texture);
+    // this._texturePromises.delete(key);
+
+    // image.destroy();
+
+    // this._checkSize();
 };
 
 /**

@@ -80,60 +80,61 @@ FORGE.BackgroundShaderRenderer.prototype._boot = function()
  * @method FORGE.BackgroundShaderRenderer#_setDisplayObject
  * @private
  */
-FORGE.BackgroundShaderRenderer.prototype._setDisplayObject = function(displayObject)
+FORGE.BackgroundShaderRenderer.prototype._setDisplayObject = function(media)
 {
-    this._displayObject = displayObject;
+    this._displayObject = media.displayObject;
+    this._texture = media.texture.texture;
 
-    if (FORGE.Utils.isTypeOf(displayObject, "Image") || FORGE.Utils.isTypeOf(displayObject, "Canvas"))
-    {
-        this._texture = new THREE.Texture();
-        this._texture.image = displayObject.element;
-    }
-    else if (FORGE.Utils.isTypeOf(displayObject, ["VideoHTML5", "VideoDash"]))
-    {
-        // Evil hack from Hell
-        // Reduce texture size for big videos on safari
-        if (FORGE.Device.browser.toLowerCase() === "safari" && displayObject.originalHeight > 1440)
-        {
-            this._videoReductionFactor = 2;
-        }
+    // if (FORGE.Utils.isTypeOf(displayObject, "Image") || FORGE.Utils.isTypeOf(displayObject, "Canvas"))
+    // {
+    //     this._texture = new THREE.Texture();
+    //     this._texture.image = displayObject.element;
+    // }
+    // else if (FORGE.Utils.isTypeOf(displayObject, ["VideoHTML5", "VideoDash"]))
+    // {
+    //     // Evil hack from Hell
+    //     // Reduce texture size for big videos on safari
+    //     if (FORGE.Device.browser.toLowerCase() === "safari" && displayObject.originalHeight > 1440)
+    //     {
+    //         this._videoReductionFactor = 2;
+    //     }
 
-        if (this._displayObject.onQualityChange.has(this._mediaQualityChangeHandler, this))
-        {
-            this._displayObject.onQualityChange.remove(this._mediaQualityChangeHandler, this);
-        }
+    //     if (this._displayObject.onQualityChange.has(this._mediaQualityChangeHandler, this))
+    //     {
+    //         this._displayObject.onQualityChange.remove(this._mediaQualityChangeHandler, this);
+    //     }
 
-        this._displayObject.onQualityChange.add(this._mediaQualityChangeHandler, this);
+    //     this._displayObject.onQualityChange.add(this._mediaQualityChangeHandler, this);
 
-        this._textureCanvas = document.createElement("canvas");
-        this._textureCanvas.width = displayObject.originalWidth / this._videoReductionFactor;
-        this._textureCanvas.height = displayObject.originalHeight / this._videoReductionFactor;
-        this._textureContext = this._textureCanvas.getContext("2d");
-        this._texture = new THREE.Texture(this._textureCanvas);
-    }
-    else
-    {
-        throw "Wrong type of display object " + displayObject.className;
-    }
+    //     this._textureCanvas = document.createElement("canvas");
+    //     this._textureCanvas.width = displayObject.originalWidth / this._videoReductionFactor;
+    //     this._textureCanvas.height = displayObject.originalHeight / this._videoReductionFactor;
+    //     this._textureContext = this._textureCanvas.getContext("2d");
+    //     this._texture = new THREE.Texture(this._textureCanvas);
+    // }
+    // else
+    // {
+    //     throw "Wrong type of display object " + displayObject.className;
+    // }
 
-    this._texture.format = THREE.RGBFormat;
-    this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
-    this._texture.magFilter = THREE.LinearFilter;
-    this._texture.wrapS = THREE.ClampToEdgeWrapping;
-    this._texture.wrapT = THREE.ClampToEdgeWrapping;
+    // this._texture.format = THREE.RGBFormat;
+    // this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
+    // this._texture.magFilter = THREE.LinearFilter;
+    // this._texture.wrapS = THREE.ClampToEdgeWrapping;
+    // this._texture.wrapT = THREE.ClampToEdgeWrapping;
 
-    this._texture.generateMipmaps = false;
-    this._texture.minFilter = THREE.LinearFilter;
+    // this._texture.generateMipmaps = false;
+    // this._texture.minFilter = THREE.LinearFilter;
 
-    if (this._mediaFormat === FORGE.MediaFormat.FLAT &&
-        FORGE.Math.isPowerOfTwo(displayObject.width) && FORGE.Math.isPowerOfTwo(displayObject.height))
-    {
-        // Enable mipmaps for flat rendering to avoid aliasing
-        this._texture.generateMipmaps = true;
-        this._texture.minFilter = THREE.LinearMipMapLinearFilter;
-    }
+    // if (this._mediaFormat === FORGE.MediaFormat.FLAT &&
+    //     FORGE.Math.isPowerOfTwo(displayObject.width) && FORGE.Math.isPowerOfTwo(displayObject.height))
+    // {
+    //     // Enable mipmaps for flat rendering to avoid aliasing
+    //     this._texture.generateMipmaps = true;
+    //     this._texture.minFilter = THREE.LinearMipMapLinearFilter;
+    // }
 
-    this._texture.needsUpdate = true;
+    // this._texture.needsUpdate = true;
 
     this._mesh.material.uniforms.tTexture.value = this._texture;
 

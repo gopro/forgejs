@@ -644,6 +644,7 @@ FORGE.Viewer.prototype._createCanvas = function()
 FORGE.Viewer.prototype._updateLogic = function()
 {
     this._display.update();
+    this._media.update();
     this._keyboard.update();
     this._gamepad.update();
     this._audio.update();

@@ -417,7 +417,8 @@ FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
 
     if (this._backgroundRenderer !== null)
     {
-        this._backgroundRenderer.displayObject = media.displayObject;
+        // this._backgroundRenderer.displayObject = media.displayObject;
+        this._backgroundRenderer.media = media;
     }
 
     this._setupRenderPipeline();
@@ -432,7 +433,7 @@ FORGE.RenderManager.prototype._mediaQualityChangeHandler = function(event)
 {
     this.log("Media quality has changed");
 
-    this._backgroundRenderer.displayObject = event.emitter;
+    // this._backgroundRenderer.displayObject = event.emitter;
 };
 
 /**

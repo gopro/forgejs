@@ -39,6 +39,8 @@ FORGE.BackgroundMeshRenderer = function(viewer, target, options)
      */
     this._textureContext = null;
 
+    this._media = null;
+
     /**
      * Media type
      * @type {string}
@@ -140,47 +142,51 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
  * @method FORGE.BackgroundMeshRenderer#_setDisplayObject
  * @private
  */
-FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObject)
+FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(media)
 {
     if (this._mesh === null)
     {
         this._updateInternals();
     }
 
-    this._displayObject = displayObject;
+    this._media = media;
+    this._displayObject = media.displayObject;
 
-    if (FORGE.Utils.isTypeOf(displayObject, "Image"))
-    {
-        this._texture = new THREE.Texture();
-        this._texture.image = displayObject.element;
-    }
-    else if (FORGE.Utils.isTypeOf(displayObject, "Canvas"))
-    {
-        this._texture = new THREE.Texture();
-        this._texture.image = displayObject.element;
-    }
-    else if (FORGE.Utils.isTypeOf(displayObject, ["VideoHTML5", "VideoDash"]))
-    {
-        // Evil hack from Hell
-        // Reduce texture size for big videos on safari
-        if (FORGE.Device.browser.toLowerCase() === "safari" && displayObject.originalHeight > 1440)
-        {
-            this._videoReductionFactor = 2;
-        }
+    // if (FORGE.Utils.isTypeOf(displayObject, "Image"))
+    // {
+    //     this._texture = new THREE.Texture();
+    //     this._texture.image = displayObject.element;
+    // }
+    // else if (FORGE.Utils.isTypeOf(displayObject, "Canvas"))
+    // {
+    //     this._texture = new THREE.Texture();
+    //     this._texture.image = displayObject.element;
+    // }
+    // else if (FORGE.Utils.isTypeOf(displayObject, ["VideoHTML5", "VideoDash"]))
+    // {
+    //     // Evil hack from Hell
+    //     // Reduce texture size for big videos on safari
+    //     if (FORGE.Device.browser.toLowerCase() === "safari" && displayObject.originalHeight > 1440)
+    //     {
+    //         this._videoReductionFactor = 2;
+    //     }
 
-        this._textureCanvas = document.createElement("canvas");
-        this._textureCanvas.width = displayObject.originalWidth / this._videoReductionFactor;
-        this._textureCanvas.height = displayObject.originalHeight / this._videoReductionFactor;
-        this._textureContext = this._textureCanvas.getContext("2d");
-        this._texture = new THREE.Texture(this._textureCanvas);
-    }
-    else
-    {
-        throw "Wrong type of display object " + displayObject.type;
-    }
+    //     this._textureCanvas = document.createElement("canvas");
+    //     this._textureCanvas.width = displayObject.originalWidth / this._videoReductionFactor;
+    //     this._textureCanvas.height = displayObject.originalHeight / this._videoReductionFactor;
+    //     this._textureContext = this._textureCanvas.getContext("2d");
+    //     this._texture = new THREE.Texture(this._textureCanvas);
+    // }
+    // else
+    // {
+    //     throw "Wrong type of display object " + displayObject.type;
+    // }
 
-    this._texture.format = THREE.RGBAFormat;
-    this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
+    // this._texture.format = THREE.RGBAFormat;
+    // this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
+
+
+    this._texture = media.texture.texture;
 
     if (typeof this._mesh.material.uniforms.tTextureRatio !== "undefined")
     {

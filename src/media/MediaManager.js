@@ -71,6 +71,21 @@ FORGE.MediaManager.prototype.add = function(config)
     return media.uid;
 };
 
+FORGE.MediaManager.prototype.update = function()
+{
+    var media;
+
+    for(var i = 0, ii = this._media.length; i < ii; i++)
+    {
+        media = this._media[i];
+
+        if(typeof media.update === "function")
+        {
+            media.update();
+        }
+    }
+};
+
 FORGE.MediaManager.prototype.load = function(uid)
 {
     var media = FORGE.UID.get(uid);

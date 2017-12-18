@@ -13,6 +13,8 @@ FORGE.MediaVideo = function(viewer, config)
     //@todo to replace the displayObject reference
     this._video = null;
 
+    this._texture = null;
+
     FORGE.Media.call(this, viewer, config, "MediaVideo");
 };
 
@@ -86,6 +88,8 @@ FORGE.MediaVideo.prototype._onLoadedMetaDataHandler = function()
         this._displayObject.autoResume = this._options.autoResume;
     }
 
+    this._texture = new FORGE.MediaTexture(this._displayObject);
+
     this._notifyLoadComplete();
 };
 
@@ -145,6 +149,14 @@ FORGE.MediaVideo.prototype._onEndedHandler = function()
     }
 };
 
+FORGE.MediaVideo.prototype.update = function()
+{
+    if(this._texture !== null)
+    {
+        this._texture.update();
+    }
+};
+
 /**
  * MediaVideo load
  * @method FORGE.MediaVideo#load
@@ -186,6 +198,12 @@ FORGE.MediaVideo.prototype.unload = function()
         this._displayObject = null;
     }
 
+    if(this._texture !== null)
+    {
+        this._texture.destroy();
+        this._texture = null;
+    }
+
     FORGE.Media.prototype.unload.call(this);
 };
 
@@ -200,3 +218,18 @@ FORGE.MediaVideo.prototype.destroy = function()
 
     FORGE.Media.prototype.destroy.call(this);
 };
+
+/**
+ * Get the texture
+ * @name FORGE.MediaVideo#texture
+ * @type {FORGE.MediaTexture}
+ * @readonly
+ */
+Object.defineProperty(FORGE.MediaVideo.prototype, "texture",
+{
+    /** @this {FORGE.MediaVideo} */
+    get: function()
+    {
+        return this._texture;
+    }
+});
