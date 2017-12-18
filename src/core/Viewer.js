@@ -174,6 +174,15 @@ FORGE.Viewer = function(parent, config, callbacks)
      */
     this._story = null;
 
+
+    /**
+     * Media manager reference.
+     * @name FORGE.Viewer#_media
+     * @type {FORGE.MediaManager}
+     * @private
+     */
+    this._media = null;
+
     /**
      * History manager reference.
      * @name FORGE.Viewer#_history
@@ -405,6 +414,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._raf = new FORGE.RequestAnimationFrame(this);
     this._i18n = new FORGE.LocaleManager(this);
     this._story = new FORGE.Story(this);
+    this._media = new FORGE.MediaManager(this);
     this._history = new FORGE.History(this);
     this._renderer = new FORGE.Renderer(this);
     this._controllers = new FORGE.ControllerManager(this);
@@ -642,6 +652,7 @@ FORGE.Viewer.prototype._createCanvas = function()
 FORGE.Viewer.prototype._updateLogic = function()
 {
     this._display.update();
+    this._media.update();
     this._keyboard.update();
     this._gamepad.update();
     this._audio.update();
@@ -665,7 +676,7 @@ FORGE.Viewer.prototype._updateRendering = function()
 {
     if (this._callbacks !== null && typeof this._callbacks.beforeRender === "function")
     {
-        this._callbacks.beforeRender.call();
+        this._callbacks.beforeRender.call(this);
     }
 
     if (this._renderer !== null)
@@ -680,7 +691,7 @@ FORGE.Viewer.prototype._updateRendering = function()
 
     if (this._callbacks !== null && typeof this._callbacks.afterRender === "function")
     {
-        this._callbacks.afterRender.call();
+        this._callbacks.afterRender.call(this);
     }
 };
 
@@ -919,6 +930,12 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._story.destroy();
         this._story = null;
+    }
+
+    if(this._media !== null)
+    {
+        this._media.destroy();
+        this._media = null;
     }
 
     if(this._tween !== null)
@@ -1269,6 +1286,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "story",
     get: function()
     {
         return this._story;
+    }
+});
+
+/**
+ * Get the media manager.
+ * @name FORGE.Viewer#media
+ * @type {FORGE.MediaManager}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "media",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._media;
     }
 });
 

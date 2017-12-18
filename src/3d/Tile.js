@@ -101,7 +101,7 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
 
     /**
      * Flag to know if parent has been checked
-     * @name FORGE.MediaStore#_parentNeedsCheck
+     * @name FORGE.Tile#_parentNeedsCheck
      * @type {boolean}
      * @private
      */
@@ -109,7 +109,7 @@ FORGE.Tile = function(parent, renderer, x, y, level, face, creator)
 
     /**
      * Flag to know if neighbourhood has been checked
-     * @name FORGE.MediaStore#_neighborsNeedCheck
+     * @name FORGE.Tile#_neighborsNeedCheck
      * @type {boolean}
      * @private
      */

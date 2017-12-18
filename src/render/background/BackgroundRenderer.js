@@ -24,7 +24,7 @@ FORGE.BackgroundRenderer = function(sceneRenderer, type)
      * @private
      */
     this._config = this._sceneRenderer.media.config;
-    
+
     /**
      * Background rendering media object
      * @name FORGE.BackgroundRenderer#_media
@@ -93,7 +93,7 @@ FORGE.BackgroundRenderer.prototype._boot = function()
     if (FORGE.BackgroundRenderer.DEBUG === true)
     {
         window.scene = this._scene;
-    } 
+    }
 
     this._camera = this._sceneRenderer.camera.main;
 
@@ -112,7 +112,7 @@ FORGE.BackgroundRenderer.prototype._boot = function()
         if (typeof this._config.source !== "undefined" && typeof this._config.source.format !== "undefined")
         {
             this._mediaFormat = this._config.source.format;
-        }        
+        }
     }
 };
 
@@ -174,11 +174,11 @@ FORGE.BackgroundRenderer.prototype.render = function(webGLRenderer, target)
             uniforms.tModelViewMatrixInverse.value = this._sceneRenderer.camera.modelViewInverse;
         }
 
-        this._sceneRenderer.view.current.updateUniforms(uniforms); 
+        this._sceneRenderer.view.current.updateUniforms(uniforms);
     }
 
     this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this._camera.projectionMatrix, this._camera.matrixWorldInverse ) );
-    
+
     webGLRenderer.render(this._scene, this._camera, target, false);
 };
 

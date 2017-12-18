@@ -5,19 +5,19 @@
  * in the renderer.
  *
  * @constructor FORGE.MediaTexture
- * @param {THREE.Texture} texture - the THREE.Texture to store
+ * @param {FORGE.DisplayObject} texture - the THREE.Texture to store
  * @param {boolean} locked - is the texture locked (i.e. it isn't deletable)
  * @param {number} size - the size of the texture
  */
-FORGE.MediaTexture = function(texture, locked, size)
+FORGE.MediaTexture = function(displayObject, locked)
 {
     /**
-     * The texture
-     * @name FORGE.MediaTexture#_texture
-     * @type {THREE.Texture}
+     * The displayObject used to create a texture with (image or video)
+     * @name FORGE.MediaTexture#_element
+     * @type {FORGE.DisplayObject}
      * @private
      */
-    this._texture = texture;
+    this._displayObject = displayObject;
 
     /**
      * Can the texture be deleted ? Otherwise it is locked, e.g. it is a level 0
@@ -27,13 +27,21 @@ FORGE.MediaTexture = function(texture, locked, size)
      */
     this._locked = locked;
 
+     /**
+     * The texture
+     * @name FORGE.MediaTexture#_texture
+     * @type {THREE.Texture}
+     * @private
+     */
+    this._texture = null;
+
     /**
      * The size of the texture
      * @name FORGE.MediaTexture#_size
      * @type {number}
      * @private
      */
-    this._size = size;
+    this._size = 0;
 
     /**
      * The time the texture was last used
@@ -50,9 +58,55 @@ FORGE.MediaTexture = function(texture, locked, size)
      * @private
      */
     this._count = 0;
+
+    this._boot();
 };
 
 FORGE.MediaTexture.prototype.constructor = FORGE.MediaTexture;
+
+/**
+ * Boot routine
+ * @method FORGE.MediaTexture#_boot
+ */
+FORGE.MediaTexture.prototype._boot = function()
+{
+    var width = this._displayObject.width;
+    var height = this._displayObject.height;
+
+    this._size = width * height;
+
+    this._texture = new THREE.Texture();
+    this._texture.needsUpdate = true;
+
+    this._texture.format = THREE.RGBFormat;
+    this._texture.mapping = THREE.Texture.DEFAULT_MAPPING;
+    this._texture.magFilter = THREE.LinearFilter;
+    this._texture.wrapS = THREE.ClampToEdgeWrapping;
+    this._texture.wrapT = THREE.ClampToEdgeWrapping;
+
+    if (FORGE.Math.isPowerOfTwo(width) && FORGE.Math.isPowerOfTwo(height))
+    {
+        // Enable mipmaps for flat rendering to avoid aliasing
+        this._texture.generateMipmaps = true;
+        this._texture.minFilter = THREE.LinearMipMapLinearFilter;
+    }
+    else
+    {
+        this._texture.generateMipmaps = false;
+        this._texture.minFilter = THREE.LinearFilter;
+    }
+
+    this._texture.image = this._displayObject.canvas;
+};
+
+/**
+ * Update texture
+ * @method FORGE.MediaTexture#update
+ */
+FORGE.MediaTexture.prototype.update = function()
+{
+    this._texture.needsUpdate = true;
+};
 
 /**
  * Destroy routine
@@ -66,6 +120,8 @@ FORGE.MediaTexture.prototype.destroy = function()
     }
 
     this._texture = null;
+
+    this._displayObject = null;
 };
 
 /**

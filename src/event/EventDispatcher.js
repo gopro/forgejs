@@ -256,16 +256,11 @@ FORGE.EventDispatcher.prototype.dispatch = function(data, async)
 };
 
 /**
- * Destroy method.
- * @method FORGE.EventDispatcher#destroy
+ * Reset method.
+ * @method FORGE.EventDispatcher#reset
  */
-FORGE.EventDispatcher.prototype.destroy = function()
+FORGE.EventDispatcher.prototype.reset = function()
 {
-    if(this._alive === false)
-    {
-        return;
-    }
-
     if(this._listeners !== null)
     {
         var n = this._listeners.length;
@@ -277,8 +272,24 @@ FORGE.EventDispatcher.prototype.destroy = function()
         this._listeners = null;
     }
 
-    this._emitter = null;
+    this._dispatched = false;
     this._previousData = null;
+};
+
+/**
+ * Destroy method.
+ * @method FORGE.EventDispatcher#destroy
+ */
+FORGE.EventDispatcher.prototype.destroy = function()
+{
+    if(this._alive === false)
+    {
+        return;
+    }
+
+    this.reset();
+
+    this._emitter = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };

@@ -19,6 +19,13 @@ FORGE.MediaType.UNDEFINED = "undefined";
 FORGE.MediaType.IMAGE = "image";
 
 /**
+ * @name FORGE.MediaType.TILED
+ * @type {string}
+ * @const
+ */
+FORGE.MediaType.TILED = "tiled";
+
+/**
  * @name FORGE.MediaType.VIDEO
  * @type {string}
  * @const

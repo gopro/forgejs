@@ -413,7 +413,8 @@ FORGE.RenderManager.prototype._mediaLoadCompleteHandler = function(event)
 
     if (this._backgroundRenderer !== null)
     {
-        this._backgroundRenderer.displayObject = media.displayObject;
+        // this._backgroundRenderer.displayObject = media.displayObject;
+        this._backgroundRenderer.media = media;
     }
 
     this._setupRenderPipeline();
@@ -448,7 +449,7 @@ FORGE.RenderManager.prototype._mediaQualityChangeHandler = function(event)
 {
     this.log("Media quality has changed");
 
-    this._backgroundRenderer.displayObject = event.emitter;
+    // this._backgroundRenderer.displayObject = event.emitter;
 };
 
 /**
@@ -614,17 +615,18 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     var media = this._viewer.story.scene.media;
     var mediaConfig = media.config;
 
-    if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
+    // if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
+    if (media.type !== FORGE.MediaType.UNDEFINED)
     {
-        config.type = mediaConfig.type;
+        config.type = media.type;
 
-        if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
+        if (typeof media.source !== "undefined" && media.source !== null)
         {
-            var source = mediaConfig.source;
+            var source = media.source;
 
             if (typeof source.levels === "undefined")
             {
-                config.mediaFormat = mediaConfig.source.format;
+                config.mediaFormat = source.format;
                 var ratio = media.displayObject.element.width / media.displayObject.element.height || 1;
 
                 if (typeof source.fov !== "undefined")
@@ -656,11 +658,11 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
             }
         }
 
-        if (typeof mediaConfig.options !== "undefined" && mediaConfig.options !== null)
+        if (typeof media.options !== "undefined" && media.options !== null)
         {
-            if (typeof mediaConfig.options.color !== "undefined")
+            if (typeof media.options.color !== "undefined")
             {
-                config.color = mediaConfig.options.color;
+                config.color = media.options.color;
             }
         }
     }
@@ -676,26 +678,26 @@ FORGE.RenderManager.prototype._setBackgroundRenderer = function(type)
     else if (type === FORGE.BackgroundType.PYRAMID)
     {
         this.log("Create background pyramid renderer (multiresolution image)");
-        this._backgroundRenderer = new FORGE.BackgroundPyramidRenderer(this._viewer, renderTarget, mediaConfig);
+        this._backgroundRenderer = new FORGE.BackgroundPyramidRenderer(this._viewer, renderTarget, media.config);
     }
     else if (type === FORGE.BackgroundType.MESH)
     {
         this.log("Create background mesh renderer");
 
-        if (typeof mediaConfig !== "undefined" && mediaConfig !== null)
+        if (typeof media.config !== "undefined" && media.config !== null)
         {
-            if (typeof mediaConfig.source !== "undefined" && mediaConfig.source !== null)
+            if (typeof media.source !== "undefined" && media.source !== null)
             {
-                config.order = mediaConfig.source.order || "RLUDFB";
+                config.order = media.source.order || "RLUDFB";
 
                 // Get the right tile
-                if (typeof mediaConfig.source.tile === "number")
+                if (typeof media.source.tile === "number")
                 {
-                    config.tile = mediaConfig.source.tile;
+                    config.tile = media.source.tile;
                 }
-                else if (Array.isArray(mediaConfig.source.levels) && typeof mediaConfig.source.levels[0].tile === "number")
+                else if (Array.isArray(media.source.levels) && typeof media.source.levels[0].tile === "number")
                 {
-                    config.tile = mediaConfig.source.levels[0].tile;
+                    config.tile = media.source.levels[0].tile;
                 }
             }
         }
@@ -751,19 +753,17 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         return;
     }
 
-    var mediaConfig = media.config;
-
-    if (mediaConfig.type === FORGE.MediaType.GRID)
+    if (media.type === FORGE.MediaType.GRID)
     {
         this._backgroundRendererType = FORGE.BackgroundType.MESH;
     }
-    else if (typeof mediaConfig.source !== "undefined")
+    else if (typeof media.source !== null)
     {
-        if (typeof mediaConfig.source.levels !== "undefined" && media.type === FORGE.MediaType.IMAGE)
+        if (typeof media.source.levels !== "undefined" && media.type === FORGE.MediaType.TILED)
         {
             this._backgroundRendererType = FORGE.BackgroundType.PYRAMID;
         }
-        else if (mediaConfig.source.format === FORGE.MediaFormat.CUBE)
+        else if (media.source.format === FORGE.MediaFormat.CUBE)
         {
             this._backgroundRendererType = FORGE.BackgroundType.MESH;
         }
@@ -777,13 +777,13 @@ FORGE.RenderManager.prototype._setBackgroundRendererType = function(vrEnabled)
         this._backgroundRendererType = FORGE.BackgroundType.SHADER;
     }
 
-    if (typeof mediaConfig.source === "undefined" || typeof mediaConfig.source.format === "undefined")
+    if (media.source === null || typeof media.source.format === "undefined")
     {
         this.log("VR off - view " + this._viewManager.current.type + ", background type = " + this._backgroundRendererType);
     }
     else
     {
-        this.log("VR off - media " + mediaConfig.source.format + ", view " + this._viewManager.current.type +
+        this.log("VR off - media " + media.source.format + ", view " + this._viewManager.current.type +
             ", background type = " + this._backgroundRendererType);
     }
 };

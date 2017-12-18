@@ -40,7 +40,7 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shaderSTW.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shaderSTW.fragmentShader);
-    
+
     var material = new THREE.ShaderMaterial({
         uniforms: /** @type {FORGEUniform} */ (shaderSTW.uniforms),
         vertexShader: vertexShader,
@@ -75,8 +75,8 @@ FORGE.BackgroundShaderRenderer.prototype.render = function(webGLRenderer, target
 
     // var tn = (this._viewer.clock.elapsedTime % periodMS) / periodMS;
     // var ramp = tn < 0.5 ? 2 * tn : 2 - 2 * tn;
-    
-    // this._mesh.material.uniforms.tMixRatio.value = ramp;    
+
+    // this._mesh.material.uniforms.tMixRatio.value = ramp;
     // this._mesh.material.uniforms.tTime.value = tn;
 
     FORGE.BackgroundMeshRenderer.prototype.render.call(this, webGLRenderer, target);
