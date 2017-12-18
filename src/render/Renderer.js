@@ -151,11 +151,11 @@ FORGE.Renderer.prototype._buildMaterial = function(canvas)
         },
 
         tTexture1: {
-            value: new THREE.TextureLoader().load( './equis/Olive-day-4096x4096.jpg' )
+            value: null
         },
 
         tTexture2: {
-            value: new THREE.TextureLoader().load( './equis/Olive-night-4096x4096.jpg' )
+            value: null
         },
 
         tOpacity: {
