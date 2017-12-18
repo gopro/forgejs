@@ -75,6 +75,15 @@ FORGE.SceneViewportManager.prototype._boot = function()
     // Prepare VR rendering
     this._setupVRViewports();
 
+    // @todo enable this finally
+//    this._viewer.controllers.onActivate.add(this._renewActiveViewport, this)
+    this._viewer.canvas.pointer.onTap.add(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onDoubleTap.add(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onPanStart.add(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onPinchStart.add(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onPressStart.add(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onRotateStart.add(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onWheel.add(this._renewActiveViewport, this);
 };
 
 /**
@@ -116,6 +125,44 @@ FORGE.SceneViewportManager.prototype._parseConfig = function(config)
             var viewport = new FORGE.SceneViewport(this._viewer, this._scene, viewportConfig);
             this._viewports.push(viewport);
         }        
+    }
+};
+
+/**
+ * Get the index of the scene viewport containing some point
+ * @method FORGE.SceneViewportManager#_getSceneViewportIndexContainingPoint
+ * @param {THREE.Vector2} point - point
+ * @return {FORGE.SceneViewport} viewport containing the point (-1 if no viewport does)
+ * @private
+ */
+FORGE.SceneViewportManager.prototype._getSceneViewportIndexContainingPoint = function(point)
+{
+    return this._viewports.findIndex(function(sceneViewport) {
+        return sceneViewport.viewport.contains(point);
+    });
+};
+
+/**
+ * Renew active viewport if needed with pointer event.
+ * @method FORGE.SceneViewportManager#_renewActiveViewport
+ * @private
+ */
+FORGE.SceneViewportManager.prototype._renewActiveViewport = function(event)
+{
+    var px = event.data.clientX || event.data.center.x;
+    var py = event.data.clientY || event.data.center.y;
+    var point = new THREE.Vector2(px, this._viewer.height - py);
+    var index = this._getSceneViewportIndexContainingPoint(point);
+    if (index === -1)
+    {
+        return;
+    }
+
+    this._active = index;
+
+    if (this._onActiveViewportChange !== null)
+    {
+        this._onActiveViewportChange.dispatch();   
     }
 };
 
@@ -164,28 +211,20 @@ FORGE.SceneViewportManager.prototype.render = function(webGLRenderer, target)
 
 /**
  * Get the relative mouse position inside the target element of a mouse event
- * @method FORGE.SceneViewportManager.getRelativePosition
- * @static
+ * @method FORGE.SceneViewportManager#getRelativeMousePosition
  * @param {THREE.Vector2} mouse - The mouse position in container space
- * @return {THREE.Vector2}
+ * @return {THREE.Vector2} relative mouse position in current viewport (null if out of bounds)
  */
-FORGE.SceneViewportManager.prototype.getRelativePosition = function(mouse)
+FORGE.SceneViewportManager.prototype.getRelativeMousePosition = function(mouse)
 {
-    var rect = null;
-
-    this._viewports.forEach(function(sceneViewport) {
-        if (sceneViewport.viewport.contains(mouse))
-        {
-            rect = sceneViewport.viewport;
-        }
-    });
-
-    if (rect === null)
+    var index = this._getSceneViewportIndexContainingPoint(mouse);
+    if (index === -1)
     {
         return null;
     }
 
-    return new THREE.Vector2(mouse.x - rect.x, mouse.y - rect.y);
+    var viewport = this._viewports[index].viewport;
+    return new THREE.Vector2(mouse.x - viewport.x, mouse.y - viewport.y);
 };
 
 /**
@@ -194,6 +233,14 @@ FORGE.SceneViewportManager.prototype.getRelativePosition = function(mouse)
  */
 FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
 {
+    this._viewer.canvas.pointer.onTap.remove(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onDoubleTap.remove(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onPanStart.remove(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onPinchStart.remove(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onPressStart.remove(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onRotateStart.remove(this._renewActiveViewport, this);
+    this._viewer.canvas.pointer.onWheel.remove(this._renewActiveViewport, this);
+
     if (this._onActiveViewportChange !== null)
     {
         this._onActiveViewportChange.destroy();

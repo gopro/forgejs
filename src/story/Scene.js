@@ -171,14 +171,6 @@ FORGE.Scene = function(viewer)
     this._onMediaCreate = null;
     this._onTransitionCreate = null;
 
-    /**
-     * media create event dispatcher.
-     * @name  FORGE.Scene#_onMediaCreate
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onActiveViewportChange = null;
-
     FORGE.BaseObject.call(this, "Scene");
 };
 
@@ -332,16 +324,6 @@ FORGE.Scene.prototype._createViewports = function(config)
     // TODO : renderer should expose scene size for each frame, it could change during transitions
     this._renderTarget = new THREE.WebGLRenderTarget(this._viewer.width, this._viewer.height, rtParams);
     this._viewportManager = new FORGE.SceneViewportManager(this._viewer, this);
-
-    this._viewportManager.onActiveViewportChange.add(this._onActiveSceneViewportChange, this);
-};
-
-FORGE.Scene.prototype._onActiveSceneViewportChange = function(transition)
-{
-    if (this._onActiveViewportChange !== null)
-    {
-        this._onActiveViewportChange.dispatch();
-    }
 };
 
 FORGE.Scene.prototype._createTransition = function(transition)
@@ -587,7 +569,6 @@ FORGE.Scene.prototype.destroy = function()
     this._description.destroy();
     this._description = null;
 
-    this._viewportManager.onActiveViewportChange.remove(this._onActiveSceneViewportChange, this);
     this._viewportManager.destroy();
     this._viewportManager = null;
 
@@ -830,6 +811,21 @@ Object.defineProperty(FORGE.Scene.prototype, "thumbnails",
 });
 
 /**
+ * Get the scene viewport manager.
+ * @name  FORGE.Scene#viewportManager
+ * @readonly
+ * @type {FORGE.SceneViewportManager}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "viewportManager",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._viewportManager;
+    }
+});
+
+/**
  * Get the scene media.
  * @name  FORGE.Scene#media
  * @readonly
@@ -1046,25 +1042,5 @@ Object.defineProperty(FORGE.Scene.prototype, "onTransitionCreate",
         }
 
         return this._onTransitionCreate;
-    }
-});
-
-/**
- * Get the onActiveViewportChange {@link FORGE.EventDispatcher}.
- * @name  FORGE.Scene#onActiveViewportChange
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.Scene.prototype, "onActiveViewportChange",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        if (this._onActiveViewportChange === null)
-        {
-            this._onActiveViewportChange = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onActiveViewportChange;
     }
 });

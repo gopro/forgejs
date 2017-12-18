@@ -203,8 +203,15 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
     this._active = true;
     this._panning = true;
 
-    var position = FORGE.Pointer.getRelativeMousePosition(event.data);
-    this._positionStart = new THREE.Vector2(position.x, position.y);
+
+    var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
+    var viewportPosition = this._viewer.story.scene.viewportManager.getRelativeMousePosition(screenPosition);
+    if (viewportPosition === null)
+    {
+        return;
+    }
+
+    this._positionStart = new THREE.Vector2(viewportPosition.x, viewportPosition.y);
     this._positionPrevious.copy(this._positionStart);
     this._positionCurrent.copy(this._positionStart);
     this._velocity.set(0, 0);
@@ -225,15 +232,15 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
  */
 FORGE.ControllerPointer.prototype._panMoveHandler = function(event)
 {
-    var position = FORGE.Pointer.getRelativeMousePosition(event.data);
-
-    if(this._viewer.controllers.enabled === false || position === null)
+    var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
+    var viewportPosition = this._viewer.story.scene.viewportManager.getRelativeMousePosition(screenPosition);
+    if (viewportPosition === null || this._viewer.controllers.enabled === false || viewportPosition === null)
     {
         return;
     }
 
     this._positionPrevious.copy(this._positionCurrent);
-    this._positionCurrent.set(position.x, position.y);
+    this._positionCurrent.set(viewportPosition.x, viewportPosition.y);
     // this.log("Current position: " + this._positionCurrent.x + ", " + this._positionCurrent.y);
 
     if(this._orientation.drag === true && this._panning === true)
@@ -265,6 +272,20 @@ FORGE.ControllerPointer.prototype._panEndHandler = function()
     }
 
     this._viewer.controllers.notifyControlEnd(this);
+};
+
+/**
+ * Active viewport change handler.
+ * @method FORGE.ControllerPointer#_onSceneActiveViewportChange
+ * @param {FORGE.Event} event - new scene active viewport
+ * @private
+ */
+FORGE.ControllerPointer.prototype._onSceneActiveViewportChange = function(event)
+{
+    // If panning was in progress, end it for current previous viewport and start it for the new viewport
+
+
+    FORGE.ControllerBase.prototype._onSceneActiveViewportChange.call(this, event);
 };
 
 /**
