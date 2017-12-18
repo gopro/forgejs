@@ -94,17 +94,6 @@ FORGE.BackgroundMeshRenderer.prototype._onMeshCreated = function()
  */
 FORGE.BackgroundMeshRenderer.prototype._onTextureCreated = function()
 {
-    var uniforms = this._mesh.material.uniforms;
-
-    if ("tTexture" in uniforms)
-    {
-        uniforms.tTexture.value = this._texture;
-    }
-
-    if ("tTextureRatio" in uniforms)
-    {
-        uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
-    }
 };
 
 /**
@@ -121,31 +110,6 @@ FORGE.BackgroundMeshRenderer.prototype._onViewChanged = function()
     }
 
     this._mesh.material = this._createMaterial();
-};
-
-/**
- * Before render handler
- * @method FORGE.BackgroundMeshRenderer#_onBeforeRender
- * @private
- */
-FORGE.BackgroundMeshRenderer.prototype._onBeforeRender = function()
-{
-    var uniforms = this._mesh.material.uniforms;
-
-    if (typeof uniforms === "undefined")
-    {
-        return;
-    }
-
-    if ("tTexture" in uniforms)
-    {
-        uniforms.tTexture.value = this._texture;
-    }
-
-    if ("tOpacity" in uniforms)
-    {
-        uniforms.tOpacity.value = 1.0;
-    }
 };
 
 /**
@@ -204,7 +168,6 @@ FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
     var material = this._createMaterial();
 
     this._mesh = new THREE.Mesh(geometry, material);
-    this._mesh.onBeforeRender = this._onBeforeRender.bind(this);
 
     this._scene.add(this._mesh);
 };
@@ -233,6 +196,45 @@ FORGE.BackgroundMeshRenderer.prototype._disposeMesh = function(mesh)
         mesh.geometry.dispose();
         mesh.geometry = null;
     }
+};
+
+
+/**
+ * Render routine.
+ * @param {THREE.WebGLRenderer} webGLRenderer THREE WebGL renderer
+ * @param {THREE.WebGLRenderTarget} target WebGL render target
+ * @method FORGE.BackgroundMeshRenderer#render
+ */
+FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
+{
+    var uniforms = this._mesh.material.uniforms;
+
+    if (typeof uniforms === "undefined")
+    {
+        return;
+    }
+
+    if ("tTexture" in uniforms)
+    {
+        uniforms.tTexture.value = this._texture;
+    }
+
+    if ("tOpacity" in uniforms)
+    {
+        uniforms.tOpacity.value = 1.0;
+    }
+
+    if ("tTexture" in uniforms)
+    {
+        uniforms.tTexture.value = this._texture;
+    }
+
+    if ("tTextureRatio" in uniforms)
+    {
+        uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+    }
+
+    FORGE.BackgroundTextureRenderer.prototype.render.call(this, webGLRenderer, target);
 };
 
 /**
