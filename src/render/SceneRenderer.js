@@ -51,7 +51,7 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
      * @private
      */
     this._objectRenderer = null;
-    
+
     /**
      * Camera.
      * @name FORGE.SceneRenderer#_camera
@@ -156,7 +156,7 @@ FORGE.SceneRenderer.prototype._createObjectRenderer = function()
  * Background renderer choice policy is based on media type and format
  *
  * - Media type grid: grid renderer
- * 
+ *
  * - Type is image and source has some defined levels: pyramid renderer (multiresolution)
 
  * - Source format is equirectangular: shader renderer
@@ -164,9 +164,9 @@ FORGE.SceneRenderer.prototype._createObjectRenderer = function()
  *   this could be a good fallback on devices with cheap GPU where fragment shader rendering is top heavy
  *
  * - Source format is flat: plane renderer
- * 
+ *
  * - Source format is cube: mesh renderer
- * 
+ *
  * @method FORGE.SceneRenderer#_createBackgroundRenderer
  * @private
  */
@@ -175,65 +175,59 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
     this._scene.media.onLoadComplete.remove(this._createBackgroundRenderer, this);
 
     var media = event.emitter;
-    var mediaConfig = this._scene.config.media;
-
     var backgroundRendererRef;
 
-    if (typeof mediaConfig === "undefined")
+    if (media.type === FORGE.MediaType.UNDEFINED)
     {
         backgroundRendererRef = FORGE.BackgroundRenderer;
     }
-    else 
+    else
     {
-        var sourceConfig = mediaConfig.source;
-
-        if (mediaConfig.type === FORGE.MediaType.GRID)
+        if (media.type === FORGE.MediaType.GRID)
         {
             backgroundRendererRef = FORGE.BackgroundGridRenderer;
         }
 
         // Multi resolution is checked before other meshes as it is a special case of cube format
-        else if (typeof sourceConfig.levels !== "undefined" && mediaConfig.type === FORGE.MediaType.IMAGE)
+        else if (media.type === FORGE.MediaType.TILED)
         {
             backgroundRendererRef = FORGE.BackgroundPyramidRenderer;
         }
 
-        else if (sourceConfig.format === FORGE.MediaFormat.EQUIRECTANGULAR)
+        else if(media.type === FORGE.MediaType.IMAGE || media.type === FORGE.MediaType.VIDEO)
         {
-            // Background shader or mesh with sphere geometry
-            // Default choice: using a shader renderer allows spherical transitions between scenes
-            // Performance fallback: mesh renderer
-            if (this._sceneViewport.config.vr === true)
+            if (media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
             {
-                backgroundRendererRef = FORGE.BackgroundSphereRenderer;
+                // Background shader or mesh with sphere geometry
+                // Default choice: using a shader renderer allows spherical transitions between scenes
+                // Performance fallback: mesh renderer
+                if (this._sceneViewport.config.vr === true)
+                {
+                    backgroundRendererRef = FORGE.BackgroundSphereRenderer;
+                }
+                else
+                {
+                    backgroundRendererRef = FORGE.BackgroundShaderRenderer;
+                }
             }
-            else
+
+            // Flat media format (beware: flat view is another thing)
+            else if (media.source.format === FORGE.MediaFormat.FLAT)
             {
-                backgroundRendererRef = FORGE.BackgroundShaderRenderer;
+                backgroundRendererRef = FORGE.BackgroundPlaneRenderer;
             }
-        }
 
-        // Flat media format (beware: flat view is another thing)
-        else if (sourceConfig.format === FORGE.MediaFormat.FLAT)
-        {
-            backgroundRendererRef = FORGE.BackgroundPlaneRenderer;
-        }
+            // Cube: mesh with cube geometry
+            // Todo: add cube texel picking in shader to allow shader renderer usage and support spherical transitions
+            else if (media.source.format === FORGE.MediaFormat.CUBE)
+            {
+                backgroundRendererRef = FORGE.BackgroundCubeRenderer;
+            }
 
-        // Cube: mesh with cube geometry
-        // Todo: add cube texel picking in shader to allow shader renderer usage and support spherical transitions
-        else if (sourceConfig.format === FORGE.MediaFormat.CUBE)
-        {
-            backgroundRendererRef = FORGE.BackgroundCubeRenderer;
-        }
-
-        // No media
-        else
-        {
-            backgroundRendererRef = FORGE.BackgroundRenderer;
         }
     }
 
-    this._backgroundRenderer = new backgroundRendererRef(this, mediaConfig);
+    this._backgroundRenderer = new backgroundRendererRef(this);
 };
 
 /**
@@ -274,11 +268,11 @@ FORGE.SceneRenderer.prototype.render = function(webGLRenderer, target)
     }
 
     this._backgroundRenderer.render(webGLRenderer, target);
-    
+
     // This is pure nonsense !! RenderPipeline renders all render passes...
     // The object renderer should have done its job before to prepare the textures
     // this._objectRenderer.render();
-    
+
     // Get background and foreground textures and call pipeline render routine
     // this._pipeline.render();
 };

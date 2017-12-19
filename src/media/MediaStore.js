@@ -78,20 +78,20 @@ FORGE.MediaStore = function(viewer, config, preview)
     this._textureStackInterval = null;
 
     /**
-     * The current size of all loaded textures.
-     * @name FORGE.MediaStore#_size
+     * The current amount of pixels of all loaded textures.
+     * @name FORGE.MediaStore#_pixels
      * @type {number}
      * @private
      */
-    this._size = 0;
+    this._pixels = 0;
 
     /**
-     * The max size of the cache.
-     * @name FORGE.MediaStore#_maxSize
+     * The max size of the cache in pixels.
+     * @name FORGE.MediaStore#_maxPixels
      * @type {number}
      * @private
      */
-    this._maxSize = 0;
+    this._maxPixels = 0;
 
     /**
      * The global pattern of texture file urls
@@ -134,7 +134,8 @@ FORGE.MediaStore.TEXTURE_STACK_INTERVAL_MS = 250;
  * Table describing previous cube face
  * @type {CubeFaceObject}
  */
-FORGE.MediaStore.CUBE_FACE_CONFIG = {
+FORGE.MediaStore.CUBE_FACE_CONFIG =
+{
     "front": "front",
     "right": "right",
     "back": "back",
@@ -163,15 +164,15 @@ FORGE.MediaStore.prototype._boot = function()
 
     if (FORGE.Device.desktop === true)
     {
-        this._maxSize = 150000000;
+        this._maxPixels = 150000000;
     }
     else if (FORGE.Device.iOS === true)
     {
-        this._maxSize = 40000000;
+        this._maxPixels = 40000000;
     }
     else
     {
-        this._maxSize = 50000000;
+        this._maxPixels = 50000000;
     }
 };
 
@@ -309,29 +310,27 @@ FORGE.MediaStore.prototype._load = function(tile)
  * @param {FORGE.Image} image - the loaded image
  * @private
  */
-FORGE.MediaStore.prototype._onLoadComplete = function(image)
+FORGE.MediaStore.prototype._onLoadComplete = function(event)
 {
+    var image = event.emitter;
+
     if (this._textures === null)
     {
-        image.emitter.destroy();
+        image.destroy();
         // stop it all, it means this mediastore has been destroyed and this is
         // a late-coming tile
         return;
     }
 
-    image = image.emitter;
     var tile = image.data.tile;
     var key = this._createKey(tile);
 
     this.log("Texture load complete for tile " + tile.name);
 
-    var texture = new THREE.Texture();
-    texture.image = image.element;
+    var mediaTexture = new FORGE.MediaTexture(image, (tile.level === FORGE.Tile.PREVIEW));
 
-    var size = image.element.height * image.element.width;
-    this._size += size;
+    this._pixels += mediaTexture.pixels;
 
-    var mediaTexture = new FORGE.MediaTexture(texture, (tile.level === FORGE.Tile.PREVIEW), size);
     this._textures.set(key, mediaTexture);
 
     // destroy the image, it is no longer needed
@@ -341,9 +340,7 @@ FORGE.MediaStore.prototype._onLoadComplete = function(image)
     entry.load.resolve(mediaTexture.texture);
     this._texturePromises.delete(key);
 
-    image.destroy();
-
-    this._checkSize();
+    this._checkPixels();
 };
 
 /**
@@ -362,21 +359,21 @@ FORGE.MediaStore.prototype._discardTexture = function(key)
 
     var texture = this._textures.get(key);
 
-    this._size -= texture.size;
+    this._pixels -= texture.pixels;
     texture.destroy();
 
     this._textures.delete(key);
 };
 
 /**
- * Check the current size of the store, and flush some texture if necessary.
+ * Check the current count of pixels of the store, and flush some texture if necessary.
  *
- * @method FORGE.MediaStore#_checkSize
+ * @method FORGE.MediaStore#_checkPixels
  * @private
  */
-FORGE.MediaStore.prototype._checkSize = function()
+FORGE.MediaStore.prototype._checkPixels = function()
 {
-    if (this._size < this._maxSize)
+    if (this._pixels < this._maxPixels)
     {
         return;
     }
@@ -388,7 +385,7 @@ FORGE.MediaStore.prototype._checkSize = function()
 
     entries = FORGE.Utils.sortArrayByProperty(entries, "1.lastTime");
 
-    while (this._size > this._maxSize)
+    while (this._pixels > this._maxPixels)
     {
         // oldest are first
         texture = entries.shift();

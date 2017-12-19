@@ -59,12 +59,12 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
 
         if (typeof source.order !== "undefined")
         {
-            this._layout = source.order; 
+            this._layout = source.order;
         }
-        
+
         if (typeof source.tile !== "undefined")
         {
-            this._tile = source.tile; 
+            this._tile = source.tile;
         }
     }
 
@@ -131,7 +131,7 @@ FORGE.BackgroundMeshRenderer.prototype._createMaterial = function()
 {
     var shader = FORGE.Utils.clone(this._sceneRenderer.view.current.shaderWTS).mapping;
     this.log("Media " + this._mediaType + ", use mapping shader");
- 
+
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
 
@@ -184,7 +184,7 @@ FORGE.BackgroundMeshRenderer.prototype._disposeMesh = function(mesh)
         if (typeof mesh.material.map !== "undefined" && mesh.material.map instanceof THREE.Texture)
         {
             mesh.material.map.dispose();
-            mesh.material.map = null;                
+            mesh.material.map = null;
         }
 
         mesh.material.dispose();
@@ -246,7 +246,7 @@ FORGE.BackgroundMeshRenderer.prototype.destroy = function()
     this._sceneRenderer.view.onChange.remove(this._onViewChanged, this);
 
     // Remove and dispose all meshes from the scene
-    if (this._mesh !== null) 
+    if (this._mesh !== null)
     {
         this._scene.remove(this._mesh);
         this._disposeMesh(this._mesh);

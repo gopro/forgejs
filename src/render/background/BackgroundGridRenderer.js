@@ -40,12 +40,12 @@ FORGE.BackgroundGridRenderer.prototype._boot = function()
 
     if (typeof this._config.options !== "undefined" &&
         typeof this._config.options.color !== "undefined")
-    {        
+    {
         this._gridColor = this._config.options.color;
     }
 
     if (this._sceneRenderer.background !== null)
-    {        
+    {
         this._backgroundColor = this._sceneRenderer.background;
     }
 

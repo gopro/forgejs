@@ -556,7 +556,6 @@ FORGE.VideoHTML5.prototype._boot = function()
         this.load(this._config);
     }
 
-    this._viewer.display.register(this, this._isAmbisonic());
     this._notifyReady();
     this._applyPending(false);
 };
@@ -1908,6 +1907,8 @@ FORGE.VideoHTML5.prototype._isAmbisonic = function()
  */
 FORGE.VideoHTML5.prototype.update = function()
 {
+    FORGE.VideoBase.prototype.update.call(this);
+
     if(this._decoder !== null && this._playing === true)
     {
         //Rotate the binaural renderer based on a Three.js camera object.

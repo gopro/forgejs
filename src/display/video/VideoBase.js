@@ -49,6 +49,14 @@ FORGE.VideoBase = function(viewer, name)
      */
     this._paused = false;
 
+    /**
+     * The canvas to draw the video to in case of texture usage.
+     * @name FORGE.VideoBase#_canvas
+     * @type {Element|HTMLCanvasElement}
+     * @private
+     */
+    this._canvas = null;
+
     FORGE.DisplayObject.call(this, viewer, null, name);
 };
 
@@ -64,9 +72,13 @@ FORGE.VideoBase.prototype._boot = function()
 {
     FORGE.DisplayObject.prototype._boot.call(this);
 
+    this._canvas = document.createElement("canvas");
+
     // Listen to the Page Visibility event
     this._viewer.onPause.add(this._onVisibilityChange, this);
     this._viewer.onResume.add(this._onVisibilityChange, this);
+
+    this._viewer.display.register(this, true);
 };
 
 /**
@@ -93,6 +105,33 @@ FORGE.VideoBase.prototype._onVisibilityChange = function(event)
     {
         this.play();
         return;
+    }
+};
+
+/**
+ * Update method called by the viewer main loop.
+ * @method FORGE.VideoHTML5#update
+ */
+FORGE.VideoBase.prototype.update = function()
+{
+    if(this.element !== null && this._playing === true)
+    {
+        // Evil hack from Hell
+        // Reduce texture size for big videos on safari
+        var factor = (FORGE.Device.browser.toLowerCase() === "safari" && this.originalHeight > 1440) ? 2 : 1;
+
+        // Set the canvas at the proper size
+        this._canvas.width = this.originalWidth / factor;
+        this._canvas.height = this.originalHeight / factor;
+
+        if (this.element instanceof HTMLVideoElement && this.element.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA)
+        {
+            var ctx = this._canvas.getContext("2d");
+
+            ctx.drawImage(this.element,
+                0, 0, this.element.videoWidth, this.element.videoHeight,
+                0, 0, this._canvas.width, this._canvas.height);
+        }
     }
 };
 
@@ -200,5 +239,36 @@ Object.defineProperty(FORGE.VideoBase.prototype, "endCount",
     get: function()
     {
         return this._endCount;
+    }
+});
+
+/**
+ * Get the HTML element of the video.
+ * @name FORGE.VideoBase#element
+ * @readonly
+ * @type {Element|HTMLVideElement}
+ */
+Object.defineProperty(FORGE.VideoBase.prototype, "element",
+{
+    /** @this {FORGE.VideoBase} */
+    get: function()
+    {
+        // Need to be implemented by child classes
+        return null;
+    }
+});
+
+/**
+ * Get the canvas of the video.
+ * @name FORGE.VideoBase#canvas
+ * @readonly
+ * @type {Element|HTMLCanvasElement}
+ */
+Object.defineProperty(FORGE.VideoBase.prototype, "canvas",
+{
+    /** @this {FORGE.VideoBase} */
+    get: function()
+    {
+        return this._canvas;
     }
 });
