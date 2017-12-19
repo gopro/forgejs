@@ -56,7 +56,7 @@ FORGE.BackgroundCubeRenderer.prototype._boot = function()
 
         if (typeof this._config.source.tile !== "undefined")
         {
-            this._tile = this._config.source.tile;        
+            this._tile = this._config.source.tile;
         }
     }
 
@@ -164,7 +164,7 @@ FORGE.BackgroundCubeRenderer.prototype._computeUVMap = function()
  * @private
  */
 FORGE.BackgroundCubeRenderer.prototype._onTextureCreated = function()
-{    
+{
     if (this._texture.image !== null)
     {
         this._faces.x = this._texture.image.width / this._tile;

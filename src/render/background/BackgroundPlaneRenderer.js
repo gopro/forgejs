@@ -52,8 +52,8 @@ FORGE.BackgroundPlaneRenderer.prototype._boot = function()
  */
 FORGE.BackgroundPlaneRenderer.prototype._computePlaneSize = function()
 {
-    var texHeight = this._displayObject.originalHeight;
-    var texRatio = this._displayObject.originalWidth / this._displayObject.originalHeight;
+    var texHeight = this._media.displayObject.originalHeight;
+    var texRatio = this._media.displayObject.originalWidth / this._media.displayObject.originalHeight;
 
     var width = this._size;
     var height = Math.round(width / texRatio);
@@ -85,13 +85,13 @@ FORGE.BackgroundPlaneRenderer.prototype._onMeshCreated = function()
 
     this._mesh.position.set(0, 0, -size.z);
     this._mesh.material.side = THREE.FrontSide;
-    
+
     if (this.DEBUG === true)
     {
         var fovMax = FORGE.Math.radToDeg(2 * Math.atan(0.5 * size.y / size.z));
-        var fovMin = FORGE.Math.radToDeg(2 * Math.atan((0.5 * size.y / size.z) * (this._getViewport().size.height / this._displayObject.height)));
+        var fovMin = FORGE.Math.radToDeg(2 * Math.atan((0.5 * size.y / size.z) * (this._getViewport().size.height / this._media.displayObject.height)));
 
-        this.log("Flat rendering boundaries [" + fovMin.toFixed() + ", " + fovMax.toFixed() + "]");        
+        this.log("Flat rendering boundaries [" + fovMin.toFixed() + ", " + fovMax.toFixed() + "]");
     }
 
     FORGE.BackgroundMeshRenderer.prototype._onMeshCreated.call(this);

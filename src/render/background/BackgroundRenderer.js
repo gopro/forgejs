@@ -4,10 +4,10 @@
  *
  * @constructor FORGE.BackgroundRenderer
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
- * @param {string=} type - The type of the object as long as many other object inherits from this one.
+ * @param {string=} className - The className of the object as long as many other object inherits from this one.
  * @extends {FORGE.BaseObject}
  */
-FORGE.BackgroundRenderer = function(sceneRenderer, type)
+FORGE.BackgroundRenderer = function(sceneRenderer, className)
 {
     /**
      * The scene renderer reference.
@@ -72,7 +72,7 @@ FORGE.BackgroundRenderer = function(sceneRenderer, type)
      */
     this._mediaFormat = FORGE.MediaFormat.EQUIRECTANGULAR;
 
-    FORGE.BaseObject.call(this, type || "BackgroundRenderer");
+    FORGE.BaseObject.call(this, className || "BackgroundRenderer");
 
     this._boot();
 };
