@@ -36,12 +36,12 @@ FORGE.MediaTexture = function(displayObject, locked)
     this._texture = null;
 
     /**
-     * The size of the texture
-     * @name FORGE.MediaTexture#_size
+     * The size of the texture in pixels
+     * @name FORGE.MediaTexture#_pixels
      * @type {number}
      * @private
      */
-    this._size = 0;
+    this._pixels = 0;
 
     /**
      * The time the texture was last used
@@ -70,10 +70,8 @@ FORGE.MediaTexture.prototype.constructor = FORGE.MediaTexture;
  */
 FORGE.MediaTexture.prototype._boot = function()
 {
-    var width = this._displayObject.width;
-    var height = this._displayObject.height;
-
-    this._size = width * height;
+    this._size = new FORGE.Size(this._displayObject.width, this._displayObject.height);
+    this._pixels = this._size.width * this._size.height;
 
     this._texture = new THREE.Texture();
     this._texture.needsUpdate = true;
@@ -84,7 +82,7 @@ FORGE.MediaTexture.prototype._boot = function()
     this._texture.wrapS = THREE.ClampToEdgeWrapping;
     this._texture.wrapT = THREE.ClampToEdgeWrapping;
 
-    if (FORGE.Math.isPowerOfTwo(width) && FORGE.Math.isPowerOfTwo(height))
+    if (FORGE.Math.isPowerOfTwo(this._size.width) && FORGE.Math.isPowerOfTwo(this._size.height))
     {
         // Enable mipmaps for flat rendering to avoid aliasing
         this._texture.generateMipmaps = true;
@@ -158,10 +156,24 @@ Object.defineProperty(FORGE.MediaTexture.prototype, "locked",
 });
 
 /**
- * Get the size of the texture
- * @name  FORGE.MediaTexture#size
+ * Get the number of pixels of the texture
+ * @name  FORGE.MediaTexture#pixels
  * @type {number}
  * @readonly
+ */
+Object.defineProperty(FORGE.MediaTexture.prototype, "pixels",
+{
+    /** @this {FORGE.MediaTexture} */
+    get: function()
+    {
+        return this._pixels;
+    }
+});
+
+/**
+ * Get texture size.
+ * @name FORGE.MediaTexture#size
+ * @type {FORGE.Size}
  */
 Object.defineProperty(FORGE.MediaTexture.prototype, "size",
 {
