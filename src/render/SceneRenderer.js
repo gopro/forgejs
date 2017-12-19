@@ -262,6 +262,8 @@ FORGE.SceneRenderer.prototype.setView = function(config)
  */
 FORGE.SceneRenderer.prototype.render = function(webGLRenderer, target)
 {
+    this._camera.update();
+    
     if (this._backgroundRenderer === null)
     {
         return;
