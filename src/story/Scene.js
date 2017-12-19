@@ -329,7 +329,7 @@ FORGE.Scene.prototype._createTransition = function(transition)
 
     if(this._transition === null)
     {
-        this._transition = new FORGE.Media(this._viewer, transition);
+        // this._transition = new FORGE.Media(this._viewer, transition);
 
         if(this.onTransitionCreate !== null)
         {
