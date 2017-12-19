@@ -7,7 +7,6 @@
  * @param {SceneMediaConfig} config input media configuration from json
  * @param {string} className - The className of the object as long as many other object inherits from this one.
  * @extends {FORGE.BaseObject}
- *
  */
 FORGE.Media = function(viewer, config, className)
 {
@@ -59,15 +58,6 @@ FORGE.Media = function(viewer, config, className)
      * @private
      */
     this._preview = null;
-
-    /**
-     * Display object that will be used to create a texture.
-     * @name FORGE.Media#_displayObject
-     * @type {(FORGE.Image|FORGE.Video)}
-     * @private
-     * @todo Clarify where des belong the displayObject (only image and video)
-     */
-    this._displayObject = null;
 
     /**
      * Loaded flag
@@ -223,13 +213,6 @@ FORGE.Media.prototype.unload = function()
  */
 FORGE.Media.prototype.destroy = function()
 {
-    // @todo clear this !
-    if (this._displayObject !== null)
-    {
-        this._displayObject.destroy();
-        this._displayObject = null;
-    }
-
     if (this._onLoadComplete !== null)
     {
         this._onLoadComplete.destroy();
@@ -299,32 +282,6 @@ Object.defineProperty(FORGE.Media.prototype, "options",
     get: function()
     {
         return this._options;
-    }
-});
-
-/**
- * Get the displayObject.
- * @name  FORGE.Media#displayObject
- * @type {FORGE.DisplayObject}
- * @readonly
- * @todo  Clarify where does belong the display object property (only video and image !!)
- */
-Object.defineProperty(FORGE.Media.prototype, "displayObject",
-{
-    /** @this {FORGE.Media} */
-    get: function()
-    {
-        if (this._type === FORGE.MediaType.IMAGE && this._store === null)
-        {
-            if (this._displayObject !== null && this._displayObject.loaded === true)
-            {
-                return this._displayObject;
-            }
-
-            return this._preview;
-        }
-
-        return this._displayObject;
     }
 });
 

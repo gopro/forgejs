@@ -32,8 +32,6 @@ FORGE.MediaGrid.prototype._parseConfig = function(config)
  */
 FORGE.MediaGrid.prototype.load = function()
 {
-    //@todo clean this when displayObject will no longer exists?!
-    this._displayObject = null;
     this._notifyLoadComplete();
 };
 

@@ -9,10 +9,20 @@
  */
 FORGE.MediaImage = function(viewer, config)
 {
-    //placeholder
-    //@todo to replace the displayObject reference
+    /**
+     * The Image reference
+     * @name FORGE.MediaImage#_image
+     * @type {FORGE.Image}
+     * @private
+     */
     this._image = null;
 
+    /**
+     * The Media texture associated to this image.
+     * @name FORGE.MediaImage#_texture
+     * @type {FORGE.MediaTexture}
+     * @private
+     */
     this._texture = null;
 
     FORGE.Media.call(this, viewer, config, "MediaImage");
@@ -80,7 +90,7 @@ FORGE.MediaImage.prototype._parseConfig = function(config)
  */
 FORGE.MediaImage.prototype._onImageLoadComplete = function()
 {
-    this._texture = new FORGE.MediaTexture(this._displayObject);
+    this._texture = new FORGE.MediaTexture(this._image);
 
     this._notifyLoadComplete();
 };
@@ -91,16 +101,11 @@ FORGE.MediaImage.prototype._onImageLoadComplete = function()
  */
 FORGE.MediaImage.prototype._notifyLoadComplete = function()
 {
-    this._loaded = this._displayObject !== null && this._displayObject.loaded && this._preview !== null && this._preview.loaded;
+    this._loaded = this._image !== null && this._image.loaded && this._preview !== null && this._preview.loaded;
 
-    if (this._preview === null || (this._displayObject !== null && this._displayObject.loaded === false) || this._preview.loaded === false)
+    if (this._preview === null || (this._image !== null && this._image.loaded === false) || this._preview.loaded === false)
     {
         this._onLoadComplete.dispatch();
-    }
-    else if (this._viewer.renderer.backgroundRenderer !== null)
-    {
-        //@todo ! Ouch ! Remove this strong link between media image and the background renderer !
-        this._viewer.renderer.backgroundRenderer.displayObject = this._displayObject;
     }
 };
 
@@ -116,8 +121,8 @@ FORGE.MediaImage.prototype.load = function()
         url: this._source.url
     };
 
-    this._displayObject = new FORGE.Image(this._viewer, imageConfig);
-    this._displayObject.onLoadComplete.addOnce(this._onImageLoadComplete, this);
+    this._image = new FORGE.Image(this._viewer, imageConfig);
+    this._image.onLoadComplete.addOnce(this._onImageLoadComplete, this);
 };
 
 /**
@@ -126,10 +131,10 @@ FORGE.MediaImage.prototype.load = function()
  */
 FORGE.MediaImage.prototype.unload = function()
 {
-    if(this._displayObject !== null)
+    if(this._image !== null)
     {
-        this._displayObject.destroy();
-        this._displayObject = null;
+        this._image.destroy();
+        this._image = null;
     }
 
     if(this._texture !== null)
@@ -151,6 +156,36 @@ FORGE.MediaImage.prototype.destroy = function()
 
     FORGE.Media.prototype.destroy.call(this);
 };
+
+/**
+ * Get the image
+ * @name FORGE.MediaImage#image
+ * @type {FORGE.Image}
+ * @readonly
+ */
+Object.defineProperty(FORGE.MediaImage.prototype, "image",
+{
+    /** @this {FORGE.MediaImage} */
+    get: function()
+    {
+        return this._image;
+    }
+});
+
+/**
+ * Get the displayObject
+ * @name FORGE.MediaImage#displayObject
+ * @type {FORGE.Image}
+ * @readonly
+ */
+Object.defineProperty(FORGE.MediaImage.prototype, "displayObject",
+{
+    /** @this {FORGE.MediaImage} */
+    get: function()
+    {
+        return this._image;
+    }
+});
 
 /**
  * Get the texture

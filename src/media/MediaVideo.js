@@ -9,10 +9,20 @@
  */
 FORGE.MediaVideo = function(viewer, config)
 {
-    //placeholder
-    //@todo to replace the displayObject reference
+    /**
+     * The Video reference
+     * @name FORGE.MediaImage#_video
+     * @type {FORGE.VideoBase}
+     * @private
+     */
     this._video = null;
 
+    /**
+     * The Media texture associated to this video.
+     * @name FORGE.MediaImage#_texture
+     * @type {FORGE.MediaTexture}
+     * @private
+     */
     this._texture = null;
 
     FORGE.Media.call(this, viewer, config, "MediaVideo");
@@ -75,20 +85,20 @@ FORGE.MediaVideo.prototype._onLoadedMetaDataHandler = function()
 {
     if (this._options !== null)
     {
-        this._displayObject.volume = (typeof this._options.volume === "number") ? this._options.volume : 1;
-        this._displayObject.loop = (typeof this._options.loop === "boolean") ? this._options.loop : true;
-        this._displayObject.currentTime = (typeof this._options.startTime === "number") ? this._options.startTime : 0;
+        this._video.volume = (typeof this._options.volume === "number") ? this._options.volume : 1;
+        this._video.loop = (typeof this._options.loop === "boolean") ? this._options.loop : true;
+        this._video.currentTime = (typeof this._options.startTime === "number") ? this._options.startTime : 0;
 
         if (this._options.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
         {
-            this._displayObject.play();
+            this._video.play();
         }
 
-        this._displayObject.autoPause = this._options.autoPause;
-        this._displayObject.autoResume = this._options.autoResume;
+        this._video.autoPause = this._options.autoPause;
+        this._video.autoResume = this._options.autoResume;
     }
 
-    this._texture = new FORGE.MediaTexture(this._displayObject);
+    this._texture = new FORGE.MediaTexture(this._video);
 
     this._notifyLoadComplete();
 };
@@ -165,25 +175,25 @@ FORGE.MediaVideo.prototype.load = function()
 {
     if (typeof this._source.streaming !== "undefined" && this._source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
     {
-        this._displayObject = new FORGE.VideoDash(this._viewer, this._uid);
+        this._video = new FORGE.VideoDash(this._viewer, this._uid);
     }
     else
     {
         var scene = this._viewer.story.scene;
 
         // check of the ambisonic state of the video sound prior to the video instanciation
-        this._displayObject = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
+        this._video = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
     }
 
     // At this point, source.url is either a streaming address, a simple
     // url, or an array of url
-    this._displayObject.load(this._source.url);
+    this._video.load(this._source.url);
 
-    this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
-    this._displayObject.onPlay.add(this._onPlayHandler, this);
-    this._displayObject.onPause.add(this._onPauseHandler, this);
-    this._displayObject.onSeeked.add(this._onSeekedHandler, this);
-    this._displayObject.onEnded.add(this._onEndedHandler, this);
+    this._video.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
+    this._video.onPlay.add(this._onPlayHandler, this);
+    this._video.onPause.add(this._onPauseHandler, this);
+    this._video.onSeeked.add(this._onSeekedHandler, this);
+    this._video.onEnded.add(this._onEndedHandler, this);
 };
 
 /**
@@ -192,10 +202,10 @@ FORGE.MediaVideo.prototype.load = function()
  */
 FORGE.MediaVideo.prototype.unload = function()
 {
-    if(this._displayObject !== null)
+    if(this._video !== null)
     {
-        this._displayObject.destroy();
-        this._displayObject = null;
+        this._video.destroy();
+        this._video = null;
     }
 
     if(this._texture !== null)
@@ -218,6 +228,36 @@ FORGE.MediaVideo.prototype.destroy = function()
 
     FORGE.Media.prototype.destroy.call(this);
 };
+
+/**
+ * Get the video
+ * @name FORGE.MediaVideo#video
+ * @type {FORGE.Image}
+ * @readonly
+ */
+Object.defineProperty(FORGE.MediaVideo.prototype, "video",
+{
+    /** @this {FORGE.MediaImage} */
+    get: function()
+    {
+        return this._video;
+    }
+});
+
+/**
+ * Get the displayObject
+ * @name FORGE.MediaVideo#displayObject
+ * @type {FORGE.VideoBase}
+ * @readonly
+ */
+Object.defineProperty(FORGE.MediaVideo.prototype, "displayObject",
+{
+    /** @this {FORGE.MediaImage} */
+    get: function()
+    {
+        return this._video;
+    }
+});
 
 /**
  * Get the texture
