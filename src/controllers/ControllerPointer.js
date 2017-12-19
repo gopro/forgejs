@@ -484,14 +484,20 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
 
     if(this._zoom.toPointer === true)
     {
-        var screen = FORGE.Pointer.getRelativeMousePosition(event.data);
-        var stw0 = this._viewer.view.screenToWorld(screen);
+        var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
+        var viewportPosition = this._viewer.story.scene.viewportManager.getRelativeMousePosition(screenPosition);
+        if (viewportPosition === null)
+        {
+            return;
+        }
+
+        var stw0 = this._viewer.view.screenToWorld(viewportPosition);
         var spherical0 = FORGE.Math.cartesianToSpherical(stw0.x, stw0.y, stw0.z);
         var quat0 = FORGE.Quaternion.fromEuler(spherical0.theta, spherical0.phi, 0);
 
         this._viewer.view.current.updateUniforms();
 
-        var stw1 = this._viewer.view.screenToWorld(screen);
+        var stw1 = this._viewer.view.screenToWorld(viewportPosition);
         var spherical1 = FORGE.Math.cartesianToSpherical(stw1.x, stw1.y, stw1.z);
         var quat1 = FORGE.Quaternion.fromEuler(spherical1.theta, spherical1.phi, 0);
 

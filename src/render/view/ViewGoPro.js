@@ -153,7 +153,7 @@ FORGE.ViewGoPro.prototype.worldToScreen = function(worldPt, parallaxFactor)
  */
 FORGE.ViewGoPro.prototype.screenToWorld = function(screenPt)
 {
-    var resolution = this._viewer.renderer.displayResolution;
+    var resolution = this._getResolution();
 
     screenPt = screenPt || new THREE.Vector2(resolution.width / 2, resolution.height / 2);
 

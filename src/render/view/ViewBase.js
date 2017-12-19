@@ -149,6 +149,17 @@ FORGE.ViewBase.prototype._boot = function()
 };
 
 /**
+ * Get resolution.
+ * @method FORGE.ViewBase#_getResolution
+ * @return {FORGE.Size} viewport resolution
+ * @private
+ */
+FORGE.ViewBase.prototype._getResolution = function()
+{
+    return this._viewManager.sceneRenderer.viewport.size;
+};
+
+/**
  * Compute fragment from a screen point.
  *
  * @method FORGE.ViewBase#_screenToFragment
@@ -158,7 +169,7 @@ FORGE.ViewBase.prototype._boot = function()
  */
 FORGE.ViewBase.prototype._screenToFragment = function(screenPt)
 {
-    var resolution = this._viewManager.sceneRenderer.viewport.size;
+    var resolution = this._getResolution();
     var fx = (2.0 * screenPt.x / resolution.width) - 1.0;
     var fy = (2.0 * screenPt.y / resolution.height) - 1.0;
     return new THREE.Vector2(fx * resolution.ratio, fy);
@@ -174,7 +185,7 @@ FORGE.ViewBase.prototype._screenToFragment = function(screenPt)
  */
 FORGE.ViewBase.prototype._fragmentToScreen = function(fragment)
 {
-    var resolution = this._viewManager.sceneRenderer.viewport.size;
+    var resolution = this._getResolution();
     var sx = ((fragment.x / resolution.ratio) + 1.0) * (resolution.width / 2.0);
     var sy = (fragment.y + 1.0) * (resolution.height / 2.0);
     return new THREE.Vector2(Math.round(sx), resolution.height - Math.round(sy));

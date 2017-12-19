@@ -1403,7 +1403,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "view",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return undefined;//this._sceneRenderer.view;
+        return this._story.scene.activeViewport.sceneRenderer.view;
     }
 });
 
