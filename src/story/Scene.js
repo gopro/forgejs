@@ -170,17 +170,6 @@ FORGE.Scene = function(viewer)
      */
     this._onTransitionCreate = null;
 
-<<<<<<< HEAD
-=======
-    /**
-     * Active viewport change event dispatcher.
-     * @name  FORGE.Scene#_onActiveViewportChange
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onActiveViewportChange = null;
-
->>>>>>> origin/rroux-media-manager-merge
     FORGE.BaseObject.call(this, "Scene");
 };
 
@@ -1020,27 +1009,4 @@ Object.defineProperty(FORGE.Scene.prototype, "onTransitionCreate",
         return this._onTransitionCreate;
     }
 });
-<<<<<<< HEAD
-=======
 
-/**
- * Get the onActiveViewportChange {@link FORGE.EventDispatcher}.
- * @name  FORGE.Scene#onActiveViewportChange
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.Scene.prototype, "onActiveViewportChange",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        if (this._onActiveViewportChange === null)
-        {
-            this._onActiveViewportChange = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onActiveViewportChange;
-    }
-});
-
->>>>>>> origin/rroux-media-manager-merge
