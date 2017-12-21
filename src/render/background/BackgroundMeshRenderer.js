@@ -12,6 +12,7 @@ FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer)
 {
     /**
      * The mesh (cube) the video is on.
+     * @name FORGE.BackgroundMeshRenderer#_mesh
      * @type {THREE.Mesh}
      * @private
      */
@@ -19,6 +20,7 @@ FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer)
 
     /**
      * The size of the mesh.
+     * @name FORGE.BackgroundMeshRenderer#_size
      * @type {number}
      * @private
      */
@@ -28,6 +30,7 @@ FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer)
      * The number of subdivision of a face, per direction. For example, if the
      * subdivision is 4, the cube would be composed of 4 * 4 quads per face (in
      * reality it is 4 * 4 * 2 triangles).
+     * @name FORGE.BackgroundMeshRenderer#_subdivision
      * @type {number}
      * @private
      */

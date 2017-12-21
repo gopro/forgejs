@@ -12,6 +12,7 @@ FORGE.BackgroundPlaneRenderer = function(viewer, sceneRenderer)
 {
     /**
      * The size of the mesh.
+     * @name FORGE.BackgroundPlaneRenderer#_size
      * @type {number}
      * @private
      */
@@ -19,6 +20,7 @@ FORGE.BackgroundPlaneRenderer = function(viewer, sceneRenderer)
 
     /**
      * Media vertical fov (radians)
+     * @name FORGE.BackgroundPlaneRenderer#_mediaVFov
      * @type {number}
      * @private
      */

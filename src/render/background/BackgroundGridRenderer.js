@@ -12,6 +12,7 @@ FORGE.BackgroundGridRenderer = function(viewer, sceneRenderer)
 {
     /**
      * Grid color
+     * @name FORGE.BackgroundGridRenderer#_gridColor
      * @type {string}
      * @private
      */
@@ -19,6 +20,7 @@ FORGE.BackgroundGridRenderer = function(viewer, sceneRenderer)
 
     /**
      * Background color
+     * @name FORGE.BackgroundGridRenderer#_backgroundColor
      * @type {string}
      * @private
      */

@@ -14,6 +14,7 @@ FORGE.BackgroundCubeRenderer = function(viewer, sceneRenderer)
      * The layout of the faces in the texture. There are six faces to specify:
      * Right (R), Left (L), Up (U), Down (D), Front (F), Back (B). The default
      * layout is the Facebook one, with RLUDFB.
+     * @name FORGE.BackgroundCubeRenderer#_order
      * @type {string}
      * @private
      */
@@ -21,6 +22,7 @@ FORGE.BackgroundCubeRenderer = function(viewer, sceneRenderer)
 
     /**
      * The size of a tile (width = height)
+     * @name FORGE.BackgroundCubeRenderer#_tile
      * @type {number}
      * @private
      */
@@ -28,6 +30,7 @@ FORGE.BackgroundCubeRenderer = function(viewer, sceneRenderer)
 
     /**
      * The number of horizontal faces and vertical ones in the media.
+     * @name FORGE.BackgroundCubeRenderer#_faces
      * @type {THREE.Vector2}
      * @private
      */

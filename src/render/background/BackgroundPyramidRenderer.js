@@ -12,6 +12,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 {
     /**
      * Current level of the pyramid
+     * @name FORGE.BackgroundPyramidRenderer#_level
      * @type {number}
      * @private
      */
@@ -19,6 +20,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * The size of the cube.
+     * @name FORGE.BackgroundPyramidRenderer#_size
      * @type {number}
      * @private
      */
@@ -26,6 +28,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * Texture store
+     * @name FORGE.BackgroundPyramidRenderer#_textureStore
      * @type {?FORGE.MediaStore}
      * @private
      */
@@ -33,6 +36,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * Cache of tiles
+     * @name FORGE.BackgroundPyramidRenderer#_tileCache
      * @type {?Object}
      * @private
      */
@@ -40,6 +44,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * Number of pixels at current level
+     * @name FORGE.BackgroundPyramidRenderer#_levelPixels
      * @type {number}
      * @private
      */
@@ -47,6 +52,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * Minimum fov computed with max level
+     * @name FORGE.BackgroundPyramidRenderer#_fovMin
      * @type {number}
      * @private
      */
@@ -54,6 +60,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * Number of tiles for all levels
+     * @name FORGE.BackgroundPyramidRenderer#_tilesLevel
      * @type {Array<TilesOnLevel>}
      * @private
      */
@@ -61,6 +68,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * List of renderered tiles
+     * @name FORGE.BackgroundPyramidRenderer#_renderList
      * @type {?Array<FORGE.Tile>}
      * @private
      */
@@ -68,6 +76,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * List of tiles in renderered tiles neighborhood
+     * @name FORGE.BackgroundPyramidRenderer#_renderNeighborList
      * @type {?Array<FORGE.Tile>}
      * @private
      */
@@ -75,6 +84,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * Enable tile clearing policy
+     * @name FORGE.BackgroundPyramidRenderer#_clearTilesEnabled
      * @type {boolean}
      * @private
      */
@@ -82,6 +92,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 
     /**
      * Number of pixels at current level presented in human readable format
+     * @name FORGE.BackgroundPyramidRenderer#_levelPixelsHumanReadable
      * @type {string}
      * @private
      */

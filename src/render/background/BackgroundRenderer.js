@@ -77,6 +77,7 @@ FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
     /**
      * Media format (cubemap, equirectangular, flat)
      * Default: equirectangular
+     * @name FORGE.BackgroundRenderer#_mediaFormat
      * @type {string}
      * @private
      */
