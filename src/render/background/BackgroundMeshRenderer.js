@@ -3,12 +3,12 @@
  * BackgroundMeshRenderer class.
  *
  * @constructor FORGE.BackgroundMeshRenderer
- * @extends {FORGE.BackgroundTextureRenderer}
- *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {string=} className - The class name of the object as long as many other object inherits from this one.
+ * @extends {FORGE.BackgroundRenderer}
  */
-FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer)
+FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer, className)
 {
     /**
      * The mesh (cube) the video is on.
@@ -17,6 +17,14 @@ FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer)
      * @private
      */
     this._mesh = null;
+
+    /**
+     * Texture used for video rendering
+     * @name FORGE.BackgroundMeshRenderer#_texture
+     * @type {THREE.Texture}
+     * @private
+     */
+    this._texture = null;
 
     /**
      * The size of the mesh.
@@ -36,10 +44,14 @@ FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer)
      */
     this._subdivision = 8;
 
+<<<<<<< 27229739a415173a4fab6de5441fb141ef06b512
     FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundMeshRenderer");
+=======
+    FORGE.BackgroundRenderer.call(this, sceneRenderer, className || "BackgroundMeshRenderer");
+>>>>>>> Remove BackgroundTextureRenderer WIP
 };
 
-FORGE.BackgroundMeshRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);
+FORGE.BackgroundMeshRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
 FORGE.BackgroundMeshRenderer.prototype.constructor = FORGE.BackgroundMeshRenderer;
 
 /**
@@ -55,7 +67,9 @@ FORGE.BackgroundMeshRenderer.DEFAULT_TEXTURE_NAME = "Default Texture";
  */
 FORGE.BackgroundMeshRenderer.prototype._boot = function()
 {
-    FORGE.BackgroundTextureRenderer.prototype._boot.call(this);
+    FORGE.BackgroundRenderer.prototype._boot.call(this);
+
+    this._texture = this._media.texture.texture;
 
     if (typeof this._config.source !== "undefined")
     {
@@ -75,7 +89,6 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
     this._createMesh();
     this._onMeshCreated();
 
-    this._createTexture();
     this._onTextureCreated();
 
     this._sceneRenderer.view.onChange.add(this._onViewChanged, this);
@@ -211,7 +224,7 @@ FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
         uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
     }
 
-    FORGE.BackgroundTextureRenderer.prototype.render.call(this, webGLRenderer, target);
+    FORGE.BackgroundRenderer.prototype.render.call(this, webGLRenderer, target);
 };
 
 /**
@@ -230,5 +243,5 @@ FORGE.BackgroundMeshRenderer.prototype.destroy = function()
         this._mesh = null;
     }
 
-    FORGE.BackgroundTextureRenderer.prototype.destroy.call(this);
+    FORGE.BackgroundRenderer.prototype.destroy.call(this);
 };
