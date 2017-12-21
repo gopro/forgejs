@@ -254,7 +254,7 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
             // Flat media format (beware: flat view is another thing)
             else if (media.source.format === FORGE.MediaFormat.FLAT)
             {
-                backgroundRendererRef = FORGE.BackgroundPlaneRenderer;
+                backgroundRendererRef = FORGE.BackgroundShaderRenderer;
             }
 
             // Cube: mesh with cube geometry
