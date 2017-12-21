@@ -25,9 +25,3 @@ FORGE.MediaFormat.CUBE = "cube";
  */
 FORGE.MediaFormat.FLAT = "flat";
 
-/**
- * @name FORGE.MediaFormat.HOTSPOT
- * @type {string}
- * @const
- */
-FORGE.MediaFormat.HOTSPOT = "hotspot";
