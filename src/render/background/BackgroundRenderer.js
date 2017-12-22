@@ -101,6 +101,7 @@ FORGE.BackgroundRenderer.prototype._boot = function()
     this._scene = new THREE.Scene();
     this._scene.name = "Background scene";
 
+    // Debug for the three.js inspector browser extension.
     if (FORGE.BackgroundRenderer.DEBUG === true)
     {
         window.scene = this._scene;
