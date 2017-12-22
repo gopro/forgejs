@@ -110,7 +110,6 @@ FORGE.Scene = function(viewer)
      */
     this._mediaUid = "";
 
-    this._transition = null;
 
     /**
      * The scene render target (texture)
@@ -321,25 +320,14 @@ FORGE.Scene.prototype._createViewports = function(config)
     this._viewports = new FORGE.SceneViewportManager(this._viewer, this);
 };
 
-FORGE.Scene.prototype._createTransition = function(transition)
 /**
  * Media load compelte handler
  * @method FORGE.Scene._mediaLoadCompleteHandler
  */
 FORGE.Scene.prototype._mediaLoadCompleteHandler = function()
 {
-    this.log("create transition");
-
-    if(this._transition === null)
-    {
-        // this._transition = new FORGE.Media(this._viewer, transition);
     this.media.onLoadComplete.remove(this._mediaLoadCompleteHandler, this);
 
-        if(this.onTransitionCreate !== null)
-        {
-            this.onTransitionCreate.dispatch({ media: this._transition });
-        }
-    }
     this._viewportManager.notifyMediaLoadComplete();
 };
 
@@ -401,7 +389,6 @@ FORGE.Scene.prototype.loadStart = function(time)
     // Trigger the media load
     this.media.load(this._mediaUid);
 
-    this._createTransition(this._config.transition);
     this._createViewports(this._config);
 
     if (this._onLoadStart !== null)
@@ -445,9 +432,6 @@ FORGE.Scene.prototype.unload = function()
     {
         this._events.onUnloadStart.dispatch();
     }
-
-    this._transition.destroy();
-    this._transition = null;
 
     this._viewer.media.unload(this._mediaUid);
 
@@ -588,12 +572,6 @@ FORGE.Scene.prototype.destroy = function()
 
     this._viewports.destroy();
     this._viewports = null;
-
-    if (this._transition !== null)
-    {
-        this._transition.destroy();
-        this._transition = null;
-    }
 
     if (this._onLoadStart !== null)
     {
@@ -864,21 +842,6 @@ Object.defineProperty(FORGE.Scene.prototype, "renderTarget",
     get: function()
     {
         return this._renderTarget;
-    }
-});
-
-/**
- * Get the scene transition.
- * @name  FORGE.Scene#transition
- * @readonly
- * @type {FORGE.Media}
- */
-Object.defineProperty(FORGE.Scene.prototype, "transition",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        return this._transition;
     }
 });
 
