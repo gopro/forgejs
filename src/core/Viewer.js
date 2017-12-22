@@ -1418,7 +1418,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "fxs",
 /**
  * Get the viewer render manager.
  * @name FORGE.Viewer#renderer
- * @type {FORGE.SceneRenderer}
+ * @type {FORGE.Renderer}
  * @readonly
  */
 Object.defineProperty(FORGE.Viewer.prototype, "renderer",
