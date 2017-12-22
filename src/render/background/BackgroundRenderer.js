@@ -3,7 +3,7 @@
  * BackgroundRenderer class.
  *
  * @constructor FORGE.BackgroundRenderer
- * 
+ *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  * @param {string=} className - The className of the object as long as many other object inherits from this one.
@@ -18,7 +18,7 @@ FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
      * @private
      */
     this._viewer = viewer;
-    
+
     /**
      * The scene renderer reference.
      * @name FORGE.BackgroundRenderer#_sceneRenderer

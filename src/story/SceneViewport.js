@@ -68,7 +68,7 @@ FORGE.SceneViewport.prototype.constructor = FORGE.SceneViewport;
  * @private
  */
 FORGE.SceneViewport.prototype._boot = function()
-{   
+{
     var w = (this._config.viewport.width / 100) * this._viewer.width;
     var h = (this._config.viewport.height / 100) * this._viewer.height;
     var x = (this._config.viewport.x / 100) * this._viewer.width;
@@ -97,6 +97,14 @@ FORGE.SceneViewport.prototype._boot = function()
 };
 
 /**
+ * @method FORGE.SceneViewport#notifyMediaLoadComplete
+ */
+FORGE.SceneViewport.prototype.notifyMediaLoadComplete = function()
+{
+    this._sceneRenderer.notifyMediaLoadComplete();
+};
+
+/**
  * Update viewport.
  * @method FORGE.SceneRenderer#updateWithRect
  * @param {FORGE.Rectangle} viewport - new viewport
@@ -120,7 +128,7 @@ FORGE.SceneViewport.prototype.render = function()
     if (typeof target !== "undefined" && target !== null)
     {
         target.viewport.set(this._viewport.x, this._viewport.y, this._viewport.width, this._viewport.height);
-        target.scissor.set( this._viewport.x, this._viewport.y, this._viewport.width, this._viewport.height);
+        target.scissor.set(this._viewport.x, this._viewport.y, this._viewport.width, this._viewport.height);
         target.scissorTest = true ;
     }
 
@@ -141,7 +149,7 @@ FORGE.SceneViewport.prototype.destroy = function()
     if (this._sceneRenderer !== null)
     {
         this._sceneRenderer.destroy();
-        this._sceneRenderer = null;        
+        this._sceneRenderer = null;
     }
 
     this._fx = null;

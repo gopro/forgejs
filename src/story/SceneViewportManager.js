@@ -124,7 +124,7 @@ FORGE.SceneViewportManager.prototype._parseConfig = function(config)
             viewportConfig.vr = false;
             var viewport = new FORGE.SceneViewport(this._viewer, this._scene, viewportConfig);
             this._viewports.push(viewport);
-        }        
+        }
     }
 };
 
@@ -162,7 +162,7 @@ FORGE.SceneViewportManager.prototype._renewActiveViewport = function(event)
 
     if (this._onActiveViewportChange !== null)
     {
-        this._onActiveViewportChange.dispatch();   
+        this._onActiveViewportChange.dispatch();
     }
 };
 
@@ -196,15 +196,30 @@ FORGE.SceneViewportManager.prototype._setupVRViewports = function(config)
 };
 
 /**
+ * @method FORGE.SceneViewportManager#notifyMediaLoadComplete
+ */
+FORGE.SceneViewportManager.prototype.notifyMediaLoadComplete = function()
+{
+    var viewports = this._viewer.renderer.vr === true ? this._vrViewports : this._viewports;
+
+    for(var i = 0, ii = viewports.length; i < ii; i++)
+    {
+        viewports[i].notifyMediaLoadComplete();
+    }
+};
+
+/**
  * Render routine.
  * @method FORGE.SceneViewportManager#render
  */
 FORGE.SceneViewportManager.prototype.render = function()
 {
-    var viewports = this._viewer.vr === true ? this._vrViewports : this._viewports;
-    viewports.forEach(function(viewport) {
-        viewport.render();
-    });
+    var viewports = this._viewer.renderer.vr === true ? this._vrViewports : this._viewports;
+
+    for(var i = 0, ii = viewports.length; i < ii; i++)
+    {
+        viewports[i].render();
+    }
 };
 
 /**
@@ -242,7 +257,7 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
     if (this._onActiveViewportChange !== null)
     {
         this._onActiveViewportChange.destroy();
-        this._onActiveViewportChange = null;        
+        this._onActiveViewportChange = null;
     }
 
     this._viewports.forEach(function(viewport) {

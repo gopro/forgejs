@@ -67,7 +67,7 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
      * @private
      */
     this._viewManager = null;
-    
+
     /**
      * Scene effect Composer.
      * @name FORGE.SceneRenderer#_composer
@@ -99,7 +99,8 @@ FORGE.SceneRenderer.prototype.constructor = FORGE.SceneRenderer;
  */
 FORGE.SceneRenderer.prototype._boot = function()
 {
-    if (this._scene.media === null) {
+    if (this._scene.media === null)
+    {
         this.warn("Scene has no media. This should not happen.");
         return;
     }
@@ -108,8 +109,6 @@ FORGE.SceneRenderer.prototype._boot = function()
     this._createCamera();
     this._createObjectRenderer();
     this._createComposer();
-
-    this._scene.media.onLoadComplete.add(this._createBackgroundRenderer, this);
 };
 
 /**
@@ -143,6 +142,16 @@ FORGE.SceneRenderer.prototype._createComposer = function()
     this._composerTexture.name = "Viewport-EffectComposer-Target-in-" + this._sceneViewport.uid;
 
     this._composer = new FORGE.SceneEffectComposer(this._viewer, this._composerTexture, this._scene.renderTarget, this._sceneViewport.fx);
+};
+
+/**
+ * Media load complete handler
+ * @method FORGE.SceneRenderer#_onMediaLoadComplete
+ * @private
+ */
+FORGE.SceneRenderer.prototype.notifyMediaLoadComplete = function()
+{
+    this._createBackgroundRenderer();
 };
 
 /**
@@ -212,9 +221,7 @@ FORGE.SceneRenderer.prototype._createObjectRenderer = function()
  */
 FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
 {
-    this._scene.media.onLoadComplete.remove(this._createBackgroundRenderer, this);
-
-    var media = event.emitter;
+    var media = this._scene.media;
     var backgroundRendererRef;
 
     if (media.type === FORGE.MediaType.UNDEFINED)
@@ -301,7 +308,7 @@ FORGE.SceneRenderer.prototype.setView = function(config)
 FORGE.SceneRenderer.prototype.render = function()
 {
     this._camera.update();
-    
+
     if (this._backgroundRenderer === null)
     {
         return;

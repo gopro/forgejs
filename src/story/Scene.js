@@ -322,18 +322,25 @@ FORGE.Scene.prototype._createViewports = function(config)
 };
 
 FORGE.Scene.prototype._createTransition = function(transition)
+/**
+ * Media load compelte handler
+ * @method FORGE.Scene._mediaLoadCompleteHandler
+ */
+FORGE.Scene.prototype._mediaLoadCompleteHandler = function()
 {
     this.log("create transition");
 
     if(this._transition === null)
     {
         // this._transition = new FORGE.Media(this._viewer, transition);
+    this.media.onLoadComplete.remove(this._mediaLoadCompleteHandler, this);
 
         if(this.onTransitionCreate !== null)
         {
             this.onTransitionCreate.dispatch({ media: this._transition });
         }
     }
+    this._viewportManager.notifyMediaLoadComplete();
 };
 
 /**
@@ -387,8 +394,12 @@ FORGE.Scene.prototype.loadStart = function(time)
         this._config.media.options.startTime = time;
     }
 
+    // Add the media to the manager and get its uid
     this._mediaUid = this._viewer.media.add(this._config.media);
-    this._viewer.media.load(this._mediaUid);
+    // Listen to the media load compelte event
+    this.media.onLoadComplete.add(this._mediaLoadCompleteHandler, this);
+    // Trigger the media load
+    this.media.load(this._mediaUid);
 
     this._createTransition(this._config.transition);
     this._createViewports(this._config);
