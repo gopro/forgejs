@@ -653,3 +653,30 @@ FORGE.Utils.watchObjectProperty = function(object, property, timeout, interval) 
     });
 };
 
+/**
+ * Dispose THREE.Mesh object.
+ * @method FORGE.Utils#destroyMesh
+ */
+FORGE.Utils.destroyMesh = function(mesh)
+{
+    if (mesh.material !== null)
+    {
+        if (typeof mesh.material.map !== "undefined" && mesh.material.map instanceof THREE.Texture)
+        {
+            mesh.material.map.dispose();
+            mesh.material.map = null;
+        }
+
+        mesh.material.dispose();
+        mesh.material = null;
+    }
+
+    if (mesh.geometry !== null)
+    {
+        mesh.geometry.dispose();
+        mesh.geometry = null;
+    }
+};
+
+
+
