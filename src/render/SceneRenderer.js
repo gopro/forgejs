@@ -355,6 +355,8 @@ FORGE.SceneRenderer.prototype.destroy = function()
         this._objectRenderer.destroy();
         this._objectRenderer = null;
     }
+
+    FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**

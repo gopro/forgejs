@@ -121,4 +121,11 @@ FORGE.SceneEffectComposer.prototype.destroy = function()
     this._mainComposer.passes.length = 0;
     this._mainComposer.copyPass = null;
     this._mainComposer = null;
+
+    this._viewer = null;
+    this._texture = null;
+    this._target = null;
+    this._fx = null;
+
+    FORGE.BaseObject.prototype.destroy.call(this);
 };

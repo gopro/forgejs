@@ -148,6 +148,8 @@ FORGE.SceneViewport.prototype.destroy = function()
     this._viewport = null;
     this._scene = null;
     this._viewer = null;
+
+    FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**

@@ -259,6 +259,8 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
 
     this._viewer = null;
     this._scene = null;
+
+    FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**
