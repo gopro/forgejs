@@ -359,16 +359,6 @@ FORGE.Story.prototype._addScene = function(scene)
 };
 
 /**
- * Handler for the onBackgroundReady event of the FORGE.Scene that is being loaded.
- * @method FORGE.Story#_backgroundReadyHandler
- * @private
- */
-FORGE.Story.prototype._backgroundReadyHandler = function()
-{
-    this._viewer.renderer.pickingManager.start();
-};
-
-/**
  * Internal envent handler for scene load request.
  * @method FORGE.Story#_sceneLoadRequestHandler
  * @param  {FORGE.Event} event - The {@link FORGE.Event} emitted by the scene that its load method is requested.
@@ -641,12 +631,6 @@ FORGE.Story.prototype.loadScene = function(value)
     //If uid is defined and if it's not the current scene
     if(typeof uid !== "undefined" && uid !== this._sceneUid)
     {
-        // Disable picking while the scene is loading
-        this._viewer.renderer.pickingManager.stop();
-
-        // Read it when the background is ready again
-        this._viewer.renderer.onBackgroundReady.addOnce(this._backgroundReadyHandler, this);
-
         this._loadUid(uid);
     }
 };
