@@ -5,9 +5,10 @@
  * @constructor FORGE.BackgroundMeshRenderer
  * @extends {FORGE.BackgroundTextureRenderer}
  *
+ * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  */
-FORGE.BackgroundMeshRenderer = function(sceneRenderer)
+FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer)
 {
     /**
      * The mesh (cube) the video is on.
@@ -32,7 +33,7 @@ FORGE.BackgroundMeshRenderer = function(sceneRenderer)
      */
     this._subdivision = 8;
 
-    FORGE.BackgroundTextureRenderer.call(this, sceneRenderer, "BackgroundMeshRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundMeshRenderer");
 };
 
 FORGE.BackgroundMeshRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);
@@ -161,7 +162,7 @@ FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
     if (this._mesh !== null)
     {
         this._scene.remove(this._mesh);
-        this._disposeMesh(this._mesh);
+        FORGE.Utils.destroyMesh(this._mesh);
     }
 
     var geometry = this._createGeometry();
@@ -171,33 +172,6 @@ FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
 
     this._scene.add(this._mesh);
 };
-
-/**
- * Dispose current mesh.
- * @method FORGE.BackgroundMeshRenderer#_disposeMesh
- * @private
- */
-FORGE.BackgroundMeshRenderer.prototype._disposeMesh = function(mesh)
-{
-    if (mesh.material !== null)
-    {
-        if (typeof mesh.material.map !== "undefined" && mesh.material.map instanceof THREE.Texture)
-        {
-            mesh.material.map.dispose();
-            mesh.material.map = null;
-        }
-
-        mesh.material.dispose();
-        mesh.material = null;
-    }
-
-    if (mesh.geometry !== null)
-    {
-        mesh.geometry.dispose();
-        mesh.geometry = null;
-    }
-};
-
 
 /**
  * Render routine.
@@ -249,7 +223,7 @@ FORGE.BackgroundMeshRenderer.prototype.destroy = function()
     if (this._mesh !== null)
     {
         this._scene.remove(this._mesh);
-        this._disposeMesh(this._mesh);
+        FORGE.Utils.destroyMesh(this._mesh);
         this._mesh = null;
     }
 

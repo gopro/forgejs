@@ -5,9 +5,10 @@
  * @constructor FORGE.BackgroundPyramidRenderer
  * @extends {FORGE.BackgroundRenderer}
  *
+ * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  */
-FORGE.BackgroundPyramidRenderer = function(sceneRenderer)
+FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
 {
     /**
      * Current level of the pyramid
@@ -86,7 +87,7 @@ FORGE.BackgroundPyramidRenderer = function(sceneRenderer)
      */
     this._levelPixelsHumanReadable = "";
 
-    FORGE.BackgroundRenderer.call(this, sceneRenderer, "BackgroundPyramidRenderer");
+    FORGE.BackgroundRenderer.call(this, viewer, sceneRenderer, "BackgroundPyramidRenderer");
 };
 
 FORGE.BackgroundPyramidRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);

@@ -3,11 +3,13 @@
  * BackgroundTextureRenderer class.
  *
  * @constructor FORGE.BackgroundTextureRenderer
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
- * @param {string=} type - The type of the object as long as many other object inherits from this one.
+ * 
  * @extends {FORGE.BackgroundRenderer}
+ *
+ * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
+ * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  */
-FORGE.BackgroundTextureRenderer = function(sceneRenderer, type)
+FORGE.BackgroundTextureRenderer = function(viewer, sceneRenderer, type)
 {
     /**
      * Texture used for video rendering
@@ -17,7 +19,7 @@ FORGE.BackgroundTextureRenderer = function(sceneRenderer, type)
     this._texture = null;
 
 
-    FORGE.BackgroundRenderer.call(this, sceneRenderer, type || "BackgroundTextureRenderer");
+    FORGE.BackgroundRenderer.call(this, viewer, sceneRenderer, type || "BackgroundTextureRenderer");
 };
 
 FORGE.BackgroundTextureRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);

@@ -67,6 +67,22 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
      * @private
      */
     this._viewManager = null;
+    
+    /**
+     * Scene effect Composer.
+     * @name FORGE.SceneRenderer#_composer
+     * @type {FORGE.SceneEffectComposer}
+     * @private
+     */
+    this._composer = null;
+
+    /**
+     * Composer input texture.
+     * @name FORGE.SceneRenderer#_viewManager
+     * @type {FORGE.ViewManager}
+     * @private
+     */
+    this._composerTexture = null;
 
     FORGE.BaseObject.call(this, "SceneRenderer");
 
@@ -75,7 +91,6 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
 
 FORGE.SceneRenderer.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.SceneRenderer.prototype.constructor = FORGE.SceneRenderer;
-
 
 /**
  * Boot sequence.
@@ -92,17 +107,42 @@ FORGE.SceneRenderer.prototype._boot = function()
     this._createViewManager();
     this._createCamera();
     this._createObjectRenderer();
+    this._createComposer();
 
     this._scene.media.onLoadComplete.add(this._createBackgroundRenderer, this);
 };
 
 /**
- * Media load complete handler
- * @method FORGE.SceneRenderer#_createCamera
+ * Create composer and render texture
+ * @method FORGE.SceneRenderer#_createComposer
  * @private
  */
-FORGE.SceneRenderer.prototype._onMediaLoadComplete = function()
+FORGE.SceneRenderer.prototype._createComposer = function()
 {
+    if (this._sceneViewport.fx.length === 0)
+    {
+        return;
+    }
+
+    if (this._composerTexture !== null)
+    {
+        this._composerTexture.dispose();
+        this._composerTexture = null;
+    }
+
+    var rtParams =
+    {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBFormat,
+        stencilBuffer: false
+    };
+
+    // TODO : renderer should expose scene size for each frame, it could change during transitions
+    this._composerTexture = new THREE.WebGLRenderTarget(this._sceneViewport.size.width, this._sceneViewport.size.height, rtParams);
+    this._composerTexture.name = "Viewport-EffectComposer-Target-in-" + this._sceneViewport.uid;
+
+    this._composer = new FORGE.SceneEffectComposer(this._viewer, this._composerTexture, this._scene.renderTarget, this._sceneViewport.fx);
 };
 
 /**
@@ -227,7 +267,7 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
         }
     }
 
-    this._backgroundRenderer = new backgroundRendererRef(this);
+    this._backgroundRenderer = new backgroundRendererRef(this._viewer, this);
 };
 
 /**
@@ -257,10 +297,8 @@ FORGE.SceneRenderer.prototype.setView = function(config)
 /**
  * Render routine.
  * @method FORGE.SceneRenderer#render
- * @param {THREE.WebGLRenderer} webGLRenderer
- * @param {THREE.WebGLRenderTarget} target
  */
-FORGE.SceneRenderer.prototype.render = function(webGLRenderer, target)
+FORGE.SceneRenderer.prototype.render = function()
 {
     this._camera.update();
     
@@ -269,14 +307,20 @@ FORGE.SceneRenderer.prototype.render = function(webGLRenderer, target)
         return;
     }
 
-    this._backgroundRenderer.render(webGLRenderer, target);
+    if (this._viewportComposer === null)
+    {
+        this._backgroundRenderer.render(this._scene.renderTarget);
+    }
+    else
+    {
+        this._backgroundRenderer.render(this._composerTexture);
+        this._composer.render();
+    }
+
 
     // This is pure nonsense !! RenderPipeline renders all render passes...
     // The object renderer should have done its job before to prepare the textures
     // this._objectRenderer.render();
-
-    // Get background and foreground textures and call pipeline render routine
-    // this._pipeline.render();
 };
 
 /**
@@ -287,6 +331,12 @@ FORGE.SceneRenderer.prototype.destroy = function()
 {
     this._config = null;
     this._viewer = null;
+
+    if (this._composer !== null)
+    {
+        this._composer.destroy();
+        this._composer = null;
+    }
 
     if (this._viewManager !== null)
     {

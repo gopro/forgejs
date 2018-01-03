@@ -198,14 +198,12 @@ FORGE.SceneViewportManager.prototype._setupVRViewports = function(config)
 /**
  * Render routine.
  * @method FORGE.SceneViewportManager#render
- * @param {THREE.WebGLRenderer} webGLRenderer - WebGL renderer
- * @param {THREE.WebGLRenderTarget} target - target texture
  */
-FORGE.SceneViewportManager.prototype.render = function(webGLRenderer, target)
+FORGE.SceneViewportManager.prototype.render = function()
 {
-    var viewports = this._viewer.renderer.vr === true ? this._vrViewports : this._viewports;
+    var viewports = this._viewer.vr === true ? this._vrViewports : this._viewports;
     viewports.forEach(function(viewport) {
-        viewport.render(webGLRenderer, target);
+        viewport.render();
     });
 };
 
@@ -264,12 +262,27 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
 };
 
 /**
- * Get the current active viewport.
- * @name FORGE.SceneViewportManager#activeViewport
+ * Get the viewport list
+ * @name  FORGE.SceneViewportManager#all
+ * @readonly
+ * @type {Array<FORGE.SceneViewport>}
+ */
+Object.defineProperty(FORGE.SceneViewportManager.prototype, "all",
+{
+    /** @this {FORGE.SceneViewportManager} */
+    get: function()
+    {
+        return this._viewer.vr === true ? this._vrViewports : this._viewports;
+    }
+});
+
+/**
+ * Get the current active.
+ * @name FORGE.SceneViewportManager#active
  * @type {FORGE.SceneViewport}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewportManager.prototype, "activeViewport",
+Object.defineProperty(FORGE.SceneViewportManager.prototype, "active",
 {
     /** @this {FORGE.SceneViewportManager} */
     get: function()
@@ -313,3 +326,4 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "onActiveViewportCha
         return this._onActiveViewportChange;
     }
 });
+

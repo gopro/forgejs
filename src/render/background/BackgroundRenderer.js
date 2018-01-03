@@ -3,12 +3,22 @@
  * BackgroundRenderer class.
  *
  * @constructor FORGE.BackgroundRenderer
+ * 
+ * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  * @param {string=} className - The className of the object as long as many other object inherits from this one.
  * @extends {FORGE.BaseObject}
  */
-FORGE.BackgroundRenderer = function(sceneRenderer, className)
+FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
 {
+    /**
+     * The viewer reference.
+     * @name FORGE.BackgroundRenderer#_viewer
+     * @type {FORGE.Viewer}
+     * @private
+     */
+    this._viewer = viewer;
+    
     /**
      * The scene renderer reference.
      * @name FORGE.BackgroundRenderer#_sceneRenderer
@@ -148,11 +158,10 @@ FORGE.BackgroundRenderer.prototype.isObjectInScene = function(object)
 
 /**
  * Render routine.
- * @param {THREE.WebGLRenderer} webGLRenderer THREE WebGL renderer
  * @param {THREE.WebGLRenderTarget} target WebGL render target
  * @method FORGE.BackgroundRenderer#render
  */
-FORGE.BackgroundRenderer.prototype.render = function(webGLRenderer, target)
+FORGE.BackgroundRenderer.prototype.render = function(target)
 {
     if (typeof this._mesh !== "undefined")
     {
@@ -179,7 +188,7 @@ FORGE.BackgroundRenderer.prototype.render = function(webGLRenderer, target)
 
     this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this._camera.projectionMatrix, this._camera.matrixWorldInverse ) );
 
-    webGLRenderer.render(this._scene, this._camera, target, false);
+    this._viewer.renderer.webGLRenderer.render(this._scene, this._camera, target, false);
 };
 
 /**

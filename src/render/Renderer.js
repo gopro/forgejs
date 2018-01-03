@@ -215,7 +215,7 @@ FORGE.Renderer.prototype.render = function()
 
     // Ask current scene (and transition if any) to render
     // They will change the renderer viewport, we'll set it back once it's done
-    currentScene.render(this._webGLRenderer);
+    currentScene.render();
 
     // Assign textures from the scene and render the whole scene
     this._quad.material.uniforms.tTexture1.value = currentScene.renderTarget;
@@ -292,17 +292,17 @@ FORGE.Renderer.prototype.destroy = function()
 };
 
 /**
- * Get viewer.
- * @name FORGE.Renderer#viewer
- * @type {FORGE.Viewer}
+ * Get the WebGL renderer.
+ * @name FORGE.Renderer#webGLRenderer
+ * @type {THREE.WebGLRenderer}
  * @readonly
  */
-Object.defineProperty(FORGE.Renderer.prototype, "viewer",
+Object.defineProperty(FORGE.Renderer.prototype, "webGLRenderer",
 {
     /** @this {FORGE.Renderer} */
     get: function()
     {
-        return this._viewer;
+        return this._webGLRenderer;
     }
 });
 

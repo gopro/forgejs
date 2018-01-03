@@ -41,6 +41,12 @@ FORGE.SceneViewport = function(viewer, scene, config)
     this._viewport = null;
 
     /**
+     * FX Pipeline definition
+     * @type {Array<string>}
+     */
+    this._fx = null;
+
+    /**
      * The scene renderer.
      * @name FORGE.SceneViewport#_sceneRenderer
      * @type {FORGE.SceneRenderer}
@@ -69,6 +75,24 @@ FORGE.SceneViewport.prototype._boot = function()
     var y = ((100 - this._config.viewport.y) / 100) * this._viewer.height - h;
 
     this._viewport = new FORGE.Rectangle(x, y, w, h);
+
+    this._uid = this._config.uid;
+    this._register();
+
+    this._fx = [];
+    if (typeof this._config.fx !== "undefined")
+    {
+        this._fx = this._config.fx;
+    }
+    else if (typeof this._scene.config.fx !== "undefined")
+    {
+        this._fx = this._scene.config.fx;
+    }
+    else if (typeof this._viewer.story.config.fx !== "undefined")
+    {
+        this._fx = this._viewer.story.config.fx;
+    }
+
     this._sceneRenderer = new FORGE.SceneRenderer(this._viewer, this._scene, this);
 };
 
@@ -86,10 +110,13 @@ FORGE.SceneViewport.prototype.updateWithRect = function(viewport)
  * Render routine.
  * @method FORGE.SceneRenderer#render
  * @param {THREE.WebGLRenderer} webGLRenderer
- * @param {THREE.WebGLRenderTarget} target
  */
-FORGE.SceneViewport.prototype.render = function(webGLRenderer, target)
+FORGE.SceneViewport.prototype.render = function()
 {   
+    var target = this._scene.renderTarget;
+
+    // this._viewer.renderer.webGLRenderer.setRenderTarget(target);
+
     if (typeof target !== "undefined" && target !== null)
     {
         target.viewport.set(this._viewport.x, this._viewport.y, this._viewport.width, this._viewport.height);
@@ -99,10 +126,10 @@ FORGE.SceneViewport.prototype.render = function(webGLRenderer, target)
 
     if (typeof this._config.background !== undefined)
     {
-        webGLRenderer.setClearColor(new THREE.Color(this._config.background));
+        this._viewer.renderer.webGLRenderer.setClearColor(new THREE.Color(this._config.background));
     }
 
-    this._sceneRenderer.render(webGLRenderer, target);
+    this._sceneRenderer.render(target);
 };
 
 /**
@@ -117,6 +144,7 @@ FORGE.SceneViewport.prototype.destroy = function()
         this._sceneRenderer = null;        
     }
 
+    this._fx = null;
     this._viewport = null;
     this._scene = null;
     this._viewer = null;
@@ -134,6 +162,21 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "config",
     get: function()
     {
         return this._config;
+    }
+});
+
+/**
+ * Get the FX pipeline definition
+ * @name  FORGE.SceneViewport#fx
+ * @readonly
+ * @type {Array<string>}
+ */
+Object.defineProperty(FORGE.SceneViewport.prototype, "fx",
+{
+    /** @this {FORGE.SceneViewport} */
+    get: function()
+    {
+        return this._fx;
     }
 });
 

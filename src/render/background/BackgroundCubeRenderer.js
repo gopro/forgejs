@@ -5,9 +5,10 @@
  * @constructor FORGE.BackgroundCubeRenderer
  * @extends {FORGE.BackgroundMeshRenderer}
  *
+ * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  */
-FORGE.BackgroundCubeRenderer = function(sceneRenderer)
+FORGE.BackgroundCubeRenderer = function(viewer, sceneRenderer)
 {
     /**
      * The layout of the faces in the texture. There are six faces to specify:
@@ -32,7 +33,7 @@ FORGE.BackgroundCubeRenderer = function(sceneRenderer)
      */
     this._faces = new THREE.Vector2(0, 0);
 
-    FORGE.BackgroundMeshRenderer.call(this, sceneRenderer, "BackgroundCubeRenderer");
+    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundCubeRenderer");
 };
 
 FORGE.BackgroundCubeRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);

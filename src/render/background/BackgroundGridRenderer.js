@@ -5,9 +5,10 @@
  * @constructor FORGE.BackgroundGridRenderer
  * @extends {FORGE.BackgroundMeshRenderer}
  *
+ * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  */
-FORGE.BackgroundGridRenderer = function(sceneRenderer)
+FORGE.BackgroundGridRenderer = function(viewer, sceneRenderer)
 {
     /**
      * Grid color
@@ -23,7 +24,7 @@ FORGE.BackgroundGridRenderer = function(sceneRenderer)
      */
     this._backgroundColor = "#202040";
 
-    FORGE.BackgroundMeshRenderer.call(this, sceneRenderer, "BackgroundGridRenderer");
+    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundGridRenderer");
 };
 
 FORGE.BackgroundGridRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);

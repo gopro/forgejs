@@ -115,6 +115,14 @@ FORGE.Scene = function(viewer)
     this._renderTarget = null;
 
     /**
+     * FX manager.
+     * @name  FORGE.Viewer#_fxs
+     * @type {FORGE.FXManager}
+     * @private
+     */
+    this._fxs = null;
+
+    /**
      * Load request event dispatcher.
      * @name  FORGE.Scene#_onLoadRequest
      * @type {FORGE.EventDispatcher}
@@ -302,6 +310,8 @@ FORGE.Scene.prototype._createViewports = function(config)
 
     // TODO : renderer should expose scene size for each frame, it could change during transitions
     this._renderTarget = new THREE.WebGLRenderTarget(this._viewer.width, this._viewer.height, rtParams);
+
+    this._renderTarget.name = "Scene-Target-" + this._name.value;
     this._viewportManager = new FORGE.SceneViewportManager(this._viewer, this);
 };
 
@@ -537,9 +547,9 @@ FORGE.Scene.prototype.isAmbisonic = function()
  * @method FORGE.Scene#render
  * @private
  */
-FORGE.Scene.prototype.render = function(webGLRenderer)
+FORGE.Scene.prototype.render = function()
 {
-    this._viewportManager.render(webGLRenderer, this._renderTarget);
+    this._viewportManager.render();
 };
 
 /**
@@ -1009,4 +1019,5 @@ Object.defineProperty(FORGE.Scene.prototype, "onTransitionCreate",
         return this._onTransitionCreate;
     }
 });
+
 

@@ -1,46 +1,36 @@
 /**
- * Used to feed time to shader when uniform is declared
+ * Shader Pass for FX rendering
  *
  * @constructor FORGE.ShaderPass
- * @param {string} uid unique identifier
- * @param {string} type shader type
  * @param {Object} shader shader object
  * @param {string=} textureID uniform texture string identifier
  * @extends {THREE.ShaderPass}
  */
-FORGE.ShaderPass = function(uid, type, shader, textureID)
+FORGE.ShaderPass = function(shader, textureID)
 {
     /**
-     * Unique id
-     * @name FORGE.ShaderPass#_uid
-     * @type {string}
-     * @private
-     */
-    this._uid = uid;
-
-    /**
-     * Shader pass type.
-     * @name FORGE.ShaderPass#_type
-     * @type {string}
-     * @private
-     */
-    this._type = type || "shader";
-
-    /**
-     * Rendering position.
-     * @name FORGE.ShaderPass#_position
-     * @type {string}
-     * @private
-     */
-    this._position = FORGE.PassPosition.UNKNOWN;
-
-    /**
-     * Sum of clock deltas.
-     * @name FORGE.ShaderPass#_deltaSum
+     * Current time computed by accumultating render delta
+     * @name FORGE.ShaderPass#_time
      * @type {number}
      * @private
      */
-    this._deltaSum = 0;
+    this._time = 0;
+
+    /**
+     * Bypass flag
+     * @name FORGE.ShaderPass#_bypass
+     * @type {boolean}
+     * @private
+     */
+    this._bypass = false;
+
+    /**
+     * Copy pass
+     * @name FORGE.ShaderPass#_copyPass
+     * @type {THREE.Pass}
+     * @private
+     */
+    this._copyPass = new THREE.ShaderPass(THREE.CopyShader);
 
     THREE.ShaderPass.call(this, shader, textureID || "tDiffuse");
 };
@@ -58,60 +48,59 @@ FORGE.ShaderPass.prototype.constructor = FORGE.ShaderPass;
  */
 FORGE.ShaderPass.prototype.render = function(renderer, writeBuffer, readBuffer, delta, maskActive)
 {
-    this._deltaSum += delta;
+    this._time += delta;
 
-    if (this.uniforms.hasOwnProperty("time"))
+    if ("time" in this.uniforms)
     {
-        this.uniforms["time"].value = this._deltaSum;
+        this.uniforms["time"].value = this._time;
     }
 
-    THREE.ShaderPass.prototype.render.call(this, renderer, writeBuffer, readBuffer, delta, maskActive);
+    if (this._bypass)
+    {
+        this._copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
+    }
+    else
+    {
+        THREE.ShaderPass.prototype.render.call(this, renderer, writeBuffer, readBuffer, delta, maskActive);
+    }
 };
 
 /**
- * Get ShaderPass uid
- * @name FORGE.ShaderPass#uid
- * @type {string}
+ * Destroy sequence
+ * @method FORGE.ShaderPass#destroy
  */
-Object.defineProperty(FORGE.ShaderPass.prototype, "uid",
+FORGE.ShaderPass.prototype.destroy = function()
 {
-    /** @this {FORGE.ShaderPass} */
-    get: function()
-    {
-        return this._uid;
-    }
-});
+    this.textureID = null;
+    
+    this._copyPass = null;
+
+    this.scene.remove(this.quad);
+    this.scene = null;
+
+    FORGE.Utils.destroyMesh(this.quad);
+    
+    this.material = null;
+    this.uniforms = null;
+    this.camera = null;
+};
 
 /**
- * Get ShaderPass type
- * @name FORGE.ShaderPass#type
- * @type {string}
+ * Get/Set the bypass flag.
+ * @name FORGE.FX#bypass
+ * @type {boolean}
  */
-Object.defineProperty(FORGE.ShaderPass.prototype, "type",
+Object.defineProperty(FORGE.ShaderPass.prototype, "bypass",
 {
-    /** @this {FORGE.ShaderPass} */
+    /** @this {FORGE.FX} */
     get: function()
     {
-        return this._type;
-    }
-});
-
-/**
- * Get ShaderPass position
- * @name FORGE.ShaderPass#position
- * @type {string}
- */
-Object.defineProperty(FORGE.ShaderPass.prototype, "position",
-{
-    /** @this {FORGE.ShaderPass} */
-    get: function()
-    {
-        return this._position;
+        return this._bypass;
     },
 
-    /** @this {FORGE.ShaderPass} */
-    set: function(position)
+    /** @this {FORGE.FX} */
+    set: function(value)
     {
-        this._position = position;
+        this._bypass = value;
     }
 });

@@ -5,12 +5,12 @@
  * @constructor FORGE.BackgroundShaderRenderer
  * @extends {FORGE.BackgroundMeshRenderer}
  *
+ * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
- * @extends {FORGE.BackgroundRenderer}
  */
-FORGE.BackgroundShaderRenderer = function(sceneRenderer)
+FORGE.BackgroundShaderRenderer = function(viewer, sceneRenderer)
 {
-    FORGE.BackgroundMeshRenderer.call(this, sceneRenderer, "BackgroundShaderRenderer");
+    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundShaderRenderer");
 };
 
 FORGE.BackgroundShaderRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);

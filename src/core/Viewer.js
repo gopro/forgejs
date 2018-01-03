@@ -159,21 +159,12 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._controllers = null;
 
     /**
-     * Post processing.
-     * @name  FORGE.Viewer#_postProcessing
-     * @type {FORGE.PostProcessing}
-     * @private
-     */
-    this._postProcessing = null;
-
-    /**
      * Story reference.
      * @name FORGE.Viewer#_story
      * @type {FORGE.Story}
      * @private
      */
     this._story = null;
-
 
     /**
      * Media manager reference.
@@ -423,7 +414,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._hotspots = new FORGE.HotspotManager(this);
     this._actions = new FORGE.ActionManager(this);
     // this._director = new FORGE.Director(this);
-    this._postProcessing = new FORGE.PostProcessing(this);
+    this._fxs = new FORGE.FXManager(this);
 
     this._keyboard = new FORGE.Keyboard(this);
     this._gyroscope = new FORGE.Gyroscope(this);
@@ -532,6 +523,11 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
         this._actions.addConfig(config.actions);
     }
 
+    if (typeof config.fx !== "undefined")
+    {
+        this._fxs.addConfig(config.fx);
+    }
+
     if (typeof config.director !== "undefined")
     {
         this._director.load(config.director);
@@ -540,11 +536,6 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
     if (typeof config.hotspots !== "undefined")
     {
         this._hotspots.addTracks(config.hotspots);
-    }
-
-    if (typeof config.postProcessing !== "undefined")
-    {
-        this._postProcessing.addConfig(config.postProcessing);
     }
 
     // if (typeof config.plugins !== "undefined")
@@ -896,12 +887,6 @@ FORGE.Viewer.prototype.destroy = function()
         this._container = null;
     }
 
-    if(this._postProcessing !== null)
-    {
-        this._postProcessing.destroy();
-        this._postProcessing = null;
-    }
-
     if(this._actions !== null)
     {
         this._actions.destroy();
@@ -954,6 +939,12 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._i18n.destroy();
         this._i18n = null;
+    }
+
+    if(this._fxs !== null)
+    {
+        this._fxs.destroy();
+        this._fxs = null;
     }
 
     this._parent = null;
@@ -1410,6 +1401,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "i18n",
 });
 
 /**
+ * Get the FX Manager object.
+ * @name FORGE.Viewer#fxs
+ * @type {FORGE.FXManager}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "fxs",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._fxs;
+    }
+});
+
+/**
  * Get the viewer render manager.
  * @name FORGE.Viewer#renderer
  * @type {FORGE.SceneRenderer}
@@ -1435,7 +1441,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "view",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._story.scene.activeViewport.sceneRenderer.view;
+        return this._story.scene.viewportManager.active.sceneRenderer.view;
     }
 });
 
@@ -1450,7 +1456,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "camera",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._story.scene.activeViewport.sceneRenderer.camera;
+        return this._story.scene.viewportManager.active.sceneRenderer.camera;
     }
 });
 
@@ -1466,21 +1472,6 @@ Object.defineProperty(FORGE.Viewer.prototype, "controllers",
     get: function()
     {
         return this._controllers;
-    }
-});
-
-/**
- * Get the postProcessing object.
- * @name FORGE.Viewer#postProcessing
- * @type {FORGE.PostProcessing}
- * @readonly
- */
-Object.defineProperty(FORGE.Viewer.prototype, "postProcessing",
-{
-    /** @this {FORGE.Viewer} */
-    get: function()
-    {
-        return this._postProcessing;
     }
 });
 

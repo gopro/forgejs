@@ -5,9 +5,10 @@
  * @constructor FORGE.BackgroundPlaneRenderer
  * @extends {FORGE.BackgroundMeshRenderer}
  *
+ * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  */
-FORGE.BackgroundPlaneRenderer = function(sceneRenderer)
+FORGE.BackgroundPlaneRenderer = function(viewer, sceneRenderer)
 {
     /**
      * The size of the mesh.
@@ -23,7 +24,7 @@ FORGE.BackgroundPlaneRenderer = function(sceneRenderer)
      */
     this._mediaVFov = 90;
 
-    FORGE.BackgroundMeshRenderer.call(this, sceneRenderer, "BackgroundPlaneRenderer");
+    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundPlaneRenderer");
 };
 
 FORGE.BackgroundPlaneRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
