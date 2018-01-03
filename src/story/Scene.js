@@ -16,11 +16,11 @@ FORGE.Scene = function(viewer)
 
     /**
      * Scene viewports manager.
-     * @name FORGE.Scene#_viewportManager
+     * @name FORGE.Scene#_viewports
      * @type {FORGE.SceneViewportManager}
      * @private
      */
-    this._viewportManager = null;
+    this._viewports = null;
 
     /**
      * The scene config object.
@@ -112,6 +112,12 @@ FORGE.Scene = function(viewer)
 
     this._transition = null;
 
+    /**
+     * The scene render target (texture)
+     * @name FORGE.Scene#_renderTarget
+     * @type {THREE.WebGLRenderTarget}
+     * @private
+     */
     this._renderTarget = null;
 
     /**
@@ -310,9 +316,9 @@ FORGE.Scene.prototype._createViewports = function(config)
 
     // TODO : renderer should expose scene size for each frame, it could change during transitions
     this._renderTarget = new THREE.WebGLRenderTarget(this._viewer.width, this._viewer.height, rtParams);
-
     this._renderTarget.name = "Scene-Target-" + this._name.value;
-    this._viewportManager = new FORGE.SceneViewportManager(this._viewer, this);
+
+    this._viewports = new FORGE.SceneViewportManager(this._viewer, this);
 };
 
 FORGE.Scene.prototype._createTransition = function(transition)
@@ -549,7 +555,7 @@ FORGE.Scene.prototype.isAmbisonic = function()
  */
 FORGE.Scene.prototype.render = function()
 {
-    this._viewportManager.render();
+    this._viewports.render();
 };
 
 /**
@@ -569,8 +575,8 @@ FORGE.Scene.prototype.destroy = function()
     this._description.destroy();
     this._description = null;
 
-    this._viewportManager.destroy();
-    this._viewportManager = null;
+    this._viewports.destroy();
+    this._viewports = null;
 
     if (this._transition !== null)
     {
@@ -679,7 +685,7 @@ Object.defineProperty(FORGE.Scene.prototype, "activeViewport",
     /** @this {FORGE.Scene} */
     get: function()
     {
-        return this._viewportManager.activeViewport;
+        return this._viewports.active;
     }
 });
 
@@ -815,7 +821,7 @@ Object.defineProperty(FORGE.Scene.prototype, "viewportManager",
     /** @this {FORGE.Scene} */
     get: function()
     {
-        return this._viewportManager;
+        return this._viewports;
     }
 });
 

@@ -10,11 +10,19 @@ FORGE.FXManager = function(viewer)
 {
     /**
      * The viewer reference.
-     * @name FORGE.PostProcessing#_viewer
+     * @name FORGE.FXManager#_viewer
      * @type {FORGE.Viewer}
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * The FX list.
+     * @name FORGE.FXManager#_fxs
+     * @type {Array<string>}
+     * @private
+     */
+    this._fxs = null;
 
     FORGE.BaseObject.call(this, "FXManager");
 
@@ -31,7 +39,7 @@ FORGE.FXManager.prototype.constructor = FORGE.FXManager;
  */
 FORGE.FXManager.prototype._boot = function()
 {
-    this._fxList = [];
+    this._fxs = [];
 };
 
 /**
@@ -60,7 +68,7 @@ FORGE.FXManager.prototype.addConfig = function(config)
             continue;
         }
 
-        this._fxList.push(fx);
+        this._fxs.push(fx);
     }
 };
 
@@ -82,13 +90,13 @@ FORGE.FXManager.prototype.destroy = function()
 {
     this._config = null;
 
-    while (this._fxList.length > 0)
+    while (this._fxs.length > 0)
     {
-        var fx = this._fxList.pop();
+        var fx = this._fxs.pop();
         fx.destroy();
     }
 
-    this._fxList = null;
+    this._fxs = null;
 };
 
 /**
@@ -101,6 +109,6 @@ Object.defineProperty(FORGE.FXManager.prototype, "all",
     /** @this {FORGE.FXManager} */
     get: function()
     {
-        return this._fxList;
+        return this._fxs;
     }
 });
