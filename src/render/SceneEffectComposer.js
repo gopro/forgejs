@@ -46,12 +46,20 @@ FORGE.SceneEffectComposer = function(viewer, texture, target, fx)
     this._fx = fx;
 
     /**
-     * Effect composer
-     * @name FORGE.SceneEffectComposer#_composer
+     * Effect composer rendering into viewport textures.
+     * @name FORGE.SceneEffectComposer#_viewportComposer
      * @type {THREE.EffectComposer}
      * @private
      */
-    this._composer = null;
+    this._viewportComposer = null;
+
+    /**
+     * Effect composer rendering viewport into the target.
+     * @name FORGE.SceneEffectComposer#_mainComposer
+     * @type {THREE.EffectComposer}
+     * @private
+     */
+    this._mainComposer = null;
 
     FORGE.BaseObject.call(this, "SceneEffectComposer");
 
@@ -71,32 +79,46 @@ FORGE.SceneEffectComposer.prototype._boot = function()
     var outTexture = this._texture.clone();
     outTexture.name += "-output";
 
-    this._composer = new THREE.EffectComposer(this._viewer.renderer.webGLRenderer, this._target);
-    this._composer.addPass(new THREE.TexturePass(this._texture));
+    this._viewportComposer = new THREE.EffectComposer(this._viewer.renderer.webGLRenderer, outTexture);
+    this._viewportComposer.addPass(new THREE.TexturePass(this._texture));
 
     for (var i=0, ii=this._fx.length; i<ii; i++)
     {
         var pass = this._viewer.fxs.getFXPassByUID(this._fx[i]);
-        this._composer.addPass(pass);
+        this._viewportComposer.addPass(pass);
     }
 
     // Add a final copy pass to ensure composer always ends up rendering in its write buffer
-    this._composer.addPass(new THREE.ShaderPass(THREE.CopyShader));
+    this._viewportComposer.addPass(new THREE.ShaderPass(THREE.CopyShader));
+
+    this._mainComposer = new THREE.EffectComposer(this._viewer.renderer.webGLRenderer, this._target);
+    this._mainComposer.addPass(new THREE.TexturePass(outTexture));
+    this._mainComposer.addPass(new THREE.ShaderPass(THREE.CopyShader));
 };
 
 FORGE.SceneEffectComposer.prototype.render = function()
 {
-    this._composer.render(this._viewer.clock.deltaTime);
+    this._viewportComposer.render(this._viewer.clock.deltaTime);
+    this._mainComposer.render();
 };
 
 FORGE.SceneEffectComposer.prototype.destroy = function()
 {
-    this._composer.renderer = null;
-    this._composer.writeBuffer.dispose();
-    this._composer.readBuffer.dispose();
-    this._composer.renderTarget1 = null;
-    this._composer.renderTarget2 = null;
-    this._composer.passes.length = 0;
-    this._composer.copyPass = null;
-    this._composer = null;
+    this._viewportComposer.renderer = null;
+    this._viewportComposer.writeBuffer.dispose();
+    this._viewportComposer.readBuffer.dispose();
+    this._viewportComposer.renderTarget1 = null;
+    this._viewportComposer.renderTarget2 = null;
+    this._viewportComposer.passes.length = 0;
+    this._viewportComposer.copyPass = null;
+    this._viewportComposer = null;
+
+    this._mainComposer.renderer = null;
+    this._mainComposer.writeBuffer.dispose();
+    this._mainComposer.readBuffer.dispose();
+    this._mainComposer.renderTarget1 = null;
+    this._mainComposer.renderTarget2 = null;
+    this._mainComposer.passes.length = 0;
+    this._mainComposer.copyPass = null;
+    this._mainComposer = null;
 };
