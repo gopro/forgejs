@@ -129,7 +129,6 @@ FORGE.Media.prototype._parseConfig = function(config)
 {
     this._config = /** @type {SceneMediaConfig} */ (FORGE.Utils.extendSimpleObject(FORGE.Media.DEFAULT_CONFIG, config));
 
-    // Warning : UID is not registered and applied to the FORGE.Image|FORGE.VideoHTML5|FORGE.VideoDash objects for registration
     this._uid = this._config.uid;
     this._type = this._config.type;
     this._preview = (typeof this._config.preview !== "undefined") ? this._config.preview : null;

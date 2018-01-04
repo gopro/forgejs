@@ -70,7 +70,7 @@ FORGE.MediaTexture.prototype.constructor = FORGE.MediaTexture;
  */
 FORGE.MediaTexture.prototype._boot = function()
 {
-    this._size = new FORGE.Size(this._displayObject.width, this._displayObject.height);
+    this._size = new FORGE.Size(this._displayObject.canvas.width, this._displayObject.canvas.height);
     this._pixels = this._size.width * this._size.height;
 
     this._texture = new THREE.Texture();
