@@ -657,28 +657,8 @@ FORGE.Camera.prototype._setYaw = function(value, unit)
     // Convert value in radians for clamp if unit is in degrees.
     value = (unit === FORGE.Math.DEGREES) ? FORGE.Math.degToRad(value) : value;
 
-    // Wrap the value between -PI and +PI, except for FLAT view where we apply texture ratio
-    if (this._sceneRenderer.view.type === FORGE.ViewType.FLAT)
-    {
-        if (this._sceneRenderer.media.loaded === false)
-        {
-            return false;
-        }
-        
-        var displayObject = this._sceneRenderer.media.displayObject;
-        var ratio = displayObject.pixelWidth / displayObject.pixelHeight;
-
-        if (displayObject.element instanceof HTMLVideoElement)
-        {
-            ratio = displayObject.element.videoWidth / displayObject.element.videoHeight;
-        }
-
-        value = FORGE.Math.wrap(value, -Math.PI * ratio, Math.PI * ratio);
-    }
-    else
-    {
-        value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
-    }
+    // Wrap the value between -PI and +PI
+    value = FORGE.Math.wrap(value, -Math.PI, Math.PI);
 
     var boundaries = this._getYawBoundaries();
 
