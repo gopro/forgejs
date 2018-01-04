@@ -28,6 +28,13 @@ FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
     this._sceneRenderer = sceneRenderer;
 
     /**
+     * @name FORGE.BackgroundRenderer#_scene
+     * @type {THREE.Scene}
+     * @private
+     */
+    this._scene = null;
+
+    /**
      * Background rendering media object
      * @name FORGE.BackgroundRenderer#_media
      * @type {FORGE.Media}
@@ -51,13 +58,6 @@ FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
      */
     this._frustum = null;
 
-    /**
-     * @name FORGE.BackgroundRenderer#_scene
-     * @type {THREE.Scene}
-     * @private
-     */
-    this._scene = null;
-
     FORGE.BaseObject.call(this, className || "BackgroundRenderer");
 
     this._boot();
@@ -74,7 +74,7 @@ FORGE.BackgroundRenderer.prototype.constructor = FORGE.BackgroundRenderer;
 FORGE.BackgroundRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
-    this._scene.name = "Background scene";
+    this._scene.name = "BackgroundRenderer";
 
     // Debug for the three.js inspector browser extension.
     if (FORGE.BackgroundRenderer.DEBUG === true)
@@ -82,11 +82,11 @@ FORGE.BackgroundRenderer.prototype._boot = function()
         window.scene = this._scene;
     }
 
+    this._media = this._sceneRenderer.media;
+
     this._camera = this._sceneRenderer.camera.main;
 
     this._frustum = new THREE.Frustum();
-
-    this._media = this._sceneRenderer.media;
 };
 
 /**
@@ -116,7 +116,7 @@ FORGE.BackgroundRenderer.prototype.isObjectInFrustum = function(object)
  */
 FORGE.BackgroundRenderer.prototype.isObjectInScene = function(object)
 {
-    return this._scene.getObjectByName(object.name) !== undefined;
+    return typeof this._scene.getObjectByName(object.name) !== "undefined";
 };
 
 /**
@@ -137,13 +137,8 @@ FORGE.BackgroundRenderer.prototype.render = function(target)
  */
 FORGE.BackgroundRenderer.prototype.destroy = function()
 {
-    if (this._renderTarget !== null)
-    {
-        this._renderTarget.dispose();
-        this._renderTarget = null;
-    }
-
     this._scene = null;
+    this._media = null;
     this._camera = null;
     this._frustum = null;
 
@@ -151,7 +146,7 @@ FORGE.BackgroundRenderer.prototype.destroy = function()
 };
 
 /**
- * Get background scene.
+ * Get background threejs scene.
  * @name FORGE.BackgroundRenderer#scene
  * @type {THREE.Scene}
  */
@@ -165,7 +160,7 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "scene",
 });
 
 /**
- * Get camera frustum.
+ * Get camera threejs frustum.
  * @name FORGE.BackgroundRenderer#frustum
  * @type {THREE.Frustum}
  */
