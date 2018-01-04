@@ -126,29 +126,6 @@ FORGE.BackgroundRenderer.prototype.isObjectInScene = function(object)
  */
 FORGE.BackgroundRenderer.prototype.render = function(target)
 {
-    if (typeof this._mesh !== "undefined")
-    {
-        // Update common shader material parameters
-        var uniforms = this._mesh.material.uniforms;
-
-        if ("tViewport" in uniforms)
-        {
-            uniforms.tViewport.value = this._getViewport().asVector;
-        }
-
-        if ("tViewportRatio" in uniforms)
-        {
-            uniforms.tViewportRatio.value = this._getViewport().size.ratio;
-        }
-
-        if ("tModelViewMatrixInverse" in uniforms)
-        {
-            uniforms.tModelViewMatrixInverse.value = this._sceneRenderer.camera.modelViewInverse;
-        }
-
-        this._sceneRenderer.view.current.updateUniforms(uniforms);
-    }
-
     this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this._camera.projectionMatrix, this._camera.matrixWorldInverse ) );
 
     this._viewer.renderer.webGLRenderer.render(this._scene, this._camera, target, false);

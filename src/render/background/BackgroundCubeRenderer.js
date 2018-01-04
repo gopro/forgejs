@@ -3,7 +3,7 @@
  * BackgroundCubeRenderer class.
  *
  * @constructor FORGE.BackgroundCubeRenderer
- * @extends {FORGE.BackgroundMeshRenderer}
+ * @extends {FORGE.BackgroundTextureRenderer}
  *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
@@ -36,10 +36,10 @@ FORGE.BackgroundCubeRenderer = function(viewer, sceneRenderer)
      */
     this._faces = new THREE.Vector2(0, 0);
 
-    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundCubeRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundCubeRenderer");
 };
 
-FORGE.BackgroundCubeRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
+FORGE.BackgroundCubeRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);
 FORGE.BackgroundCubeRenderer.prototype.constructor = FORGE.BackgroundCubeRenderer;
 
 /**
@@ -49,7 +49,7 @@ FORGE.BackgroundCubeRenderer.prototype.constructor = FORGE.BackgroundCubeRendere
  */
 FORGE.BackgroundCubeRenderer.prototype._boot = function()
 {
-    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+    FORGE.BackgroundTextureRenderer.prototype._boot.call(this);
 
     this._subdivision = 32;
 
@@ -179,7 +179,7 @@ FORGE.BackgroundCubeRenderer.prototype._onTextureCreated = function()
 
     this._mesh.geometry.attributes.uv.set(this._computeUVMap());
 
-    FORGE.BackgroundMeshRenderer.prototype._onTextureCreated.call(this);
+    FORGE.BackgroundTextureRenderer.prototype._onTextureCreated.call(this);
 };
 
 /**

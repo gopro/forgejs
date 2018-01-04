@@ -53,14 +53,15 @@ module.exports = function(grunt)
         "src/render/RenderDisplay.js",
         "src/render/RenderParams.js",
 
+        //Warning ! The order matter !
         "src/render/background/BackgroundRenderer.js",
-        "src/render/background/BackgroundTextureRenderer.js",
         "src/render/background/BackgroundMeshRenderer.js",
-        "src/render/background/BackgroundGridRenderer.js",
+        "src/render/background/BackgroundTextureRenderer.js",
         "src/render/background/BackgroundCubeRenderer.js",
         "src/render/background/BackgroundSphereRenderer.js",
         "src/render/background/BackgroundPlaneRenderer.js",
         "src/render/background/BackgroundShaderRenderer.js",
+        "src/render/background/BackgroundGridRenderer.js",
         "src/render/background/BackgroundPyramidRenderer.js",
 
         "src/render/postProcessing/FX.js",

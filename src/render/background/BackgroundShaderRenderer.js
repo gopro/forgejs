@@ -3,17 +3,17 @@
  * BackgroundShaderRenderer class.
  *
  * @constructor FORGE.BackgroundShaderRenderer
- * @extends {FORGE.BackgroundMeshRenderer}
+ * @extends {FORGE.BackgroundTextureRenderer}
  *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  */
 FORGE.BackgroundShaderRenderer = function(viewer, sceneRenderer)
 {
-    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundShaderRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundShaderRenderer");
 };
 
-FORGE.BackgroundShaderRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
+FORGE.BackgroundShaderRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);
 FORGE.BackgroundShaderRenderer.prototype.constructor = FORGE.BackgroundShaderRenderer;
 
 /**
@@ -23,7 +23,7 @@ FORGE.BackgroundShaderRenderer.prototype.constructor = FORGE.BackgroundShaderRen
  */
 FORGE.BackgroundShaderRenderer.prototype._boot = function()
 {
-    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+    FORGE.BackgroundTextureRenderer.prototype._boot.call(this);
 
     // Override camera with some orthographic for quad rendering
     this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
@@ -81,6 +81,6 @@ FORGE.BackgroundShaderRenderer.prototype.render = function(webGLRenderer, target
     // this._mesh.material.uniforms.tMixRatio.value = ramp;
     // this._mesh.material.uniforms.tTime.value = tn;
 
-    FORGE.BackgroundMeshRenderer.prototype.render.call(this, webGLRenderer, target);
+    FORGE.BackgroundTextureRenderer.prototype.render.call(this, webGLRenderer, target);
 };
 

@@ -10,10 +10,10 @@
  */
 FORGE.BackgroundSphereRenderer = function(viewer, sceneRenderer)
 {
-    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundSphereRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundSphereRenderer");
 };
 
-FORGE.BackgroundSphereRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
+FORGE.BackgroundSphereRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);
 FORGE.BackgroundSphereRenderer.prototype.constructor = FORGE.BackgroundSphereRenderer;
 
 /**
@@ -23,7 +23,7 @@ FORGE.BackgroundSphereRenderer.prototype.constructor = FORGE.BackgroundSphereRen
  */
 FORGE.BackgroundSphereRenderer.prototype._boot = function()
 {
-    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+    FORGE.BackgroundTextureRenderer.prototype._boot.call(this);
 
     this._subdivision = 64;
 

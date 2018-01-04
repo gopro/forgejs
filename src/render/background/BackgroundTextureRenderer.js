@@ -3,67 +3,87 @@
  * BackgroundTextureRenderer class.
  *
  * @constructor FORGE.BackgroundTextureRenderer
- * 
- * @extends {FORGE.BackgroundRenderer}
- *
+
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {string=} className - The class name of the object as long as many other object inherits from this one.
+ * @extends {FORGE.BackgroundRenderer}
  */
-FORGE.BackgroundTextureRenderer = function(viewer, sceneRenderer, type)
+FORGE.BackgroundTextureRenderer = function(viewer, sceneRenderer, className)
 {
     /**
      * Texture used for video rendering
+     * @name FORGE.BackgroundTextureRenderer#_texture
      * @type {THREE.Texture}
      * @private
      */
     this._texture = null;
 
+    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, className || "BackgroundTextureRenderer");
 
-    FORGE.BackgroundRenderer.call(this, viewer, sceneRenderer, type || "BackgroundTextureRenderer");
 };
 
-// FORGE.BackgroundTextureRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
-// FORGE.BackgroundTextureRenderer.prototype.constructor = FORGE.BackgroundTextureRenderer;
+FORGE.BackgroundTextureRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
+FORGE.BackgroundTextureRenderer.prototype.constructor = FORGE.BackgroundTextureRenderer;
 
-// /**
-//  * Init routine.
-//  * @method FORGE.BackgroundTextureRenderer#_boot
-//  * @private
-//  */
-// FORGE.BackgroundTextureRenderer.prototype._boot = function()
-// {
-//     FORGE.BackgroundRenderer.prototype._boot.call(this);
 
-//     this._texture = this._media.texture.texture;
-// };
+/**
+ * Init routine.
+ * @method FORGE.BackgroundTextureRenderer#_boot
+ * @private
+ */
+FORGE.BackgroundTextureRenderer.prototype._boot = function()
+{
+    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
 
-// *
-//  * Create texture
-//  * @method FORGE.BackgroundTextureRenderer#_createTexture
-//  * @private
+    this._texture = this._media.texture.texture;
+};
 
-// FORGE.BackgroundTextureRenderer.prototype._createTexture = function()
-// {
+/**
+ * Render routine.
+ * @param {THREE.WebGLRenderer} webGLRenderer THREE WebGL renderer
+ * @param {THREE.WebGLRenderTarget} target WebGL render target
+ * @method FORGE.BackgroundTextureRenderer#render
+ */
+FORGE.BackgroundTextureRenderer.prototype.render = function(webGLRenderer, target)
+{
+    var uniforms = this._mesh.material.uniforms;
 
-// };
+    if (typeof uniforms === "undefined")
+    {
+        return;
+    }
 
-// /**
-//  * Render routine.
-//  * @param {THREE.WebGLRenderer} webGLRenderer THREE WebGL renderer
-//  * @param {THREE.WebGLRenderTarget} target WebGL render target
-//  * @method FORGE.BackgroundTextureRenderer#render
-//  */
-// FORGE.BackgroundTextureRenderer.prototype.render = function(webGLRenderer, target)
-// {
-//     FORGE.BackgroundRenderer.prototype.render.call(this, webGLRenderer, target);
-// };
+    if ("tTexture" in uniforms)
+    {
+        uniforms.tTexture.value = this._texture;
+    }
 
-// /**
-//  * Destroy sequence.
-//  * @method FORGE.BackgroundTextureRenderer#destroy
-//  */
-// FORGE.BackgroundTextureRenderer.prototype.destroy = function()
-// {
-//     FORGE.BackgroundRenderer.prototype.destroy.call(this);
+    if ("tOpacity" in uniforms)
+    {
+        uniforms.tOpacity.value = 1.0;
+    }
 
-// };
+    if ("tTexture" in uniforms)
+    {
+        uniforms.tTexture.value = this._texture;
+    }
+
+    if ("tTextureRatio" in uniforms)
+    {
+        uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
+    }
+
+    FORGE.BackgroundMeshRenderer.prototype.render.call(this, webGLRenderer, target);
+};
+
+/**
+ * Destroy sequence.
+ * @method FORGE.BackgroundTextureRenderer#destroy
+ */
+FORGE.BackgroundTextureRenderer.prototype.destroy = function()
+{
+    this._texture = null;
+
+    FORGE.BackgroundMeshRenderer.prototype.destroy.call(this);
+};

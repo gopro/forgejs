@@ -3,7 +3,7 @@
  * BackgroundPlaneRenderer class.
  *
  * @constructor FORGE.BackgroundPlaneRenderer
- * @extends {FORGE.BackgroundMeshRenderer}
+ * @extends {FORGE.BackgroundTextureRenderer}
  *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
@@ -26,10 +26,10 @@ FORGE.BackgroundPlaneRenderer = function(viewer, sceneRenderer)
      */
     this._mediaVFov = 90;
 
-    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundPlaneRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundPlaneRenderer");
 };
 
-FORGE.BackgroundPlaneRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
+FORGE.BackgroundPlaneRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);
 FORGE.BackgroundPlaneRenderer.prototype.constructor = FORGE.BackgroundPlaneRenderer;
 
 /**
@@ -39,7 +39,7 @@ FORGE.BackgroundPlaneRenderer.prototype.constructor = FORGE.BackgroundPlaneRende
  */
 FORGE.BackgroundPlaneRenderer.prototype._boot = function()
 {
-    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+    FORGE.BackgroundTextureRenderer.prototype._boot.call(this);
 
     // @todo No verticalFov on media root config, need to clarify this. Certainly in options but not in reference ...
     // if (typeof this._config.verticalFov !== "undefined")

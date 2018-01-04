@@ -19,14 +19,6 @@ FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer, className)
     this._mesh = null;
 
     /**
-     * Texture used for video rendering
-     * @name FORGE.BackgroundMeshRenderer#_texture
-     * @type {THREE.Texture}
-     * @private
-     */
-    this._texture = null;
-
-    /**
      * The size of the mesh.
      * @name FORGE.BackgroundMeshRenderer#_size
      * @type {number}
@@ -68,9 +60,6 @@ FORGE.BackgroundMeshRenderer.DEFAULT_TEXTURE_NAME = "Default Texture";
 FORGE.BackgroundMeshRenderer.prototype._boot = function()
 {
     FORGE.BackgroundRenderer.prototype._boot.call(this);
-
-    this._texture = this._media.texture.texture;
-
 
     this._sceneRenderer.view.onChange.add(this._onViewChanged, this);
 
@@ -201,32 +190,26 @@ FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
  */
 FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
 {
+
+    // Update common shader material parameters
     var uniforms = this._mesh.material.uniforms;
 
-    if (typeof uniforms === "undefined")
+    if ("tViewport" in uniforms)
     {
-        return;
+        uniforms.tViewport.value = this._getViewport().asVector;
     }
 
-    if ("tTexture" in uniforms)
+    if ("tViewportRatio" in uniforms)
     {
-        uniforms.tTexture.value = this._texture;
+        uniforms.tViewportRatio.value = this._getViewport().size.ratio;
     }
 
-    if ("tOpacity" in uniforms)
+    if ("tModelViewMatrixInverse" in uniforms)
     {
-        uniforms.tOpacity.value = 1.0;
+        uniforms.tModelViewMatrixInverse.value = this._sceneRenderer.camera.modelViewInverse;
     }
 
-    if ("tTexture" in uniforms)
-    {
-        uniforms.tTexture.value = this._texture;
-    }
-
-    if ("tTextureRatio" in uniforms)
-    {
-        uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
-    }
+    this._sceneRenderer.view.current.updateUniforms(uniforms);
 
     FORGE.BackgroundRenderer.prototype.render.call(this, webGLRenderer, target);
 };
