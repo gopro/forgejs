@@ -382,14 +382,14 @@ FORGE.Scene.prototype.loadStart = function(time)
         this._config.media.options.startTime = time;
     }
 
+    this._createViewports(this._config);
+
     // Add the media to the manager and get its uid
     this._mediaUid = this._viewer.media.add(this._config.media);
     // Listen to the media load compelte event
     this.media.onLoadComplete.add(this._mediaLoadCompleteHandler, this);
     // Trigger the media load
     this.media.load(this._mediaUid);
-
-    this._createViewports(this._config);
 
     if (this._onLoadStart !== null)
     {
