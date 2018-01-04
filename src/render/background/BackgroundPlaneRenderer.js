@@ -39,12 +39,15 @@ FORGE.BackgroundPlaneRenderer.prototype.constructor = FORGE.BackgroundPlaneRende
  */
 FORGE.BackgroundPlaneRenderer.prototype._boot = function()
 {
-    if (typeof this._config.verticalFov !== "undefined")
-    {
-        this._mediaVFov = this._config.verticalFov;
-    }
-
     FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+
+    // @todo No verticalFov on media root config, need to clarify this. Certainly in options but not in reference ...
+    // if (typeof this._config.verticalFov !== "undefined")
+    // {
+    //     this._mediaVFov = this._config.verticalFov;
+    // }
+
+    this._bootComplete();
 };
 
 /**

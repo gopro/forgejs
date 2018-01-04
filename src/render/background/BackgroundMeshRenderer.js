@@ -71,28 +71,29 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
 
     this._texture = this._media.texture.texture;
 
-    if (typeof this._config.source !== "undefined")
-    {
-        var source = this._config.source;
-
-        if (typeof source.order !== "undefined")
-        {
-            this._layout = source.order;
-        }
-
-        if (typeof source.tile !== "undefined")
-        {
-            this._tile = source.tile;
-        }
-    }
-
-    this._createMesh();
-    this._onMeshCreated();
-
-    this._onTextureCreated();
 
     this._sceneRenderer.view.onChange.add(this._onViewChanged, this);
+
+    // Only this class will call boot complete.
+    // The child classes will call this at the end of their own boot function
+    if(this.className === "BackgroundMeshRenderer")
+    {
+        this._bootComplete();
+    }
 };
+
+/**
+ * Boot complete routine.
+ * @method FORGE.BackgroundMeshRenderer#_bootComplete
+ * @private
+ */
+FORGE.BackgroundMeshRenderer.prototype._bootComplete = function()
+{
+    this._createMesh();
+    this._onMeshCreated();
+    this._onTextureCreated();
+};
+
 
 /**
  * Placeholder function to be implemented by subclass specific needs
@@ -102,6 +103,7 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
  */
 FORGE.BackgroundMeshRenderer.prototype._onMeshCreated = function()
 {
+
 };
 
 /**
@@ -111,6 +113,7 @@ FORGE.BackgroundMeshRenderer.prototype._onMeshCreated = function()
  */
 FORGE.BackgroundMeshRenderer.prototype._onTextureCreated = function()
 {
+
 };
 
 /**
@@ -147,7 +150,7 @@ FORGE.BackgroundMeshRenderer.prototype._createGeometry = function()
 FORGE.BackgroundMeshRenderer.prototype._createMaterial = function()
 {
     var shader = FORGE.Utils.clone(this._sceneRenderer.view.current.shaderWTS).mapping;
-    this.log("Media " + this._mediaType + ", use mapping shader");
+    this.log("Media " + this._media.type + ", use mapping shader");
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
@@ -166,6 +169,7 @@ FORGE.BackgroundMeshRenderer.prototype._createMaterial = function()
 
     return material;
 };
+
 
 /**
  * Create mesh

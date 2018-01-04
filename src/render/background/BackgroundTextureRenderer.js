@@ -41,7 +41,7 @@ FORGE.BackgroundTextureRenderer = function(viewer, sceneRenderer, type)
 //  * Create texture
 //  * @method FORGE.BackgroundTextureRenderer#_createTexture
 //  * @private
- 
+
 // FORGE.BackgroundTextureRenderer.prototype._createTexture = function()
 // {
 
@@ -65,4 +65,5 @@ FORGE.BackgroundTextureRenderer = function(viewer, sceneRenderer, type)
 // FORGE.BackgroundTextureRenderer.prototype.destroy = function()
 // {
 //     FORGE.BackgroundRenderer.prototype.destroy.call(this);
+
 // };

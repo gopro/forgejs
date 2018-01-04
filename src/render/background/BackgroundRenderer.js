@@ -28,14 +28,6 @@ FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
     this._sceneRenderer = sceneRenderer;
 
     /**
-     * Scene media config
-     * @name FORGE.BackgroundRenderer#_config
-     * @type {?SceneMediaConfig}
-     * @private
-     */
-    this._config = this._sceneRenderer.media.config;
-
-    /**
      * Background rendering media object
      * @name FORGE.BackgroundRenderer#_media
      * @type {FORGE.Media}
@@ -66,23 +58,6 @@ FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
      */
     this._scene = null;
 
-    /**
-     * Media type (image, video, grid)
-     * Default: grid
-     * @type {string}
-     * @private
-     */
-    this._mediaType = FORGE.MediaType.GRID;
-
-    /**
-     * Media format (cubemap, equirectangular, flat)
-     * Default: equirectangular
-     * @name FORGE.BackgroundRenderer#_mediaFormat
-     * @type {string}
-     * @private
-     */
-    this._mediaFormat = FORGE.MediaFormat.EQUIRECTANGULAR;
-
     FORGE.BaseObject.call(this, className || "BackgroundRenderer");
 
     this._boot();
@@ -112,20 +87,6 @@ FORGE.BackgroundRenderer.prototype._boot = function()
     this._frustum = new THREE.Frustum();
 
     this._media = this._sceneRenderer.media;
-
-    if (typeof this._config !== "undefined")
-    {
-        // Override default value with config
-        if (typeof this._config.type !== "undefined")
-        {
-            this._mediaType = this._config.type;
-        }
-
-        if (typeof this._config.source !== "undefined" && typeof this._config.source.format !== "undefined")
-        {
-            this._mediaFormat = this._config.source.format;
-        }
-    }
 };
 
 /**

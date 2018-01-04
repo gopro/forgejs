@@ -39,12 +39,16 @@ FORGE.BackgroundGridRenderer.prototype.constructor = FORGE.BackgroundGridRendere
  */
 FORGE.BackgroundGridRenderer.prototype._boot = function()
 {
+    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+
     this._subdivision = 32;
 
-    if (typeof this._config.options !== "undefined" &&
-        typeof this._config.options.color !== "undefined")
+    if(this._media.options !== null)
     {
-        this._gridColor = this._config.options.color;
+        if(typeof this._media.options.color !== "undefined")
+        {
+            this._gridColor = this._media.options.color;
+        }
     }
 
     if (this._sceneRenderer.background !== null)
@@ -52,7 +56,7 @@ FORGE.BackgroundGridRenderer.prototype._boot = function()
         this._backgroundColor = this._sceneRenderer.background;
     }
 
-    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+    this._bootComplete();
 };
 
 /**
@@ -142,7 +146,7 @@ FORGE.BackgroundGridRenderer.prototype._createGeometry = function()
 FORGE.BackgroundGridRenderer.prototype._createMaterial = function()
 {
     var shader = FORGE.Utils.clone(this._sceneRenderer.view.current.shaderWTS).wireframe;
-    this.log("Media " + this._mediaType + ", use wireframe shader");
+    this.log("Media " + this._media.type + ", use wireframe shader");
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);

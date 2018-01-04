@@ -27,6 +27,8 @@ FORGE.BackgroundShaderRenderer.prototype._boot = function()
 
     // Override camera with some orthographic for quad rendering
     this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
+
+    this._bootComplete();
 };
 
 /**

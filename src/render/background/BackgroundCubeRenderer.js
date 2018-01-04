@@ -49,22 +49,24 @@ FORGE.BackgroundCubeRenderer.prototype.constructor = FORGE.BackgroundCubeRendere
  */
 FORGE.BackgroundCubeRenderer.prototype._boot = function()
 {
+    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+
     this._subdivision = 32;
 
-    if (typeof this._config.source !== "undefined")
+    if(this._media.source !== null)
     {
-        if (typeof this._config.source.order !== "undefined")
+        if (typeof this._media.source.order !== "undefined")
         {
-            this._order = this._config.source.order;
+            this._order = this._media.source.order;
         }
 
-        if (typeof this._config.source.tile !== "undefined")
+        if (typeof this._media.source.tile !== "undefined")
         {
-            this._tile = this._config.source.tile;
+            this._tile = this._media.source.tile;
         }
     }
 
-    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+    this._bootComplete();
 };
 
 /**

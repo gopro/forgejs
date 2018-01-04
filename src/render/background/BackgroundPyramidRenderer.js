@@ -127,7 +127,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this.log("boot");
 
-    this._parseConfig(this._config);
+    this._createLevels();
 
     this._size = 2 * FORGE.Renderer.DEPTH_FAR;
 
@@ -137,7 +137,7 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     this._camera = this._sceneRenderer.camera.main;
     this._sceneRenderer.camera.onChange.add(this._onCameraChange, this);
 
-    if (typeof this._config.preview !== "undefined")
+    if (this._media.preview !== null)
     {
         this._createPreview();
     }
@@ -157,30 +157,34 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 };
 
 /**
- * Parse configuration.
- * @method FORGE.BackgroundPyramidRenderer#_parseConfig
+ * Create levels.
+ * @method FORGE.BackgroundPyramidRenderer#_createLevels
  * @private
  */
-FORGE.BackgroundPyramidRenderer.prototype._parseConfig = function(config)
+FORGE.BackgroundPyramidRenderer.prototype._createLevels = function()
 {
     // Store all tiles number per level for quick access
     this._tilesLevel = [];
-    if (typeof this._config.source.levels !== "undefined")
+
+    if (this._media.source !== null && typeof this._media.source.levels !== "undefined")
     {
+        var levels = this._media.source.levels;
         var level;
 
-        for (var l = 0, levels = this._config.source.levels.length; l < levels; l++)
+        for (var i = 0, ii = levels.length; i < ii; i++)
         {
-            level = this._config.source.levels[l];
-            this._tilesLevel.push({
+            level = this._media.source.levels[i];
+
+            this._tilesLevel.push(
+            {
                 x: level.width / level.tile,
                 y: level.height / level.tile
             });
         }
-    }
 
-    // Set min fov to be used to reach max level of resolution
-    this._fovMin = 1.01 * FORGE.Math.degToRad(this._pyramidLevelToCameraFov(config.source.levels.length - 1));
+        // Set min fov to be used to reach max level of resolution
+        this._fovMin = 1.01 * FORGE.Math.degToRad(this._pyramidLevelToCameraFov(levels.length - 1));
+    }
 };
 
 /**
@@ -536,13 +540,13 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
     var levelConfig;
     if (level === FORGE.Tile.PREVIEW)
     {
-        levelConfig = this._config.preview;
+        levelConfig = this._media.preview;
         levelConfig.width = levelConfig.tile;
         levelConfig.height = levelConfig.tile;
     }
     else
     {
-        levelConfig = this._config.source.levels[level];
+        levelConfig = this._media.source.levels[level];
     }
 
     // Compute pixels count
@@ -638,7 +642,6 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
     this._renderNeighborList = null;
     this._renderList.length = 0;
     this._renderList = null;
-    this._config = null;
 
     FORGE.BackgroundRenderer.prototype.destroy.call(this);
 };
@@ -681,7 +684,7 @@ Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "levelMax",
     /** @this {FORGE.BackgroundPyramidRenderer} */
     get: function()
     {
-        return this._config.source.levels.length - 1;
+        return this._media.source.levels.length - 1;
     }
 });
 

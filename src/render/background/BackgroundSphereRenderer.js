@@ -23,9 +23,11 @@ FORGE.BackgroundSphereRenderer.prototype.constructor = FORGE.BackgroundSphereRen
  */
 FORGE.BackgroundSphereRenderer.prototype._boot = function()
 {
+    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+
     this._subdivision = 64;
 
-    FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
+    this._bootComplete();
 };
 
 /**
@@ -80,7 +82,7 @@ FORGE.BackgroundSphereRenderer.prototype._createGeometry = function()
 FORGE.BackgroundSphereRenderer.prototype._onMeshCreated = function()
 {
     // Equirectangular mapping on a sphere needs a yaw shift of PI/2 to set front at center of the texture
-    if (this._mediaFormat === FORGE.MediaFormat.EQUIRECTANGULAR)
+    if (this._media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
     {
         this._mesh.rotation.set(0, Math.PI / 2, 0, "YXZ");
     }
