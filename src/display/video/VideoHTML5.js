@@ -1725,6 +1725,7 @@ FORGE.VideoHTML5.prototype._onEventHandler = function(event)
 
         case "loadedmetadata":
             this._metaDataLoaded = true;
+            this._updateCanvasSize();
 
             if (this._onLoadedMetaData !== null)
             {

@@ -1332,6 +1332,7 @@ FORGE.VideoDash.prototype._onLoadedMetaDataHandler = function(event)
     this.log("onLoadedMetaData [readyState: " + element.readyState + "]");
 
     this._metaDataLoaded = true;
+    this._updateCanvasSize();
 
     if (this._onLoadedMetaData !== null)
     {

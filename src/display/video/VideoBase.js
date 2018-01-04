@@ -109,21 +109,31 @@ FORGE.VideoBase.prototype._onVisibilityChange = function(event)
 };
 
 /**
- * Update method called by the viewer main loop.
- * @method FORGE.VideoHTML5#update
+ * Update the canvas size according to the video size.
+ * @method FORGE.VideoBase#_updateCanvasSize
  */
-FORGE.VideoBase.prototype.update = function()
+FORGE.VideoBase.prototype._updateCanvasSize = function()
 {
-    if(this.element !== null && this._playing === true)
+    if(this.element !== null)
     {
         // Evil hack from Hell
         // Reduce texture size for big videos on safari
         var factor = (FORGE.Device.browser.toLowerCase() === "safari" && this.originalHeight > 1440) ? 2 : 1;
 
         // Set the canvas at the proper size
-        this._canvas.width = this.originalWidth / factor;
-        this._canvas.height = this.originalHeight / factor;
+        this._canvas.width = this.element.videoWidth / factor;
+        this._canvas.height = this.element.videoHeight / factor;
+    }
+};
 
+/**
+ * Update the canvas image according to the video frame content.
+ * @method FORGE.VideoBase#_updateCanvasImage
+ */
+FORGE.VideoBase.prototype._updateCanvasImage = function()
+{
+    if(this.element !== null && this._playing === true)
+    {
         if (this.element instanceof HTMLVideoElement && this.element.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA)
         {
             var ctx = this._canvas.getContext("2d");
@@ -133,6 +143,16 @@ FORGE.VideoBase.prototype.update = function()
                 0, 0, this._canvas.width, this._canvas.height);
         }
     }
+};
+
+/**
+ * Update method called by the viewer main loop.
+ * @method FORGE.VideoBase#update
+ */
+FORGE.VideoBase.prototype.update = function()
+{
+    this._updateCanvasSize();
+    this._updateCanvasImage();
 };
 
 /**
