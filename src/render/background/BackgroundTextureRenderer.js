@@ -59,16 +59,6 @@ FORGE.BackgroundTextureRenderer.prototype.render = function(webGLRenderer, targe
         uniforms.tTexture.value = this._texture;
     }
 
-    if ("tOpacity" in uniforms)
-    {
-        uniforms.tOpacity.value = 1.0;
-    }
-
-    if ("tTexture" in uniforms)
-    {
-        uniforms.tTexture.value = this._texture;
-    }
-
     if ("tTextureRatio" in uniforms)
     {
         uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
