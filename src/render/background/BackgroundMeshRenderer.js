@@ -36,11 +36,7 @@ FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer, className)
      */
     this._subdivision = 8;
 
-<<<<<<< 27229739a415173a4fab6de5441fb141ef06b512
-    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundMeshRenderer");
-=======
-    FORGE.BackgroundRenderer.call(this, sceneRenderer, className || "BackgroundMeshRenderer");
->>>>>>> Remove BackgroundTextureRenderer WIP
+    FORGE.BackgroundRenderer.call(this, viewer, sceneRenderer, className || "BackgroundMeshRenderer");
 };
 
 FORGE.BackgroundMeshRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
