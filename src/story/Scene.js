@@ -328,7 +328,7 @@ FORGE.Scene.prototype._mediaLoadCompleteHandler = function()
 {
     this.media.onLoadComplete.remove(this._mediaLoadCompleteHandler, this);
 
-    this._viewportManager.notifyMediaLoadComplete();
+    this._viewports.notifyMediaLoadComplete();
 };
 
 /**

@@ -314,7 +314,7 @@ FORGE.SceneRenderer.prototype.render = function()
         return;
     }
 
-    if (this._viewportComposer === null)
+    if (this._composer === null)
     {
         this._backgroundRenderer.render(this._scene.renderTarget);
     }
