@@ -145,7 +145,18 @@ FORGE.ViewBase.prototype.constructor = FORGE.ViewBase;
  */
 FORGE.ViewBase.prototype._boot = function()
 {
-    this._viewer.story.onSceneLoadComplete.add(this.updateUniforms, this);
+    //@todo Check the utility of this call.
+    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
+};
+
+/**
+ * Scene load complete handler.
+ * @method FORGE.ViewBase#_sceneLoadCompleteHandler
+ * @private
+ */
+FORGE.ViewBase.prototype._sceneLoadCompleteHandler = function()
+{
+    this.updateUniforms();
 };
 
 /**
@@ -251,6 +262,8 @@ FORGE.ViewBase.prototype.getProjectionFov = function()
  */
 FORGE.ViewBase.prototype.destroy = function()
 {
+    this._viewer.story.onSceneLoadComplete.remove(this._sceneLoadCompleteHandler, this);
+
     this._viewer = null;
     this._camera = null;
 
