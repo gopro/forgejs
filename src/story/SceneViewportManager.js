@@ -260,16 +260,18 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
         this._onActiveViewportChange = null;
     }
 
-    this._viewports.forEach(function(viewport) {
-        viewport.destroy();
-    });
-    this._viewports.length = 0;
+    for(var i = 0, ii = this._viewports.length; i < ii; i++)
+    {
+        this._viewports[i].destroy();
+    }
+
     this._viewports = null;
 
-    this._vrViewports.forEach(function(viewport) {
-        viewport.destroy();
-    });
-    this._vrViewports.length = 0;
+    for(var j = 0, jj = this._vrViewports.length; j < jj; j++)
+    {
+        this._vrViewports[j].destroy();
+    }
+
     this._vrViewports = null;
 
     this._viewer = null;
