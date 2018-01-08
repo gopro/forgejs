@@ -345,12 +345,6 @@ FORGE.SceneRenderer.prototype.destroy = function()
         this._composer = null;
     }
 
-    if (this._viewManager !== null)
-    {
-        this._viewManager.destroy();
-        this._viewManager = null;
-    }
-
     if (this._backgroundRenderer !== null)
     {
         this._backgroundRenderer.destroy();
@@ -361,6 +355,12 @@ FORGE.SceneRenderer.prototype.destroy = function()
     {
         this._objectRenderer.destroy();
         this._objectRenderer = null;
+    }
+
+    if (this._viewManager !== null)
+    {
+        this._viewManager.destroy();
+        this._viewManager = null;
     }
 
     FORGE.BaseObject.prototype.destroy.call(this);
