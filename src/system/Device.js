@@ -134,10 +134,7 @@ FORGE.Device = (function(c)
             this._browser = "chrome";
             if (/CriOS\/(\d+)/.test(this._ua))
             {
-                if (this._safari)
-                {
-                    this._safari = false;
-                }
+                this._safari = false;
                 this._browserVersion = this._chromeVersion = parseInt(RegExp.$1, 10);
             }
             else if (/Chrome\/(\d+)/.test(this._ua))
