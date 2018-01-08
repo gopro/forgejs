@@ -110,7 +110,6 @@ FORGE.Scene = function(viewer)
      */
     this._mediaUid = "";
 
-
     /**
      * The scene render target (texture)
      * @name FORGE.Scene#_renderTarget
@@ -321,6 +320,25 @@ FORGE.Scene.prototype._createViewports = function(config)
 };
 
 /**
+ * Destroy viewports and renderers
+ * @method FORGE.Scene#_destroyViewports
+ * @private
+ */
+FORGE.Scene.prototype._destroyViewports = function()
+{
+    if (this._renderTarget !== null)
+    {
+        this._renderTarget.dispose();
+        this._renderTarget = null;
+    }
+
+    if (this._viewports !== null)
+    {
+        this._viewports.destroy();
+    }
+};
+
+/**
  * Media load compelte handler
  * @method FORGE.Scene._mediaLoadCompleteHandler
  */
@@ -432,6 +450,8 @@ FORGE.Scene.prototype.unload = function()
     {
         this._events.onUnloadStart.dispatch();
     }
+
+    this._destroyViewports();
 
     this._viewer.media.unload(this._mediaUid);
 
@@ -570,8 +590,7 @@ FORGE.Scene.prototype.destroy = function()
     this._description.destroy();
     this._description = null;
 
-    this._viewports.destroy();
-    this._viewports = null;
+    this._destroyViewports();
 
     if (this._onLoadStart !== null)
     {
