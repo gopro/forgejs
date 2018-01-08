@@ -410,7 +410,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._renderer = new FORGE.Renderer(this);
     this._controllers = new FORGE.ControllerManager(this);
     // this._playlists = new FORGE.PlaylistManager(this);
-    // this._plugins = new FORGE.PluginManager(this);
+    this._plugins = new FORGE.PluginManager(this);
     this._hotspots = new FORGE.HotspotManager(this);
     this._actions = new FORGE.ActionManager(this);
     // this._director = new FORGE.Director(this);
@@ -428,7 +428,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._raf.boot();
     this._story.boot();
     // this._playlists.boot();
-    // this._plugins.boot();
+    this._plugins.boot();
     this._hotspots.boot();
 
     this.log("ForgeJS " + FORGE.VERSION);
@@ -538,10 +538,10 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
         this._hotspots.addTracks(config.hotspots);
     }
 
-    // if (typeof config.plugins !== "undefined")
-    // {
-    //     this._plugins.addConfig(config.plugins);
-    // }
+    if (typeof config.plugins !== "undefined")
+    {
+        this._plugins.addConfig(config.plugins);
+    }
 
     this._controllers.addConfig(config.controllers);
 
@@ -647,7 +647,7 @@ FORGE.Viewer.prototype._updateLogic = function()
     this._keyboard.update();
     this._gamepad.update();
     this._audio.update();
-    // this._plugins.update();
+    this._plugins.update();
     this._tween.update();
     this._hotspots.update();
     this._controllers.update();
