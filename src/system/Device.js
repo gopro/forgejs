@@ -134,6 +134,10 @@ FORGE.Device = (function(c)
             this._browser = "chrome";
             if (/CriOS\/(\d+)/.test(this._ua))
             {
+                if (this._safari)
+                {
+                    this._safari = false;
+                }
                 this._browserVersion = this._chromeVersion = parseInt(RegExp.$1, 10);
             }
             else if (/Chrome\/(\d+)/.test(this._ua))
@@ -965,7 +969,7 @@ FORGE.Device = (function(c)
      * @static
      * @param {Object} config - The device requirement configuration of the configuration/manifest.
      * @param {Object} [device=FORGE.Device] - The device environment to test. The default is FORGE.Device detection, but we need to modify it in test suites.
-     * @param {string} [condition="and"] [description]
+     * @param {string} [condition="and"] - The condition to reach.
      * @return {boolean} Returns true if the object is compatible with the device environment, false if not.
      */
     Tmp.prototype.check = function(config, device, condition)
