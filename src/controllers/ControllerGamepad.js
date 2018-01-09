@@ -531,7 +531,7 @@ FORGE.ControllerGamepad.prototype.disable = function()
  */
 FORGE.ControllerGamepad.prototype.update = function()
 {
-    var size = this._viewer.story.scene.viewportManager.active.size;
+    var size = this._viewer.story.scene.viewports.active.size;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
 
     this._velocity = this._positionCurrent.clone();

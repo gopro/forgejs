@@ -205,7 +205,7 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
 
 
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-    var viewportPosition = this._viewer.story.scene.viewportManager.getRelativeMousePosition(screenPosition);
+    var viewportPosition = this._viewer.story.scene.viewports.getRelativeMousePosition(screenPosition);
     if (viewportPosition === null)
     {
         return;
@@ -233,7 +233,7 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
 FORGE.ControllerPointer.prototype._panMoveHandler = function(event)
 {
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-    var viewportPosition = this._viewer.story.scene.viewportManager.getRelativeMousePosition(screenPosition);
+    var viewportPosition = this._viewer.story.scene.viewports.getRelativeMousePosition(screenPosition);
     if (viewportPosition === null || this._viewer.controllers.enabled === false || viewportPosition === null)
     {
         return;
@@ -322,7 +322,7 @@ FORGE.ControllerPointer.prototype._updateCameraWithDrag = function()
  */
 FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
 {
-    var size = this._viewer.story.scene.viewportManager.active.size;
+    var size = this._viewer.story.scene.viewports.active.size;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
 
     var logZoomFactor = Math.min(1, this._camera.fov / 90) / Math.LN2;
@@ -485,7 +485,7 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
     if(this._zoom.toPointer === true)
     {
         var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-        var viewportPosition = this._viewer.story.scene.viewportManager.getRelativeMousePosition(screenPosition);
+        var viewportPosition = this._viewer.story.scene.viewports.getRelativeMousePosition(screenPosition);
         if (viewportPosition === null)
         {
             return;

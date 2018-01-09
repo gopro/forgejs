@@ -820,11 +820,11 @@ Object.defineProperty(FORGE.Scene.prototype, "thumbnails",
 
 /**
  * Get the scene viewport manager.
- * @name  FORGE.Scene#viewportManager
+ * @name  FORGE.Scene#viewports
  * @readonly
  * @type {FORGE.SceneViewportManager}
  */
-Object.defineProperty(FORGE.Scene.prototype, "viewportManager",
+Object.defineProperty(FORGE.Scene.prototype, "viewports",
 {
     /** @this {FORGE.Scene} */
     get: function()
