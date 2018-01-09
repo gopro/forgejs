@@ -64,7 +64,7 @@ FORGE.SceneViewport.prototype.constructor = FORGE.SceneViewport;
 
 /**
  * Boot sequence.
- * @method FORGE.SceneRenderer#_boot
+ * @method FORGE.SceneViewport#_boot
  * @private
  */
 FORGE.SceneViewport.prototype._boot = function()
@@ -98,7 +98,7 @@ FORGE.SceneViewport.prototype._boot = function()
 
 /**
  * Update viewport.
- * @method FORGE.SceneRenderer#updateWithRect
+ * @method FORGE.SceneViewport#updateWithRect
  * @param {FORGE.Rectangle} viewport - new viewport
  */
 FORGE.SceneViewport.prototype.updateWithRect = function(viewport)
@@ -108,14 +108,12 @@ FORGE.SceneViewport.prototype.updateWithRect = function(viewport)
 
 /**
  * Render routine.
- * @method FORGE.SceneRenderer#render
+ * @method FORGE.SceneViewport#render
  * @param {THREE.WebGLRenderer} webGLRenderer
  */
 FORGE.SceneViewport.prototype.render = function()
 {   
     var target = this._scene.renderTarget;
-
-    // this._viewer.renderer.webGLRenderer.setRenderTarget(target);
 
     if (typeof target !== "undefined" && target !== null)
     {
@@ -134,7 +132,7 @@ FORGE.SceneViewport.prototype.render = function()
 
 /**
  * Destroy sequence.
- * @method FORGE.SceneRenderer#destroy
+ * @method FORGE.SceneViewport#destroy
  */
 FORGE.SceneViewport.prototype.destroy = function()
 {
