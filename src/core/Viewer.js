@@ -1441,7 +1441,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "view",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._story.scene.viewportManager.active.sceneRenderer.view;
+        return this._story.scene.viewports.active.sceneRenderer.view;
     }
 });
 
@@ -1456,7 +1456,7 @@ Object.defineProperty(FORGE.Viewer.prototype, "camera",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._story.scene.viewportManager.active.sceneRenderer.camera;
+        return this._story.scene.viewports.active.sceneRenderer.camera;
     }
 });
 
