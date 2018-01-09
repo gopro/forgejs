@@ -48,12 +48,21 @@ FORGE.SceneViewportManager = function(viewer, scene)
     this._active = 0;
 
     /**
-     * .
+     * Active viewport has changed event dispatcher
      * @name FORGE.Scene#_onActiveViewportChange
      * @type {FORGE.EventDispatcher}
      * @private
      */
     this._onActiveViewportChange = null;
+
+    /**
+     * All renderers are ready event dispatcher
+     * @name FORGE.Scene#_onAllRenderersReady
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._renderersReady = 0;
+    this._onAllRenderersReady = null;
 
     FORGE.BaseObject.call(this, "SceneViewport");
 
@@ -111,7 +120,55 @@ FORGE.SceneViewportManager.prototype._parseConfig = function(config)
             var viewport = new FORGE.SceneViewport(this._viewer, this._scene, viewportConfig);
             this._viewports.push(viewport);
         }
+
+        viewport.sceneRenderer.onReady.add(this._onSceneRendererReady, this);
     }
+
+    this._scene.onLoadComplete.addOnce(this._onSceneLoadComplete, this);
+};
+
+
+
+/**
+ * Scene renderer ready handler
+ * @method FORGE.SceneViewportManager#_onSceneRendererReady
+ * @param {FORGE.Event} event -  event
+ * @private
+ */
+FORGE.SceneViewportManager.prototype._onSceneRendererReady = function(event)
+{
+    if (++this._renderersReady === this._scene.config.layout.length && this._onAllRenderersReady !== null)
+    {
+        this._onAllRenderersReady.dispatch();
+    }
+};
+
+/**
+ * Scene load complete handler
+ * @method FORGE.SceneViewportManager#_onSceneLoadComplete
+ * @param {FORGE.Event} event - scene load complete event
+ * @private
+ */
+FORGE.SceneViewportManager.prototype._onSceneLoadComplete = function(event)
+{
+    if (this._viewports.length === 0)
+    {
+        this.warn("Cannot setup hotspots, no viewport created.")
+        return;
+    }
+
+    var hotspots = this._viewer.hotspots.getByType("Hotspot3D");
+    // this._viewports[0].sceneRenderer.loadHotspots(hotspots);
+
+    // for (var i=0; i<this._viewports.length; i++)
+    // // for (var i=0; i<1; i++)
+    // {
+    //     this._viewports[i].sceneRenderer.loadHotspots(hotspots);
+    // }
+
+    this._viewports.forEach(function(v,idx,arr) {
+        v.sceneRenderer.loadHotspots(hotspots);
+    });
 };
 
 /**
@@ -266,6 +323,16 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
         this._viewports[i].destroy();
     }
 
+    if (this._onAllRenderersReady !== null)
+    {
+        this._onAllRenderersReady.destroy();
+        this._onAllRenderersReady = null;        
+    }
+
+    this._viewports.forEach(function(viewport) {
+        viewport.destroy();
+    });
+    this._viewports.length = 0;
     this._viewports = null;
 
     for(var j = 0, jj = this._vrViewports.length; j < jj; j++)
@@ -344,6 +411,26 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "onActiveViewportCha
         }
 
         return this._onActiveViewportChange;
+    }
+});
+
+/**
+ * Get the onAllRenderersReady {@link FORGE.EventDispatcher}.
+ * @name  FORGE.SceneViewportManager#onAllRenderersReady
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.SceneViewportManager.prototype, "onAllRenderersReady",
+{
+    /** @this {FORGE.SceneViewportManager} */
+    get: function()
+    {
+        if (this._onAllRenderersReady === null)
+        {
+            this._onAllRenderersReady = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onAllRenderersReady;
     }
 });
 

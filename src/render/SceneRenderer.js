@@ -5,9 +5,6 @@
  * @param {FORGE.Viewer} viewer - viewer reference
  * @param {FORGE.SceneViewport} viewport - viewport parent object
  * @extends {FORGE.BaseObject}
- *
- * @todo think about how to render multiple scene at the same time, with blending / overlap / viewport layouting...
- * maybe add a layer object encapsulating background / foreground renderings to ease the process
  */
 FORGE.SceneRenderer = function(viewer, viewport)
 {
@@ -59,6 +56,22 @@ FORGE.SceneRenderer = function(viewer, viewport)
      */
     this._composerTexture = null;
 
+    /**
+     * Picking manager.
+     * @name FORGE.SceneRenderer#_picking
+     * @type {FORGE.Picking}
+     * @private
+     */
+    this._picking = null;
+
+    /**
+     * Scene renderer is ready event dispatcher
+     * @name FORGE.Scene#_onReady
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onReady = null;
+
     FORGE.BaseObject.call(this, "SceneRenderer");
 
     this._boot();
@@ -80,8 +93,8 @@ FORGE.SceneRenderer.prototype._boot = function()
         return;
     }
 
-    this._createObjectRenderer();
     this._createComposer();
+    this._createObjectRenderer();
 };
 
 /**
@@ -134,7 +147,10 @@ FORGE.SceneRenderer.prototype.notifyMediaLoadComplete = function()
  */
 FORGE.SceneRenderer.prototype._createObjectRenderer = function()
 {
-    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer);
+    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer, this);
+
+    this._picking = new FORGE.PickingRaycast();
+    this._picking = new FORGE.PickingDrawpass();
 };
 
 /**
@@ -216,6 +232,16 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
 };
 
 /**
+ * Load hotspots
+ * @method FORGE.SceneRenderer#loadHotspots
+ * @param {Array<FORGE.Hotspot3D>} hotspots - hotspots array
+ */
+FORGE.SceneRenderer.prototype.loadHotspots = function(hotspots)
+{
+    this._objectRenderer.loadHotspots(hotspots);
+};
+
+/**
  * Render routine.
  * @method FORGE.SceneRenderer#render
  */
@@ -229,10 +255,13 @@ FORGE.SceneRenderer.prototype.render = function()
     if (this._composer === null)
     {
         this._backgroundRenderer.render(this._viewport.scene.renderTarget);
+        this._objectRenderer.render(this._viewport.scene.renderTarget);
     }
     else
     {
+        this._viewer.renderer.webGLRenderer.clearTarget(this._composerTexture, false, true, false);
         this._backgroundRenderer.render(this._composerTexture);
+        this._objectRenderer.render(this._composerTexture);
         this._composer.render();
     }
 };
@@ -245,6 +274,12 @@ FORGE.SceneRenderer.prototype.destroy = function()
 {
     this._config = null;
     this._viewer = null;
+
+    if (this._onReady !== null)
+    {
+        this._onReady.destroy();
+        this._onReady = null;        
+    }
 
     if (this._composer !== null)
     {
@@ -280,4 +315,3 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "background",
         return this._backgroundRenderer;
     }
 });
-

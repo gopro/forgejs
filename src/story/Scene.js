@@ -119,6 +119,14 @@ FORGE.Scene = function(viewer)
     this._mediaUid = "";
 
     /**
+     * The 3D object manager
+     * @name FORGE.Scene#_objects
+     * @type {FORGE.ObjectManager}
+     * @private
+     */
+    this._objects = null;
+
+    /**
      * The scene render target (texture)
      * @name FORGE.Scene#_renderTarget
      * @type {THREE.WebGLRenderTarget}
@@ -133,6 +141,8 @@ FORGE.Scene = function(viewer)
      * @private
      */
     this._fxs = null;
+
+    this._pickingScene = null;
 
     /**
      * Load request event dispatcher.
@@ -318,6 +328,7 @@ FORGE.Scene.prototype._createViewports = function(config)
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
         format: THREE.RGBAFormat,
+        depthBuffer: false,
         stencilBuffer: false
     };
 
@@ -326,6 +337,75 @@ FORGE.Scene.prototype._createViewports = function(config)
     this._renderTarget.name = "Scene-Target-" + this._name.value;
 
     this._viewports = new FORGE.SceneViewportManager(this._viewer, this);
+
+    this._viewports.onAllRenderersReady.add(this._onRenderersReady, this);
+};
+
+FORGE.Scene.prototype._onRenderersReady = function(transition)
+{
+    var sceneRenderer = this._viewports.all[0].sceneRenderer;
+    // if (sceneRenderer.backgroundRenderer === null) {
+    //     return;
+    // }
+
+    this._pickingScene = sceneRenderer.objectRenderer.scene;
+    this._pickingMaterial = sceneRenderer.objectRenderer.scene.children[0].material.clone();
+    
+    var fragment = FORGE.ShaderLib.parseIncludes(FORGE.ShaderChunk.wts_frag_color);
+
+    // this._pickingMaterial.fragmentShader = FORGE.ShaderLib.parseIncludes(FORGE.ShaderChunk.wts_frag_color);
+    this._pickingMaterial.fragmentShader = fragment;
+    // this._pickingMaterial.fragmentShader = "void main() { gl_FragColor = vec4(1., 0., 0., 1.); }"
+
+    this._pickingMaterial.name = "PickingMaterial";
+
+
+    // this._pickingScene = new THREE.Scene();
+    // this._pickingScene.background = new THREE.Color("#07f");
+
+    // this._pickingScene.children.forEach(function(mesh) {
+    //     var material = mesh.material;
+
+    //     mesh.material = 
+
+    // }.bind(this));
+
+
+
+    // // var scene = sceneRenderer.backgroundRenderer.scene;
+    // var scene = sceneRenderer.objectRenderer.scene;
+    // // var scene = new THREE.Scene();
+    // scene.background = new THREE.Color("red");
+
+    // var camera = sceneRenderer.camera.main;
+    // this._pickingScene.add(camera);
+};
+
+FORGE.Scene.prototype._drawPickingPass = function()
+{
+    if (this._pickingScene === null)
+    {
+        return;
+    }
+
+    // var overrideMaterial = new THREE.MeshBasicMaterial({color:new THREE.Color("#07f"), transparent:true});
+    // this._pickingScene.background = new THREE.Color("#07f");
+    this._pickingScene.overrideMaterial = this._pickingMaterial;
+
+    var sceneRenderer = this._viewports.all[0].sceneRenderer;
+    var camera = sceneRenderer.camera.main;
+
+    var w = 400;
+    var h = w / camera.aspect;
+
+    this._renderTarget.viewport.set(20, 20, w, h);
+    this._renderTarget.scissor.set(20, 20, w, h);
+    this._renderTarget.scissorTest = true;
+    
+    this._viewer.renderer.webGLRenderer.render(this._pickingScene, camera, this._renderTarget);
+
+    // this._pickingScene.background = null;
+    this._pickingScene.overrideMaterial = null;
 };
 
 /**
@@ -580,6 +660,7 @@ FORGE.Scene.prototype.isAmbisonic = function()
 FORGE.Scene.prototype.render = function()
 {
     this._viewports.render();
+    this._drawPickingPass();
 };
 
 /**

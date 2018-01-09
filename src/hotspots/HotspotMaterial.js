@@ -569,7 +569,7 @@ FORGE.HotspotMaterial.prototype._createShaderMaterial = function()
 {
     this.log("create shader material");
 
-    if(this._viewer.renderer.view.current === null)
+    if(this._viewer.view.current === null)
     {
         return;
     }
@@ -580,7 +580,7 @@ FORGE.HotspotMaterial.prototype._createShaderMaterial = function()
         this._material = null;
     }
 
-    var shader = FORGE.Utils.clone(this._viewer.renderer.view.current.shaderWTS.mapping);
+    var shader = FORGE.Utils.clone(this._viewer.view.current.shaderWTS.mapping);
 
     if (this._type === FORGE.HotspotMaterial.types.GRAPHICS)
     {

@@ -141,7 +141,7 @@ FORGE.Hotspot3D.prototype._boot = function()
     this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
     this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);
 
-    this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
+    this._viewer.view.onChange.add(this._viewChangeHandler, this);
 
     if (typeof this._config !== "undefined" && this._config !== null)
     {
@@ -182,11 +182,6 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
         this._states.addConfig(config.states);
     }
 
-    if (typeof config.fx === "string" && config.fx !== "")
-    {
-        this._fx = config.fx;
-    }
-
     if (typeof config.events === "object" && config.events !== null)
     {
         this._createEvents(config.events);
@@ -205,7 +200,7 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
 {
     var g = group; // Just to avoid the jscs warning about group parameter not used.
 
-    this._viewer.renderer.view.current.updateUniforms(material.uniforms);
+    this._viewer.view.current.updateUniforms(material.uniforms);
 
     // Check what is the current render pass looking at the material: Hotspot or Picking Material
     if (material.name === "HotspotMaterial")
@@ -425,7 +420,6 @@ FORGE.Hotspot3D.prototype.dump = function()
         visible: this._visible,
         interactive: this._interactive,
         cursor: this._cursor,
-        fx: this._fx,
         facingCenter: this._facingCenter,
         geometry: this._geometry.dump(),
         transform: this._transform.dump(),
@@ -459,7 +453,7 @@ FORGE.Hotspot3D.prototype.hide = function()
  */
 FORGE.Hotspot3D.prototype.destroy = function()
 {
-    this._viewer.renderer.view.onChange.remove(this._viewChangeHandler, this);
+    this._viewer.story.scene.view.onChange.remove(this._viewChangeHandler, this);
 
     this._onBeforeRenderBound = null;
     this._onAfterRenderBound = null;
