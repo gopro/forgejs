@@ -97,6 +97,8 @@ FORGE.FXManager.prototype.destroy = function()
     }
 
     this._fxs = null;
+
+    FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**
