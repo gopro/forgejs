@@ -659,7 +659,7 @@ FORGE.Utils.watchObjectProperty = function(object, property, timeout, interval) 
  */
 FORGE.Utils.destroyMesh = function(mesh)
 {
-    this._mesh.userData = null;
+    mesh.userData = null;
 
     if (mesh.material !== null)
     {
