@@ -52,6 +52,9 @@ module.exports = function(grunt)
         "src/render/RenderPipeline.js",
         "src/render/RenderDisplay.js",
         "src/render/RenderParams.js",
+        "src/render/Picking.js",
+        "src/render/PickingRaycast.js",
+        "src/render/PickingDrawpass.js",
 
         "src/render/background/BackgroundRenderer.js",
         "src/render/background/BackgroundTextureRenderer.js",

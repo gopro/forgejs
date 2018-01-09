@@ -129,7 +129,6 @@ FORGE.Object3D.prototype._boot = function()
     this._events = {};
     this._mesh = new THREE.Mesh();
     this._pickingColor = FORGE.PickingDrawPass.colorFrom3DObject(this._mesh);
-    this._viewer.renderer.objects.register(this);
 };
 
 /**
@@ -236,16 +235,7 @@ FORGE.Object3D.prototype.destroy = function()
 
     if (this._mesh !== null)
     {
-        this._mesh.userData = null;
-
-        if (this._mesh.geometry !== null)
-        {
-            this._mesh.geometry.dispose();
-            this._mesh.geometry = null;
-        }
-
-        this._mesh.material = null;
-
+        FORGE.Utils.destroyMesh(this._mesh);
         this._mesh = null;
     }
 

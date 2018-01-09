@@ -6,9 +6,6 @@
  * @param {FORGE.Scene} scene - scene object
  * @param {FORGE.SceneViewport} sceneViewport - sceneViewport parent object
  * @extends {FORGE.BaseObject}
- *
- * @todo think about how to render multiple scene at the same time, with blending / overlap / viewport layouting...
- * maybe add a layer object encapsulating background / foreground renderings to ease the process
  */
 FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
 {
@@ -59,7 +56,7 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
      * @private
      */
     this._camera = null;
-
+    
     /**
      * View manager.
      * @name FORGE.SceneRenderer#_viewManager
@@ -84,6 +81,22 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
      */
     this._composerTexture = null;
 
+    /**
+     * Picking manager.
+     * @name FORGE.SceneRenderer#_picking
+     * @type {FORGE.Picking}
+     * @private
+     */
+    this._picking = null;
+
+    /**
+     * Scene renderer is ready event dispatcher
+     * @name FORGE.Scene#_onReady
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onReady = null;
+
     FORGE.BaseObject.call(this, "SceneRenderer");
 
     this._boot();
@@ -106,8 +119,8 @@ FORGE.SceneRenderer.prototype._boot = function()
 
     this._createViewManager();
     this._createCamera();
-    this._createObjectRenderer();
     this._createComposer();
+    this._createObjectRenderer();
 
     this._scene.media.onLoadComplete.add(this._createBackgroundRenderer, this);
 };
@@ -187,7 +200,10 @@ FORGE.SceneRenderer.prototype._createCamera = function()
  */
 FORGE.SceneRenderer.prototype._createObjectRenderer = function()
 {
-    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer);
+    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer, this);
+
+    this._picking = new FORGE.PickingRaycast();
+    this._picking = new FORGE.PickingDrawpass();
 };
 
 /**
@@ -268,6 +284,11 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
     }
 
     this._backgroundRenderer = new backgroundRendererRef(this._viewer, this);
+
+    if (this._onReady !== null)
+    {
+        this._onReady.dispatch();   
+    }
 };
 
 /**
@@ -295,6 +316,16 @@ FORGE.SceneRenderer.prototype.setView = function(config)
 };
 
 /**
+ * Load hotspots
+ * @method FORGE.SceneRenderer#loadHotspots
+ * @param {Array<FORGE.Hotspot3D>} hotspots - hotspots array
+ */
+FORGE.SceneRenderer.prototype.loadHotspots = function(hotspots)
+{
+    this._objectRenderer.loadHotspots(hotspots);
+};
+
+/**
  * Render routine.
  * @method FORGE.SceneRenderer#render
  */
@@ -307,20 +338,18 @@ FORGE.SceneRenderer.prototype.render = function()
         return;
     }
 
-    if (this._viewportComposer === null)
+    if (this._composer === null)
     {
         this._backgroundRenderer.render(this._scene.renderTarget);
+        this._objectRenderer.render(this._scene.renderTarget);
     }
     else
     {
+        this._viewer.renderer.webGLRenderer.clearTarget(this._composerTexture, false, true, false);
         this._backgroundRenderer.render(this._composerTexture);
+        this._objectRenderer.render(this._composerTexture);
         this._composer.render();
     }
-
-
-    // This is pure nonsense !! RenderPipeline renders all render passes...
-    // The object renderer should have done its job before to prepare the textures
-    // this._objectRenderer.render();
 };
 
 /**
@@ -331,6 +360,12 @@ FORGE.SceneRenderer.prototype.destroy = function()
 {
     this._config = null;
     this._viewer = null;
+
+    if (this._onReady !== null)
+    {
+        this._onReady.destroy();
+        this._onReady = null;        
+    }
 
     if (this._composer !== null)
     {
@@ -356,6 +391,12 @@ FORGE.SceneRenderer.prototype.destroy = function()
         this._objectRenderer = null;
     }
 
+    if (this._picking !== null)
+    {
+        this._picking.destroy();
+        this._picking = null;
+    }
+
     FORGE.BaseObject.prototype.destroy.call(this);
 };
 
@@ -370,6 +411,34 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "backgroundRenderer",
     get: function()
     {
         return this._backgroundRenderer;
+    }
+});
+
+/**
+ * Get the object renderer.
+ * @name FORGE.SceneRenderer#objectRenderer
+ * @type {FORGE.BackgroundRenderer}
+ */
+Object.defineProperty(FORGE.SceneRenderer.prototype, "objectRenderer",
+{
+    /** @this {FORGE.SceneRenderer} */
+    get: function()
+    {
+        return this._objectRenderer;
+    }
+});
+
+/**
+ * Get the scene.
+ * @name FORGE.SceneRenderer#scene
+ * @type {FORGE.Scene}
+ */
+Object.defineProperty(FORGE.SceneRenderer.prototype, "scene",
+{
+    /** @this {FORGE.SceneRenderer} */
+    get: function()
+    {
+        return this._scene;
     }
 });
 
@@ -442,3 +511,24 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "viewport",
         return this._sceneViewport.viewport;
     }
 });
+
+/**
+ * Get the onReady {@link FORGE.EventDispatcher}.
+ * @name  FORGE.SceneRenderer#onReady
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.SceneRenderer.prototype, "onReady",
+{
+    /** @this {FORGE.SceneRenderer} */
+    get: function()
+    {
+        if (this._onReady === null)
+        {
+            this._onReady = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onReady;
+    }
+});
+

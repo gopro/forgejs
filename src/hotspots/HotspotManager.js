@@ -186,7 +186,7 @@ FORGE.HotspotManager.prototype.getByType = function(type)
 {
     var result = this._hotspots.filter(function(hotspot)
     {
-        return hotspot.type === type;
+        return FORGE.Utils.isTypeOf(hotspot, type);
     });
 
     return result;
