@@ -316,13 +316,13 @@ Object.defineProperty(FORGE.Renderer.prototype, "vr",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._webGLRenderer.vr;
+        return this._webGLRenderer.vr.enabled;
     },
 
     /** @this {FORGE.Viewer} */
     set: function(value)
     {
-        this._webGLRenderer.vr = value;
+        this._webGLRenderer.vr.enabled = value;
     }
 });
 

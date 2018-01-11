@@ -29,6 +29,14 @@ FORGE.ObjectRenderer = function(viewer, sceneRenderer)
      */
     this._scene = null;
 
+    /**
+     * Picking manager.
+     * @name FORGE.SceneRenderer#_picking
+     * @type {FORGE.Picking}
+     * @private
+     */
+    this._picking = null;
+
     FORGE.BaseObject.call(this, "ObjectRenderer");
 
     this._boot();
@@ -45,16 +53,18 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
 FORGE.ObjectRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
+
+    this._picking = new FORGE.PickingDrawpass(this._viewer, this._sceneRenderer);
 };
 
 /**
- * Load hotspots
- * @method FORGE.ObjectRenderer#loadHotspots
- * @param {Array<FORGE.Hotspot3D>} hotspots - hotspots array
+ * Load objects
+ * @method FORGE.ObjectRenderer#loadObjects
+ * @param {Array<FORGE.Hotspot3D>} objects - objects array
  */
-FORGE.ObjectRenderer.prototype.loadHotspots = function(hotspots)
+FORGE.ObjectRenderer.prototype.loadObjects = function(objects)
 {
-    if (hotspots === null || hotspots.length === 0)
+    if (objects === null || objects.length === 0)
     {
         return;
     }
@@ -62,20 +72,47 @@ FORGE.ObjectRenderer.prototype.loadHotspots = function(hotspots)
     var scene = this._scene;
     
     // Clone every
-    hotspots.forEach(function(hotspot)
+    objects.forEach(function(object)
     {
-        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry().copy(hotspot.geometry.geometry), new THREE.RawShaderMaterial());
-        mesh.position.set(hotspot.transform.position.x, hotspot.transform.position.y, hotspot.transform.position.z);
-        mesh.rotation.set(hotspot.transform.rotation.x, hotspot.transform.rotation.y, hotspot.transform.rotation.z);
+        var mesh = object.mesh;
 
-        hotspot.material.onReady.addOnce(function(event) {
-            mesh.material.copy(hotspot.material.material);
-            mesh.material.uniforms.tTexture.value = hotspot.material.texture;
-            mesh.material.uniforms.tOpacity.value = hotspot.material.opacity;
-        });
+        mesh.material = new THREE.MeshBasicMaterial({color:new THREE.Color(1,0,0)})
+        // mesh.material = this._sceneRenderer.view.current.materials[Math.floor(this._viewer.clock.time % 6)];
 
         scene.add(mesh);
-    });
+
+
+        // // var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry().copy(object.geometry.geometry), new THREE.MeshBasicMaterial({color: new THREE.Color("#0f6")}));
+        // var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry().copy(object.geometry.geometry), new THREE.RawShaderMaterial());
+        // mesh.position.set(object.transform.position.x, object.transform.position.y, object.transform.position.z);
+        // mesh.rotation.set(object.transform.rotation.x, object.transform.rotation.y, object.transform.rotation.z);
+
+        // object.material.onReady.addOnce(function(event) {
+        //     mesh.material.copy(object.material.material);
+        //     mesh.material.uniforms.tTexture.value = object.material.texture;
+        //     mesh.material.uniforms.tOpacity.value = object.material.opacity;
+
+        //     mesh.onBeforeRender = function(renderer, scene, camera, geometry, material, group) {
+
+        //         // if (material.name === "PickingMaterial") {
+        //         //     if (material.program)
+        //         //     {
+        //         //         var gl = this._viewer.renderer.webGLRenderer.getContext();
+        //         //         gl.useProgram(material.program.program);
+        //         //         material.program.getUniforms().map.tColor.setValue(gl, this._pickingColor);
+        //         //         material.uniforms.tColor.value = this._pickingColor;
+        //         //     }
+        //         // }
+        //         // else if (material.name === "HotspotMaterial")
+        //         // {
+        //         // }
+
+
+        //     }.bind(this);
+
+        //     scene.add(mesh);
+        // }.bind(this));
+    }.bind(this));
 };
 
 /**
@@ -103,7 +140,9 @@ FORGE.ObjectRenderer.prototype.render = function(target)
         return;
     }
 
-    this._viewer.renderer.webGLRenderer.render(this._scene, this._sceneRenderer.camera.main, target);
+    var camera = this._sceneRenderer.camera.main;
+    this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
+    this._picking.render(this._scene, camera, target);
 };
 
 /**

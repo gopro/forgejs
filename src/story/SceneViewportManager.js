@@ -62,6 +62,7 @@ FORGE.SceneViewportManager = function(viewer, scene)
      * @private
      */
     this._renderersReady = 0;
+
     this._onAllRenderersReady = null;
 
     FORGE.BaseObject.call(this, "SceneViewport");
@@ -118,16 +119,13 @@ FORGE.SceneViewportManager.prototype._parseConfig = function(config)
             var viewportConfig = config.layout[i];
             viewportConfig.vr = false;
             var viewport = new FORGE.SceneViewport(this._viewer, this._scene, viewportConfig);
+            viewport.sceneRenderer.onReady.add(this._onSceneRendererReady, this);
             this._viewports.push(viewport);
         }
-
-        viewport.sceneRenderer.onReady.add(this._onSceneRendererReady, this);
     }
 
     this._scene.onLoadComplete.addOnce(this._onSceneLoadComplete, this);
 };
-
-
 
 /**
  * Scene renderer ready handler
@@ -273,6 +271,8 @@ FORGE.SceneViewportManager.prototype.notifyMediaLoadComplete = function()
 FORGE.SceneViewportManager.prototype.render = function()
 {
     var viewports = this._viewer.renderer.vr === true ? this._vrViewports : this._viewports;
+
+    this._viewer.renderer.webGLRenderer.setClearColor( 0x000000, 0 ); // the default
 
     for(var i = 0, ii = viewports.length; i < ii; i++)
     {

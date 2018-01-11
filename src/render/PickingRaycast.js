@@ -5,6 +5,7 @@
  * @constructor FORGE.PickingRaycast
  * 
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
+ * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference
  * @extends {FORGE.BaseObject}
  */
 FORGE.PickingRaycast = function(viewer)
@@ -22,6 +23,7 @@ FORGE.PickingRaycast.prototype.constructor = FORGE.PickingRaycast;
  */
 FORGE.PickingRaycast.prototype._boot = function()
 {
+    FORGE.Picking.prototype._boot.call(this);
 };
 
 /**

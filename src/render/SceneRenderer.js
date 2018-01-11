@@ -57,14 +57,6 @@ FORGE.SceneRenderer = function(viewer, viewport)
     this._composerTexture = null;
 
     /**
-     * Picking manager.
-     * @name FORGE.SceneRenderer#_picking
-     * @type {FORGE.Picking}
-     * @private
-     */
-    this._picking = null;
-
-    /**
      * Scene renderer is ready event dispatcher
      * @name FORGE.Scene#_onReady
      * @type {FORGE.EventDispatcher}
@@ -148,9 +140,6 @@ FORGE.SceneRenderer.prototype.notifyMediaLoadComplete = function()
 FORGE.SceneRenderer.prototype._createObjectRenderer = function()
 {
     this._objectRenderer = new FORGE.ObjectRenderer(this._viewer, this);
-
-    this._picking = new FORGE.PickingRaycast();
-    this._picking = new FORGE.PickingDrawpass();
 };
 
 /**
@@ -238,7 +227,7 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
  */
 FORGE.SceneRenderer.prototype.loadHotspots = function(hotspots)
 {
-    this._objectRenderer.loadHotspots(hotspots);
+    this._objectRenderer.loadObjects(hotspots);
 };
 
 /**
