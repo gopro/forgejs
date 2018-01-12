@@ -898,9 +898,9 @@ FORGE.Tile.prototype.destroy = function()
     this._children.length = 0;
     this._children = null;
 
-    for (var i = 0, ii = this._neighbours.length; i < ii; i++)
+    for (var j = 0, jj = this._neighbours.length; j < jj; j++)
     {
-        this._neighbours[i].onDestroy.remove(this._onNeighbourTileDestroyed, this);
+        this._neighbours[j].onDestroy.remove(this._onNeighbourTileDestroyed, this);
     }
     this._neighbours.length = 0;
     this._neighbours = null;
