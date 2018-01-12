@@ -1561,6 +1561,26 @@ Object.defineProperty(FORGE.Viewer.prototype, "height",
 });
 
 /**
+ * Get and set the viewer background color.
+ * @name FORGE.Viewer#background
+ * @type {string}
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "background",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._config.background;
+    },
+
+    /** @this {FORGE.Viewer} */
+    set: function(value)
+    {
+        this._config.background = value;
+    }
+});
+
+/**
  * Get and set the vr status.
  * @name FORGE.Viewer#vr
  * @type {boolean}
