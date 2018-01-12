@@ -71,10 +71,10 @@ Object.defineProperty(FORGE.Size.prototype, "ratio",
 
 /**
  * Get size as THREE.Vector2.
- * @name FORGE.Size#asVector
+ * @name FORGE.Size#vector
  * @type {THREE.Vector2}
  */
-Object.defineProperty(FORGE.Size.prototype, "asVector",
+Object.defineProperty(FORGE.Size.prototype, "vector2",
 {
     /** @this {FORGE.Size} */
     get: function()

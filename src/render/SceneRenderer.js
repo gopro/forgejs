@@ -3,14 +3,13 @@
  *
  * @constructor FORGE.SceneRenderer
  * @param {FORGE.Viewer} viewer - viewer reference
- * @param {FORGE.Scene} scene - scene object
- * @param {FORGE.SceneViewport} sceneViewport - sceneViewport parent object
+ * @param {FORGE.SceneViewport} viewport - viewport parent object
  * @extends {FORGE.BaseObject}
  *
  * @todo think about how to render multiple scene at the same time, with blending / overlap / viewport layouting...
  * maybe add a layer object encapsulating background / foreground renderings to ease the process
  */
-FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
+FORGE.SceneRenderer = function(viewer, viewport)
 {
     /**
      * The viewer reference.
@@ -21,20 +20,12 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
     this._viewer = viewer;
 
     /**
-     * The scene object.
-     * @name FORGE.SceneRenderer#_scene
-     * @type {FORGE.Scene}
-     * @private
-     */
-    this._scene = scene;
-
-    /**
      * The scene viewport parent object.
-     * @name FORGE.SceneRenderer#_sceneViewport
+     * @name FORGE.SceneRenderer#_viewport
      * @type {FORGE.SceneViewport}
      * @private
      */
-    this._sceneViewport = sceneViewport;
+    this._viewport = viewport;
 
     /**
      * Background renderer.
@@ -53,22 +44,6 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
     this._objectRenderer = null;
 
     /**
-     * Camera.
-     * @name FORGE.SceneRenderer#_camera
-     * @type {FORGE.Camera}
-     * @private
-     */
-    this._camera = null;
-
-    /**
-     * View manager.
-     * @name FORGE.SceneRenderer#_viewManager
-     * @type {FORGE.ViewManager}
-     * @private
-     */
-    this._viewManager = null;
-
-    /**
      * Scene effect Composer.
      * @name FORGE.SceneRenderer#_composer
      * @type {FORGE.SceneEffectComposer}
@@ -78,7 +53,7 @@ FORGE.SceneRenderer = function(viewer, scene, sceneViewport)
 
     /**
      * Composer input texture.
-     * @name FORGE.SceneRenderer#_viewManager
+     * @name FORGE.SceneRenderer#_composerTexture
      * @type {FORGE.ViewManager}
      * @private
      */
@@ -99,14 +74,12 @@ FORGE.SceneRenderer.prototype.constructor = FORGE.SceneRenderer;
  */
 FORGE.SceneRenderer.prototype._boot = function()
 {
-    if (this._scene.media === null)
+    if (this._viewport.scene.media === null)
     {
         this.warn("Scene has no media. This should not happen.");
         return;
     }
 
-    this._createViewManager();
-    this._createCamera();
     this._createObjectRenderer();
     this._createComposer();
 };
@@ -118,7 +91,7 @@ FORGE.SceneRenderer.prototype._boot = function()
  */
 FORGE.SceneRenderer.prototype._createComposer = function()
 {
-    if (this._sceneViewport.fx.length === 0)
+    if (this._viewport.fx.length === 0)
     {
         return;
     }
@@ -138,10 +111,10 @@ FORGE.SceneRenderer.prototype._createComposer = function()
     };
 
     // TODO : renderer should expose scene size for each frame, it could change during transitions
-    this._composerTexture = new THREE.WebGLRenderTarget(this._sceneViewport.size.width, this._sceneViewport.size.height, rtParams);
-    this._composerTexture.name = "Viewport-EffectComposer-Target-in-" + this._sceneViewport.uid;
+    this._composerTexture = new THREE.WebGLRenderTarget(this._viewport.size.width, this._viewport.size.height, rtParams);
+    this._composerTexture.name = "Viewport-EffectComposer-Target-in-" + this._viewport.uid;
 
-    this._composer = new FORGE.SceneEffectComposer(this._viewer, this._composerTexture, this._scene.renderTarget, this._sceneViewport.fx);
+    this._composer = new FORGE.SceneEffectComposer(this._viewer, this._composerTexture, this._viewport.scene.renderTarget, this._viewport.fx);
 };
 
 /**
@@ -152,41 +125,6 @@ FORGE.SceneRenderer.prototype._createComposer = function()
 FORGE.SceneRenderer.prototype.notifyMediaLoadComplete = function()
 {
     this._createBackgroundRenderer();
-};
-
-/**
- * Create view manager
- * @method FORGE.SceneRenderer#_createViewManager
- * @private
- */
-FORGE.SceneRenderer.prototype._createViewManager = function()
-{
-    this._viewManager = new FORGE.ViewManager(this._viewer, this);
-
-    var viewConfig = this._sceneViewport.config.view;
-    if (typeof viewConfig === "undefined" || viewConfig.type === "undefined")
-    {
-        this._viewManager.type = "rectilinear";
-    }
-
-    this._viewManager.load(viewConfig);
-};
-
-/**
- * Create and init a camera with info contained in the scene and story configurations
- * @method FORGE.SceneRenderer#_createCamera
- * @private
- */
-FORGE.SceneRenderer.prototype._createCamera = function()
-{
-    this._camera = new FORGE.Camera(this._viewer, this);
-
-    var sceneCameraConfig = /** @type {CameraConfig} */ (this._scene.config.camera);
-    var storyCameraConfig = /** @type {CameraConfig} */ (this._viewer.mainConfig.camera);
-    var sceneOverStoryCameraConfig = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(storyCameraConfig, sceneCameraConfig));
-    var cameraConfig = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(sceneOverStoryCameraConfig, this._sceneViewport.config.camera));
-
-    this._camera.load(cameraConfig);
 };
 
 /**
@@ -221,7 +159,7 @@ FORGE.SceneRenderer.prototype._createObjectRenderer = function()
  */
 FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
 {
-    var media = this._scene.media;
+    var media = this._viewport.scene.media;
     var backgroundRendererRef;
 
     if (media.type === FORGE.MediaType.UNDEFINED)
@@ -247,8 +185,8 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
             {
                 // Background shader or mesh with sphere geometry
                 // Default choice: using a shader renderer allows spherical transitions between scenes
-                // Performance fallback: mesh renderer
-                if (this._sceneViewport.config.vr === true)
+                // Performance fallback: mesh sphere renderer
+                if (this._viewport.vr === true)
                 {
                     backgroundRendererRef = FORGE.BackgroundSphereRenderer;
                 }
@@ -274,31 +212,7 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
         }
     }
 
-    this._backgroundRenderer = new backgroundRendererRef(this._viewer, this);
-};
-
-/**
- * Set view.
- * @method FORGE.SceneRenderer#setView
- * @param {string|SceneViewConfig} config - new view configuration
- */
-FORGE.SceneRenderer.prototype.setView = function(config)
-{
-    if (typeof config === "string")
-    {
-        this._viewManager.type = config;
-    }
-
-    else if (typeof config === "object")
-    {
-        this._viewManager.load(config);
-    }
-
-    else
-    {
-        this.warning("Set view with unknown configuration type (" + typeof config + ")");
-        return;
-    }
+    this._backgroundRenderer = new backgroundRendererRef(this._viewer, this._viewport);
 };
 
 /**
@@ -307,8 +221,6 @@ FORGE.SceneRenderer.prototype.setView = function(config)
  */
 FORGE.SceneRenderer.prototype.render = function()
 {
-    this._camera.update();
-
     if (this._backgroundRenderer === null)
     {
         return;
@@ -316,18 +228,13 @@ FORGE.SceneRenderer.prototype.render = function()
 
     if (this._composer === null)
     {
-        this._backgroundRenderer.render(this._scene.renderTarget);
+        this._backgroundRenderer.render(this._viewport.scene.renderTarget);
     }
     else
     {
         this._backgroundRenderer.render(this._composerTexture);
         this._composer.render();
     }
-
-
-    // This is pure nonsense !! RenderPipeline renders all render passes...
-    // The object renderer should have done its job before to prepare the textures
-    // this._objectRenderer.render();
 };
 
 /**
@@ -357,12 +264,6 @@ FORGE.SceneRenderer.prototype.destroy = function()
         this._objectRenderer = null;
     }
 
-    if (this._viewManager !== null)
-    {
-        this._viewManager.destroy();
-        this._viewManager = null;
-    }
-
     FORGE.BaseObject.prototype.destroy.call(this);
 };
 
@@ -371,7 +272,7 @@ FORGE.SceneRenderer.prototype.destroy = function()
  * @name FORGE.SceneRenderer#backgroundRenderer
  * @type {FORGE.BackgroundRenderer}
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "backgroundRenderer",
+Object.defineProperty(FORGE.SceneRenderer.prototype, "background",
 {
     /** @this {FORGE.SceneRenderer} */
     get: function()
@@ -380,72 +281,3 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "backgroundRenderer",
     }
 });
 
-/**
- * Get the camera.
- * @name FORGE.SceneRenderer#camera
- * @type {FORGE.cameraManager}
- */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "camera",
-{
-    /** @this {FORGE.SceneRenderer} */
-    get: function()
-    {
-        return this._camera;
-    }
-});
-
-/**
- * Get the view manager.
- * @name FORGE.SceneRenderer#view
- * @type {FORGE.ViewManager}
- */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "view",
-{
-    /** @this {FORGE.SceneRenderer} */
-    get: function()
-    {
-        return this._viewManager;
-    }
-});
-
-/**
- * Get the scene media.
- * @name FORGE.SceneRenderer#media
- * @type {FORGE.Media}
- */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "media",
-{
-    /** @this {FORGE.SceneRenderer} */
-    get: function()
-    {
-        return this._sceneViewport.scene.media;
-    }
-});
-
-/**
- * Get the background color of the scene (null if not defined).
- * @name FORGE.SceneRenderer#background
- * @type {string}
- */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "background",
-{
-    /** @this {FORGE.SceneRenderer} */
-    get: function()
-    {
-        return this._sceneViewport.scene.background;
-    }
-});
-
-/**
- * Get the display viewport.
- * @name FORGE.SceneRenderer#viewport
- * @type {FORGE.Rectangle}
- */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "viewport",
-{
-    /** @this {FORGE.SceneRenderer} */
-    get: function()
-    {
-        return this._sceneViewport.viewport;
-    }
-});

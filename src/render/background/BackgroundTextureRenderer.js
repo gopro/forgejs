@@ -3,13 +3,12 @@
  * BackgroundTextureRenderer class.
  *
  * @constructor FORGE.BackgroundTextureRenderer
-
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
  * @param {string=} className - The class name of the object as long as many other object inherits from this one.
- * @extends {FORGE.BackgroundRenderer}
+ * @extends {FORGE.BackgroundMeshRenderer}
  */
-FORGE.BackgroundTextureRenderer = function(viewer, sceneRenderer, className)
+FORGE.BackgroundTextureRenderer = function(viewer, viewport, className)
 {
     /**
      * Texture used for video rendering
@@ -19,7 +18,7 @@ FORGE.BackgroundTextureRenderer = function(viewer, sceneRenderer, className)
      */
     this._texture = null;
 
-    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, className || "BackgroundTextureRenderer");
+    FORGE.BackgroundMeshRenderer.call(this, viewer, viewport, className || "BackgroundTextureRenderer");
 
 };
 

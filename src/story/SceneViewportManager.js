@@ -75,8 +75,8 @@ FORGE.SceneViewportManager.prototype._boot = function()
     // Prepare VR rendering
     this._setupVRViewports();
 
-    // @todo enable this finally
-//    this._viewer.controllers.onActivate.add(this._renewActiveViewport, this)
+    // @todo enable this finally instead of all the canvas pointers
+    // this._viewer.controllers.onActivate.add(this._renewActiveViewport, this)
     this._viewer.canvas.pointer.onTap.add(this._renewActiveViewport, this);
     this._viewer.canvas.pointer.onDoubleTap.add(this._renewActiveViewport, this);
     this._viewer.canvas.pointer.onPanStart.add(this._renewActiveViewport, this);
@@ -84,6 +84,8 @@ FORGE.SceneViewportManager.prototype._boot = function()
     this._viewer.canvas.pointer.onPressStart.add(this._renewActiveViewport, this);
     this._viewer.canvas.pointer.onRotateStart.add(this._renewActiveViewport, this);
     this._viewer.canvas.pointer.onWheel.add(this._renewActiveViewport, this);
+
+    this._viewer.canvas.onResize.add(this._canvasResizeHandler, this);
 };
 
 /**
@@ -97,23 +99,7 @@ FORGE.SceneViewportManager.prototype._parseConfig = function(config)
 
     if (typeof config.layout === "undefined" || config.layout.length === 0)
     {
-        var layoutConfig = {};
-
-        layoutConfig.background = this._scene.background;
-        layoutConfig.viewport = new FORGE.Rectangle(0, 0, 100, 100);
-
-        var sceneCameraConfig = /** @type {CameraConfig} */ (this._scene.config.camera);
-        var storyCameraConfig = /** @type {CameraConfig} */ (this._viewer.mainConfig.camera);
-        layoutConfig.camera = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(storyCameraConfig, sceneCameraConfig));
-
-        var sceneViewConfig = /** @type {ViewConfig} */ (this._scene.config.view);
-        var storyViewConfig = /** @type {ViewConfig} */ (this._viewer.mainConfig.view);
-        layoutConfig.view = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(storyViewConfig, sceneViewConfig));
-
-        layoutConfig.vr = false;
-
-        // only on renderer with full viewport
-        var viewport = new FORGE.SceneViewport(this._viewer, this._scene, layoutConfig);
+        var viewport = new FORGE.SceneViewport(this._viewer, this._scene, null);
         this._viewports.push(viewport);
     }
     else
@@ -129,6 +115,16 @@ FORGE.SceneViewportManager.prototype._parseConfig = function(config)
 };
 
 /**
+ * Canvas resize handler
+ * @method FORGE.SceneViewportManager#_canvasResizeHandler
+ * @private
+ */
+FORGE.SceneViewportManager.prototype._canvasResizeHandler = function()
+{
+    console.log("TODO resize");
+};
+
+/**
  * Get the index of the scene viewport containing some point
  * @method FORGE.SceneViewportManager#_getSceneViewportIndexContainingPoint
  * @param {THREE.Vector2} point - point
@@ -137,8 +133,8 @@ FORGE.SceneViewportManager.prototype._parseConfig = function(config)
  */
 FORGE.SceneViewportManager.prototype._getSceneViewportIndexContainingPoint = function(point)
 {
-    return this._viewports.findIndex(function(sceneViewport) {
-        return sceneViewport.viewport.contains(point);
+    return this._viewports.findIndex(function(viewport) {
+        return viewport.rectangle.contains(point);
     });
 };
 
@@ -172,22 +168,24 @@ FORGE.SceneViewportManager.prototype._renewActiveViewport = function(event)
  */
 FORGE.SceneViewportManager.prototype._setupVRViewports = function(config)
 {
-    var vrLeftConfig = {
-        viewport: new FORGE.Rectangle(0, 0, 50, 100),
-        backround: this._scene.background,
-        camera: undefined,
-        view: undefined,
+    var vrLeftConfig =
+    {
+        rectangle: new FORGE.Rectangle(0, 0, 50, 100),
+        // background: undefined,
+        // camera: undefined,
+        // view: undefined,
         vr: true
     };
 
     var viewportL = new FORGE.SceneViewport(this._viewer, this._scene, vrLeftConfig);
     this._vrViewports.push(viewportL);
 
-    var vrRightConfig = {
-        viewport: new FORGE.Rectangle(50, 0, 50, 100),
-        backround: this._scene.background,
-        camera: undefined,
-        view: undefined,
+    var vrRightConfig =
+    {
+        rectangle: new FORGE.Rectangle(50, 0, 50, 100),
+        // background: undefined,
+        // camera: undefined,
+        // view: undefined,
         vr: true
     };
 
@@ -200,11 +198,14 @@ FORGE.SceneViewportManager.prototype._setupVRViewports = function(config)
  */
 FORGE.SceneViewportManager.prototype.notifyMediaLoadComplete = function()
 {
-    var viewports = this._viewer.renderer.vr === true ? this._vrViewports : this._viewports;
-
-    for(var i = 0, ii = viewports.length; i < ii; i++)
+    for(var i = 0, ii = this._viewports.length; i < ii; i++)
     {
-        viewports[i].notifyMediaLoadComplete();
+        this._viewports[i].notifyMediaLoadComplete();
+    }
+
+    for(var j = 0, jj = this._vrViewports.length; j < jj; j++)
+    {
+        this._vrViewports[j].notifyMediaLoadComplete();
     }
 };
 
@@ -236,8 +237,8 @@ FORGE.SceneViewportManager.prototype.getRelativeMousePosition = function(mouse)
         return null;
     }
 
-    var viewport = this._viewports[index].viewport;
-    return new THREE.Vector2(mouse.x - viewport.x, mouse.y - viewport.y);
+    var rectangle = this._viewports[index].rectangle;
+    return new THREE.Vector2(mouse.x - rectangle.x, mouse.y - rectangle.y);
 };
 
 /**

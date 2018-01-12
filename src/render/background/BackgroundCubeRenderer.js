@@ -3,12 +3,11 @@
  * BackgroundCubeRenderer class.
  *
  * @constructor FORGE.BackgroundCubeRenderer
- * @extends {FORGE.BackgroundTextureRenderer}
- *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @extends {FORGE.BackgroundTextureRenderer}
  */
-FORGE.BackgroundCubeRenderer = function(viewer, sceneRenderer)
+FORGE.BackgroundCubeRenderer = function(viewer, viewport)
 {
     /**
      * The layout of the faces in the texture. There are six faces to specify:
@@ -36,7 +35,7 @@ FORGE.BackgroundCubeRenderer = function(viewer, sceneRenderer)
      */
     this._faces = new THREE.Vector2(0, 0);
 
-    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundCubeRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, viewport, "BackgroundCubeRenderer");
 };
 
 FORGE.BackgroundCubeRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);

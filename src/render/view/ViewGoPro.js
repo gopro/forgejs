@@ -3,11 +3,11 @@
  *
  * @constructor FORGE.ViewGoPro
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.ViewManager} viewManager - {@link FORGE.ViewManager} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
  * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewGoPro = function(viewer, viewManager, options)
+FORGE.ViewGoPro = function(viewer, viewport, options)
 {
     /**
      * Projection distance.
@@ -17,7 +17,7 @@ FORGE.ViewGoPro = function(viewer, viewManager, options)
      */
     this._projectionDistance = 0;
 
-    FORGE.ViewBase.call(this, viewer, viewManager, options, "ViewGoPro", FORGE.ViewType.GOPRO);
+    FORGE.ViewBase.call(this, viewer, viewport, options, "ViewGoPro", FORGE.ViewType.GOPRO);
 
     this._boot();
 };
@@ -55,7 +55,7 @@ FORGE.ViewGoPro.prototype._updateViewParams = function()
         var projFovHigh = 180;
         var distance = 0;
 
-        var fov = this._viewManager.sceneRenderer.camera.fov;
+        var fov = this._viewport.camera.fov;
 
         var fn = 0;
 
@@ -124,7 +124,7 @@ FORGE.ViewGoPro.prototype.worldToScreen = function(worldPt, parallaxFactor)
     parallaxFactor = parallaxFactor || 0;
 
     var worldPt4 = new THREE.Vector4(-worldPt.x, -worldPt.y, worldPt.z, 1.0);
-    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewManager.sceneRenderer.camera.modelView);
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewport.camera.modelView);
     var rotation = FORGE.Math.eulerToRotationMatrix(camEuler.yaw, camEuler.pitch, -camEuler.roll, true);
     rotation = rotation.transpose();
     worldPt4.applyMatrix4(rotation);
@@ -153,7 +153,7 @@ FORGE.ViewGoPro.prototype.worldToScreen = function(worldPt, parallaxFactor)
  */
 FORGE.ViewGoPro.prototype.screenToWorld = function(screenPt)
 {
-    var resolution = this._getResolution();
+    var resolution = this._viewport.rectangle.size;
 
     screenPt = screenPt || new THREE.Vector2(resolution.width / 2, resolution.height / 2);
 
@@ -185,7 +185,7 @@ FORGE.ViewGoPro.prototype.screenToWorld = function(screenPt)
     worldPt.y = fragment.y * ((this._projectionDistance - worldPt.z) / (this._projectionDistance + 1));
 
     // move the point in the world system
-    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewManager.sceneRenderer.camera.modelView);
+    var camEuler = FORGE.Math.rotationMatrixToEuler(this._viewport.camera.modelView);
     var rotation = FORGE.Math.eulerToRotationMatrix(-camEuler.yaw, camEuler.pitch, -camEuler.roll, true);
     worldPt.applyMatrix4(rotation);
 
@@ -200,7 +200,7 @@ FORGE.ViewGoPro.prototype.getProjectionFov = function()
 {
     this._updateViewParams();
 
-    var theta = 0.5 * FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.fov);
+    var theta = 0.5 * FORGE.Math.degToRad(this._viewport.camera.fov);
 
     var radius = 1.0 - this._projectionDistance / 2.0;
     var offset = Math.abs(radius - 1);

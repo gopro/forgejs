@@ -3,14 +3,13 @@
  * BackgroundShaderRenderer class.
  *
  * @constructor FORGE.BackgroundShaderRenderer
- * @extends {FORGE.BackgroundTextureRenderer}
- *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @extends {FORGE.BackgroundTextureRenderer}
  */
-FORGE.BackgroundShaderRenderer = function(viewer, sceneRenderer)
+FORGE.BackgroundShaderRenderer = function(viewer, viewport)
 {
-    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundShaderRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, viewport, "BackgroundShaderRenderer");
 };
 
 FORGE.BackgroundShaderRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);
@@ -38,7 +37,7 @@ FORGE.BackgroundShaderRenderer.prototype._boot = function()
  */
 FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
 {
-    var shaderSTW = this._sceneRenderer.view.current.shaderSTW;
+    var shaderSTW = this._viewport.view.current.shaderSTW;
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shaderSTW.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shaderSTW.fragmentShader);

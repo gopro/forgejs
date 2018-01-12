@@ -3,13 +3,13 @@
  *
  * @constructor FORGE.ViewBase
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.ViewManager} viewManager - {@link FORGE.ViewManager} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
  * @param {?ViewOptionsConfig} options - The view options.
  * @param {string} className - object className.
  * @param {string} type - object view type.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ViewBase = function(viewer, viewManager, options, className, type)
+FORGE.ViewBase = function(viewer, viewport, options, className, type)
 {
     /**
      * The Viewer reference.
@@ -21,11 +21,11 @@ FORGE.ViewBase = function(viewer, viewManager, options, className, type)
 
     /**
      * The view manager reference.
-     * @name FORGE.ViewBase#_viewManager
-     * @type {FORGE.ViewManager}
+     * @name FORGE.ViewBase#_viewport
+     * @type {FORGE.SceneViewport}
      * @private
      */
-    this._viewManager = viewManager;
+    this._viewport = viewport;
 
     /**
      * The view options
@@ -160,17 +160,6 @@ FORGE.ViewBase.prototype._sceneLoadCompleteHandler = function()
 };
 
 /**
- * Get resolution.
- * @method FORGE.ViewBase#_getResolution
- * @return {FORGE.Size} viewport resolution
- * @private
- */
-FORGE.ViewBase.prototype._getResolution = function()
-{
-    return this._viewManager.sceneRenderer.viewport.size;
-};
-
-/**
  * Compute fragment from a screen point.
  *
  * @method FORGE.ViewBase#_screenToFragment
@@ -180,9 +169,10 @@ FORGE.ViewBase.prototype._getResolution = function()
  */
 FORGE.ViewBase.prototype._screenToFragment = function(screenPt)
 {
-    var resolution = this._getResolution();
+    var resolution = this._viewport.rectangle.size;
     var fx = (2.0 * screenPt.x / resolution.width) - 1.0;
     var fy = (2.0 * screenPt.y / resolution.height) - 1.0;
+
     return new THREE.Vector2(fx * resolution.ratio, fy);
 };
 
@@ -196,9 +186,10 @@ FORGE.ViewBase.prototype._screenToFragment = function(screenPt)
  */
 FORGE.ViewBase.prototype._fragmentToScreen = function(fragment)
 {
-    var resolution = this._getResolution();
+    var resolution = this._viewport.rectangle.size;
     var sx = ((fragment.x / resolution.ratio) + 1.0) * (resolution.width / 2.0);
     var sy = (fragment.y + 1.0) * (resolution.height / 2.0);
+
     return new THREE.Vector2(Math.round(sx), resolution.height - Math.round(sy));
 };
 
@@ -252,7 +243,7 @@ FORGE.ViewBase.prototype.screenToWorld = function(screenPt)
  */
 FORGE.ViewBase.prototype.getProjectionFov = function()
 {
-    return FORGE.Math.degToRad(this._viewManager.sceneRenderer.camera.fov);
+    return FORGE.Math.degToRad(this._viewport.camera.fov);
 };
 
 /**

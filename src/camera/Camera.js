@@ -3,10 +3,10 @@
  *
  * @constructor FORGE.Camera
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.Camera = function(viewer, sceneRenderer)
+FORGE.Camera = function(viewer, viewport)
 {
     /**
      * The viewer reference.
@@ -17,12 +17,12 @@ FORGE.Camera = function(viewer, sceneRenderer)
     this._viewer = viewer;
 
     /**
-     * The scene renderer reference.
-     * @name FORGE.Camera#_sceneRenderer
+     * The viewport reference.
+     * @name FORGE.Camera#_viewport
      * @type {FORGE.SceneRenderer}
      * @private
      */
-    this._sceneRenderer = sceneRenderer;
+    this._viewport = viewport;
 
     /**
      * Camera configuration that has been loaded.
@@ -334,7 +334,7 @@ FORGE.Camera.prototype._boot = function()
 
     this._gaze = new FORGE.CameraGaze(this._viewer, FORGE.Camera.DEFAULT_CONFIG.gaze);
 
-    this._sceneRenderer.view.onChange.add(this._updateInternals, this);
+    this._viewport.view.onChange.add(this._updateInternals, this);
 
     this._createMainCamera();
     this._createFlatCamera();
@@ -456,12 +456,9 @@ FORGE.Camera.prototype._resetChangelog = function()
  */
 FORGE.Camera.prototype._createMainCamera = function()
 {
-    if (typeof this._sceneRenderer !== "undefined")
-    {
-        this._main = new THREE.PerspectiveCamera(this._fov, this._sceneRenderer.viewport.size.ratio, FORGE.Renderer.DEPTH_NEAR, 2 * FORGE.Renderer.DEPTH_FAR);
-        this._main.name = "CameraMain";
-        this._main.matrixAutoUpdate = false;
-    }
+    this._main = new THREE.PerspectiveCamera(this._fov, this._viewport.size.ratio, FORGE.Renderer.DEPTH_NEAR, 2 * FORGE.Renderer.DEPTH_FAR);
+    this._main.name = "CameraMain";
+    this._main.matrixAutoUpdate = false;
 };
 
 /**
@@ -471,17 +468,14 @@ FORGE.Camera.prototype._createMainCamera = function()
  */
 FORGE.Camera.prototype._createFlatCamera = function()
 {
-    if (typeof this._sceneRenderer !== "undefined")
-    {
-        this._flat = new THREE.OrthographicCamera(
-            -1000, 1000,
-            1000, -1000,
-            FORGE.Renderer.DEPTH_NEAR,
-            FORGE.Renderer.DEPTH_FAR);
+    this._flat = new THREE.OrthographicCamera(
+        -1000, 1000,
+        1000, -1000,
+        FORGE.Renderer.DEPTH_NEAR,
+        FORGE.Renderer.DEPTH_FAR);
 
-        this._flat.name = "CameraFlat";
-        this._flat.matrixAutoUpdate = false;
-    }
+    this._flat.name = "CameraFlat";
+    this._flat.matrixAutoUpdate = false;
 };
 
 /**
@@ -540,7 +534,7 @@ FORGE.Camera.prototype._updateFromMatrix = function()
  */
 FORGE.Camera.prototype._updateMainCamera = function()
 {
-    if (this._main === null || this._sceneRenderer.view.current === null)
+    if (this._main === null || this._viewport.view.current === null)
     {
         return;
     }
@@ -558,8 +552,8 @@ FORGE.Camera.prototype._updateMainCamera = function()
     this._main.matrixWorld = mat;
     this._main.matrixWorldInverse.getInverse(mat);
 
-    this._main.fov = FORGE.Math.radToDeg(this._sceneRenderer.view.current.getProjectionFov());
-    this._main.aspect = this._sceneRenderer.viewport.size.ratio;
+    this._main.fov = FORGE.Math.radToDeg(this._viewport.view.current.getProjectionFov());
+    this._main.aspect = this._viewport.size.ratio;
     this._main.updateProjectionMatrix();
 };
 
@@ -585,7 +579,7 @@ FORGE.Camera.prototype._updateFlatCamera = function()
     this._flat.bottom = this._flat.position.y - camH / 2;
 
     var max = this._fovMax;
-    var view = this._sceneRenderer.view.current;
+    var view = this._viewport.view.current;
 
     if (view !== null && view.fovMax !== null)
     {
@@ -690,12 +684,12 @@ FORGE.Camera.prototype._getYawBoundaries = function(relative, fov)
 
     if (relative !== false && min !== max)
     {
-        var halfHFov = 0.5 * fov * this._sceneRenderer.viewport.size.ratio;
+        var halfHFov = 0.5 * fov * this._viewport.size.ratio;
         min += halfHFov;
         max -= halfHFov;
     }
 
-    var view = this._sceneRenderer.view.current;
+    var view = this._viewport.view.current;
 
     if (view !== null)
     {
@@ -774,7 +768,7 @@ FORGE.Camera.prototype._getPitchBoundaries = function(relative, fov)
         max -= halfFov;
     }
 
-    var view = this._sceneRenderer.view.current;
+    var view = this._viewport.view.current;
 
     if (view !== null)
     {
@@ -832,7 +826,7 @@ FORGE.Camera.prototype._getRollBoundaries = function()
 {
     var min = this._rollMin;
     var max = this._rollMax;
-    var view = this._sceneRenderer.view.current;
+    var view = this._viewport.view.current;
 
     if (view !== null)
     {
@@ -893,15 +887,16 @@ FORGE.Camera.prototype._getFovBoundaries = function()
 {
     var min = this._fovMin;
     var max = this._fovMax;
-    var view = this._sceneRenderer.view.current;
+    var view = this._viewport.view.current;
+
 
     /*
     // if JSON specifies a fov min (not default 0 value), use it
     // useful for multiresolution where fov limit will be computed depending
     // on max level of resolution available and stored in JSON
-    if (this._sceneRenderer.backgroundRenderer !== null && "fovMin" in this._sceneRenderer.backgroundRenderer)
+    if (this._viewport.renderer.backgroundRenderer !== null && "fovMin" in this._viewport.renderer.backgroundRenderer)
     {
-        min = Math.max(this._sceneRenderer.backgroundRenderer.fovMin, min);
+        min = Math.max(this._viewport.renderer.backgroundRenderer.fovMin, min);
     }
     else if (min === 0)
     {
@@ -925,7 +920,7 @@ FORGE.Camera.prototype._getFovBoundaries = function()
 
         var yawBoundaries = this._getYawBoundaries(false);
         var yawRange = yawBoundaries.max - yawBoundaries.min;
-        yawRange /= this._sceneRenderer.viewport.size.ratio;
+        yawRange /= this._viewport.size.ratio;
 
         if (yawRange > 0)
         {
@@ -1100,8 +1095,7 @@ FORGE.Camera.prototype.destroy = function()
     this._gaze.destroy();
     this._gaze = null;
 
-    this._sceneRenderer.view.onChange.remove(this._updateInternals, this);
-    this._sceneRenderer.onBackgroundReady.remove(this._updateInternals, this);
+    this._viewport.view.onChange.remove(this._updateInternals, this);
 
     if (this._onChange !== null)
     {
@@ -1127,7 +1121,7 @@ FORGE.Camera.prototype.destroy = function()
         this._cameraAnimation = null;
     }
 
-    this._sceneRenderer = null;
+    this._viewport = null;
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);

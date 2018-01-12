@@ -3,12 +3,11 @@
  * BackgroundGridRenderer class.
  *
  * @constructor FORGE.BackgroundGridRenderer
- * @extends {FORGE.BackgroundMeshRenderer}
- *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @extends {FORGE.BackgroundMeshRenderer}
  */
-FORGE.BackgroundGridRenderer = function(viewer, sceneRenderer)
+FORGE.BackgroundGridRenderer = function(viewer, viewport)
 {
     /**
      * Grid color
@@ -18,15 +17,7 @@ FORGE.BackgroundGridRenderer = function(viewer, sceneRenderer)
      */
     this._gridColor = "#7F7FFF";
 
-    /**
-     * Background color
-     * @name FORGE.BackgroundGridRenderer#_backgroundColor
-     * @type {string}
-     * @private
-     */
-    this._backgroundColor = "#202040";
-
-    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundGridRenderer");
+    FORGE.BackgroundMeshRenderer.call(this, viewer, viewport, "BackgroundGridRenderer");
 };
 
 FORGE.BackgroundGridRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
@@ -49,11 +40,6 @@ FORGE.BackgroundGridRenderer.prototype._boot = function()
         {
             this._gridColor = this._media.options.color;
         }
-    }
-
-    if (this._sceneRenderer.background !== null)
-    {
-        this._backgroundColor = this._sceneRenderer.background;
     }
 
     this._bootComplete();
@@ -145,7 +131,7 @@ FORGE.BackgroundGridRenderer.prototype._createGeometry = function()
  */
 FORGE.BackgroundGridRenderer.prototype._createMaterial = function()
 {
-    var shader = FORGE.Utils.clone(this._sceneRenderer.view.current.shaderWTS).wireframe;
+    var shader = FORGE.Utils.clone(this._viewport.view.current.shaderWTS).wireframe;
     this.log("Media " + this._media.type + ", use wireframe shader");
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
@@ -161,7 +147,7 @@ FORGE.BackgroundGridRenderer.prototype._createMaterial = function()
         side: THREE.BackSide
     });
 
-    material.uniforms.tBackgroundColor.value = new THREE.Color(this._backgroundColor);
+    material.uniforms.tBackgroundColor.value = new THREE.Color(this._viewport.background);
     material.uniforms.tColor.value = new THREE.Color(this._gridColor);
 
     material.blending = THREE.CustomBlending;

@@ -3,13 +3,13 @@
  *
  * @constructor FORGE.ViewFlat
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.ViewManager} viewManager - {@link FORGE.ViewManager} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
  * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */
-FORGE.ViewFlat = function(viewer, viewManager, options)
+FORGE.ViewFlat = function(viewer, viewport, options)
 {
-    FORGE.ViewBase.call(this, viewer, viewManager, options, "ViewFlat", FORGE.ViewType.FLAT);
+    FORGE.ViewBase.call(this, viewer, viewport, options, "ViewFlat", FORGE.ViewType.FLAT);
 
     this._boot();
 };
@@ -61,21 +61,19 @@ FORGE.ViewFlat.prototype._boot = function()
  */
 FORGE.ViewFlat.prototype._updateViewParams = function()
 {
-    var sceneRenderer = this._viewManager.sceneRenderer;
-
     if (this._viewer !== null)
     {
         // When repeat is ON, set yaw and pitch min and max depending on
         // texture and screen ratios
 
-        if (sceneRenderer.backgroundRenderer instanceof FORGE.BackgroundShaderRenderer)
+        if (this._viewport.renderer.background instanceof FORGE.BackgroundShaderRenderer)
         {
-            var vfov = FORGE.Math.degToRad(sceneRenderer.camera.fov);
+            var vfov = FORGE.Math.degToRad(this._viewport.camera.fov);
 
             if (this._options.repeatX === false)
             {
-                var hfov = vfov * sceneRenderer.viewport.ratio;
-                var texRatio = sceneRenderer.media.displayObject.originalWidth / sceneRenderer.media.displayObject.originalHeight;
+                var hfov = vfov * this._viewport.rectangle.ratio;
+                var texRatio = this._viewport.scene.media.displayObject.originalWidth / this._viewport.scene.media.displayObject.originalHeight;
                 this._yawMax = Math.min(360, Math.max(0, (Math.PI * texRatio - hfov) * 0.5)); // image
                 this._yawMin = -this._yawMax;
             }
@@ -116,7 +114,8 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
 FORGE.ViewFlat.prototype.updateUniforms = function(uniforms)
 {
     this._updateViewParams();
-    var camera = this._viewManager.sceneRenderer.camera;
+
+    var camera = this._viewport.camera;
 
     if (typeof uniforms === "undefined")
     {

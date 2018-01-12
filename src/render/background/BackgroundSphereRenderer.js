@@ -3,14 +3,13 @@
  * BackgroundSphereRenderer class.
  *
  * @constructor FORGE.BackgroundSphereRenderer
- * @extends {FORGE.BackgroundMeshRenderer}
- *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @extends {FORGE.BackgroundTextureRenderer}
  */
-FORGE.BackgroundSphereRenderer = function(viewer, sceneRenderer)
+FORGE.BackgroundSphereRenderer = function(viewer, viewport)
 {
-    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundSphereRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, viewport, "BackgroundSphereRenderer");
 };
 
 FORGE.BackgroundSphereRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);

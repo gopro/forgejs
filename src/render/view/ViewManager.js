@@ -3,10 +3,10 @@
  *
  * @constructor FORGE.ViewManager
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ViewManager = function(viewer, sceneRenderer)
+FORGE.ViewManager = function(viewer, viewport)
 {
     /**
      * The Viewer reference.
@@ -18,11 +18,11 @@ FORGE.ViewManager = function(viewer, sceneRenderer)
 
     /**
      * The scene renderer reference.
-     * @name FORGE.ViewManager#_sceneRenderer
-     * @type {FORGE.SceneRenderer}
+     * @name FORGE.ViewManager#_viewport
+     * @type {FORGE.SceneViewport}
      * @private
      */
-    this._sceneRenderer = sceneRenderer;
+    this._viewport = viewport;
 
     /**
      * The current view reference
@@ -93,16 +93,16 @@ FORGE.ViewManager.prototype._setView = function(type, options)
     switch (type)
     {
         case FORGE.ViewType.GOPRO:
-            this._view = new FORGE.ViewGoPro(this._viewer, this, options);
+            this._view = new FORGE.ViewGoPro(this._viewer, this._viewport, options);
             break;
 
         case FORGE.ViewType.FLAT:
-            this._view = new FORGE.ViewFlat(this._viewer, this, options);
+            this._view = new FORGE.ViewFlat(this._viewer, this._viewport, options);
             break;
 
         case FORGE.ViewType.RECTILINEAR:
         default:
-            this._view = new FORGE.ViewRectilinear(this._viewer, this, options);
+            this._view = new FORGE.ViewRectilinear(this._viewer, this._viewport, options);
             break;
     }
 
@@ -180,7 +180,7 @@ FORGE.ViewManager.prototype.disableVR = function()
     if(this._viewTypeBackup !== "")
     {
         this._setView(this._viewTypeBackup, this._viewOptionsBackup); // Restore the view as before the VR mode
-        this._sceneRenderer.camera.roll = 0; // Reset the roll to 0
+        this._viewport.camera.roll = 0; // Reset the roll to 0
     }
 };
 
@@ -246,21 +246,6 @@ Object.defineProperty(FORGE.ViewManager.prototype, "current",
     get: function()
     {
         return this._view;
-    }
-});
-
-/**
- * Get the scene renderer.
- * @name FORGE.ViewManager#sceneRenderer
- * @type {FORGE.SceneRenderer}
- * @readonly
- */
-Object.defineProperty(FORGE.ViewManager.prototype, "sceneRenderer",
-{
-    /** @this {FORGE.ViewManager} */
-    get: function()
-    {
-        return this._sceneRenderer;
     }
 });
 

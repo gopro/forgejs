@@ -3,13 +3,12 @@
  * BackgroundRenderer class.
  *
  * @constructor FORGE.BackgroundRenderer
- *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
  * @param {string=} className - The className of the object as long as many other object inherits from this one.
  * @extends {FORGE.BaseObject}
  */
-FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
+FORGE.BackgroundRenderer = function(viewer, viewport, className)
 {
     /**
      * The viewer reference.
@@ -20,12 +19,12 @@ FORGE.BackgroundRenderer = function(viewer, sceneRenderer, className)
     this._viewer = viewer;
 
     /**
-     * The scene renderer reference.
-     * @name FORGE.BackgroundRenderer#_sceneRenderer
-     * @type {FORGE.SceneRenderer}
+     * The viewport reference.
+     * @name FORGE.BackgroundRenderer#_viewport
+     * @type {FORGE.SceneViewport}
      * @private
      */
-    this._sceneRenderer = sceneRenderer;
+    this._viewport = viewport;
 
     /**
      * @name FORGE.BackgroundRenderer#_scene
@@ -82,21 +81,11 @@ FORGE.BackgroundRenderer.prototype._boot = function()
         window.scene = this._scene;
     }
 
-    this._media = this._sceneRenderer.media;
+    this._media = this._viewport.scene.media;
 
-    this._camera = this._sceneRenderer.camera.main;
+    this._camera = this._viewport.camera.main;
 
     this._frustum = new THREE.Frustum();
-};
-
-/**
- * Get the scene renderer resolution.
- * @method FORGE.BackgroundRenderer#_getResolution
- * @private
- */
-FORGE.BackgroundRenderer.prototype._getViewport = function()
-{
-    return this._sceneRenderer.viewport;
 };
 
 /**

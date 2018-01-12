@@ -253,10 +253,10 @@ Object.defineProperty(FORGE.Rectangle.prototype, "size",
 
 /**
  * Get size as THREE.Vector4.
- * @name FORGE.Rectangle#asVector
+ * @name FORGE.Rectangle#vector
  * @type {THREE.Vector4}
  */
-Object.defineProperty(FORGE.Rectangle.prototype, "asVector",
+Object.defineProperty(FORGE.Rectangle.prototype, "vector4",
 {
     /** @this {FORGE.Rectangle} */
     get: function()

@@ -4,11 +4,11 @@
  *
  * @constructor FORGE.BackgroundMeshRenderer
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
  * @param {string=} className - The class name of the object as long as many other object inherits from this one.
  * @extends {FORGE.BackgroundRenderer}
  */
-FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer, className)
+FORGE.BackgroundMeshRenderer = function(viewer, viewport, className)
 {
     /**
      * The mesh (cube) the video is on.
@@ -36,7 +36,7 @@ FORGE.BackgroundMeshRenderer = function(viewer, sceneRenderer, className)
      */
     this._subdivision = 8;
 
-    FORGE.BackgroundRenderer.call(this, viewer, sceneRenderer, className || "BackgroundMeshRenderer");
+    FORGE.BackgroundRenderer.call(this, viewer, viewport, className || "BackgroundMeshRenderer");
 };
 
 FORGE.BackgroundMeshRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
@@ -57,7 +57,7 @@ FORGE.BackgroundMeshRenderer.prototype._boot = function()
 {
     FORGE.BackgroundRenderer.prototype._boot.call(this);
 
-    this._sceneRenderer.view.onChange.add(this._onViewChanged, this);
+    this._viewport.view.onChange.add(this._onViewChanged, this);
 
     // Only this class will call boot complete.
     // The child classes will call this at the end of their own boot function
@@ -134,7 +134,7 @@ FORGE.BackgroundMeshRenderer.prototype._createGeometry = function()
  */
 FORGE.BackgroundMeshRenderer.prototype._createMaterial = function()
 {
-    var shader = FORGE.Utils.clone(this._sceneRenderer.view.current.shaderWTS).mapping;
+    var shader = FORGE.Utils.clone(this._viewport.view.current.shaderWTS).mapping;
     this.log("Media " + this._media.type + ", use mapping shader");
 
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
@@ -192,20 +192,20 @@ FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
 
     if ("tViewport" in uniforms)
     {
-        uniforms.tViewport.value = this._getViewport().asVector;
+        uniforms.tViewport.value = this._viewport.rectangle.vector4;
     }
 
     if ("tViewportRatio" in uniforms)
     {
-        uniforms.tViewportRatio.value = this._getViewport().size.ratio;
+        uniforms.tViewportRatio.value = this._viewport.rectangle.ratio;
     }
 
     if ("tModelViewMatrixInverse" in uniforms)
     {
-        uniforms.tModelViewMatrixInverse.value = this._sceneRenderer.camera.modelViewInverse;
+        uniforms.tModelViewMatrixInverse.value = this._viewport.camera.modelViewInverse;
     }
 
-    this._sceneRenderer.view.current.updateUniforms(uniforms);
+    this._viewport.view.current.updateUniforms(uniforms);
 
     FORGE.BackgroundRenderer.prototype.render.call(this, webGLRenderer, target);
 };
@@ -216,7 +216,7 @@ FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
  */
 FORGE.BackgroundMeshRenderer.prototype.destroy = function()
 {
-    this._sceneRenderer.view.onChange.remove(this._onViewChanged, this);
+    this._viewport.view.onChange.remove(this._onViewChanged, this);
 
     // Remove and dispose all meshes from the scene
     if (this._mesh !== null)

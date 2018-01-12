@@ -3,12 +3,11 @@
  * BackgroundPlaneRenderer class.
  *
  * @constructor FORGE.BackgroundPlaneRenderer
- * @extends {FORGE.BackgroundTextureRenderer}
- *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @extends {FORGE.BackgroundTextureRenderer}
  */
-FORGE.BackgroundPlaneRenderer = function(viewer, sceneRenderer)
+FORGE.BackgroundPlaneRenderer = function(viewer, viewport)
 {
     /**
      * The size of the mesh.
@@ -26,7 +25,7 @@ FORGE.BackgroundPlaneRenderer = function(viewer, sceneRenderer)
      */
     this._mediaVFov = 90;
 
-    FORGE.BackgroundTextureRenderer.call(this, viewer, sceneRenderer, "BackgroundPlaneRenderer");
+    FORGE.BackgroundTextureRenderer.call(this, viewer, viewport, "BackgroundPlaneRenderer");
 };
 
 FORGE.BackgroundPlaneRenderer.prototype = Object.create(FORGE.BackgroundTextureRenderer.prototype);
@@ -95,7 +94,7 @@ FORGE.BackgroundPlaneRenderer.prototype._onMeshCreated = function()
     if (this.DEBUG === true)
     {
         var fovMax = FORGE.Math.radToDeg(2 * Math.atan(0.5 * size.y / size.z));
-        var fovMin = FORGE.Math.radToDeg(2 * Math.atan((0.5 * size.y / size.z) * (this._getViewport().size.height / this._media.displayObject.height)));
+        var fovMin = FORGE.Math.radToDeg(2 * Math.atan((0.5 * size.y / size.z) * (this._viewport.rectangle.height / this._media.displayObject.height)));
 
         this.log("Flat rendering boundaries [" + fovMin.toFixed() + ", " + fovMax.toFixed() + "]");
     }

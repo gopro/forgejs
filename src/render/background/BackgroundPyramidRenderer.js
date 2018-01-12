@@ -3,12 +3,11 @@
  * BackgroundPyramidRenderer class.
  *
  * @constructor FORGE.BackgroundPyramidRenderer
- * @extends {FORGE.BackgroundRenderer}
- *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
+ * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @extends {FORGE.BackgroundRenderer}
  */
-FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
+FORGE.BackgroundPyramidRenderer = function(viewer, viewport)
 {
     /**
      * Current level of the pyramid
@@ -98,7 +97,7 @@ FORGE.BackgroundPyramidRenderer = function(viewer, sceneRenderer)
      */
     this._levelPixelsHumanReadable = "";
 
-    FORGE.BackgroundRenderer.call(this, viewer, sceneRenderer, "BackgroundPyramidRenderer");
+    FORGE.BackgroundRenderer.call(this, viewer, viewport, "BackgroundPyramidRenderer");
 };
 
 FORGE.BackgroundPyramidRenderer.prototype = Object.create(FORGE.BackgroundRenderer.prototype);
@@ -132,10 +131,10 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
     this._size = 2 * FORGE.Renderer.DEPTH_FAR;
 
     this._tileCache = {};
-    this._textureStore = this._sceneRenderer.media.store;
+    this._textureStore = this._media.store;
 
-    this._camera = this._sceneRenderer.camera.main;
-    this._sceneRenderer.camera.onChange.add(this._onCameraChange, this);
+    this._camera = this._viewport.camera.main;
+    this._viewport.camera.onFovChange.add(this._fovChangeHandler, this);
 
     if (this._media.preview !== null)
     {
@@ -264,10 +263,10 @@ FORGE.BackgroundPyramidRenderer.prototype._pyramidLevelToCameraFov = function(le
 
 /**
  * Camera change callback.
- * @method FORGE.BackgroundPyramidRenderer#_onCameraChange
+ * @method FORGE.BackgroundPyramidRenderer#_fovChangeHandler
  * @private
  */
-FORGE.BackgroundPyramidRenderer.prototype._onCameraChange = function(event)
+FORGE.BackgroundPyramidRenderer.prototype._fovChangeHandler = function(event)
 {
     var camera = event.emitter;
     var fov = camera.fov;
@@ -554,7 +553,8 @@ FORGE.BackgroundPyramidRenderer.prototype.selectLevel = function(level)
 
     this._levelPixels = this.nbTiles(this._level) * tilePixels;
 
-    var prefixes = {
+    var prefixes =
+    {
         3: "kilo",
         6: "mega",
         9: "giga",
@@ -622,7 +622,7 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(webGLRenderer, targe
  */
 FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 {
-    this._viewer.camera.onChange.remove(this._onCameraChange, this);
+    this._viewport.camera.onFovChange.remove(this._fovChangeHandler, this);
 
     var tile;
     for (var level in this._tileCache)
@@ -638,9 +638,7 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
 
     this._textureStore = null;
     this._tileCache = null;
-    this._renderNeighborList.length = 0;
     this._renderNeighborList = null;
-    this._renderList.length = 0;
     this._renderList = null;
 
     FORGE.BackgroundRenderer.prototype.destroy.call(this);
