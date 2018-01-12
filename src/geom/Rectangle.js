@@ -192,6 +192,21 @@ Object.defineProperty(FORGE.Rectangle.prototype, "h",
 });
 
 /**
+ * Get the ratio of the rectangle.
+ * @name FORGE.Rectangle#ratio
+ * @type {THREE.Vector2}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Rectangle.prototype, "ratio",
+{
+    /** @this {FORGE.Rectangle} */
+    get: function()
+    {
+        return this._width / this._height;
+    }
+});
+
+/**
  * Get center point.
  * @name FORGE.Rectangle#center
  * @type {THREE.Vector2}
