@@ -895,6 +895,7 @@ FORGE.Camera.prototype._getFovBoundaries = function()
     var max = this._fovMax;
     var view = this._sceneRenderer.view.current;
 
+    /*
     // if JSON specifies a fov min (not default 0 value), use it
     // useful for multiresolution where fov limit will be computed depending
     // on max level of resolution available and stored in JSON
@@ -937,6 +938,7 @@ FORGE.Camera.prototype._getFovBoundaries = function()
             min = max;
         }
     }
+    */
 
     return { min: min, max: max };
 };
