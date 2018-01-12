@@ -55,6 +55,14 @@ FORGE.Scene = function(viewer)
     this._description = null;
 
     /**
+     * The background color of the scene
+     * @name FORGE.Scene#_background
+     * @type {string}
+     * @private
+     */
+    this._background = "white";
+
+    /**
      * The array of scene uids to be sync with
      * @name FORGE.Scene#_sync
      * @type {Array<string>}
@@ -205,6 +213,7 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._name = new FORGE.LocaleString(this._viewer, this._config.name);
     this._slug = new FORGE.LocaleString(this._viewer, this._config.slug);
     this._description = new FORGE.LocaleString(this._viewer, this._config.description);
+    this._background = config.background;
     this._sync = (FORGE.Utils.isArrayOf(this._config.sync, "string") === true) ? this._config.sync : [];
 
     if(typeof config.events === "object" && config.events !== null)
@@ -875,7 +884,7 @@ Object.defineProperty(FORGE.Scene.prototype, "background",
     /** @this {FORGE.Scene} */
     get: function()
     {
-        return (typeof this._config.background !== "undefined") ? this._config.background : this._viewer.config.background;
+        return this._background;
     }
 });
 
