@@ -947,7 +947,7 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
     //If a request is already being proccessed clear it
     if (this._requestIndex !== -1 && this._requestIndex !== index)
     {
-        this._clearRequestedVideo();
+        this._abortRequest();
     }
 
     var alreadyRequested = index === this._requestIndex ? true : false;
@@ -992,7 +992,8 @@ FORGE.VideoHTML5.prototype._setRequestIndex = function(index, force)
         this._context = this._viewer.audio.context;
 
         //FOA decoder and binaural renderer
-        this._decoder = Omnitone.createFOADecoder(this._context, requestedVideo.element, {
+        this._decoder = Omnitone.createFOADecoder(this._context, requestedVideo.element,
+        {
             channelMap: this._defaultChannelMap
             //HRTFSetUrl: 'YOUR_HRTF_SET_URL', //Base URL for the cube HRTF sets.
             //postGainDB: 0, //Post-decoding gain compensation in dB.
@@ -1057,11 +1058,16 @@ FORGE.VideoHTML5.prototype._decoderInitializedError = function()
  */
 FORGE.VideoHTML5.prototype._onRequestLoadStart = function()
 {
-    var element = this._getRequestedVideo().element;
+    var element = this._getRequestedVideo();
 
-    this.log("_onRequestLoadStart [readyState: " + element.readyState + "]");
-    element.removeEventListener("loadstart", this._onRequestLoadStartBind, false);
-    element.addEventListener("loadedmetadata", this._onRequestLoadedMetaDataBind, false);
+    if (element !== null)
+    {
+        element = element.element;
+
+        this.log("_onRequestLoadStart [readyState: " + element.readyState + "]");
+        element.removeEventListener("loadstart", this._onRequestLoadStartBind, false);
+        element.addEventListener("loadedmetadata", this._onRequestLoadedMetaDataBind, false);
+    }
 };
 
 /**
@@ -1232,7 +1238,6 @@ FORGE.VideoHTML5.prototype._onRequestSeekedWhileSync = function()
     this.log("_onRequestSeekedWhileSync " + this.currentTime);
 
     var requestIndex = this._requestIndex;
-    this._abortRequest(false);
     this._setRequestIndex(requestIndex);
 };
 
@@ -1261,7 +1266,7 @@ FORGE.VideoHTML5.prototype._videoSyncTimerLoop = function()
  */
 FORGE.VideoHTML5.prototype._requestTimeOutHandler = function()
 {
-    this.log("_requestTimeOutHandler "+this._requestIndex);
+    this.log("_requestTimeOutHandler " + this._requestIndex);
     this._abortRequest(true);
 };
 
@@ -1568,20 +1573,26 @@ FORGE.VideoHTML5.prototype._clearRequestedVideo = function()
     {
         //Remove all listeners used for the requested video
         var element = video.element;
-        element.removeEventListener("loadstart", this._onRequestLoadStartBind, false);
-        element.removeEventListener("loadedmetadata", this._onRequestLoadedMetaDataBind, false);
-        element.removeEventListener("loadeddata", this._onRequestLoadedDataBind, false);
-        element.removeEventListener("play", this._onRequestCanPlayBeforeSeekBind, false);
-        element.removeEventListener("seeked", this._onRequestSeekedBind, false);
-        if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+
+        if (typeof element !== "undefined" && element !== null)
         {
-            element.removeEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+            element.removeEventListener("loadstart", this._onRequestLoadStartBind, false);
+            element.removeEventListener("loadedmetadata", this._onRequestLoadedMetaDataBind, false);
+            element.removeEventListener("loadeddata", this._onRequestLoadedDataBind, false);
+            element.removeEventListener("play", this._onRequestCanPlayBeforeSeekBind, false);
+            element.removeEventListener("seeked", this._onRequestSeekedBind, false);
+
+            if (FORGE.Device.edge === true || FORGE.Device.ie === true)
+            {
+                element.removeEventListener("canplaythrough", this._onRequestCanPlayAfterSeekBind, false);
+            }
+            else
+            {
+                element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
+            }
+
+            element.removeEventListener("error", this._onRequestErrorBind, false);
         }
-        else
-        {
-            element.removeEventListener("canplay", this._onRequestCanPlayAfterSeekBind, false);
-        }
-        element.removeEventListener("error", this._onRequestErrorBind, false);
 
         //Destroy the requested video
         this._destroyVideo(video);
@@ -1908,7 +1919,7 @@ FORGE.VideoHTML5.prototype._isAmbisonic = function()
  */
 FORGE.VideoHTML5.prototype.update = function()
 {
-    if(this._decoder !== null && this._playing === true)
+    if (this._decoder !== null && this._playing === true)
     {
         //Rotate the binaural renderer based on a Three.js camera object.
         var m4 = this._viewer.renderer.camera.modelViewInverse;
@@ -2732,7 +2743,7 @@ Object.defineProperty(FORGE.VideoHTML5.prototype, "playbackRate",
 Object.defineProperty(FORGE.VideoHTML5.prototype, "ambisonic",
 {
     /** @this {FORGE.VideoHTML5} */
-    get: function ()
+    get: function()
     {
         return this._ambisonic;
     }
