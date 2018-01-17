@@ -8,13 +8,13 @@
  * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference
  * @extends {FORGE.BaseObject}
  */
-FORGE.PickingDrawpass = function(viewer, sceneRenderer)
+FORGE.PickingDrawpass = function(viewer)
 {
     this._material = null;
 
     this._renderTarget = null;
 
-    FORGE.Picking.call(this, viewer, sceneRenderer, "PickingDrawpass");
+    FORGE.Picking.call(this, viewer, "PickingDrawpass");
 };
 
 FORGE.PickingDrawpass.prototype = Object.create(FORGE.Picking.prototype);
@@ -27,16 +27,16 @@ FORGE.PickingDrawpass.prototype.constructor = FORGE.PickingDrawpass;
  */
 FORGE.PickingDrawpass.prototype._boot = function()
 {
-    var shader = FORGE.Utils.clone(this._sceneRenderer.view.current.shaderWTS.mapping);
-    shader.uniforms.tColor = { type: "c", value: new THREE.Color( 0x000000 ) };
+    // var shader = FORGE.Utils.clone(this._sceneRenderer.view.current.shaderWTS.mapping);
+    // shader.uniforms.tColor = { type: "c", value: new THREE.Color( 0x000000 ) };
 
-    this._material = new THREE.RawShaderMaterial({
-        fragmentShader: FORGE.ShaderLib.parseIncludes(FORGE.ShaderChunk.wts_frag_color),
-        vertexShader: FORGE.ShaderLib.parseIncludes(shader.vertexShader),
-        uniforms: shader.uniforms,
-        side: THREE.FrontSide,
-        name: "PickingMaterial"
-    });
+    // this._material = new THREE.RawShaderMaterial({
+    //     fragmentShader: FORGE.ShaderLib.parseIncludes(FORGE.ShaderChunk.wts_frag_color),
+    //     vertexShader: FORGE.ShaderLib.parseIncludes(shader.vertexShader),
+    //     uniforms: shader.uniforms,
+    //     side: THREE.FrontSide,
+    //     name: "Picking"
+    // });
 
     // this._material = new THREE.MeshBasicMaterial({color: new THREE.Color("#07f")});
     // this._material.name = "PickingMaterial";
@@ -50,8 +50,9 @@ FORGE.PickingDrawpass.prototype._boot = function()
  * @param {THREE.Scene} scene - scene with objects
  * @param {THREE.Camera} camera - camera
  * @param {THREE.WebGLRenderTarget} target - render target
+ * @param {FORGE.ViewType} viewType - type of view (objects projection)
  */
-FORGE.PickingDrawpass.prototype.render = function(scene, camera, target)
+FORGE.PickingDrawpass.prototype.render = function(scene, camera, target, viewType)
 {
     var x = this._sceneRenderer.viewport.x + 20;
     var y = this._sceneRenderer.viewport.y + 20;
@@ -62,13 +63,11 @@ FORGE.PickingDrawpass.prototype.render = function(scene, camera, target)
     target.scissor.set(x, y, w, h);
     target.scissorTest = true;
 
-    // scene.background = new THREE.Color(0, 0, 0);
-    scene.overrideMaterial = this._material;
+    scene.overrideMaterial = this._viewer.renderer.getMaterialForView(viewType, "picking");
 
     this._viewer.renderer.webGLRenderer.render(scene, camera, target, false);
 
     // Restore scene params
-    // scene.background = null;
     scene.overrideMaterial = null;
 };
 

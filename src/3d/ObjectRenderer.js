@@ -1,10 +1,9 @@
 /**
  * @constructor FORGE.ObjectRenderer
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ObjectRenderer = function(viewer, sceneRenderer)
+FORGE.ObjectRenderer = function(viewer, objects)
 {
     /**
      * Viewer reference
@@ -15,19 +14,18 @@ FORGE.ObjectRenderer = function(viewer, sceneRenderer)
     this._viewer = viewer;
 
     /**
-     * The scene renderer reference.
-     * @name FORGE.ObjectRenderer#_sceneRenderer
-     * @type {FORGE.SceneRenderer}
-     * @private
-     */
-    this._sceneRenderer = sceneRenderer;
-
-    /**
      * @name FORGE.ObjectRenderer#_scene
      * @type {THREE.Scene}
      * @private
      */
     this._scene = null;
+
+    /**
+     * @name FORGE.ObjectRenderer#_objects
+     * @type {Array<FORGE.Object3D>}
+     * @private
+     */
+    this._objects = objects;
 
     /**
      * Picking manager.
@@ -54,7 +52,12 @@ FORGE.ObjectRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
 
-    this._picking = new FORGE.PickingDrawpass(this._viewer, this._sceneRenderer);
+    for (var i=0; i<this._objects.length; i++)
+    {
+        this._scene.add(this._objects[i].mesh);
+    }
+
+    this._picking = new FORGE.PickingDrawpass(this._viewer);
 };
 
 /**
@@ -64,55 +67,15 @@ FORGE.ObjectRenderer.prototype._boot = function()
  */
 FORGE.ObjectRenderer.prototype.loadObjects = function(objects)
 {
-    if (objects === null || objects.length === 0)
+    if (objects === null)
     {
         return;
     }
 
-    var scene = this._scene;
-    
-    // Clone every
-    objects.forEach(function(object)
+    for (var i=0, ii=objects.length; i<ii; i++)
     {
-        var mesh = object.mesh;
-
-        mesh.material = new THREE.MeshBasicMaterial({color:new THREE.Color(1,0,0)})
-        // mesh.material = this._sceneRenderer.view.current.materials[Math.floor(this._viewer.clock.time % 6)];
-
-        scene.add(mesh);
-
-
-        // // var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry().copy(object.geometry.geometry), new THREE.MeshBasicMaterial({color: new THREE.Color("#0f6")}));
-        // var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry().copy(object.geometry.geometry), new THREE.RawShaderMaterial());
-        // mesh.position.set(object.transform.position.x, object.transform.position.y, object.transform.position.z);
-        // mesh.rotation.set(object.transform.rotation.x, object.transform.rotation.y, object.transform.rotation.z);
-
-        // object.material.onReady.addOnce(function(event) {
-        //     mesh.material.copy(object.material.material);
-        //     mesh.material.uniforms.tTexture.value = object.material.texture;
-        //     mesh.material.uniforms.tOpacity.value = object.material.opacity;
-
-        //     mesh.onBeforeRender = function(renderer, scene, camera, geometry, material, group) {
-
-        //         // if (material.name === "PickingMaterial") {
-        //         //     if (material.program)
-        //         //     {
-        //         //         var gl = this._viewer.renderer.webGLRenderer.getContext();
-        //         //         gl.useProgram(material.program.program);
-        //         //         material.program.getUniforms().map.tColor.setValue(gl, this._pickingColor);
-        //         //         material.uniforms.tColor.value = this._pickingColor;
-        //         //     }
-        //         // }
-        //         // else if (material.name === "HotspotMaterial")
-        //         // {
-        //         // }
-
-
-        //     }.bind(this);
-
-        //     scene.add(mesh);
-        // }.bind(this));
-    }.bind(this));
+        this._scene.add(objects[i].mesh);
+    }    
 };
 
 /**
@@ -129,20 +92,52 @@ FORGE.ObjectRenderer.prototype.getRaycastable = function()
 };
 
 
+// /**
+//  * Render routine
+//  * @method FORGE.ObjectRenderer#setMaterial
+//  */
+// FORGE.ObjectRenderer.prototype.setMaterial = function(material)
+// {
+//     for (var i=0; i<this._objects.length; i++)
+//     {
+//         this._objects[i].material = material;
+//     }
+// }
+
 /**
  * Render routine
  * @method FORGE.ObjectRenderer#render
+ * @param {THREE.PerspectiveCamera} camera - render camera
+ * @param {THREE.WebGLRenderTarget} target - render target
+ * @param {FORGE.ViewType} viewType - type of view (objects projection)
  */
-FORGE.ObjectRenderer.prototype.render = function(target)
+FORGE.ObjectRenderer.prototype.render = function(camera, target, viewType)
 {
     if (this._scene.children.length === 0)
     {
         return;
     }
 
-    var camera = this._sceneRenderer.camera.main;
+    var materialRef = this._viewer.renderer.getMaterialForView(viewType, "mapping");
+
+    for (var i=0; i<this._objects.length; i++)
+    {
+        var object = this._objects[i];
+        var material = object.material;
+        var mesh = object.mesh;
+
+        mesh.frustumCulled = viewType === FORGE.ViewType.RECTILINEAR; 
+
+        mesh.material = materialRef;
+        mesh.material.side = THREE.FrontSide;
+        mesh.material.transparent = material.transparent;
+        mesh.material.needsUpdate = true;
+
+        mesh.material.uniforms.tTexture = object.material.texture;
+    }
+
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
-    this._picking.render(this._scene, camera, target);
+    // this._picking.render(this._scene, camera, target, viewType);
 };
 
 /**
@@ -151,6 +146,11 @@ FORGE.ObjectRenderer.prototype.render = function(target)
  */
 FORGE.ObjectRenderer.prototype.destroy = function()
 {
+    if (this._picking !== null) {
+        this._picking.destroy();
+        this._picking = null;
+    }
+
     this._scene.children.length = 0;
     this._scene = null;
 

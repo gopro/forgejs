@@ -86,6 +86,18 @@ FORGE.ShaderLib = {
                 fragmentShader: FORGE.ShaderChunk.wts_frag
             },
 
+            picking:
+            {
+                /** @type {FORGEUniform} */
+                uniforms:
+                {
+                    tOpacity: { type: "f", value: 1.0 },
+                    tColor: { type: "f", value: 1.0 }
+                },
+                vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
+                fragmentShader: FORGE.ShaderChunk.wts_frag_color
+            },
+
             wireframe:
             {
                 /** @type {FORGEUniform} */
@@ -114,7 +126,19 @@ FORGE.ShaderLib = {
                 fragmentShader: FORGE.ShaderChunk.wts_frag
             },
 
-             wireframe:
+            picking:
+            {
+                /** @type {FORGEUniform} */
+                uniforms:
+                {
+                    tOpacity: { type: "f", value: 1.0 },
+                    tColor: { type: "f", value: 1.0 }
+                },
+                vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
+                fragmentShader: FORGE.ShaderChunk.wts_frag_color
+            },
+
+            wireframe:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -141,6 +165,19 @@ FORGE.ShaderLib = {
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_gopro,
                 fragmentShader: FORGE.ShaderChunk.wts_frag
+            },
+
+            picking:
+            {
+                /** @type {FORGEUniform} */
+                uniforms:
+                {
+                    tProjectionDistance: { type: "f", value: 1 },
+                    tOpacity: { type: "f", value: 1.0 },
+                    tColor: { type: "f", value: 1.0 }
+                },
+                vertexShader: FORGE.ShaderChunk.wts_vert_gopro,
+                fragmentShader: FORGE.ShaderChunk.wts_frag_color
             },
 
             wireframe:

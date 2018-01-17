@@ -661,6 +661,9 @@ FORGE.Utils.destroyMesh = function(mesh)
 {
     mesh.userData = null;
 
+    mesh.onBeforeRender = null;
+    mesh.onAfterRender = null;
+
     if (mesh.material !== null)
     {
         if (typeof mesh.material.map !== "undefined" && mesh.material.map instanceof THREE.Texture)

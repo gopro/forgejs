@@ -141,8 +141,6 @@ FORGE.Hotspot3D.prototype._boot = function()
     this._mesh.onBeforeRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onBeforeRenderBound);
     this._mesh.onAfterRender = /** @type {function(this:THREE.Object3D,?THREE.WebGLRenderer,?THREE.Scene,?THREE.Camera,?THREE.Geometry,?THREE.Material,?THREE.Group)} */ (this._onAfterRenderBound);
 
-    this._viewer.view.onChange.add(this._viewChangeHandler, this);
-
     if (typeof this._config !== "undefined" && this._config !== null)
     {
         this._parseConfig(this._config);
@@ -200,24 +198,32 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
 {
     var g = group; // Just to avoid the jscs warning about group parameter not used.
 
-    this._viewer.view.current.updateUniforms(material.uniforms);
+    // this._viewer.view.current.updateUniforms(material.uniforms);
 
-    // Check what is the current render pass looking at the material: Hotspot or Picking Material
-    if (material.name === "HotspotMaterial")
+    if (material.program)
     {
-        this._material.update();
-    }
-    else if (material.name === "PickingMaterial")
-    {
-        // As picking material is the same for all spots renderer in this pass, material uniforms won't be refreshed
-        // Setting material.uniforms.tColor value will be useless, set direct value by acceding program uniforms map
-        // Call useProgram first to avoid WebGL warning if material.program is not the current program
-        // Set also material uniform to avoid both settings will collide on first object
-        if (material.program)
+        var gl = this._viewer.renderer.webGLRenderer.getContext();
+        gl.useProgram(material.program.program);
+        var uMap = material.program.getUniforms().map;
+
+        if ("tTexture" in uMap)
         {
-            var gl = this._viewer.renderer.webGLRenderer.getContext();
-            gl.useProgram(material.program.program);
-            material.program.getUniforms().map.tColor.setValue(gl, this._pickingColor);
+            material.uniforms.tTexture.value = this._material.texture;
+            uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);
+        }
+
+        // Check what is the current render pass looking at the material: Hotspot or Picking Material
+        if (material.name === "Draw")
+        {
+
+        }
+        else if (material.name === "Picking")
+        {
+            // As picking material is the same for all spots renderer in this pass, material uniforms won't be refreshed
+            // Setting material.uniforms.tColor value will be useless, set direct value by acceding program uniforms map
+            // Call useProgram first to avoid WebGL warning if material.program is not the current program
+            // Set also material uniform to avoid both settings will collide on first object
+            uMap.tColor.setValue(gl, this._pickingColor);
             material.uniforms.tColor.value = this._pickingColor;
         }
     }
@@ -228,9 +234,22 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
  * @method FORGE.Hotspot3D#_onAfterRender
  * @private
  */
-FORGE.Hotspot3D.prototype._onAfterRender = function()
+FORGE.Hotspot3D.prototype._onAfterRender = function(renderer, scene, camera, geometry, material, group)
 {
+    var g = group; // Just to avoid the jscs warning about group parameter not used.
 
+    if (material.program)
+    {
+        var gl = this._viewer.renderer.webGLRenderer.getContext();
+        gl.useProgram(material.program.program);
+        var uMap = material.program.getUniforms().map;
+
+        if ("tTexture" in uMap)
+        {
+            material.uniforms.tTexture.value = null;
+            uMap.tTexture.setValue(gl, null, this._viewer.renderer.webGLRenderer);
+        }
+    }
 };
 
 /**
@@ -343,20 +362,6 @@ FORGE.Hotspot3D.prototype._checkReady = function()
 };
 
 /**
- * View change handler
- * @method FORGE.Hotspot3D#_viewChangeHandler
- * @private
- */
-FORGE.Hotspot3D.prototype._viewChangeHandler = function()
-{
-    // Only enable frustum culling when view is rectilinear and frustum makes sense
-    this._mesh.frustumCulled = this._viewer.renderer.view.current instanceof FORGE.ViewRectilinear;
-
-    this._material.updateShader();
-    this._mesh.material = this._material.material;
-};
-
-/**
  * Override of the over method to trigger the state change
  * @method FORGE.Hotspot3D#over
  */
@@ -453,8 +458,6 @@ FORGE.Hotspot3D.prototype.hide = function()
  */
 FORGE.Hotspot3D.prototype.destroy = function()
 {
-    this._viewer.story.scene.view.onChange.remove(this._viewChangeHandler, this);
-
     this._onBeforeRenderBound = null;
     this._onAfterRenderBound = null;
 

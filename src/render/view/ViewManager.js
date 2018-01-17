@@ -63,7 +63,6 @@ FORGE.ViewManager = function(viewer, viewport)
      */
     this._onChange = null;
 
-
     FORGE.BaseObject.call(this, "ViewManager");
 };
 
@@ -105,6 +104,8 @@ FORGE.ViewManager.prototype._setView = function(type, options)
             this._view = new FORGE.ViewRectilinear(this._viewer, this._viewport, options);
             break;
     }
+
+    // this._createMaterial();
 
     this._ready = true;
 

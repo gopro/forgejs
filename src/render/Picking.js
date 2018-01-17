@@ -5,16 +5,13 @@
  * @constructor FORGE.Picking
  * 
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneRenderer} sceneRenderer - {@link FORGE.SceneRenderer} reference
  * @param {string} className - class name
  * @extends {FORGE.BaseObject}
  */
-FORGE.Picking = function(viewer, sceneRenderer, className)
+FORGE.Picking = function(viewer, className)
 {   
     this._viewer = viewer;
-    
-    this._sceneRenderer = sceneRenderer;
-    
+        
     FORGE.BaseObject.call(this, className || "Picking");
 
     this._boot();

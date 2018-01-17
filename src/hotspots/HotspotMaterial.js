@@ -550,60 +550,12 @@ FORGE.HotspotMaterial.prototype._setupWithGraphics = function()
  */
 FORGE.HotspotMaterial.prototype._setupComplete = function()
 {
-    this._createShaderMaterial();
-
     this._ready = true;
 
     if (this._onReady !== null)
     {
         this._onReady.dispatch();
     }
-};
-
-/**
- * Create the THREE.MeshBasicMaterial that will be used on a THREE.Mesh
- * @method FORGE.HotspotMaterial#_createShaderMaterial
- * @private
- */
-FORGE.HotspotMaterial.prototype._createShaderMaterial = function()
-{
-    this.log("create shader material");
-
-    if(this._viewer.view.current === null)
-    {
-        return;
-    }
-
-    if (this._material !== null)
-    {
-        this._material.dispose();
-        this._material = null;
-    }
-
-    var shader = FORGE.Utils.clone(this._viewer.view.current.shaderWTS.mapping);
-
-    if (this._type === FORGE.HotspotMaterial.types.GRAPHICS)
-    {
-        shader.fragmentShader = FORGE.ShaderChunk.wts_frag_color;
-        shader.uniforms.tColor = { type: "c", value: new THREE.Color(this._color) };
-    }
-
-    shader.uniforms.tOpacity = { type: "f", value: this._opacity };
-
-    var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
-    var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
-
-    this._material = new THREE.RawShaderMaterial(
-    {
-        fragmentShader: fragmentShader,
-        vertexShader: vertexShader,
-        uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
-        side: this._getThreeSide(this._side),
-        name: "HotspotMaterial"
-    });
-
-    this._material.transparent = this._transparent;
-    this._material.needsUpdate = true;
 };
 
 /**
@@ -635,11 +587,6 @@ FORGE.HotspotMaterial.prototype._getThreeSide = function(side)
     return result;
 };
 
-FORGE.HotspotMaterial.prototype.updateShader = function()
-{
-    this._createShaderMaterial();
-};
-
 /**
  * Load a material configuration
  * @method FORGE.HotspotMaterial#load
@@ -668,6 +615,8 @@ FORGE.HotspotMaterial.prototype.update = function()
     {
         this._texture.needsUpdate = true;
     }
+
+    return [this._material, this._texture, this._opacity];
 };
 
 
@@ -816,6 +765,12 @@ Object.defineProperty(FORGE.HotspotMaterial.prototype, "material",
     get: function()
     {
         return this._material;
+    },
+
+    /** @this {FORGE.HotspotMaterial} */
+    set: function(value)
+    {
+        this._material = value;
     }
 });
 

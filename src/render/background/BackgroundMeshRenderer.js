@@ -114,7 +114,7 @@ FORGE.BackgroundMeshRenderer.prototype._onViewChanged = function()
         this._mesh.material.dispose();
     }
 
-    this._mesh.material = this._createMaterial();
+    // this._mesh.material = this._createMaterial();
 };
 
 /**
@@ -171,10 +171,7 @@ FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
     }
 
     var geometry = this._createGeometry();
-    var material = this._createMaterial();
-
-    this._mesh = new THREE.Mesh(geometry, material);
-
+    this._mesh = new THREE.Mesh(geometry, null);
     this._scene.add(this._mesh);
 };
 
@@ -186,6 +183,7 @@ FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
  */
 FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
 {
+    this._mesh.material.side = THREE.BackSide;
 
     // Update common shader material parameters
     var uniforms = this._mesh.material.uniforms;

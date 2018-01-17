@@ -48,6 +48,14 @@ FORGE.SceneViewportManager = function(viewer, scene)
     this._active = 0;
 
     /**
+     * Object renderer.
+     * @name FORGE.SceneRenderer#_objectRenderer
+     * @type {FORGE.ObjectRenderer}
+     * @private
+     */
+    this._objectRenderer = null;
+
+    /**
      * Active viewport has changed event dispatcher
      * @name FORGE.Scene#_onActiveViewportChange
      * @type {FORGE.EventDispatcher}
@@ -156,17 +164,8 @@ FORGE.SceneViewportManager.prototype._onSceneLoadComplete = function(event)
     }
 
     var hotspots = this._viewer.hotspots.getByType("Hotspot3D");
-    // this._viewports[0].sceneRenderer.loadHotspots(hotspots);
-
-    // for (var i=0; i<this._viewports.length; i++)
-    // // for (var i=0; i<1; i++)
-    // {
-    //     this._viewports[i].sceneRenderer.loadHotspots(hotspots);
-    // }
-
-    this._viewports.forEach(function(v,idx,arr) {
-        v.sceneRenderer.loadHotspots(hotspots);
-    });
+    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer, hotspots);
+    // this._objectRenderer.loadObjects(hotspots);
 };
 
 /**
@@ -276,7 +275,8 @@ FORGE.SceneViewportManager.prototype.render = function()
 
     for(var i = 0, ii = viewports.length; i < ii; i++)
     {
-        viewports[i].render();
+        var viewport = viewports[i];
+        viewport.render();
     }
 };
 
@@ -311,6 +311,12 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
     this._viewer.canvas.pointer.onPressStart.remove(this._renewActiveViewport, this);
     this._viewer.canvas.pointer.onRotateStart.remove(this._renewActiveViewport, this);
     this._viewer.canvas.pointer.onWheel.remove(this._renewActiveViewport, this);
+
+    if (this._objectRenderer !== null)
+    {
+        this._objectRenderer.destroy();
+        this._objectRenderer = null;
+    }
 
     if (this._onActiveViewportChange !== null)
     {
@@ -360,6 +366,21 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "all",
     get: function()
     {
         return this._viewer.vr === true ? this._vrViewports : this._viewports;
+    }
+});
+
+/**
+ * Get the object renderer
+ * @name  FORGE.SceneViewportManager#objectRenderer
+ * @readonly
+ * @type {FORGE.ObjectRenderer}
+ */
+Object.defineProperty(FORGE.SceneViewportManager.prototype, "objectRenderer",
+{
+    /** @this {FORGE.SceneViewportManager} */
+    get: function()
+    {
+        return this._objectRenderer;
     }
 });
 

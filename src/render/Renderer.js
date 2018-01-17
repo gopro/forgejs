@@ -32,6 +32,16 @@ FORGE.Renderer = function(viewer)
     this._currentScene = null;
     this._nextScene = null;
 
+
+
+    /**
+     * Material pool
+     * @name FORGE.Viewer#_materialPool
+     * @type {Array<THREE.Material>}
+     * @private
+     */
+    this._materialPool = null;
+
     /**
      * Event dispatcher for the scene transition start event.
      * @name FORGE.Viewer#_onSceneTransitionStart
@@ -246,6 +256,57 @@ FORGE.Renderer.prototype.changeScene = function(scene)
     }
 };
 
+/**
+ * Get material for a given view type
+ * Set a pool of materials with lazy instantiation
+ * @method FORGE.Renderer#getMaterialForView
+ * @param {FORGE.ViewType} viewType - view type
+ * @return {THREE.RawShaderMaterial} world to screen mapping shader for the given view
+ */
+FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType)
+{
+    if (this._materialPool === null)
+    {
+        this._materialPool = {};
+    }
+
+    if (typeof shaderType === "undefined")
+    {
+        shaderType = "mapping";
+    }
+
+    if (viewType in this._materialPool)
+    {
+        return this._materialPool[viewType][shaderType];
+    }
+
+    this._materialPool[viewType] = {};
+
+    var shaderTypes = ["mapping", "picking", "wireframe"];
+    for (var i=0, ii=shaderTypes.length; i<ii; i++)
+    {
+        var type = shaderTypes[i];
+        var shader = FORGE.Utils.clone(FORGE.ShaderLib.worldToScreen[viewType][type]);
+        var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
+        var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
+
+        var material = new THREE.RawShaderMaterial(
+        {
+            fragmentShader: fragmentShader,
+            vertexShader: vertexShader,
+            uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
+            side: THREE.FrontSide,
+            name: viewType + "." + type
+        });
+
+        material.needsUpdate = true;
+
+        this._materialPool[viewType][type] = material;
+    }
+
+    return this._materialPool[viewType][shaderType];
+};
+
  /**
  * Renderer destroy sequence
  *
@@ -258,6 +319,15 @@ FORGE.Renderer.prototype.destroy = function()
     this._onSceneTransitionStart = null;
     this._onSceneTransitionProgress = null;
     this._onSceneTransitionComplete = null;
+
+    if (this._materialPool !== null)
+    {
+        while (this._materialPool.length > 0) {
+            var material = this._materialPool.shift();
+            material.dispose();
+        }
+        this._materialPool = null;
+    }
 
     if (this._clock !== null)
     {

@@ -15,9 +15,21 @@ FORGE.BackgroundGridRenderer = function(viewer, viewport)
      * @type {string}
      * @private
      */
-    this._gridColor = "#7F7FFF";
+    this._gridColor = null;
 
+<<<<<<< HEAD
     FORGE.BackgroundMeshRenderer.call(this, viewer, viewport, "BackgroundGridRenderer");
+=======
+    /**
+     * Background color
+     * @name FORGE.BackgroundGridRenderer#_backgroundColor
+     * @type {string}
+     * @private
+     */
+    this._backgroundColor = null;
+
+    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundGridRenderer");
+>>>>>>> 3D objects and background rendering rework - From now on materials are created by the main renderer and enables them to the meshes before rendering them. This way we can limit objects to one instance, one geometry and one scene when rendering multiple viewports
 };
 
 FORGE.BackgroundGridRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
@@ -34,14 +46,27 @@ FORGE.BackgroundGridRenderer.prototype._boot = function()
 
     this._subdivision = 32;
 
+    // Default values
+    this._gridColor = new THREE.Color("#7F7FFF");
+    this._backgroundColor = new THREE.Color("#202040");
+
+
     if(this._media.options !== null)
     {
         if(typeof this._media.options.color !== "undefined")
         {
-            this._gridColor = this._media.options.color;
+            this._gridColor = new THREE.Color(this._media.options.color);
         }
     }
 
+<<<<<<< HEAD
+=======
+    if (this._sceneRenderer.background !== null)
+    {
+        this._backgroundColor = new THREE.Color(this._sceneRenderer.background);
+    }
+
+>>>>>>> 3D objects and background rendering rework - From now on materials are created by the main renderer and enables them to the meshes before rendering them. This way we can limit objects to one instance, one geometry and one scene when rendering multiple viewports
     this._bootComplete();
 };
 
@@ -102,6 +127,35 @@ FORGE.BackgroundGridRenderer.prototype._computeQuadrilateralCoordsAttribute = fu
 };
 
 /**
+ * Mesh before render callback
+ * @method FORGE.BackgroundGridRenderer#_onMeshBeforeRender
+ * @private
+ */
+FORGE.BackgroundGridRenderer.prototype._onMeshBeforeRender = function(renderer, scene, camera, geometry, material, group)
+{
+    var g = group; // Just to avoid the jscs warning about group parameter not used.
+
+    if (material.program)
+    {
+        var gl = this._viewer.renderer.webGLRenderer.getContext();
+        gl.useProgram(material.program.program);
+        var uMap = material.program.getUniforms().map;
+
+        if ("tBackgroundColor" in uMap)
+        {
+            material.uniforms.tBackgroundColor.value = this._backgroundColor;
+            uMap.tBackgroundColor.setValue(gl, this._backgroundColor, this._viewer.renderer.webGLRenderer);
+        }
+
+        if ("tColor" in uMap)
+        {
+            material.uniforms.tColor.value = this._gridColor;
+            uMap.tColor.setValue(gl, this._gridColor, this._viewer.renderer.webGLRenderer);
+        }
+    }
+};
+
+/**
  * Add quadrilateral coordinates to vertices once the mesh is created
  * @method FORGE.BackgroundGridRenderer#_onMeshCreated
  * @private
@@ -110,6 +164,8 @@ FORGE.BackgroundGridRenderer.prototype._onMeshCreated = function()
 {
     var quadCoordsAttr = this._computeQuadrilateralCoordsAttribute();
     this._mesh.geometry.addAttribute("quadrilateralCoords", quadCoordsAttr);
+
+    this._mesh.onBeforeRender = this._onMeshBeforeRender.bind(this);
 
     FORGE.BackgroundMeshRenderer.prototype._onMeshCreated.call(this);
 };
@@ -125,11 +181,10 @@ FORGE.BackgroundGridRenderer.prototype._createGeometry = function()
 };
 
 /**
- * Create material for fragment shader rendering
- * @method FORGE.BackgroundGridRenderer#_createMaterial
- * @private
+ * Render sequence
+ * @method FORGE.BackgroundGridRenderer#render
  */
-FORGE.BackgroundGridRenderer.prototype._createMaterial = function()
+FORGE.BackgroundGridRenderer.prototype.render = function(webGLRenderer, target)
 {
     var shader = FORGE.Utils.clone(this._viewport.view.current.shaderWTS).wireframe;
     this.log("Media " + this._media.type + ", use wireframe shader");
@@ -155,8 +210,23 @@ FORGE.BackgroundGridRenderer.prototype._createMaterial = function()
     material.blendSrcAlpha = THREE.SrcAlphaFactor;
     material.blendDstAlpha = THREE.OneMinusSrcAlphaFactor;
 
-    material.needsUpdate = true;
+    material.uniforms.tBackgroundColor.value = this._backgroundColor;
+    material.uniforms.tColor.value = this._gridColor;
 
-    return material;
+    this._mesh.material = material;
+
+    FORGE.BackgroundMeshRenderer.prototype.render.call(this, webGLRenderer, target);
+};
+
+/**
+ * Destroy sequence
+ * @method FORGE.BackgroundGridRenderer#destroy
+ */
+FORGE.BackgroundGridRenderer.prototype.destroy = function()
+{
+    this._gridColor = null;
+    this._backgroundColor = null;
+
+    FORGE.BackgroundMeshRenderer.prototype.destroy.call(this);
 };
 
