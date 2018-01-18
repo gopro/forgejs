@@ -17,9 +17,6 @@ FORGE.BackgroundGridRenderer = function(viewer, viewport)
      */
     this._gridColor = null;
 
-<<<<<<< HEAD
-    FORGE.BackgroundMeshRenderer.call(this, viewer, viewport, "BackgroundGridRenderer");
-=======
     /**
      * Background color
      * @name FORGE.BackgroundGridRenderer#_backgroundColor
@@ -28,8 +25,7 @@ FORGE.BackgroundGridRenderer = function(viewer, viewport)
      */
     this._backgroundColor = null;
 
-    FORGE.BackgroundMeshRenderer.call(this, viewer, sceneRenderer, "BackgroundGridRenderer");
->>>>>>> 3D objects and background rendering rework - From now on materials are created by the main renderer and enables them to the meshes before rendering them. This way we can limit objects to one instance, one geometry and one scene when rendering multiple viewports
+    FORGE.BackgroundMeshRenderer.call(this, viewer, viewport, "BackgroundGridRenderer");
 };
 
 FORGE.BackgroundGridRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
@@ -46,27 +42,14 @@ FORGE.BackgroundGridRenderer.prototype._boot = function()
 
     this._subdivision = 32;
 
-    // Default values
+    this._backgroundColor = new THREE.Color(this._viewport.background);
+
     this._gridColor = new THREE.Color("#7F7FFF");
-    this._backgroundColor = new THREE.Color("#202040");
-
-
-    if(this._media.options !== null)
+    if(this._media.options !== null && typeof this._media.options.color !== "undefined")
     {
-        if(typeof this._media.options.color !== "undefined")
-        {
-            this._gridColor = new THREE.Color(this._media.options.color);
-        }
+        this._gridColor = new THREE.Color(this._media.options.color);
     }
 
-<<<<<<< HEAD
-=======
-    if (this._sceneRenderer.background !== null)
-    {
-        this._backgroundColor = new THREE.Color(this._sceneRenderer.background);
-    }
-
->>>>>>> 3D objects and background rendering rework - From now on materials are created by the main renderer and enables them to the meshes before rendering them. This way we can limit objects to one instance, one geometry and one scene when rendering multiple viewports
     this._bootComplete();
 };
 
@@ -186,24 +169,8 @@ FORGE.BackgroundGridRenderer.prototype._createGeometry = function()
  */
 FORGE.BackgroundGridRenderer.prototype.render = function(webGLRenderer, target)
 {
-    var shader = FORGE.Utils.clone(this._viewport.view.current.shaderWTS).wireframe;
-    this.log("Media " + this._media.type + ", use wireframe shader");
-
-    var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
-    var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
-
-    var material = new THREE.RawShaderMaterial(
-    {
-        fragmentShader: fragmentShader,
-        vertexShader: vertexShader,
-        uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
-        name: "BackgroundMeshMaterial",
-        transparent: true,
-        side: THREE.BackSide
-    });
-
-    material.uniforms.tBackgroundColor.value = new THREE.Color(this._viewport.background);
-    material.uniforms.tColor.value = new THREE.Color(this._gridColor);
+    var material = this._viewer.renderer.getMaterialForView(this._viewport.view.current.type, "wireframe");
+    material.transparent = true;
 
     material.blending = THREE.CustomBlending;
     material.blendEquationAlpha = THREE.AddEquation;
@@ -215,7 +182,7 @@ FORGE.BackgroundGridRenderer.prototype.render = function(webGLRenderer, target)
 
     this._mesh.material = material;
 
-    this._sceneRenderer.view.current.updateUniforms(material.uniforms);
+    this._viewport.view.current.updateUniforms(material.uniforms);
 
     FORGE.BackgroundMeshRenderer.prototype.render.call(this, webGLRenderer, target);
 };
@@ -226,8 +193,8 @@ FORGE.BackgroundGridRenderer.prototype.render = function(webGLRenderer, target)
  */
 FORGE.BackgroundGridRenderer.prototype.destroy = function()
 {
-    this._gridColor = null;
     this._backgroundColor = null;
+    this._gridColor = null;
 
     FORGE.BackgroundMeshRenderer.prototype.destroy.call(this);
 };

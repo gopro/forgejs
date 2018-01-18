@@ -56,14 +56,6 @@ FORGE.SceneRenderer = function(viewer, viewport)
      */
     this._composerTexture = null;
 
-    /**
-     * Scene renderer is ready event dispatcher
-     * @name FORGE.Scene#_onReady
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onReady = null;
-
     FORGE.BaseObject.call(this, "SceneRenderer");
 
     this._boot();
@@ -234,14 +226,14 @@ FORGE.SceneRenderer.prototype.render = function()
     if (this._composer === null)
     {
         this._backgroundRenderer.render(this._viewport.scene.renderTarget);
-        this._sceneViewport.objectRenderer.render(this._viewport.camera.main, this._viewport.scene.renderTarget, this._viewport.view.current);
+        this._viewport.scene.viewports.objectRenderer.render(this._viewport.camera.main, this._viewport.scene.renderTarget, this._viewport.view.current);
     }
     else
     {
         this._viewer.renderer.webGLRenderer.clearTarget(this._composerTexture, false, true, false);
 
         this._backgroundRenderer.render(this._composerTexture);
-        this._sceneViewport.objectRenderer.render(this._camera.main, this._composerTexture, this._viewManager.current);
+        this._viewport.scene.viewports.objectRenderer.render(this._viewport.camera.main, this._composerTexture, this._viewport.view.current);
 
         this._composer.render();
     }
@@ -255,12 +247,6 @@ FORGE.SceneRenderer.prototype.destroy = function()
 {
     this._config = null;
     this._viewer = null;
-
-    if (this._onReady !== null)
-    {
-        this._onReady.destroy();
-        this._onReady = null;        
-    }
 
     if (this._composer !== null)
     {

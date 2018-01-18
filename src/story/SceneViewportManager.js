@@ -127,26 +127,11 @@ FORGE.SceneViewportManager.prototype._parseConfig = function(config)
             var viewportConfig = config.layout[i];
             viewportConfig.vr = false;
             var viewport = new FORGE.SceneViewport(this._viewer, this._scene, viewportConfig);
-            viewport.sceneRenderer.onReady.add(this._onSceneRendererReady, this);
             this._viewports.push(viewport);
         }
     }
 
     this._scene.onLoadComplete.addOnce(this._onSceneLoadComplete, this);
-};
-
-/**
- * Scene renderer ready handler
- * @method FORGE.SceneViewportManager#_onSceneRendererReady
- * @param {FORGE.Event} event -  event
- * @private
- */
-FORGE.SceneViewportManager.prototype._onSceneRendererReady = function(event)
-{
-    if (++this._renderersReady === this._scene.config.layout.length && this._onAllRenderersReady !== null)
-    {
-        this._onAllRenderersReady.dispatch();
-    }
 };
 
 /**
