@@ -63,16 +63,6 @@ FORGE.SceneViewportManager = function(viewer, scene)
      */
     this._onActiveViewportChange = null;
 
-    /**
-     * All renderers are ready event dispatcher
-     * @name FORGE.Scene#_onAllRenderersReady
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._renderersReady = 0;
-
-    this._onAllRenderersReady = null;
-
     FORGE.BaseObject.call(this, "SceneViewport");
 
     this._boot();
@@ -313,12 +303,6 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
         this._viewports[i].destroy();
     }
 
-    if (this._onAllRenderersReady !== null)
-    {
-        this._onAllRenderersReady.destroy();
-        this._onAllRenderersReady = null;        
-    }
-
     this._viewports.forEach(function(viewport) {
         viewport.destroy();
     });
@@ -418,24 +402,3 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "onActiveViewportCha
         return this._onActiveViewportChange;
     }
 });
-
-/**
- * Get the onAllRenderersReady {@link FORGE.EventDispatcher}.
- * @name  FORGE.SceneViewportManager#onAllRenderersReady
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.SceneViewportManager.prototype, "onAllRenderersReady",
-{
-    /** @this {FORGE.SceneViewportManager} */
-    get: function()
-    {
-        if (this._onAllRenderersReady === null)
-        {
-            this._onAllRenderersReady = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onAllRenderersReady;
-    }
-});
-
