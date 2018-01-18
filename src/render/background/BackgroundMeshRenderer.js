@@ -113,8 +113,6 @@ FORGE.BackgroundMeshRenderer.prototype._onViewChanged = function()
     {
         this._mesh.material.dispose();
     }
-
-    // this._mesh.material = this._createMaterial();
 };
 
 /**

@@ -165,7 +165,6 @@ FORGE.SceneViewportManager.prototype._onSceneLoadComplete = function(event)
 
     var hotspots = this._viewer.hotspots.getByType("Hotspot3D");
     this._objectRenderer = new FORGE.ObjectRenderer(this._viewer, hotspots);
-    // this._objectRenderer.loadObjects(hotspots);
 };
 
 /**

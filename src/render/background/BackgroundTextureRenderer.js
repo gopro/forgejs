@@ -19,7 +19,6 @@ FORGE.BackgroundTextureRenderer = function(viewer, viewport, className)
     this._texture = null;
 
     FORGE.BackgroundMeshRenderer.call(this, viewer, viewport, className || "BackgroundTextureRenderer");
-
 };
 
 FORGE.BackgroundTextureRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);

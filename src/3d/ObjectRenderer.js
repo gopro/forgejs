@@ -72,6 +72,8 @@ FORGE.ObjectRenderer.prototype.loadObjects = function(objects)
         return;
     }
 
+    this._objects.concat(objects);
+
     for (var i=0, ii=objects.length; i<ii; i++)
     {
         this._scene.add(objects[i].mesh);
@@ -91,34 +93,21 @@ FORGE.ObjectRenderer.prototype.getRaycastable = function()
     });
 };
 
-
-// /**
-//  * Render routine
-//  * @method FORGE.ObjectRenderer#setMaterial
-//  */
-// FORGE.ObjectRenderer.prototype.setMaterial = function(material)
-// {
-//     for (var i=0; i<this._objects.length; i++)
-//     {
-//         this._objects[i].material = material;
-//     }
-// }
-
 /**
  * Render routine
  * @method FORGE.ObjectRenderer#render
  * @param {THREE.PerspectiveCamera} camera - render camera
  * @param {THREE.WebGLRenderTarget} target - render target
- * @param {FORGE.ViewType} viewType - type of view (objects projection)
+ * @param {FORGE.View} view - current view for rendering
  */
-FORGE.ObjectRenderer.prototype.render = function(camera, target, viewType)
+FORGE.ObjectRenderer.prototype.render = function(camera, target, view)
 {
     if (this._scene.children.length === 0)
     {
         return;
     }
 
-    var materialRef = this._viewer.renderer.getMaterialForView(viewType, "mapping");
+    var materialRef = this._viewer.renderer.getMaterialForView(view.type, "mapping");
 
     for (var i=0; i<this._objects.length; i++)
     {
@@ -126,15 +115,20 @@ FORGE.ObjectRenderer.prototype.render = function(camera, target, viewType)
         var material = object.material;
         var mesh = object.mesh;
 
-        mesh.frustumCulled = viewType === FORGE.ViewType.RECTILINEAR; 
+        mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR; 
 
         mesh.material = materialRef;
         mesh.material.side = THREE.FrontSide;
         mesh.material.transparent = material.transparent;
         mesh.material.needsUpdate = true;
 
-        mesh.material.uniforms.tTexture = object.material.texture;
+        if ("tTexture" in mesh.material.uniforms)
+        {
+            mesh.material.uniforms.tTexture = object.material.texture;
+        }
     }
+
+    view.updateUniforms(materialRef.uniforms);
 
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
     // this._picking.render(this._scene, camera, target, viewType);
@@ -151,7 +145,9 @@ FORGE.ObjectRenderer.prototype.destroy = function()
         this._picking = null;
     }
 
-    this._scene.children.length = 0;
+    this._objects = null;
+
+    this._scene.children = null;
     this._scene = null;
 
     this._viewer = null;

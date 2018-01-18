@@ -215,6 +215,8 @@ FORGE.BackgroundGridRenderer.prototype.render = function(webGLRenderer, target)
 
     this._mesh.material = material;
 
+    this._sceneRenderer.view.current.updateUniforms(material.uniforms);
+
     FORGE.BackgroundMeshRenderer.prototype.render.call(this, webGLRenderer, target);
 };
 

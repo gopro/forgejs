@@ -212,12 +212,8 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
             uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);
         }
 
-        // Check what is the current render pass looking at the material: Hotspot or Picking Material
-        if (material.name === "Draw")
-        {
-
-        }
-        else if (material.name === "Picking")
+        // Picking draw pass could need some special uniforms
+        if (material.name === "Picking")
         {
             // As picking material is the same for all spots renderer in this pass, material uniforms won't be refreshed
             // Setting material.uniforms.tColor value will be useless, set direct value by acceding program uniforms map
