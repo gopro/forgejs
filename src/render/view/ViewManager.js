@@ -105,8 +105,6 @@ FORGE.ViewManager.prototype._setView = function(type, options)
             break;
     }
 
-    // this._createMaterial();
-
     this._ready = true;
 
     this.notifyChange();

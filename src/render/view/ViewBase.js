@@ -131,9 +131,6 @@ FORGE.ViewBase = function(viewer, viewport, options, className, type)
      */
     this._shaderWTS = null;
 
-
-    this._materialPool = null;
-
     FORGE.BaseObject.call(this, className || "ViewBase");
 };
 
@@ -150,12 +147,6 @@ FORGE.ViewBase.prototype._boot = function()
 {
     //@todo Check the utility of this call.
     this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
-
-    this._materialPool = [];
-    var colors = [[1,0,0],[0,1,0],[0,0,1],[1,1,0],[1,0,1],[0,1,1]];
-    for (var i=0; i<6; i++) {
-        this._materialPool.push(new THREE.MeshBasicMaterial({color:new THREE.Color(colors[i][0],colors[i][1],colors[i][2])}));
-    }
 };
 
 /**
@@ -429,21 +420,6 @@ Object.defineProperty(FORGE.ViewBase.prototype, "shaderWTS",
     get: function()
     {
         return this._shaderWTS;
-    }
-});
-
-/**
- * Materials
- * @name FORGE.ViewBase#materials
- * @type {Array<THREE.Material>}
- * @readonly
- */
-Object.defineProperty(FORGE.ViewBase.prototype, "materials",
-{
-    /** @this {FORGE.ViewBase} */
-    get: function()
-    {
-        return this._materialPool;
     }
 });
 
