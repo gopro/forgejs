@@ -141,6 +141,7 @@ FORGE.SceneViewport.prototype._parseConfig = function(config)
     var sceneBG = this._scene.background;
     var viewportBG = config.background;
     this._background = typeof viewportBG === "string" ? viewportBG : typeof sceneBG === "string" ? sceneBG : viewerBG;
+    this._viewer.renderer.webGLRenderer.setClearColor(new THREE.Color(this._background));
 
     this._createViewManager(config.view);
 
@@ -219,7 +220,6 @@ FORGE.SceneViewport.prototype.render = function()
     target.scissor.set(this._rectangle.x, this._rectangle.y, this._rectangle.width, this._rectangle.height);
     target.scissorTest = true ;
 
-    this._viewer.renderer.webGLRenderer.setClearColor(new THREE.Color(this._background));
     this._viewportRenderer.render(target);
 };
 
