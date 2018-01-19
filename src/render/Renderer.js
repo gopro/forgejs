@@ -23,7 +23,7 @@ FORGE.Renderer = function(viewer)
     this._scene = null;
 
     this._quad = null;
-    
+
     this._camera = null;
 
     this._layout = null;
@@ -135,7 +135,7 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
     var material = this._buildMaterial(canvas);
 
     this._quad = new THREE.Mesh(geometry, material);
-    
+
     this._scene = new THREE.Scene();
     this._scene.add(this._quad);
 
@@ -191,7 +191,7 @@ FORGE.Renderer.prototype._buildMaterial = function(canvas)
         "uniform sampler2D tTexture2;",
         "uniform float tOpacity;",
         "uniform vec2 tResolution;",
-        
+
         "void main() {",
         "   gl_FragColor = texture2D(tTexture1, gl_FragCoord.xy / tResolution);",
         // "   gl_FragColor = texture2D(tTexture1, vUv);",
@@ -250,7 +250,7 @@ FORGE.Renderer.prototype.changeScene = function(scene)
     {
         this._onSceneTransitionProgress.dispatch({ progress: 0.5});
     }
-    
+
     if (this._onSceneTransitionComplete !== null)
     {
         this._onSceneTransitionComplete.dispatch();
@@ -344,7 +344,7 @@ FORGE.Renderer.prototype.destroy = function()
 
         if (this._quad.geometry !== null) {
             this._quad.geometry.dispose();
-            this._quad.geometry = null;            
+            this._quad.geometry = null;
         }
     }
 

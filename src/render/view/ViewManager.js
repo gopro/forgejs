@@ -190,7 +190,6 @@ FORGE.ViewManager.prototype.disableVR = function()
  * @param {THREE.Vector3} worldPt - Point in world space
  * @param {number} parallax - Parallax factor [0..1]
  * @return {THREE.Vector2} Point in screen coordinates
- * @todo Implement worldToScreen
  */
 FORGE.ViewManager.prototype.worldToScreen = function(worldPt, parallax)
 {
@@ -203,7 +202,6 @@ FORGE.ViewManager.prototype.worldToScreen = function(worldPt, parallax)
  * @method FORGE.ViewManager#screenToWorld
  * @param {THREE.Vector2} screenPt point in screen space
  * @return {THREE.Vector3}
- * @todo Implement screenToWorld
  */
 FORGE.ViewManager.prototype.screenToWorld = function(screenPt)
 {

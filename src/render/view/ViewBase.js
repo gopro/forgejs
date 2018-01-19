@@ -214,7 +214,6 @@ FORGE.ViewBase.prototype.updateUniforms = function(uniforms)
  * @param {THREE.Vector3} worldPt - Point in world space
  * @param {number} parallax - Parallax factor [0..1]
  * @return {?THREE.Vector2} Point in screen coordinates or null if the point is out of bounds.
- * @todo Implement worldToScreen
  */
 FORGE.ViewBase.prototype.worldToScreen = function(worldPt, parallax)
 {
@@ -229,7 +228,6 @@ FORGE.ViewBase.prototype.worldToScreen = function(worldPt, parallax)
  * @method FORGE.ViewBase#screenToWorld
  * @param {THREE.Vector2} screenPt point in screen space
  * @return {?THREE.Vector3} Point in world space or null if the screenPt is out of bounds.
- * @todo Implement screenToWorld
  */
 FORGE.ViewBase.prototype.screenToWorld = function(screenPt)
 {
