@@ -588,6 +588,8 @@ FORGE.Scene.prototype.isAmbisonic = function()
  */
 FORGE.Scene.prototype.render = function()
 {
+    this._viewer.renderer.webGLRenderer.setSize(this._viewer.width, this._viewer.height);
+    this._renderTarget.setSize(this._viewer.width, this._viewer.height);
     this._viewports.render();
 };
 
