@@ -52,7 +52,7 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
  */
 FORGE.ObjectRenderer.prototype._boot = function()
 {
-    this._scene = new THREE.Scene();
+window.scene =     this._scene = new THREE.Scene();
 
     for (var i=0; i<this._objects.length; i++)
     {
@@ -73,6 +73,7 @@ FORGE.ObjectRenderer.prototype._getPickableObjects = function(id)
     return this._objects.filter(function(object) {
         return object.ready === true && object.interactive === true;
     })
+
 };
 
 /**
