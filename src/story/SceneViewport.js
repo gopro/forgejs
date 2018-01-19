@@ -198,6 +198,17 @@ FORGE.SceneViewport.prototype._createViewManager = function(config)
 };
 
 /**
+ * @method FORGE.SceneViewport#updateRectangle
+ */
+FORGE.SceneViewport.prototype.updateRectangle = function()
+{
+    this._rectangle.w = (this._config.rectangle.width / 100) * this._viewer.width;
+    this._rectangle.h = (this._config.rectangle.height / 100) * this._viewer.height;
+    this._rectangle.x = (this._config.rectangle.x / 100) * this._viewer.width;
+    this._rectangle.y = ((100 - this._config.rectangle.y) / 100) * this._viewer.height - this._rectangle.h;
+};
+
+/**
  * @method FORGE.SceneViewport#notifyMediaLoadComplete
  */
 FORGE.SceneViewport.prototype.notifyMediaLoadComplete = function()

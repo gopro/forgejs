@@ -229,6 +229,7 @@ FORGE.Renderer.prototype.render = function()
 
     // Assign textures from the scene and render the whole scene
     this._quad.material.uniforms.tTexture1.value = currentScene.renderTarget;
+    this._quad.material.uniforms.tResolution.value = new THREE.Vector2(this._viewer.width, this._viewer.height);
     this._webGLRenderer.setViewport(0, 0, this._viewer.width, this._viewer.height);
     this._webGLRenderer.render(this._scene, this._camera);
 };

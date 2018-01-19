@@ -149,7 +149,10 @@ FORGE.SceneViewportManager.prototype._onSceneLoadComplete = function(event)
  */
 FORGE.SceneViewportManager.prototype._canvasResizeHandler = function()
 {
-    console.log("TODO resize");
+    for(var i = 0, ii = this._viewports.length; i < ii; i++)
+    {
+        this._viewports[i].updateRectangle();
+    }
 };
 
 /**
