@@ -15,15 +15,7 @@ FORGE.BackgroundGridRenderer = function(viewer, viewport)
      * @type {string}
      * @private
      */
-    this._gridColor = null;
-
-    /**
-     * Background color
-     * @name FORGE.BackgroundGridRenderer#_backgroundColor
-     * @type {string}
-     * @private
-     */
-    this._backgroundColor = null;
+    this._gridColor = "#7F7FFF";
 
     FORGE.BackgroundMeshRenderer.call(this, viewer, viewport, "BackgroundGridRenderer");
 };
@@ -42,12 +34,12 @@ FORGE.BackgroundGridRenderer.prototype._boot = function()
 
     this._subdivision = 32;
 
-    this._backgroundColor = new THREE.Color(this._viewport.background);
-
-    this._gridColor = new THREE.Color("#7F7FFF");
-    if(this._media.options !== null && typeof this._media.options.color !== "undefined")
+    if(this._media.options !== null)
     {
-        this._gridColor = new THREE.Color(this._media.options.color);
+        if(typeof this._media.options.color !== "undefined")
+        {
+            this._gridColor = this._media.options.color;
+        }
     }
 
     this._bootComplete();
@@ -110,35 +102,6 @@ FORGE.BackgroundGridRenderer.prototype._computeQuadrilateralCoordsAttribute = fu
 };
 
 /**
- * Mesh before render callback
- * @method FORGE.BackgroundGridRenderer#_onMeshBeforeRender
- * @private
- */
-FORGE.BackgroundGridRenderer.prototype._onMeshBeforeRender = function(renderer, scene, camera, geometry, material, group)
-{
-    var g = group; // Just to avoid the jscs warning about group parameter not used.
-
-    if (material.program)
-    {
-        var gl = this._viewer.renderer.webGLRenderer.getContext();
-        gl.useProgram(material.program.program);
-        var uMap = material.program.getUniforms().map;
-
-        if ("tBackgroundColor" in uMap)
-        {
-            material.uniforms.tBackgroundColor.value = this._backgroundColor;
-            uMap.tBackgroundColor.setValue(gl, this._backgroundColor, this._viewer.renderer.webGLRenderer);
-        }
-
-        if ("tColor" in uMap)
-        {
-            material.uniforms.tColor.value = this._gridColor;
-            uMap.tColor.setValue(gl, this._gridColor, this._viewer.renderer.webGLRenderer);
-        }
-    }
-};
-
-/**
  * Add quadrilateral coordinates to vertices once the mesh is created
  * @method FORGE.BackgroundGridRenderer#_onMeshCreated
  * @private
@@ -147,8 +110,6 @@ FORGE.BackgroundGridRenderer.prototype._onMeshCreated = function()
 {
     var quadCoordsAttr = this._computeQuadrilateralCoordsAttribute();
     this._mesh.geometry.addAttribute("quadrilateralCoords", quadCoordsAttr);
-
-    this._mesh.onBeforeRender = this._onMeshBeforeRender.bind(this);
 
     FORGE.BackgroundMeshRenderer.prototype._onMeshCreated.call(this);
 };
@@ -164,38 +125,38 @@ FORGE.BackgroundGridRenderer.prototype._createGeometry = function()
 };
 
 /**
- * Render sequence
- * @method FORGE.BackgroundGridRenderer#render
+ * Create material for fragment shader rendering
+ * @method FORGE.BackgroundGridRenderer#_createMaterial
+ * @private
  */
-FORGE.BackgroundGridRenderer.prototype.render = function(webGLRenderer, target)
+FORGE.BackgroundGridRenderer.prototype._createMaterial = function()
 {
-    var material = this._viewer.renderer.getMaterialForView(this._viewport.view.current.type, "wireframe");
-    material.transparent = true;
+    var shader = FORGE.Utils.clone(this._viewport.view.current.shaderWTS).wireframe;
+    this.log("Media " + this._media.type + ", use wireframe shader");
+
+    var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
+    var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
+
+    var material = new THREE.RawShaderMaterial(
+    {
+        fragmentShader: fragmentShader,
+        vertexShader: vertexShader,
+        uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
+        name: "BackgroundMeshMaterial",
+        transparent: true,
+        side: THREE.BackSide
+    });
+
+    material.uniforms.tBackgroundColor.value = new THREE.Color(this._viewport.background);
+    material.uniforms.tColor.value = new THREE.Color(this._gridColor);
 
     material.blending = THREE.CustomBlending;
     material.blendEquationAlpha = THREE.AddEquation;
     material.blendSrcAlpha = THREE.SrcAlphaFactor;
     material.blendDstAlpha = THREE.OneMinusSrcAlphaFactor;
 
-    material.uniforms.tBackgroundColor.value = this._backgroundColor;
-    material.uniforms.tColor.value = this._gridColor;
+    material.needsUpdate = true;
 
-    this._mesh.material = material;
-
-    this._viewport.view.current.updateUniforms(material.uniforms);
-
-    FORGE.BackgroundMeshRenderer.prototype.render.call(this, webGLRenderer, target);
-};
-
-/**
- * Destroy sequence
- * @method FORGE.BackgroundGridRenderer#destroy
- */
-FORGE.BackgroundGridRenderer.prototype.destroy = function()
-{
-    this._backgroundColor = null;
-    this._gridColor = null;
-
-    FORGE.BackgroundMeshRenderer.prototype.destroy.call(this);
+    return material;
 };
 
