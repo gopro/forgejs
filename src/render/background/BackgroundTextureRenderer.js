@@ -19,6 +19,7 @@ FORGE.BackgroundTextureRenderer = function(viewer, viewport, className)
     this._texture = null;
 
     FORGE.BackgroundMeshRenderer.call(this, viewer, viewport, className || "BackgroundTextureRenderer");
+
 };
 
 FORGE.BackgroundTextureRenderer.prototype = Object.create(FORGE.BackgroundMeshRenderer.prototype);
@@ -45,10 +46,6 @@ FORGE.BackgroundTextureRenderer.prototype._boot = function()
  */
 FORGE.BackgroundTextureRenderer.prototype.render = function(webGLRenderer, target)
 {
-    this._mesh.material = this._viewer.renderer.getMaterialForView(this._viewport.view.current.type, "mapping");
-    this._mesh.material.side = THREE.BackSide;
-    this._mesh.material.transparent = false;
-
     var uniforms = this._mesh.material.uniforms;
 
     if (typeof uniforms === "undefined")
