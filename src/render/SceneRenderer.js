@@ -33,14 +33,6 @@ FORGE.SceneRenderer = function(viewer, viewport)
     this._backgroundRenderer = null;
 
     /**
-     * Object renderer.
-     * @name FORGE.SceneRenderer#_objectRenderer
-     * @type {FORGE.ObjectRenderer}
-     * @private
-     */
-    this._objectRenderer = null;
-
-    /**
      * Scene effect Composer.
      * @name FORGE.SceneRenderer#_composer
      * @type {FORGE.SceneEffectComposer}
@@ -78,7 +70,6 @@ FORGE.SceneRenderer.prototype._boot = function()
     }
 
     this._createComposer();
-    this._createObjectRenderer();
 };
 
 /**
@@ -122,16 +113,6 @@ FORGE.SceneRenderer.prototype._createComposer = function()
 FORGE.SceneRenderer.prototype.notifyMediaLoadComplete = function()
 {
     this._createBackgroundRenderer();
-};
-
-/**
- * Create object renderer.
- * @method FORGE.SceneRenderer#_createObjectRenderer
- * @private
- */
-FORGE.SceneRenderer.prototype._createObjectRenderer = function()
-{
-    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer, this);
 };
 
 /**
@@ -258,12 +239,6 @@ FORGE.SceneRenderer.prototype.destroy = function()
     {
         this._backgroundRenderer.destroy();
         this._backgroundRenderer = null;
-    }
-
-    if (this._objectRenderer !== null)
-    {
-        this._objectRenderer.destroy();
-        this._objectRenderer = null;
     }
 
     FORGE.BaseObject.prototype.destroy.call(this);
