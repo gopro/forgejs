@@ -43,7 +43,7 @@ FORGE.SceneRenderer = function(viewer, viewport)
     /**
      * Composer input texture.
      * @name FORGE.SceneRenderer#_composerTexture
-     * @type {FORGE.ViewManager}
+     * @type {THREE.WebGLRenderTarget}
      * @private
      */
     this._composerTexture = null;
