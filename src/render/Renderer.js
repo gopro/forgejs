@@ -18,21 +18,37 @@ FORGE.Renderer = function(viewer)
      */
     this._viewer = viewer;
 
+    /**
+     * WebGL renderer reference
+     * @name FORGE.Renderer#_webGLRenderer
+     * @type {THREE.WebGLRenderer}
+     * @private
+     */
     this._webGLRenderer = null;
 
+    /**
+     * THREE Scene to render the final screen result
+     * @name  FORGE.Renderer#_scene
+     * @type {THREE.Scene}
+     * @private
+     */
     this._scene = null;
 
+    /**
+     * THREE Mesh used to render the final screen result
+     * @name  FORGE.Renderer#_quad
+     * @type {THREE.Mesh}
+     * @private
+     */
     this._quad = null;
 
+    /**
+     * THREE OrthographicCamera used to render the final screen result
+     * @name  FORGE.Renderer#_camera
+     * @type {THREE.OrthographicCamera}
+     * @private
+     */
     this._camera = null;
-
-    this._layout = null;
-
-    // Scene ?? Media ?? Something else ?
-    this._currentScene = null;
-    this._nextScene = null;
-
-
 
     /**
      * Material pool
@@ -65,7 +81,6 @@ FORGE.Renderer = function(viewer)
      * @private
      */
     this._onSceneTransitionComplete = null;
-
 
     FORGE.BaseObject.call(this, "Renderer");
 
@@ -104,9 +119,6 @@ FORGE.Renderer.prototype._boot = function()
  */
 FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
 {
-    // TODO
-    // this._layout = new FORGE.LayoutManager();
-    // var canvas = this._layout.container;
     var canvas = this._viewer.canvas.dom;
 
     var options = this._viewer.config.webgl;
@@ -131,15 +143,11 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
     this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
 
     var geometry = new THREE.PlaneBufferGeometry(2, 2);
-
     var material = this._buildMaterial(canvas);
-
     this._quad = new THREE.Mesh(geometry, material);
 
     this._scene = new THREE.Scene();
     this._scene.add(this._quad);
-
-    this._clock = new FORGE.Clock();
 };
 
 /**
@@ -151,7 +159,8 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
  */
 FORGE.Renderer.prototype._buildMaterial = function(canvas)
 {
-    var uniforms = {
+    var uniforms =
+    {
         tTime: {
             value: 1.0
         },
@@ -323,20 +332,17 @@ FORGE.Renderer.prototype.destroy = function()
 
     if (this._materialPool !== null)
     {
-        while (this._materialPool.length > 0) {
+        while (this._materialPool.length > 0)
+        {
             var material = this._materialPool.shift();
             material.dispose();
         }
+
         this._materialPool = null;
     }
 
-    if (this._clock !== null)
+    if (this._quad !== null)
     {
-        this._clock.destroy();
-        this._clock = null;
-    }
-
-    if (this._quad !== null) {
         if (this._quad.material !== null) {
             this._quad.material.dispose();
             this._quad.material = null;
