@@ -25,14 +25,6 @@ FORGE.Object3D = function(viewer, className)
     this._mesh = null;
 
     /**
-     * The fx set id applied to the object
-     * @name  FORGE.Object3D#_fx
-     * @type {string}
-     * @private
-     */
-    this._fx = "";
-
-    /**
      * Visibility flag
      * @name  FORGE.Object3D#_visible
      * @type {boolean}
@@ -346,21 +338,6 @@ Object.defineProperty(FORGE.Object3D.prototype, "interactive",
     set: function(value)
     {
         this._interactive = Boolean(value);
-    }
-});
-
-/**
- * Get the FX applied to this object
- * @name FORGE.Object3D#fx
- * @readonly
- * @type {string}
- */
-Object.defineProperty(FORGE.Object3D.prototype, "fx",
-{
-    /** @this {FORGE.Object3D} */
-    get: function()
-    {
-        return this._fx;
     }
 });
 

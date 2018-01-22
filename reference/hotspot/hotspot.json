@@ -53,13 +53,6 @@
             "default": "pointer"
         },
 
-        "fx": {
-            "type": "string",
-            "title": "FX to apply",
-            "description": "The UID of the special effect (FX) to apply to the hotspot.",
-            "example": "fx-0"
-        },
-
         "facingCenter": {
             "type": "boolean",
             "title": "Facing Center",
