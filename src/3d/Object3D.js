@@ -215,8 +215,6 @@ FORGE.Object3D.prototype.out = function()
  */
 FORGE.Object3D.prototype.destroy = function()
 {
-    this._viewer.renderer.objects.unregister(this);
-
     if (this._mesh !== null)
     {
         FORGE.Utils.destroyMesh(this._mesh);
