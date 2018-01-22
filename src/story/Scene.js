@@ -119,14 +119,6 @@ FORGE.Scene = function(viewer)
     this._mediaUid = "";
 
     /**
-     * The 3D object manager
-     * @name FORGE.Scene#_objects
-     * @type {FORGE.ObjectManager}
-     * @private
-     */
-    this._objects = null;
-
-    /**
      * The scene render target (texture)
      * @name FORGE.Scene#_renderTarget
      * @type {THREE.WebGLRenderTarget}
