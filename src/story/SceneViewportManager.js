@@ -289,6 +289,8 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
     this._viewer.canvas.pointer.onRotateStart.remove(this._renewActiveViewport, this);
     this._viewer.canvas.pointer.onWheel.remove(this._renewActiveViewport, this);
 
+    this._viewer.canvas.onResize.remove(this._canvasResizeHandler, this);
+
     if (this._objectRenderer !== null)
     {
         this._objectRenderer.destroy();
