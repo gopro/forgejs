@@ -271,14 +271,6 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._renderer = null;
 
     /**
-     * Scene renderer reference.
-     * @name FORGE.Viewer#_sceneRenderer
-     * @type {FORGE.SceneRenderer}
-     * @private
-     */
-    this._sceneRenderer = null;
-
-    /**
      * Paused state of the main loop.
      * @name FORGE.Viewer#_paused
      * @type {boolean}
@@ -675,11 +667,6 @@ FORGE.Viewer.prototype._updateRendering = function()
         this._renderer.render();
     }
 
-    // if (this._sceneRenderer !== null)
-    // {
-    //     this._sceneRenderer.render();
-    // }
-
     if (this._callbacks !== null && typeof this._callbacks.afterRender === "function")
     {
         this._callbacks.afterRender.call(this);
@@ -849,12 +836,6 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._renderer.destroy();
         this._renderer = null;
-    }
-
-    if(this._sceneRenderer !== null)
-    {
-        this._sceneRenderer.destroy();
-        this._sceneRenderer = null;
     }
 
     if(this._canvas !== null)
