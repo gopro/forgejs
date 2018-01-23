@@ -55,15 +55,6 @@ FORGE.ActionManager.prototype._parseConfig = function(config)
 };
 
 /**
- * Get an action by id.
- * @method FORGE.ActionManager#get
- */
-FORGE.ActionManager.prototype.get = function(uid)
-{
-    return FORGE.UID.get(uid, "Action");
-};
-
-/**
  * Add actions configuration
  * @method FORGE.ActionManager#addConfig
  * @param {(Array<ActionConfig>|ActionConfig)} config - Array of action configurations or a single action configuration.
@@ -71,6 +62,16 @@ FORGE.ActionManager.prototype.get = function(uid)
 FORGE.ActionManager.prototype.addConfig = function(config)
 {
     this._parseConfig(config);
+};
+
+/**
+ * Get an action by its UID.
+ * @method FORGE.ActionManager#get
+ * @param {string} uid - The UID of the action you want to get.
+ */
+FORGE.ActionManager.prototype.get = function(uid)
+{
+    return FORGE.UID.get(uid, "Action");
 };
 
 /**
