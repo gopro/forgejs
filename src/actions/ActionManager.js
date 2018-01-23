@@ -15,28 +15,12 @@ FORGE.ActionManager = function(viewer)
     this._viewer = viewer;
 
     /**
-     * Configuration of actions from the JSON
-     * @name  FORGE.ActionManager#_config
-     * @type {Array<ActionConfig>}
-     * @private
-     */
-    this._config = null;
-
-    /**
-     * Camera reference.
+     * Actions array.
      * @name FORGE.ActionManager#_actions
-     * @type {Array}
+     * @type {Array<FORGE.Action>}
      * @private
      */
     this._actions = [];
-
-    /**
-     * Event dispatcher for ready status.
-     * @name FORGE.ActionManager#_onReady
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onReady = null;
 
     FORGE.BaseObject.call(this, "ActionManager");
 };
@@ -104,4 +88,10 @@ FORGE.ActionManager.prototype.destroy = function()
             a = null;
         }
     }
+
+    this._actions = null;
+
+    this._viewer = null;
+
+    FORGE.BaseObject.prototype.destroy.call(this);
 };
