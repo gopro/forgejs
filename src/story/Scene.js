@@ -345,6 +345,7 @@ FORGE.Scene.prototype._destroyViewports = function()
     if (this._viewports !== null)
     {
         this._viewports.destroy();
+        this._viewports = null;
     }
 };
 
