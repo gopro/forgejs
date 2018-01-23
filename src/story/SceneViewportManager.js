@@ -41,11 +41,11 @@ FORGE.SceneViewportManager = function(viewer, scene)
 
     /**
      * Index of active viewport, where the controller is active.
-     * @name FORGE.Scene#_active
+     * @name FORGE.Scene#_index
      * @type {number}
      * @private
      */
-    this._active = 0;
+    this._index = 0;
 
     /**
      * Object renderer.
@@ -180,12 +180,13 @@ FORGE.SceneViewportManager.prototype._renewActiveViewport = function(event)
     var py = event.data.clientY || event.data.center.y;
     var point = new THREE.Vector2(px, this._viewer.height - py);
     var index = this._getSceneViewportIndexContainingPoint(point);
+
     if (index === -1)
     {
         return;
     }
 
-    this._active = index;
+    this._index = index;
 
     if (this._onActiveViewportChange !== null)
     {
@@ -266,6 +267,7 @@ FORGE.SceneViewportManager.prototype.render = function()
 FORGE.SceneViewportManager.prototype.getRelativeMousePosition = function(mouse)
 {
     var index = this._getSceneViewportIndexContainingPoint(mouse);
+
     if (index === -1)
     {
         return null;
@@ -358,7 +360,7 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "objectRenderer",
 });
 
 /**
- * Get the current active.
+ * Get the active viewport.
  * @name FORGE.SceneViewportManager#active
  * @type {FORGE.SceneViewport}
  * @readonly
@@ -368,7 +370,22 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "active",
     /** @this {FORGE.SceneViewportManager} */
     get: function()
     {
-        return this._viewports[this._active];
+        return this._viewports[this._index];
+    }
+});
+
+/**
+ * Get and set the active viewport index.
+ * @name FORGE.SceneViewportManager#index
+ * @type {number}
+ * @readonly
+ */
+Object.defineProperty(FORGE.SceneViewportManager.prototype, "index",
+{
+    /** @this {FORGE.SceneViewportManager} */
+    get: function()
+    {
+        return this._index;
     },
 
     /** @this {FORGE.SceneViewportManager} */
@@ -376,10 +393,11 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "active",
     {
         if (value < 0 || value >= this._viewports.length)
         {
+            this.warn("Index "+value+" is out of bounds");
             return;
         }
 
-        this._active = value;
+        this._index = value;
 
         if (this._onActiveViewportChange == true)
         {
