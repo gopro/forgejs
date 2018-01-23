@@ -114,7 +114,7 @@ FORGE.SceneViewport.DEFAULT_CONFIG =
  */
 FORGE.SceneViewport.prototype._boot = function()
 {
-    this._config = FORGE.Utils.extendMultipleObjects(FORGE.SceneViewport.DEFAULT_CONFIG, this._config);
+    this._config = FORGE.Utils.extendSimpleObject(FORGE.SceneViewport.DEFAULT_CONFIG, this._config);
     this._parseConfig(this._config);
 
     this._viewportRenderer = new FORGE.SceneRenderer(this._viewer, this);
