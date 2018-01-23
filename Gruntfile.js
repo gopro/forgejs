@@ -134,7 +134,6 @@ module.exports = function(grunt)
         "src/director/Director.js",
         "src/director/DirectorTrack.js",
 
-        "src/actions/ActionSet.js",
         "src/actions/ActionEventDispatcher.js",
         "src/actions/Action.js",
         "src/actions/ActionManager.js",
