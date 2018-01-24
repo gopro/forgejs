@@ -48,10 +48,7 @@ module.exports = function(grunt)
         "src/story/SceneViewport.js",
         "src/render/SceneEffectComposer.js",
         "src/render/SceneRenderer.js",
-
         "src/render/Picking.js",
-        "src/render/PickingRaycast.js",
-        "src/render/PickingDrawpass.js",
 
         "src/render/background/BackgroundRenderer.js",
         "src/render/background/BackgroundMeshRenderer.js",
@@ -94,8 +91,6 @@ module.exports = function(grunt)
         "src/3d/Object3D.js",
         "src/3d/ObjectRenderer.js",
         "src/3d/Raycaster.js",
-        "src/3d/PickingDrawPass.js",
-        "src/3d/PickingManager.js",
         "src/3d/Tile.js",
 
         "src/hotspots/HotspotManager.js",
