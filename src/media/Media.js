@@ -243,15 +243,53 @@ FORGE.Media.prototype._parseConfig = function(config)
             return;
         }
 
-        if (typeof source.streaming !== "undefined" && source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
+        var streamFallback = false;
+        var streamVideoHTML5 = true;
+
+        if (typeof source.streaming !== "undefined")
         {
-            this._displayObject = new FORGE.VideoDash(this._viewer, this._uid);
+            if (FORGE.Device.mediaSource === true)
+            {
+                // check the canPlayType ability for HLS or DASH if fallback is required
+                if (source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
+                {
+                    streamVideoHTML5 = false;
+                    this._displayObject = new FORGE.VideoDash(this._viewer, this._uid);
+                }
+                else if (source.streaming.toLowerCase() === FORGE.VideoFormat.HLS)
+                {
+                    // check HLS native support prior any video class creation
+                    if (FORGE.Device.canPlayVideo(FORGE.VideoFormat.HLS) === true)
+                    {
+                        streamVideoHTML5 = true;
+                    }
+                    else
+                    {
+                        streamVideoHTML5 = false;
+                        this._displayObject = new FORGE.VideoHls(this._viewer, this._uid);
+                    }
+                }
+            }
+            else
+            {
+                streamFallback = true;
+            }
         }
-        else if (typeof source.streaming !== "undefined" && source.streaming.toLowerCase() === FORGE.VideoFormat.HLS)
+
+        // check the canPlayType ability for HLS or DASH if native fallback is required
+        if (streamFallback === true)
         {
-            this._displayObject = new FORGE.VideoHls(this._viewer, this._uid);
+            if ((source.streaming.toLowerCase() === FORGE.VideoFormat.HLS && FORGE.Device.canPlayVideo(FORGE.VideoFormat.HLS) === true) || (source.streaming.toLowerCase() === FORGE.VideoFormat.DASH && FORGE.Device.canPlayVideo(FORGE.VideoFormat.DASH) === true))
+            {
+                streamVideoHTML5 = true;
+            }
+            else
+            {
+                streamVideoHTML5 = false;
+            }
         }
-        else
+
+        if (streamVideoHTML5 === true)
         {
             var scene = this._viewer.story.scene;
 
@@ -259,16 +297,18 @@ FORGE.Media.prototype._parseConfig = function(config)
             this._displayObject = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
         }
 
-        // At this point, source.url is either a streaming address, a simple
-        // url, or an array of url
-        this._displayObject.load(source.url);
+        if (this._displayObject !== null)
+        {
+            // At this point, source.url is either a streaming address, a simple
+            // url, or an array of url
+            this._displayObject.load(source.url);
 
-        this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
-        this._displayObject.onPlay.add(this._onPlayHandler, this);
-        this._displayObject.onPause.add(this._onPauseHandler, this);
-        this._displayObject.onSeeked.add(this._onSeekedHandler, this);
-        this._displayObject.onEnded.add(this._onEndedHandler, this);
-
+            this._displayObject.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
+            this._displayObject.onPlay.add(this._onPlayHandler, this);
+            this._displayObject.onPause.add(this._onPauseHandler, this);
+            this._displayObject.onSeeked.add(this._onSeekedHandler, this);
+            this._displayObject.onEnded.add(this._onEndedHandler, this);
+        }
 
         return;
     }
