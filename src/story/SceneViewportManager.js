@@ -105,6 +105,8 @@ FORGE.SceneViewportManager.prototype._boot = function()
     this._viewer.canvas.pointer.onWheel.add(this._renewActiveViewport, this);
 
     this._viewer.canvas.onResize.add(this._canvasResizeHandler, this);
+
+    this._scene.onLoadComplete.addOnce(this._onSceneLoadComplete, this);
 };
 
 /**
@@ -127,7 +129,6 @@ FORGE.SceneViewportManager.prototype._setLayout = function(layoutUid)
         }
     }
 
-    this._scene.onLoadComplete.addOnce(this._onSceneLoadComplete, this);
 };
 
 /**
