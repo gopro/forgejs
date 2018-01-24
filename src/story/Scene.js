@@ -847,6 +847,21 @@ Object.defineProperty(FORGE.Scene.prototype, "viewports",
 });
 
 /**
+ * Get the scene media uid.
+ * @name  FORGE.Scene#mediaUid
+ * @readonly
+ * @type {string}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "mediaUid",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._mediaUid;
+    }
+});
+
+/**
  * Get the scene media.
  * @name  FORGE.Scene#media
  * @readonly
