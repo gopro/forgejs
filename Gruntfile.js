@@ -138,6 +138,10 @@ module.exports = function(grunt)
         "src/actions/Action.js",
         "src/actions/ActionManager.js",
 
+        "src/layout/Layout.js",
+        "src/layout/LayoutManager.js",
+        "src/layout/LayoutPresets.js",
+
         "src/plugin/Plugin.js",
         "src/plugin/PluginEngine.js",
         "src/plugin/PluginManager.js",
