@@ -96,20 +96,6 @@ FORGE.MediaImage.prototype._onImageLoadComplete = function()
 };
 
 /**
- * Method to dispatch the load complete event and set the MediaImage ready.
- * @method FORGE.MediaImage#_onLoadedMetaDataHandler
- */
-FORGE.MediaImage.prototype._notifyLoadComplete = function()
-{
-    this._loaded = this._image !== null && this._image.loaded && this._preview !== null && this._preview.loaded;
-
-    if (this._preview === null || (this._image !== null && this._image.loaded === false) || this._preview.loaded === false)
-    {
-        this._onLoadComplete.dispatch();
-    }
-};
-
-/**
  * Media image load
  * @method FORGE.MediaImage#load
  */
