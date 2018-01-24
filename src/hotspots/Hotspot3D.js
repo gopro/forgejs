@@ -161,7 +161,7 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
 
     // Set the mesh name
     this._mesh.name = "mesh-" + this._uid;
-    this._mesh.userData = config;
+    this._mesh.userData.hotspotUID = config.uid; // @todo: if no UID in config, set it later
 
     this._name = (typeof config.name === "string") ? config.name : "";
     this._visible = (typeof config.visible === "boolean") ? config.visible : true;
@@ -197,30 +197,33 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
 FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, geometry, material, group)
 {
     var g = group; // Just to avoid the jscs warning about group parameter not used.
+    var gl = this._viewer.renderer.webGLRenderer.getContext();
 
     // this._viewer.view.current.updateUniforms(material.uniforms);
 
     if (material.program)
     {
-        var gl = this._viewer.renderer.webGLRenderer.getContext();
         gl.useProgram(material.program.program);
         var uMap = material.program.getUniforms().map;
 
-        if ("tTexture" in uMap)
-        {
-            material.uniforms.tTexture.value = this._material.texture;
-            uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);
-        }
-
-        // Picking draw pass could need some special uniforms
-        if (material.name === "Picking")
+        if (material.name.includes("picking"))
         {
             // As picking material is the same for all spots renderer in this pass, material uniforms won't be refreshed
             // Setting material.uniforms.tColor value will be useless, set direct value by acceding program uniforms map
             // Call useProgram first to avoid WebGL warning if material.program is not the current program
             // Set also material uniform to avoid both settings will collide on first object
-            uMap.tColor.setValue(gl, this._pickingColor);
-            material.uniforms.tColor.value = this._pickingColor;
+
+            if ("pickingColor" in this._mesh.userData && "tColor" in uMap)
+            {
+                uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
+                material.uniforms.tColor.value = this._mesh.userData.pickingColor;
+            }
+        }
+        
+        if ("tTexture" in uMap && this._material.texture !== null)
+        {
+            material.uniforms.tTexture.value = this._material.texture;
+            uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);
         }
     }
 };
@@ -232,20 +235,6 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
  */
 FORGE.Hotspot3D.prototype._onAfterRender = function(renderer, scene, camera, geometry, material, group)
 {
-    var g = group; // Just to avoid the jscs warning about group parameter not used.
-
-    if (material.program)
-    {
-        var gl = this._viewer.renderer.webGLRenderer.getContext();
-        gl.useProgram(material.program.program);
-        var uMap = material.program.getUniforms().map;
-
-        if ("tTexture" in uMap)
-        {
-            material.uniforms.tTexture.value = null;
-            uMap.tTexture.setValue(gl, null, this._viewer.renderer.webGLRenderer);
-        }
-    }
 };
 
 /**

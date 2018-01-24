@@ -14,6 +14,7 @@ FORGE.ObjectRenderer = function(viewer, objects)
     this._viewer = viewer;
 
     /**
+     * Scene where all objects are renderered (whatever the viewport)
      * @name FORGE.ObjectRenderer#_scene
      * @type {THREE.Scene}
      * @private
@@ -21,6 +22,7 @@ FORGE.ObjectRenderer = function(viewer, objects)
     this._scene = null;
 
     /**
+     * List of objects to render
      * @name FORGE.ObjectRenderer#_objects
      * @type {Array<FORGE.Object3D>}
      * @private
@@ -28,7 +30,7 @@ FORGE.ObjectRenderer = function(viewer, objects)
     this._objects = objects;
 
     /**
-     * Picking manager.
+     * Picking manager
      * @name FORGE.SceneRenderer#_picking
      * @type {FORGE.Picking}
      * @private
@@ -50,27 +52,41 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
  */
 FORGE.ObjectRenderer.prototype._boot = function()
 {
-window.scene =     this._scene = new THREE.Scene();
+    this._scene = new THREE.Scene();
 
     for (var i=0; i<this._objects.length; i++)
     {
         this._scene.add(this._objects[i].mesh);
     }
 
-    // this._picking = new FORGE.PickingDrawpass(this._viewer);
+    this._picking = new FORGE.Picking(this._viewer, this);
 };
 
 /**
- * Get 3d objects that are eligible to raycast (interactive)
- * @method  FORGE.ObjectRenderer#getRaycastable
- * @return {Array<FORGE.Object3D>}
+ * Retrieve the list of all pickable objects
+ * @method FORGE.ObjectRenderer#_getPickableObjects
+ * @private
+ * @return {Array<FORGE.Object3D>} list of all pickable objects
  */
-FORGE.ObjectRenderer.prototype.getRaycastable = function()
+FORGE.ObjectRenderer.prototype._getPickableObjects = function(id)
 {
-    return this._objects.filter(function(object)
-    {
-        return (object.ready === true && object.interactive === true);
-    });
+    return this._objects.filter(function(object) {
+        return object.ready === true && object.interactive === true;
+    })
+};
+
+/**
+ * Retrieve object3D matching the given id
+ * It should be pickable, i.e. ready and interactive
+ * @method FORGE.ObjectRenderer#getInteractiveObjectWithId
+ * @param {number} id - object id
+ * @return {FORGE.Object3D} object3D or undefined if not found
+ */
+FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
+{
+    return this._getPickableObjects().find(function(object) {
+        return object.mesh.id === id;
+    })
 };
 
 /**
@@ -104,7 +120,7 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
         mesh.material.transparent = material.transparent;
         mesh.material.needsUpdate = true;
 
-        if ("tTexture" in mesh.material.uniforms)
+        if ("tTexture" in mesh.material.uniforms && object.material.texture !== null)
         {
             mesh.material.uniforms.tTexture = object.material.texture;
         }
@@ -114,7 +130,12 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
     
-    // this._picking.render(this._scene, camera, target, viewType);
+    // If current viewport is active and there are some pickable objects, render the picking passs
+    var pickable = this._getPickableObjects();
+    if (this._viewer.story.scene.activeViewport === viewport && pickable.length > 0)
+    {
+        this._picking.render(viewport);
+    }
 };
 
 /**
