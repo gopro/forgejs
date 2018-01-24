@@ -97,16 +97,21 @@ FORGE.VideoQuality.mimeTypeFromURL = function(url)
 {
     var types = ["mp4", "webm", "ogg"];
     var parsedURL = FORGE.URL.parse(url);
-    
+
     if(parsedURL.extension !== "" && types.indexOf(parsedURL.extension) !== -1)
     {
         return "video/" + parsedURL.extension;
     }
 
-    var streamingTypes = ["mpd"];
-    if(parsedURL.extension !== "" && streamingTypes.indexOf(parsedURL.extension) !== -1)
+    var streamingTypes = ["mpd", "m3u8"];
+    var streamingMimeTypes = ["application/dash+xml", "application/x-mpegURL"];
+    if(parsedURL.extension !== "")
     {
-        return "application/dash+xml";
+        var index = streamingTypes.indexOf(parsedURL.extension);
+        if (index !== -1)
+        {
+            return streamingMimeTypes[index];
+        }
     }
 
     return "";
@@ -118,7 +123,7 @@ FORGE.VideoQuality.mimeTypeFromURL = function(url)
  * @type {string|number}
  * @readonly
  */
-Object.defineProperty(FORGE.VideoQuality.prototype, "id", 
+Object.defineProperty(FORGE.VideoQuality.prototype, "id",
 {
     /** @this {FORGE.VideoQuality} */
     get: function()
