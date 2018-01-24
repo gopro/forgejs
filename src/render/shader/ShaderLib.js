@@ -92,7 +92,8 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tOpacity: { type: "f", value: 1.0 },
-                    tColor: { type: "f", value: 1.0 }
+                    tTexture: { type: "t", value: null },
+                    tColor: { type: "c", value: new THREE.Color() }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
                 fragmentShader: FORGE.ShaderChunk.wts_frag_color
@@ -103,8 +104,8 @@ FORGE.ShaderLib = {
                 /** @type {FORGEUniform} */
                 uniforms:
                 {
-                    tBackgroundColor: { type: "c", value: null },
-                    tColor: { type: "c", value: null },
+                    tBackgroundColor: { type: "c", value: new THREE.Color() },
+                    tColor: { type: "c", value: new THREE.Color() },
                     tModelViewMatrixInverse: { type: "m4", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear_wireframe,
@@ -132,7 +133,8 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tOpacity: { type: "f", value: 1.0 },
-                    tColor: { type: "f", value: 1.0 }
+                    tTexture: { type: "t", value: null },
+                    tColor: { type: "c", value: new THREE.Color() }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
                 fragmentShader: FORGE.ShaderChunk.wts_frag_color
@@ -143,8 +145,8 @@ FORGE.ShaderLib = {
                 /** @type {FORGEUniform} */
                 uniforms:
                 {
-                    tBackgroundColor: { type: "c", value: null },
-                    tColor: { type: "c", value: null },
+                    tBackgroundColor: { type: "c", value: new THREE.Color() },
+                    tColor: { type: "c", value: new THREE.Color() },
                     tModelViewMatrixInverse: { type: "m4", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear_wireframe,
@@ -173,8 +175,9 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tProjectionDistance: { type: "f", value: 1 },
+                    tTexture: { type: "t", value: null },
                     tOpacity: { type: "f", value: 1.0 },
-                    tColor: { type: "f", value: 1.0 }
+                    tColor: { type: "c", value: new THREE.Color() }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_gopro,
                 fragmentShader: FORGE.ShaderChunk.wts_frag_color
@@ -185,8 +188,8 @@ FORGE.ShaderLib = {
                 /** @type {FORGEUniform} */
                 uniforms:
                 {
-                    tBackgroundColor: { type: "c", value: null },
-                    tColor: { type: "c", value: null },
+                    tBackgroundColor: { type: "c", value: new THREE.Color() },
+                    tColor: { type: "c", value: new THREE.Color() },
                     tProjectionDistance: { type: "f", value: 1 }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_gopro_wireframe,
