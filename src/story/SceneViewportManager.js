@@ -232,21 +232,6 @@ FORGE.SceneViewportManager.prototype._setupVRViewports = function(config)
     this._vrViewports.push(viewportR);
 };
 
-/**
- * @method FORGE.SceneViewportManager#notifyMediaLoadComplete
- */
-FORGE.SceneViewportManager.prototype.notifyMediaLoadComplete = function()
-{
-    for(var i = 0, ii = this._viewports.length; i < ii; i++)
-    {
-        this._viewports[i].notifyMediaLoadComplete();
-    }
-
-    for(var j = 0, jj = this._vrViewports.length; j < jj; j++)
-    {
-        this._vrViewports[j].notifyMediaLoadComplete();
-    }
-};
 
 /**
  * Render routine.

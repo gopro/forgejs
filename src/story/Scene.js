@@ -374,17 +374,6 @@ FORGE.Scene.prototype._destroyViewports = function()
 };
 
 /**
- * Media load compelte handler
- * @method FORGE.Scene._mediaLoadCompleteHandler
- */
-FORGE.Scene.prototype._mediaLoadCompleteHandler = function()
-{
-    this.media.onLoadComplete.remove(this._mediaLoadCompleteHandler, this);
-
-    this._viewports.notifyMediaLoadComplete();
-};
-
-/**
  * Add a scene configuration object.
  * @method  FORGE.Scene#addConfig
  * @param {SceneConfig} config - The scene configuration object to add.
@@ -435,14 +424,13 @@ FORGE.Scene.prototype.loadStart = function(time)
         this._config.media.options.startTime = time;
     }
 
-    this._createViewports(this._config);
-
     // Add the media to the manager and get its uid
     this._mediaUid = this._viewer.media.add(this._config.media);
-    // Listen to the media load compelte event
-    this.media.onLoadComplete.add(this._mediaLoadCompleteHandler, this);
+
     // Trigger the media load
     this.media.load(this._mediaUid);
+
+    this._createViewports(this._config);
 
     if (this._onLoadStart !== null)
     {

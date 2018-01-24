@@ -69,6 +69,24 @@ FORGE.BackgroundCubeRenderer.prototype._boot = function()
 };
 
 /**
+ * Media load complete handler.
+ * @method FORGE.BackgroundCubeRenderer#_mediaLoadCompleteHandler
+ * @private
+ */
+FORGE.BackgroundCubeRenderer.prototype._mediaLoadCompleteHandler = function()
+{
+    FORGE.BackgroundTextureRenderer.prototype._mediaLoadCompleteHandler.call(this);
+
+    if (this._texture.image !== null)
+    {
+        this._faces.x = this._texture.image.width / this._tile;
+        this._faces.y = this._texture.image.height / this._tile;
+    }
+
+    this._mesh.geometry.attributes.uv.set(this._computeUVMap());
+};
+
+/**
  * Return an array containing each coord for the uv mapping of the cube geometry
  * @method FORGE.BackgroundCubeRenderer#_computeUVMap
  * @return {Float32Array} The array containing the UVs
@@ -161,24 +179,6 @@ FORGE.BackgroundCubeRenderer.prototype._computeUVMap = function()
     applyUVMapForFace(layout.indexOf("F"), this._faces.x, this._faces.y, this._subdivision);
 
     return uvMap;
-};
-
-/**
- * It will be called if it exists, once the mesh is created
- * @method FORGE.BackgroundCubeRenderer#_onTextureCreated
- * @private
- */
-FORGE.BackgroundCubeRenderer.prototype._onTextureCreated = function()
-{
-    if (this._texture.image !== null)
-    {
-        this._faces.x = this._texture.image.width / this._tile;
-        this._faces.y = this._texture.image.height / this._tile;
-    }
-
-    this._mesh.geometry.attributes.uv.set(this._computeUVMap());
-
-    FORGE.BackgroundTextureRenderer.prototype._onTextureCreated.call(this);
 };
 
 /**

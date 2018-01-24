@@ -69,6 +69,7 @@ FORGE.SceneRenderer.prototype._boot = function()
         return;
     }
 
+    this._createBackgroundRenderer();
     this._createComposer();
 };
 
@@ -103,16 +104,6 @@ FORGE.SceneRenderer.prototype._createComposer = function()
     this._composerTexture.name = "Viewport-EffectComposer-Target-in-" + this._viewport.uid;
 
     this._composer = new FORGE.SceneEffectComposer(this._viewer, this._composerTexture, this._viewport.scene.renderTarget, this._viewport.fx);
-};
-
-/**
- * Media load complete handler
- * @method FORGE.SceneRenderer#_onMediaLoadComplete
- * @private
- */
-FORGE.SceneRenderer.prototype.notifyMediaLoadComplete = function()
-{
-    this._createBackgroundRenderer();
 };
 
 /**
@@ -186,7 +177,6 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
             {
                 backgroundRendererRef = FORGE.BackgroundCubeRenderer;
             }
-
         }
     }
 
@@ -199,11 +189,6 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
  */
 FORGE.SceneRenderer.prototype.render = function()
 {
-    if (this._backgroundRenderer === null)
-    {
-        return;
-    }
-
     if (this._composer === null)
     {
         this._backgroundRenderer.render(this._viewport.scene.renderTarget);

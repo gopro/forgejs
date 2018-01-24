@@ -57,6 +57,14 @@ FORGE.BackgroundRenderer = function(viewer, viewport, className)
      */
     this._frustum = null;
 
+    /**
+     * Is the background is ready for render, this mean is the media is loaded ?
+     * @name FORGE.BackgroundRenderer#_ready
+     * @type {boolean}
+     * @private
+     */
+    this._ready = false;
+
     FORGE.BaseObject.call(this, className || "BackgroundRenderer");
 
     this._boot();
@@ -86,6 +94,18 @@ FORGE.BackgroundRenderer.prototype._boot = function()
     this._camera = this._viewport.camera.main;
 
     this._frustum = new THREE.Frustum();
+
+    this._media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
+};
+
+/**
+ * Media load complete handler.
+ * @method FORGE.BackgroundRenderer#_mediaLoadCompleteHandler
+ * @private
+ */
+FORGE.BackgroundRenderer.prototype._mediaLoadCompleteHandler = function()
+{
+    this._ready = true;
 };
 
 /**
@@ -115,6 +135,11 @@ FORGE.BackgroundRenderer.prototype.isObjectInScene = function(object)
  */
 FORGE.BackgroundRenderer.prototype.render = function(target)
 {
+    if(this._ready === false)
+    {
+        return;
+    }
+
     this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this._camera.projectionMatrix, this._camera.matrixWorldInverse ) );
 
     this._viewer.renderer.webGLRenderer.render(this._scene, this._camera, target, false);

@@ -76,9 +76,29 @@ FORGE.BackgroundMeshRenderer.prototype._bootComplete = function()
 {
     this._createMesh();
     this._onMeshCreated();
-    this._onTextureCreated();
 };
 
+/**
+ * Create mesh
+ * @method FORGE.BackgroundMeshRenderer#_createMesh
+ * @private
+ */
+FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
+{
+    // Start with clearing existing mesh
+    if (this._mesh !== null)
+    {
+        this._scene.remove(this._mesh);
+        FORGE.Utils.destroyMesh(this._mesh);
+    }
+
+    var geometry = this._createGeometry();
+    var material = this._createMaterial();
+
+    this._mesh = new THREE.Mesh(geometry, material);
+
+    this._scene.add(this._mesh);
+};
 
 /**
  * Placeholder function to be implemented by subclass specific needs
@@ -89,32 +109,6 @@ FORGE.BackgroundMeshRenderer.prototype._bootComplete = function()
 FORGE.BackgroundMeshRenderer.prototype._onMeshCreated = function()
 {
 
-};
-
-/**
- * It will be called if it exists, once the mesh is created
- * @method FORGE.BackgroundMeshRenderer#_onTextureCreated
- * @private
- */
-FORGE.BackgroundMeshRenderer.prototype._onTextureCreated = function()
-{
-
-};
-
-/**
- * Event handler called when the view has changed
- * Refresh the mesh material with new shaders
- * @method FORGE.BackgroundMeshRenderer#_onViewChanged
- * @private
- */
-FORGE.BackgroundMeshRenderer.prototype._onViewChanged = function()
-{
-    if (this._mesh.material instanceof THREE.Material)
-    {
-        this._mesh.material.dispose();
-    }
-
-    this._mesh.material = this._createMaterial();
 };
 
 /**
@@ -155,27 +149,20 @@ FORGE.BackgroundMeshRenderer.prototype._createMaterial = function()
     return material;
 };
 
-
 /**
- * Create mesh
- * @method FORGE.BackgroundMeshRenderer#_createMesh
+ * Event handler called when the view has changed
+ * Refresh the mesh material with new shaders
+ * @method FORGE.BackgroundMeshRenderer#_onViewChanged
  * @private
  */
-FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
+FORGE.BackgroundMeshRenderer.prototype._onViewChanged = function()
 {
-    // Start with clearing existing mesh
-    if (this._mesh !== null)
+    if (this._mesh.material instanceof THREE.Material)
     {
-        this._scene.remove(this._mesh);
-        FORGE.Utils.destroyMesh(this._mesh);
+        this._mesh.material.dispose();
     }
 
-    var geometry = this._createGeometry();
-    var material = this._createMaterial();
-
-    this._mesh = new THREE.Mesh(geometry, material);
-
-    this._scene.add(this._mesh);
+    this._mesh.material = this._createMaterial();
 };
 
 /**
@@ -186,6 +173,10 @@ FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
  */
 FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
 {
+    if (this._ready == false)
+    {
+        return;
+    }
 
     // Update common shader material parameters
     var uniforms = this._mesh.material.uniforms;

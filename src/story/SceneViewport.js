@@ -209,14 +209,6 @@ FORGE.SceneViewport.prototype.updateRectangle = function()
 };
 
 /**
- * @method FORGE.SceneViewport#notifyMediaLoadComplete
- */
-FORGE.SceneViewport.prototype.notifyMediaLoadComplete = function()
-{
-    this._viewportRenderer.notifyMediaLoadComplete();
-};
-
-/**
  * Render routine.
  * @method FORGE.SceneViewport#render
  * @param {THREE.WebGLRenderer} webGLRenderer
