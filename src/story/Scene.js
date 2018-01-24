@@ -63,6 +63,14 @@ FORGE.Scene = function(viewer)
     this._background = "white";
 
     /**
+     * The layout uid in the scene configuration
+     * @name FORGE.Scene#_layoutUid
+     * @type {string}
+     * @private
+     */
+    this._layoutUid = "";
+
+    /**
      * The array of scene uids to be sync with
      * @name FORGE.Scene#_sync
      * @type {Array<string>}
@@ -214,9 +222,25 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._slug = new FORGE.LocaleString(this._viewer, this._config.slug);
     this._description = new FORGE.LocaleString(this._viewer, this._config.description);
     this._background = config.background;
+    this._layoutUid = typeof config.layout === "string" && config.layout !== "" ? config.layout : this._viewer.layouts.defaultUid;
     this._sync = (FORGE.Utils.isArrayOf(this._config.sync, "string") === true) ? this._config.sync : [];
 
-    if(typeof config.events === "object" && config.events !== null)
+
+    // Set the default layout
+    this._layoutUid = this._viewer.layouts.defaultUid;
+
+    // If there is a specified layout uid, use it !
+    if (typeof config.layout === "string" && config.layout !== "")
+    {
+        this._layoutUid = config.layout;
+    }
+    else if (typeof config.layout === "object" && config.layout !== null)
+    {
+        var layout = this._viewer.layouts.addConfig(config.layout);
+        this._layoutUid = layout.uid;
+    }
+
+    if (typeof config.events === "object" && config.events !== null)
     {
         this._createEvents(config.events);
     }
@@ -847,21 +871,6 @@ Object.defineProperty(FORGE.Scene.prototype, "viewports",
 });
 
 /**
- * Get the scene media uid.
- * @name  FORGE.Scene#mediaUid
- * @readonly
- * @type {string}
- */
-Object.defineProperty(FORGE.Scene.prototype, "mediaUid",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        return this._mediaUid;
-    }
-});
-
-/**
  * Get the scene media.
  * @name  FORGE.Scene#media
  * @readonly
@@ -874,6 +883,37 @@ Object.defineProperty(FORGE.Scene.prototype, "media",
     {
         var media = FORGE.UID.get(this._mediaUid);
         return media;
+    }
+});
+
+/**
+ * Get the scene layout uid.
+ * @name  FORGE.Scene#layoutUid
+ * @readonly
+ * @type {string}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "layoutUid",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._layoutUid;
+    }
+});
+
+/**
+ * Get the scene layout.
+ * @name  FORGE.Scene#layout
+ * @readonly
+ * @type {FORGE.Layout}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "layout",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        var layout = FORGE.UID.get(this._layoutUid);
+        return layout;
     }
 });
 

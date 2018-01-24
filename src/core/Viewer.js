@@ -143,6 +143,14 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._actions = null;
 
     /**
+     * Layout Manager reference
+     * @name FORGE.Viewer#_layouts
+     * @type {FORGE.LayoutManager}
+     * @private
+     */
+    this._layouts = null;
+
+    /**
      * Director's cut track manager
      * @name  FORGE.Viewer#_director
      * @type {FORGE.Director}
@@ -405,6 +413,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._plugins = new FORGE.PluginManager(this);
     this._hotspots = new FORGE.HotspotManager(this);
     this._actions = new FORGE.ActionManager(this);
+    this._layouts = new FORGE.LayoutManager(this);
     // this._director = new FORGE.Director(this);
     this._fxs = new FORGE.FXManager(this);
 
@@ -513,6 +522,11 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
     if (typeof config.actions !== "undefined")
     {
         this._actions.addConfig(config.actions);
+    }
+
+    if (typeof config.layouts !== "undefined")
+    {
+        this._layouts.addConfig(config.layouts);
     }
 
     if (typeof config.fx !== "undefined")
@@ -874,6 +888,12 @@ FORGE.Viewer.prototype.destroy = function()
         this._actions = null;
     }
 
+    if(this._layouts !== null)
+    {
+        this._layouts.destroy();
+        this._layouts = null;
+    }
+
     if(this._display !== null)
     {
         this._display.destroy();
@@ -1228,6 +1248,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "actions",
     get: function()
     {
         return this._actions;
+    }
+});
+
+/**
+ * Get the viewer layout manager.
+ * @name FORGE.Viewer#layouts
+ * @type {FORGE.LayoutManager}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "layouts",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._layouts;
     }
 });
 

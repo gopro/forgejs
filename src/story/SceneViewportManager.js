@@ -24,6 +24,14 @@ FORGE.SceneViewportManager = function(viewer, scene)
     this._scene = scene;
 
     /**
+     * The current Forge.Layout uid
+     * @name FORGE.SceneViewportManager#_layoutUid
+     * @type {string}
+     * @private
+     */
+    this._layoutUid = "";
+
+    /**
      * Array of scene viewports.
      * @name FORGE.Scene#_viewports
      * @type {Array<FORGE.SceneViewport>}
@@ -77,11 +85,14 @@ FORGE.SceneViewportManager.prototype.constructor = FORGE.SceneViewportManager;
  */
 FORGE.SceneViewportManager.prototype._boot = function()
 {
+    this._viewports = [];
+    this._vrViewports = [];
+
     // Parse config for screen rendering
-    this._parseConfig(this._scene.config);
+    this._setLayout(this._scene.layoutUid);
 
     // Prepare VR rendering
-    this._setupVRViewports();
+    // this._setupVRViewports();
 
     // @todo enable this finally instead of all the canvas pointers
     // this._viewer.controllers.onActivate.add(this._renewActiveViewport, this)
@@ -97,25 +108,20 @@ FORGE.SceneViewportManager.prototype._boot = function()
 };
 
 /**
- * Parse config.
+ * Set the current layout.
+ * @name FORGE.SceneViewportManager#_setLayout
+ * @param {string} layoutUid - The layout uid used to create viewports
  * @private
  */
-FORGE.SceneViewportManager.prototype._parseConfig = function(config)
+FORGE.SceneViewportManager.prototype._setLayout = function(layoutUid)
 {
-    this._viewports = [];
-    this._vrViewports = [];
+    var layout = FORGE.UID.get(layoutUid);
 
-    if (typeof config.layout === "undefined" || config.layout.length === 0)
+    if (Array.isArray(layout.viewports) === true)
     {
-        var viewport = new FORGE.SceneViewport(this._viewer, this._scene, null);
-        this._viewports.push(viewport);
-    }
-    else
-    {
-        for (var i=0, ii=config.layout.length; i<ii; i++)
+        for (var i = 0, ii = layout.viewports.length; i < ii; i++)
         {
-            var viewportConfig = config.layout[i];
-            viewportConfig.vr = false;
+            var viewportConfig = layout.viewports[i];
             var viewport = new FORGE.SceneViewport(this._viewer, this._scene, viewportConfig);
             this._viewports.push(viewport);
         }
