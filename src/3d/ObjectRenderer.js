@@ -122,7 +122,7 @@ FORGE.ObjectRenderer.prototype.render = function(camera, target, view)
         mesh.material.transparent = material.transparent;
         mesh.material.needsUpdate = true;
 
-        if ("tTexture" in mesh.material.uniforms)
+        if ("tTexture" in mesh.material.uniforms && object.material.texture !== null)
         {
             mesh.material.uniforms.tTexture = object.material.texture;
         }
