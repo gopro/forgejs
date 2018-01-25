@@ -1,6 +1,6 @@
 /**
  * Hotspot material handles the parse of the material config and the loading of the needed resource.<br>
- * In the end it provides a THREE.MeshBasicMaterial when the resources are loaded.
+ * In the end it provides a THREE.Material when the resources are loaded.
  *
  * @constructor FORGE.HotspotMaterial
  * @param {FORGE.Viewer} viewer - The viewer reference.
@@ -80,11 +80,11 @@ FORGE.HotspotMaterial = function(viewer, hotspotUid)
      * The base color of the material.<br>
      * Can be a number 0xff0000 or a string: rgb(255, 0, 0), rgb(100%, 0%, 0%), hsl(0, 100%, 50%), #ff0000.
      * @name  FORGE.HotspotMaterial#_opacity
-     * @type {(number|string)}
+     * @type {THREE.Color}
      * @default
      * @private
      */
-    this._color = 0xffffff;
+    this._color = new THREE.Color(0xffffff);
 
     /**
      * The display object used for the texture
@@ -239,7 +239,7 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
 {
     this._opacity = (typeof config.opacity === "number") ? FORGE.Math.clamp(config.opacity, 0, 1) : 1;
     this._transparent = (typeof config.transparent === "boolean") ? config.transparent : false;
-    this._color = (typeof config.color === "string") ? config.color : 0xffffff;
+    this._color = new THREE.Color((typeof config.color === "string") ? config.color : 0xffffff);
     this._update = (typeof config.update === "boolean") ? config.update : false;
     this._side = (typeof config.side === "string") ? config.side : FORGE.HotspotMaterial.sides.DOUBLE;
 
@@ -653,7 +653,7 @@ FORGE.HotspotMaterial.prototype.dump = function()
 {
     var dump =
     {
-        color: this._color,
+        color: this._color.getHexString(),
         opacity: this._opacity,
         transparent: this._transparent,
         side: this._side,
@@ -754,10 +754,10 @@ Object.defineProperty(FORGE.HotspotMaterial.prototype, "texture",
 });
 
 /**
- * Get the THREE.MeshBasicMaterial used for this hotspot material.
+ * Get the THREE.Material used for this hotspot material.
  * @name FORGE.HotspotMaterial#material
  * @readonly
- * @type {THREE.MeshBasicMaterial}
+ * @type {THREE.Material}
  */
 Object.defineProperty(FORGE.HotspotMaterial.prototype, "material",
 {
@@ -808,7 +808,7 @@ Object.defineProperty(FORGE.HotspotMaterial.prototype, "transparent",
  * Get the color of this hotspot material.
  * @name FORGE.HotspotMaterial#color
  * @readonly
- * @type {(string|number)}
+ * @type {THREE.Color}
  */
 Object.defineProperty(FORGE.HotspotMaterial.prototype, "color",
 {

@@ -4,8 +4,8 @@
 
 #include <defines>
 
-uniform sampler2D tTexture;
 uniform float tOpacity;
+uniform sampler2D tTexture;
 
 varying vec2 vUv;
 

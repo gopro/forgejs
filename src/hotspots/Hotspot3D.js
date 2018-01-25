@@ -213,14 +213,14 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
             // Call useProgram first to avoid WebGL warning if material.program is not the current program
             // Set also material uniform to avoid both settings will collide on first object
 
-            if ("pickingColor" in this._mesh.userData && "tColor" in uMap)
+            if ("pickingColor" in this._mesh.userData && "tColor" in uMap && "tColor" in material.uniforms)
             {
                 uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
                 material.uniforms.tColor.value = this._mesh.userData.pickingColor;
             }
         }
         
-        if ("tTexture" in uMap && this._material.texture !== null)
+        if ("tTexture" in uMap  && "tTexture" in material.uniforms && this._material.texture !== null)
         {
             material.uniforms.tTexture.value = this._material.texture;
             uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);

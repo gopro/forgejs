@@ -105,8 +105,6 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
     var view = viewport.view.current;
     var camera = viewport.camera.main;
 
-    var materialRef = this._viewer.renderer.getMaterialForView(view.type, "mapping");
-
     for (var i=0; i<this._objects.length; i++)
     {
         var object = this._objects[i];
@@ -115,22 +113,40 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 
         mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR;
 
-        mesh.material = materialRef;
+        if (object.material.type === FORGE.HotspotMaterial.types.GRAPHICS)
+        {
+            mesh.material = this._viewer.renderer.getMaterialForView(view.type, "coloring");
+        }
+        else
+        {
+            mesh.material = this._viewer.renderer.getMaterialForView(view.type, "mapping");
+        }
+
         mesh.material.side = THREE.FrontSide;
         mesh.material.transparent = material.transparent;
         mesh.material.needsUpdate = true;
 
         if ("tTexture" in mesh.material.uniforms && object.material.texture !== null)
         {
-            mesh.material.uniforms.tTexture = object.material.texture;
+            mesh.material.uniforms.tTexture.value = object.material.texture;
         }
-    }
 
-    view.updateUniforms(materialRef.uniforms);
+        if ("tColor" in mesh.material.uniforms && object.material.color !== null)
+        {
+            mesh.material.uniforms.tColor.value = object.material.color;
+        }
+
+        if ("tOpacity" in mesh.material.uniforms && object.material.opacity !== null)
+        {
+            mesh.material.uniforms.tOpacity.value = object.material.opacity;
+        }
+
+        view.updateUniforms(mesh.material.uniforms);
+    }
 
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
     
-    // If current viewport is active and there are some pickable objects, render the picking passs
+    // If current viewport is active and there are some pickable objects, render the picking pass
     var pickable = this._getPickableObjects();
     if (this._viewer.story.scene.activeViewport === viewport && pickable.length > 0)
     {
