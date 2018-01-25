@@ -292,7 +292,7 @@ FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType)
 
     this._materialPool[viewType] = {};
 
-    var shaderTypes = ["mapping", "picking", "wireframe"];
+    var shaderTypes = ["mapping", "coloring", "picking", "wireframe"];
     for (var i=0, ii=shaderTypes.length; i<ii; i++)
     {
         var type = shaderTypes[i];
