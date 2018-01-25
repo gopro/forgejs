@@ -40,14 +40,6 @@ FORGE.SceneViewportManager = function(viewer, scene)
     this._viewports = null;
 
     /**
-     * Array of scene viewports for VR rendering.
-     * @name FORGE.Scene#_vrViewports
-     * @type {Array<FORGE.SceneViewport>}
-     * @private
-     */
-    this._vrViewports = null;
-
-    /**
      * Index of active viewport, where the controller is active.
      * @name FORGE.Scene#_index
      * @type {number}
@@ -86,13 +78,9 @@ FORGE.SceneViewportManager.prototype.constructor = FORGE.SceneViewportManager;
 FORGE.SceneViewportManager.prototype._boot = function()
 {
     this._viewports = [];
-    this._vrViewports = [];
 
     // Parse config for screen rendering
     this._setLayout(this._scene.layoutUid);
-
-    // Prepare VR rendering
-    // this._setupVRViewports();
 
     // @todo enable this finally instead of all the canvas pointers
     // this._viewer.controllers.onActivate.add(this._renewActiveViewport, this)
@@ -118,17 +106,44 @@ FORGE.SceneViewportManager.prototype._boot = function()
 FORGE.SceneViewportManager.prototype._setLayout = function(layoutUid)
 {
     var layout = FORGE.UID.get(layoutUid);
+    this._createViewports(layout.viewports);
+};
 
-    if (Array.isArray(layout.viewports) === true)
+/**
+ * Create viewports
+ * @name FORGE.SceneViewportManager#_createViewports
+ * @param {string} layoutUid - The layout uid used to create viewports
+ * @private
+ */
+FORGE.SceneViewportManager.prototype._createViewports = function(config)
+{
+    // Create the viewports
+    if (Array.isArray(config) === true)
     {
-        for (var i = 0, ii = layout.viewports.length; i < ii; i++)
+        for (var i = 0, ii = config.length; i < ii; i++)
         {
-            var viewportConfig = layout.viewports[i];
-            var viewport = new FORGE.SceneViewport(this._viewer, this._scene, viewportConfig);
+            var viewport = new FORGE.SceneViewport(this._viewer, this._scene, config[i]);
             this._viewports.push(viewport);
         }
     }
 
+    // Reset the active viewport index to 0
+    this._index = 0;
+};
+
+/**
+ * Destroy viewports
+ * @name FORGE.SceneViewportManager#_destroyViewports
+ * @private
+ */
+FORGE.SceneViewportManager.prototype._destroyViewports = function()
+{
+    for(var i = 0, ii = this._viewports.length; i < ii; i++)
+    {
+        this._viewports[i].destroy();
+    }
+
+    this._viewports = [];
 };
 
 /**
@@ -202,51 +217,14 @@ FORGE.SceneViewportManager.prototype._renewActiveViewport = function(event)
 };
 
 /**
- * Setup VR viewports.
- * @private
- */
-FORGE.SceneViewportManager.prototype._setupVRViewports = function(config)
-{
-    var vrLeftConfig =
-    {
-        rectangle: new FORGE.Rectangle(0, 0, 50, 100),
-        // background: undefined,
-        // camera: undefined,
-        // view: undefined,
-        vr: true
-    };
-
-    var viewportL = new FORGE.SceneViewport(this._viewer, this._scene, vrLeftConfig);
-    this._vrViewports.push(viewportL);
-
-    var vrRightConfig =
-    {
-        rectangle: new FORGE.Rectangle(50, 0, 50, 100),
-        // background: undefined,
-        // camera: undefined,
-        // view: undefined,
-        vr: true
-    };
-
-    var viewportR = new FORGE.SceneViewport(this._viewer, this._scene, vrRightConfig);
-    this._vrViewports.push(viewportR);
-};
-
-
-/**
  * Render routine.
  * @method FORGE.SceneViewportManager#render
  */
 FORGE.SceneViewportManager.prototype.render = function()
 {
-    var viewports = this._viewer.renderer.vr === true ? this._vrViewports : this._viewports;
-
-    this._viewer.renderer.webGLRenderer.setClearColor( 0x000000, 0 ); // the default
-
-    for(var i = 0, ii = viewports.length; i < ii; i++)
+    for(var i = 0, ii = this._viewports.length; i < ii; i++)
     {
-        var viewport = viewports[i];
-        viewport.render();
+        this._viewports[i].render();
     }
 };
 
@@ -297,19 +275,7 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
         this._onActiveViewportChange = null;
     }
 
-    for(var i = 0, ii = this._viewports.length; i < ii; i++)
-    {
-        this._viewports[i].destroy();
-    }
-
-    this._viewports = null;
-
-    for(var j = 0, jj = this._vrViewports.length; j < jj; j++)
-    {
-        this._vrViewports[j].destroy();
-    }
-
-    this._vrViewports = null;
+    this._destroyViewports();
 
     this._viewer = null;
     this._scene = null;
@@ -328,7 +294,31 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "all",
     /** @this {FORGE.SceneViewportManager} */
     get: function()
     {
-        return this._viewer.vr === true ? this._vrViewports : this._viewports;
+        return this._viewports;
+    }
+});
+
+/**
+ * Get and set the layout uid.
+ * @name FORGE.SceneViewportManager#layoutUid
+ * @type {FORGE.SceneViewport}
+ * @readonly
+ */
+Object.defineProperty(FORGE.SceneViewportManager.prototype, "layoutUid",
+{
+    /** @this {FORGE.SceneViewportManager} */
+    get: function()
+    {
+        return this._layoutUid;
+    },
+
+    set: function(value)
+    {
+        if (FORGE.UID.isTypeOf(value, "Layout"))
+        {
+            this._destroyViewports();
+            this._setLayout(value);
+        }
     }
 });
 

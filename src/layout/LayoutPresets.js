@@ -17,7 +17,30 @@ FORGE.LayoutPresets.SINGLE =
     viewports :
     [
         {
-            rectangle: { x:0, y:0, width:100, height:100 }
+            rectangle: { x: 0, y: 0, width: 100, height: 100 }
+        }
+    ]
+};
+
+/**
+ * @name FORGE.LayoutPresets.VR
+ * @type {LayoutConfig}
+ * @const
+ */
+FORGE.LayoutPresets.VR =
+{
+    uid: "forge-layout-preset-vr",
+    name: "VR",
+    viewports :
+    [
+        {
+            rectangle: { x: 0, y: 0, width: 50, height: 100 },
+            vr: true
+        },
+
+        {
+            rectangle: { x: 50, y: 0, width: 50, height: 100 },
+            vr: true
         }
     ]
 };
