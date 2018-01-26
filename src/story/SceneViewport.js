@@ -43,9 +43,9 @@ FORGE.SceneViewport = function(viewer, scene, config)
     /**
      * Viewport background color
      * @name FORGE.SceneViewport#_background
-     * @type {string}
+     * @type {THREE.Color}
      */
-    this._background = "";
+    this._background = null;
 
     /**
      * Viewport camera
@@ -140,7 +140,8 @@ FORGE.SceneViewport.prototype._parseConfig = function(config)
     var viewerBG = this._viewer.background;
     var sceneBG = this._scene.background;
     var viewportBG = config.background;
-    this._background = typeof viewportBG === "string" ? viewportBG : typeof sceneBG === "string" ? sceneBG : viewerBG;
+    var background = typeof viewportBG === "string" ? viewportBG : typeof sceneBG === "string" ? sceneBG : viewerBG;
+    this._background = new THREE.Color(background);
 
     this._createViewManager(config.view);
 
@@ -222,7 +223,8 @@ FORGE.SceneViewport.prototype.render = function()
     target.scissor.set(this._rectangle.x, this._rectangle.y, this._rectangle.width, this._rectangle.height);
     target.scissorTest = true ;
 
-    this._viewer.renderer.webGLRenderer.setClearColor(new THREE.Color(this._background));
+    this._viewer.renderer.webGLRenderer.setClearColor(this._background);
+    this._viewer.renderer.webGLRenderer.clearTarget(target, true, false, false);
     this._viewportRenderer.render(target);
 };
 
@@ -252,6 +254,7 @@ FORGE.SceneViewport.prototype.destroy = function()
 
     this._fx = null;
     this._rectangle = null;
+    this._background = null;
     this._scene = null;
     this._viewer = null;
 
@@ -297,7 +300,7 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "rectangle",
 /**
  * Get the viewport background color.
  * @name FORGE.SceneViewport#background
- * @type {string}
+ * @type {THREE.Color}
  * @readonly
  */
 Object.defineProperty(FORGE.SceneViewport.prototype, "background",
