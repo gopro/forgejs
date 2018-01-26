@@ -63,12 +63,6 @@ FORGE.SceneRenderer.prototype.constructor = FORGE.SceneRenderer;
  */
 FORGE.SceneRenderer.prototype._boot = function()
 {
-    if (this._viewport.scene.media === null)
-    {
-        this.warn("Scene has no media. This should not happen.");
-        return;
-    }
-
     this._createBackgroundRenderer();
     this._createComposer();
 };
