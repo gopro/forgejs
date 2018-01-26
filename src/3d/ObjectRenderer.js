@@ -30,6 +30,14 @@ FORGE.ObjectRenderer = function(viewer, objects)
     this._objects = objects;
 
     /**
+     * Reference on last renderer viewport
+     * @name FORGE.ObjectRenderer#_lastViewport
+     * @type {FORGE.SceneViewport}
+     * @private
+     */
+    this._lastViewport = null;
+
+    /**
      * Picking manager
      * @name FORGE.SceneRenderer#_picking
      * @type {FORGE.Picking}
@@ -67,11 +75,12 @@ window.scene =     this._scene = new THREE.Scene();
 
 /**
  * Retrieve the list of all pickable objects
+ * That means ready and interactive
  * @method FORGE.ObjectRenderer#_getPickableObjects
  * @private
  * @return {Array<FORGE.Object3D>} list of all pickable objects
  */
-FORGE.ObjectRenderer.prototype._getPickableObjects = function(id)
+FORGE.ObjectRenderer.prototype._getPickableObjects = function()
 {
     return this._objects.filter(function(object) {
         return object.ready === true && object.interactive === true;
@@ -81,7 +90,7 @@ FORGE.ObjectRenderer.prototype._getPickableObjects = function(id)
 
 /**
  * Retrieve object3D matching the given id
- * It should be pickable, i.e. ready and interactive
+ * It should be pickable, that means ready and interactive
  * @method FORGE.ObjectRenderer#getInteractiveObjectWithId
  * @param {number} id - object id
  * @return {FORGE.Object3D} object3D or undefined if not found
@@ -95,6 +104,14 @@ FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
 
 /**
  * Render routine
+ *
+ * If viewport has changed since last render
+ * Iterate over each object to setup its material and projection uniforms
+ * 
+ * Render the scene for the viewport passed as argument
+ * Call the picking to draw its pass if current viewport is active and there
+ * are pickable objects
+ * 
  * @method FORGE.ObjectRenderer#render
  * @param {FORGE.Viewport} viewport - current rendering viewport
  * @param {FORGE.WebGLRenderTarget} target - render target
@@ -109,44 +126,34 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
     var view = viewport.view.current;
     var camera = viewport.camera.main;
 
-    for (var i=0; i<this._objects.length; i++)
+    if (this._lastViewport === null || viewport.uid !== this._lastViewport.uid)
     {
-        var object = this._objects[i];
-        var material = object.material;
-        var mesh = object.mesh;
-
-        mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR;
-
-        if (object.material.type === FORGE.HotspotMaterial.types.GRAPHICS)
+        for (var i=0; i<this._objects.length; i++)
         {
-            mesh.material = this._viewer.renderer.getMaterialForView(view.type, "coloring");
-        }
-        else
-        {
-            mesh.material = this._viewer.renderer.getMaterialForView(view.type, "mapping");
-        }
+            var object = this._objects[i];
+            var material = object.material;
+            var mesh = object.mesh;
 
-        mesh.material.side = THREE.FrontSide;
-        mesh.material.transparent = material.transparent;
-        mesh.material.needsUpdate = true;
+            mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR;
 
-        if ("tTexture" in mesh.material.uniforms && object.material.texture !== null)
-        {
-            mesh.material.uniforms.tTexture.value = object.material.texture;
+            if (object.material.type === FORGE.HotspotMaterial.types.GRAPHICS)
+            {
+                mesh.material = this._viewer.renderer.getMaterialForView(view.type, "coloring");
+            }
+            else
+            {
+                mesh.material = this._viewer.renderer.getMaterialForView(view.type, "mapping");
+            }
+
+            mesh.material.side = THREE.FrontSide;
+            mesh.material.transparent = material.transparent;
+
+            // Update projection uniforms with view update call
+            view.updateUniforms(mesh.material.uniforms);
         }
-
-        if ("tColor" in mesh.material.uniforms && object.material.color !== null)
-        {
-            mesh.material.uniforms.tColor.value = object.material.color;
-        }
-
-        if ("tOpacity" in mesh.material.uniforms && object.material.opacity !== null)
-        {
-            mesh.material.uniforms.tOpacity.value = object.material.opacity;
-        }
-
-        view.updateUniforms(mesh.material.uniforms);
     }
+
+    this._lastViewport = viewport;
 
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
     
@@ -174,6 +181,8 @@ FORGE.ObjectRenderer.prototype.destroy = function()
     this._scene.children = null;
     this._scene = null;
 
+    this._lastViewport = null;
+    
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
