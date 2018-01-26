@@ -47,6 +47,7 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
 
 /**
  * Init routine
+ * Add meshes to the scene and ensure they have a picking color set
  * @method FORGE.ObjectRenderer#_boot
  * @private
  */
@@ -56,7 +57,9 @@ window.scene =     this._scene = new THREE.Scene();
 
     for (var i=0; i<this._objects.length; i++)
     {
-        this._scene.add(this._objects[i].mesh);
+        var mesh = this._objects[i].mesh;
+        mesh.userData.pickingColor = FORGE.Picking.colorFromObjectID(mesh.id);
+        this._scene.add(mesh);
     }
 
     this._picking = new FORGE.Picking(this._viewer, this);

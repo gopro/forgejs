@@ -112,7 +112,6 @@ FORGE.Object3D.prototype._boot = function()
 {
     this._events = {};
     this._mesh = new THREE.Mesh();
-    this._mesh.userData.pickingColor = FORGE.Picking.colorFromObjectID(this._mesh.id);
 };
 
 /**
