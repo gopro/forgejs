@@ -199,27 +199,32 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
     var g = group; // Just to avoid the jscs warning about group parameter not used.
     var gl = this._viewer.renderer.webGLRenderer.getContext();
 
-    // this._viewer.view.current.updateUniforms(material.uniforms);
-
     if (material.program)
     {
         gl.useProgram(material.program.program);
         var uMap = material.program.getUniforms().map;
 
-        if (material.name.includes("picking"))
+        if ("tColor" in uMap && "tColor" in material.uniforms)
         {
-            // As picking material is the same for all spots renderer in this pass, material uniforms won't be refreshed
-            // Setting material.uniforms.tColor value will be useless, set direct value by acceding program uniforms map
-            // Call useProgram first to avoid WebGL warning if material.program is not the current program
-            // Set also material uniform to avoid both settings will collide on first object
-
-            if ("pickingColor" in this._mesh.userData && "tColor" in uMap && "tColor" in material.uniforms)
+            if (material.name.includes("picking") && "pickingColor" in this._mesh.userData)
             {
-                uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
                 material.uniforms.tColor.value = this._mesh.userData.pickingColor;
+                uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
+            }
+            
+            else if (this._material.color !== null)
+            {
+                material.uniforms.tColor.value = this._material.color;
+                uMap.tColor.setValue(gl, this._material.color, this._viewer.renderer.webGLRenderer);
             }
         }
         
+        if ("tOpacity" in uMap  && "tOpacity" in material.uniforms && this._material.opacity !== null)
+        {
+            material.uniforms.tOpacity.value = this._material.opacity;
+            uMap.tOpacity.setValue(gl, this._material.opacity, this._viewer.renderer.webGLRenderer);
+        }
+
         if ("tTexture" in uMap  && "tTexture" in material.uniforms && this._material.texture !== null)
         {
             material.uniforms.tTexture.value = this._material.texture;
@@ -247,7 +252,6 @@ FORGE.Hotspot3D.prototype._stateLoadCompleteHandler = function()
     this.log("state load complete handler");
 
     this._mesh.geometry = this._geometry.geometry;
-    this._mesh.material = this._material.material;
     this._mesh.visible = this._visible;
 
     this._updatePosition();
