@@ -239,9 +239,11 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
 {
     this._opacity = (typeof config.opacity === "number") ? FORGE.Math.clamp(config.opacity, 0, 1) : 1;
     this._transparent = (typeof config.transparent === "boolean") ? config.transparent : false;
-    this._color = new THREE.Color((typeof config.color === "string") ? config.color : 0xffffff);
     this._update = (typeof config.update === "boolean") ? config.update : false;
     this._side = (typeof config.side === "string") ? config.side : FORGE.HotspotMaterial.sides.DOUBLE;
+
+    var color = (typeof config.color === "string") ? config.color : 0xff0000;
+    this._color = new THREE.Color(color);
 
     // Hotspot with image as background
     if (typeof config.image !== "undefined" && config.image !== null)
@@ -559,17 +561,15 @@ FORGE.HotspotMaterial.prototype._setupComplete = function()
 };
 
 /**
- * Converts the side string to the side number of Three
- * @method FORGE.HotspotMaterial#_getThreeSide
- * @param {string} [side] the string that represents the side of the material from the HotspotMaterial.sides
+ * Get the side of the hotspot material
+ * @method FORGE.HotspotMaterial#getThreeSide
  * @return {number} [description]
- * @private
  */
-FORGE.HotspotMaterial.prototype._getThreeSide = function(side)
+FORGE.HotspotMaterial.prototype.getThreeSide = function()
 {
     var result = THREE.DoubleSide; // Default is double
 
-    switch(side)
+    switch(this._side)
     {
         case FORGE.HotspotMaterial.sides.FRONT:
             result = THREE.FrontSide;

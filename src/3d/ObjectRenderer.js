@@ -145,8 +145,10 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
                 mesh.material = this._viewer.renderer.getMaterialForView(view.type, "mapping");
             }
 
-            mesh.material.side = THREE.FrontSide;
+            mesh.material.side = material.getThreeSide();
+
             mesh.material.transparent = material.transparent;
+            mesh.material.opacity = material.opacity;
 
             // Update projection uniforms with view update call
             view.updateUniforms(mesh.material.uniforms);
