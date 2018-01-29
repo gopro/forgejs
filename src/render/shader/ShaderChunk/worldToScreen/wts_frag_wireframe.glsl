@@ -1,5 +1,6 @@
 /**
- * Fragment shader drawing wireframe
+ * Fragment shader
+ * Wireframe drawing purpose
  * Wireframe is computed using barycentric coordinates
  * Compute distance to the edge to find what should be displayed
  */
