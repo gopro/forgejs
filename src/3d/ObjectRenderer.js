@@ -146,7 +146,6 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
             }
 
             mesh.material.side = material.getThreeSide();
-
             mesh.material.transparent = material.transparent;
             mesh.material.opacity = material.opacity;
 

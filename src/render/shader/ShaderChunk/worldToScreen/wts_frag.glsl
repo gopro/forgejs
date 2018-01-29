@@ -1,5 +1,7 @@
 /**
  * Fragment shader
+ * Retrieve the color of a texture
+ * Alpha is mixed with input opacity
  */
 
 #include <defines>

@@ -1,5 +1,7 @@
 /**
- * Fragment shader - single color drawing
+ * Fragment shader
+ * Retrieve a color with given opacity
+ * Use this shader to apply simple colors to a mesh
  */
 
 #include <defines>

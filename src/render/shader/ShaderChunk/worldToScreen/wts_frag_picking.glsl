@@ -1,6 +1,7 @@
 /**
- * Fragment shader - single color drawing for picking purpose
- * It will lookup texture to discard points where texture alpha is null
+ * Fragment shader
+ * Draw single color for picking purpose
+ * Texture is looked up to discard points where alpha is null
  */
 
 #include <defines>
