@@ -251,6 +251,23 @@ FORGE.Picking.prototype._getObjectAtNormalizedPosition = function(posn)
 };
 
 /**
+ * Dump picking texture to the scene target
+ * @method FORGE.Picking#render
+ * @param {THREE.WebGLRenderTarget} target - draw target
+ */
+FORGE.Picking.prototype._dumpTexture = function(target)
+{
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
+    var geometry = new THREE.PlaneBufferGeometry(1, 1);
+    var material = new THREE.MeshBasicMaterial({color:new THREE.Color(0xffffff), map: this._renderTarget});
+    var quad = new THREE.Mesh(geometry, material);
+    var scene = new THREE.Scene();
+    scene.add(quad);
+
+    this._viewer.renderer.webGLRenderer.render(scene, camera, target, false);
+};
+
+/**
  * Render routine
  * @method FORGE.Picking#render
  * @param {FORGE.Viewport} viewport - current rendering viewport
@@ -278,6 +295,8 @@ FORGE.Picking.prototype.render = function(viewport)
 
     // Restore scene params
     scene.overrideMaterial = null;
+
+    // this._dumpTexture(viewport.scene.renderTarget);
 };
 
 /**
