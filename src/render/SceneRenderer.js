@@ -186,14 +186,14 @@ FORGE.SceneRenderer.prototype.render = function()
     if (this._composer === null)
     {
         this._backgroundRenderer.render(this._viewport.scene.renderTarget);
-        this._viewport.scene.viewports.objectRenderer.render(this._viewport.camera.main, this._viewport.scene.renderTarget, this._viewport.view.current);
+        this._viewport.scene.viewports.objectRenderer.render(this._viewport, this._viewport.scene.renderTarget);
     }
     else
     {
         this._viewer.renderer.webGLRenderer.clearTarget(this._composerTexture, false, true, false);
 
         this._backgroundRenderer.render(this._composerTexture);
-        this._viewport.scene.viewports.objectRenderer.render(this._viewport.camera.main, this._composerTexture, this._viewport.view.current);
+        this._viewport.scene.viewports.objectRenderer.render(this._viewport, this._composerTexture);
 
         this._composer.render();
     }

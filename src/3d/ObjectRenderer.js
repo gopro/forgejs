@@ -50,34 +50,14 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
  */
 FORGE.ObjectRenderer.prototype._boot = function()
 {
-    this._scene = new THREE.Scene();
+window.scene =     this._scene = new THREE.Scene();
 
     for (var i=0; i<this._objects.length; i++)
     {
         this._scene.add(this._objects[i].mesh);
     }
 
-    this._picking = new FORGE.PickingDrawpass(this._viewer);
-};
-
-/**
- * Load objects
- * @method FORGE.ObjectRenderer#loadObjects
- * @param {Array<FORGE.Hotspot3D>} objects - objects array
- */
-FORGE.ObjectRenderer.prototype.loadObjects = function(objects)
-{
-    if (objects === null)
-    {
-        return;
-    }
-
-    this._objects.concat(objects);
-
-    for (var i=0, ii=objects.length; i<ii; i++)
-    {
-        this._scene.add(objects[i].mesh);
-    }    
+    // this._picking = new FORGE.PickingDrawpass(this._viewer);
 };
 
 /**
@@ -96,16 +76,18 @@ FORGE.ObjectRenderer.prototype.getRaycastable = function()
 /**
  * Render routine
  * @method FORGE.ObjectRenderer#render
- * @param {THREE.PerspectiveCamera} camera - render camera
- * @param {THREE.WebGLRenderTarget} target - render target
- * @param {FORGE.View} view - current view for rendering
+ * @param {FORGE.Viewport} viewport - current rendering viewport
+ * @param {FORGE.WebGLRenderTarget} target - render target
  */
-FORGE.ObjectRenderer.prototype.render = function(camera, target, view)
+FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 {
     if (this._scene.children.length === 0)
     {
         return;
     }
+
+    var view = viewport.view.current;
+    var camera = viewport.camera.main;
 
     var materialRef = this._viewer.renderer.getMaterialForView(view.type, "mapping");
 
@@ -115,7 +97,7 @@ FORGE.ObjectRenderer.prototype.render = function(camera, target, view)
         var material = object.material;
         var mesh = object.mesh;
 
-        mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR; 
+        mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR;
 
         mesh.material = materialRef;
         mesh.material.side = THREE.FrontSide;
@@ -131,6 +113,7 @@ FORGE.ObjectRenderer.prototype.render = function(camera, target, view)
     view.updateUniforms(materialRef.uniforms);
 
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
+    
     // this._picking.render(this._scene, camera, target, viewType);
 };
 
