@@ -44,10 +44,11 @@ module.exports = function(grunt)
         "src/media/MediaTiled.js",
 
         "src/render/Renderer.js",
-        "src/story/SceneViewportManager.js",
-        "src/story/SceneViewport.js",
-        "src/render/SceneEffectComposer.js",
-        "src/render/SceneRenderer.js",
+        "src/render/Viewport.js",
+        "src/render/ViewportManager.js",
+        "src/render/ViewportComposer.js",
+        "src/render/ViewportRenderer.js",
+        "src/render/ObjectRenderer.js",
         "src/render/Picking.js",
 
         "src/render/background/BackgroundRenderer.js",
@@ -60,9 +61,9 @@ module.exports = function(grunt)
         "src/render/background/BackgroundGridRenderer.js",
         "src/render/background/BackgroundPyramidRenderer.js",
 
-        "src/render/postProcessing/FX.js",
-        "src/render/postProcessing/FXManager.js",
-        "src/render/postProcessing/ShaderPass.js",
+        "src/render/fx/FX.js",
+        "src/render/fx/FXManager.js",
+        "src/render/fx/ShaderPass.js",
 
         "src/render/shader/ShaderChunk.js",
         "build/tmp/forge.glsl.js",
@@ -82,7 +83,6 @@ module.exports = function(grunt)
         "src/timeline/Track.js",
 
         "src/3d/Object3D.js",
-        "src/3d/ObjectRenderer.js",
         "src/3d/Tile.js",
 
         "src/hotspots/HotspotManager.js",
