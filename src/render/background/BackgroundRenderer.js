@@ -4,7 +4,7 @@
  *
  * @constructor FORGE.BackgroundRenderer
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @param {FORGE.Viewport} viewport - {@link FORGE.Viewport} reference.
  * @param {string=} className - The className of the object as long as many other object inherits from this one.
  * @extends {FORGE.BaseObject}
  */
@@ -21,7 +21,7 @@ FORGE.BackgroundRenderer = function(viewer, viewport, className)
     /**
      * The viewport reference.
      * @name FORGE.BackgroundRenderer#_viewport
-     * @type {FORGE.SceneViewport}
+     * @type {FORGE.Viewport}
      * @private
      */
     this._viewport = viewport;

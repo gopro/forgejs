@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.Camera
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @param {FORGE.Viewport} viewport - {@link FORGE.Viewport} reference.
  * @extends {FORGE.BaseObject}
  */
 FORGE.Camera = function(viewer, viewport)
@@ -19,7 +19,7 @@ FORGE.Camera = function(viewer, viewport)
     /**
      * The viewport reference.
      * @name FORGE.Camera#_viewport
-     * @type {FORGE.SceneRenderer}
+     * @type {FORGE.Viewport}
      * @private
      */
     this._viewport = viewport;

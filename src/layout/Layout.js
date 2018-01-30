@@ -58,7 +58,7 @@ FORGE.Layout.prototype._boot = function()
  */
 FORGE.Layout.prototype._parseConfig = function(config)
 {
-    var viewports = [ FORGE.SceneViewport.DEFAULT_CONFIG ];
+    var viewports = [ FORGE.Viewport.DEFAULT_CONFIG ];
 
     if(typeof config === "object" && config !== null)
     {

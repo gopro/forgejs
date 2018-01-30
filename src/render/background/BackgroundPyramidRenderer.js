@@ -4,7 +4,7 @@
  *
  * @constructor FORGE.BackgroundPyramidRenderer
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @param {FORGE.Viewport} viewport - {@link FORGE.Viewport} reference.
  * @extends {FORGE.BackgroundRenderer}
  */
 FORGE.BackgroundPyramidRenderer = function(viewer, viewport)

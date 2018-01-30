@@ -32,7 +32,7 @@ FORGE.ObjectRenderer = function(viewer, objects)
     /**
      * Reference on last renderer viewport
      * @name FORGE.ObjectRenderer#_lastViewport
-     * @type {FORGE.SceneViewport}
+     * @type {FORGE.Viewport}
      * @private
      */
     this._lastViewport = null;
@@ -48,7 +48,7 @@ FORGE.ObjectRenderer = function(viewer, objects)
 
     /**
      * Picking manager
-     * @name FORGE.SceneRenderer#_picking
+     * @name FORGE.ObjectRenderer#_picking
      * @type {FORGE.Picking}
      * @private
      */

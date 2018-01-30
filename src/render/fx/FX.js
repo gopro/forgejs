@@ -3,7 +3,7 @@
  * Post processing FX class.
  *
  * @constructor FORGE.FX
- * @param {SceneViewportConfig} config - fx configuration
+ * @param {ViewportConfig} config - fx configuration
  * @extends {FORGE.BaseObject}
  */
 FORGE.FX = function(config)

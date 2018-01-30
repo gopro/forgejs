@@ -123,7 +123,7 @@ FORGE.LayoutManager.prototype.destroy = function()
  */
 Object.defineProperty(FORGE.LayoutManager.prototype, "defaultUid",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._defaultUid;
@@ -137,7 +137,7 @@ Object.defineProperty(FORGE.LayoutManager.prototype, "defaultUid",
  */
 Object.defineProperty(FORGE.LayoutManager.prototype, "default",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return FORGE.UID.get(this._defaultUid);

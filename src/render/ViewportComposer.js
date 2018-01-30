@@ -1,7 +1,7 @@
 /**
- * SceneEffectComposer class.
+ * ViewportComposer class.
  *
- * @constructor FORGE.SceneEffectComposer
+ * @constructor FORGE.ViewportComposer
  * @param {FORGE.Viewer} viewer - viewer reference
  * @param {THREE.WebGLRenderTarget} texture - composer texture pass input texture
  * @param {THREE.WebGLRenderTarget} target - composer output texture target
@@ -11,11 +11,11 @@
  * @todo think about how to render multiple scene at the same time, with blending / overlap / viewport layouting...
  * maybe add a layer object encapsulating background / foreground renderings to ease the process
  */
-FORGE.SceneEffectComposer = function(viewer, texture, target, fx)
+FORGE.ViewportComposer = function(viewer, texture, target, fx)
 {
     /**
      * The viewer reference.
-     * @name FORGE.SceneEffectComposer#_viewer
+     * @name FORGE.ViewportComposer#_viewer
      * @type {FORGE.Viewer}
      * @private
      */
@@ -23,7 +23,7 @@ FORGE.SceneEffectComposer = function(viewer, texture, target, fx)
 
     /**
      * Input texture.
-     * @name FORGE.SceneEffectComposer#_texture
+     * @name FORGE.ViewportComposer#_texture
      * @type {THREE.Texture}
      * @private
      */
@@ -31,7 +31,7 @@ FORGE.SceneEffectComposer = function(viewer, texture, target, fx)
 
     /**
      * The render target.
-     * @name FORGE.SceneEffectComposer#_target
+     * @name FORGE.ViewportComposer#_target
      * @type {THREE.WebGLRenderTarget}
      * @private
      */
@@ -39,7 +39,7 @@ FORGE.SceneEffectComposer = function(viewer, texture, target, fx)
 
     /**
      * FX configuration (list of UIDs).
-     * @name FORGE.SceneEffectComposer#
+     * @name FORGE.ViewportComposer#
      * @type {Array<string>}
      * @private
      */
@@ -47,7 +47,7 @@ FORGE.SceneEffectComposer = function(viewer, texture, target, fx)
 
     /**
      * Effect composer rendering into viewport textures.
-     * @name FORGE.SceneEffectComposer#_viewportComposer
+     * @name FORGE.ViewportComposer#_viewportComposer
      * @type {THREE.EffectComposer}
      * @private
      */
@@ -55,21 +55,21 @@ FORGE.SceneEffectComposer = function(viewer, texture, target, fx)
 
     /**
      * Effect composer rendering viewport into the target.
-     * @name FORGE.SceneEffectComposer#_mainComposer
+     * @name FORGE.ViewportComposer#_mainComposer
      * @type {THREE.EffectComposer}
      * @private
      */
     this._mainComposer = null;
 
-    FORGE.BaseObject.call(this, "SceneEffectComposer");
+    FORGE.BaseObject.call(this, "ViewportComposer");
 
     this._boot();
 };
 
-FORGE.SceneEffectComposer.prototype = Object.create(FORGE.BaseObject.prototype);
-FORGE.SceneEffectComposer.prototype.constructor = FORGE.SceneEffectComposer;
+FORGE.ViewportComposer.prototype = Object.create(FORGE.BaseObject.prototype);
+FORGE.ViewportComposer.prototype.constructor = FORGE.ViewportComposer;
 
-FORGE.SceneEffectComposer.prototype._boot = function()
+FORGE.ViewportComposer.prototype._boot = function()
 {
     if (typeof this._fx === "undefined")
     {
@@ -96,13 +96,13 @@ FORGE.SceneEffectComposer.prototype._boot = function()
     this._mainComposer.addPass(new THREE.ShaderPass(THREE.CopyShader));
 };
 
-FORGE.SceneEffectComposer.prototype.render = function()
+FORGE.ViewportComposer.prototype.render = function()
 {
     this._viewportComposer.render(this._viewer.clock.deltaTime);
     this._mainComposer.render();
 };
 
-FORGE.SceneEffectComposer.prototype.destroy = function()
+FORGE.ViewportComposer.prototype.destroy = function()
 {
     this._viewportComposer.renderer = null;
     this._viewportComposer.writeBuffer.dispose();

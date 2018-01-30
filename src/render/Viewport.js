@@ -1,16 +1,16 @@
 /**
  * viewport - part of a layout
- * @constructor FORGE.SceneViewport
+ * @constructor FORGE.Viewport
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
  * @param {FORGE.Scene} scene {@link FORGE.Scene} reference.
  * @param {!ViewportConfig} config scene layout config.
  * @extends {FORGE.BaseObject}
  */
-FORGE.SceneViewport = function(viewer, scene, config)
+FORGE.Viewport = function(viewer, scene, config)
 {
     /**
      * The viewer reference.
-     * @name FORGE.SceneViewport#_viewer
+     * @name FORGE.Viewport#_viewer
      * @type {FORGE.Viewer}
      * @private
      */
@@ -18,7 +18,7 @@ FORGE.SceneViewport = function(viewer, scene, config)
 
     /**
      * The scene reference.
-     * @name FORGE.SceneViewport#_scene
+     * @name FORGE.Viewport#_scene
      * @type {FORGE.Scene}
      * @private
      */
@@ -26,15 +26,15 @@ FORGE.SceneViewport = function(viewer, scene, config)
 
     /**
      * Input layout configuration to setup the viewport.
-     * @name FORGE.SceneViewport#_config
-     * @type {!SceneViewportConfig}
+     * @name FORGE.Viewport#_config
+     * @type {!ViewportConfig}
      * @private
      */
     this._config = config;
 
     /**
      * Viewport for this part of the layout.
-     * @name FORGE.SceneViewport#_rectangle
+     * @name FORGE.Viewport#_rectangle
      * @type {FORGE.Rectangle}
      * @private
      */
@@ -42,14 +42,14 @@ FORGE.SceneViewport = function(viewer, scene, config)
 
     /**
      * Viewport background color
-     * @name FORGE.SceneViewport#_background
+     * @name FORGE.Viewport#_background
      * @type {THREE.Color}
      */
     this._background = null;
 
     /**
      * Viewport camera
-     * @name FORGE.SceneViewport#_camera
+     * @name FORGE.Viewport#_camera
      * @type {FORGE.Camera}
      * @private
      */
@@ -57,7 +57,7 @@ FORGE.SceneViewport = function(viewer, scene, config)
 
     /**
      * Viewport view manager
-     * @name FORGE.SceneViewport#_viewManager
+     * @name FORGE.Viewport#_viewManager
      * @type {FORGE.ViewManager}
      * @private
      */
@@ -71,7 +71,7 @@ FORGE.SceneViewport = function(viewer, scene, config)
 
     /**
      * Is this viewport is used for VR?
-     * @name  FORGE.SceneViewport#_vr
+     * @name  FORGE.Viewport#_vr
      * @type {boolean}
      * @private
      */
@@ -79,26 +79,26 @@ FORGE.SceneViewport = function(viewer, scene, config)
 
     /**
      * The scene renderer.
-     * @name FORGE.SceneViewport#_viewportRenderer
-     * @type {FORGE.SceneRenderer}
+     * @name FORGE.Viewport#_viewportRenderer
+     * @type {FORGE.ViewportRenderer}
      * @private
      */
     this._viewportRenderer = null;
 
-    FORGE.BaseObject.call(this, "SceneViewport");
+    FORGE.BaseObject.call(this, "Viewport");
 
     this._boot();
 };
 
-FORGE.SceneViewport.prototype = Object.create(FORGE.BaseObject.prototype);
-FORGE.SceneViewport.prototype.constructor = FORGE.SceneViewport;
+FORGE.Viewport.prototype = Object.create(FORGE.BaseObject.prototype);
+FORGE.Viewport.prototype.constructor = FORGE.Viewport;
 
 /**
- * @name FORGE.SceneViewport.DEFAULT_CONFIG
+ * @name FORGE.Viewport.DEFAULT_CONFIG
  * @type {ViewportConfig}
  * @const
  */
-FORGE.SceneViewport.DEFAULT_CONFIG =
+FORGE.Viewport.DEFAULT_CONFIG =
 {
     rectangle: new FORGE.Rectangle(0, 0, 100, 100),
     background: null,
@@ -109,23 +109,23 @@ FORGE.SceneViewport.DEFAULT_CONFIG =
 
 /**
  * Boot sequence.
- * @method FORGE.SceneViewport#_boot
+ * @method FORGE.Viewport#_boot
  * @private
  */
-FORGE.SceneViewport.prototype._boot = function()
+FORGE.Viewport.prototype._boot = function()
 {
-    this._config = FORGE.Utils.extendSimpleObject(FORGE.SceneViewport.DEFAULT_CONFIG, this._config);
+    this._config = FORGE.Utils.extendSimpleObject(FORGE.Viewport.DEFAULT_CONFIG, this._config);
     this._parseConfig(this._config);
 
-    this._viewportRenderer = new FORGE.SceneRenderer(this._viewer, this);
+    this._viewportRenderer = new FORGE.ViewportRenderer(this._viewer, this);
 };
 
 /**
  * Parse viewport configuration.
- * @method FORGE.SceneViewport#_parseConfig
+ * @method FORGE.Viewport#_parseConfig
  * @private
  */
-FORGE.SceneViewport.prototype._parseConfig = function(config)
+FORGE.Viewport.prototype._parseConfig = function(config)
 {
     this._uid = config.uid;
     this._register();
@@ -166,11 +166,11 @@ FORGE.SceneViewport.prototype._parseConfig = function(config)
 
 /**
  * Create and init a camera with info contained in the scene and story configurations
- * @method FORGE.SceneViewport#_createCamera
+ * @method FORGE.Viewport#_createCamera
  * @param {CameraConfig} config - The camera viewport configuration
  * @private
  */
-FORGE.SceneViewport.prototype._createCamera = function(config)
+FORGE.Viewport.prototype._createCamera = function(config)
 {
     this._camera = new FORGE.Camera(this._viewer, this);
 
@@ -183,11 +183,11 @@ FORGE.SceneViewport.prototype._createCamera = function(config)
 
 /**
  * Create view manager
- * @method FORGE.SceneViewport#_createViewManager
+ * @method FORGE.Viewport#_createViewManager
  * @param {ViewConfig} config - The view config
  * @private
  */
-FORGE.SceneViewport.prototype._createViewManager = function(config)
+FORGE.Viewport.prototype._createViewManager = function(config)
 {
     this._viewManager = new FORGE.ViewManager(this._viewer, this);
 
@@ -199,9 +199,9 @@ FORGE.SceneViewport.prototype._createViewManager = function(config)
 };
 
 /**
- * @method FORGE.SceneViewport#updateRectangle
+ * @method FORGE.Viewport#updateRectangle
  */
-FORGE.SceneViewport.prototype.updateRectangle = function()
+FORGE.Viewport.prototype.updateRectangle = function()
 {
     this._rectangle.w = (this._config.rectangle.width / 100) * this._viewer.width;
     this._rectangle.h = (this._config.rectangle.height / 100) * this._viewer.height;
@@ -211,10 +211,10 @@ FORGE.SceneViewport.prototype.updateRectangle = function()
 
 /**
  * Render routine.
- * @method FORGE.SceneViewport#render
+ * @method FORGE.Viewport#render
  * @param {THREE.WebGLRenderer} webGLRenderer
  */
-FORGE.SceneViewport.prototype.render = function()
+FORGE.Viewport.prototype.render = function()
 {
     this._camera.update();
 
@@ -230,9 +230,9 @@ FORGE.SceneViewport.prototype.render = function()
 
 /**
  * Destroy sequence.
- * @method FORGE.SceneViewport#destroy
+ * @method FORGE.Viewport#destroy
  */
-FORGE.SceneViewport.prototype.destroy = function()
+FORGE.Viewport.prototype.destroy = function()
 {
     if (this._viewportRenderer !== null)
     {
@@ -263,13 +263,13 @@ FORGE.SceneViewport.prototype.destroy = function()
 
 /**
  * Get the FX pipeline definition
- * @name  FORGE.SceneViewport#fx
+ * @name  FORGE.Viewport#fx
  * @readonly
  * @type {Array<string>}
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "fx",
+Object.defineProperty(FORGE.Viewport.prototype, "fx",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._fx;
@@ -278,19 +278,19 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "fx",
 
 /**
  * Get and set the viewport rectangle.
- * @name FORGE.SceneViewport#rectangle
+ * @name FORGE.Viewport#rectangle
  * @type {FORGE.Rectangle}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "rectangle",
+Object.defineProperty(FORGE.Viewport.prototype, "rectangle",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._rectangle;
     },
 
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     set: function(value)
     {
         this._rectangle = value;
@@ -299,13 +299,13 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "rectangle",
 
 /**
  * Get the viewport background color.
- * @name FORGE.SceneViewport#background
+ * @name FORGE.Viewport#background
  * @type {THREE.Color}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "background",
+Object.defineProperty(FORGE.Viewport.prototype, "background",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._background;
@@ -314,13 +314,13 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "background",
 
 /**
  * Get the viewport camera.
- * @name FORGE.SceneViewport#camera
+ * @name FORGE.Viewport#camera
  * @type {FORGE.Camera}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "camera",
+Object.defineProperty(FORGE.Viewport.prototype, "camera",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._camera;
@@ -329,13 +329,13 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "camera",
 
 /**
  * Get the viewport view manager.
- * @name FORGE.SceneViewport#view
+ * @name FORGE.Viewport#view
  * @type {FORGE.ViewManager}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "view",
+Object.defineProperty(FORGE.Viewport.prototype, "view",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._viewManager;
@@ -344,13 +344,13 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "view",
 
 /**
  * Get the viewport vr property. is this viewport is used for VR?
- * @name FORGE.SceneViewport#vr
+ * @name FORGE.Viewport#vr
  * @type {boolean}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "vr",
+Object.defineProperty(FORGE.Viewport.prototype, "vr",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._vr;
@@ -359,13 +359,13 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "vr",
 
 /**
  * Get sceneRenderer.
- * @name FORGE.SceneViewport#renderer
- * @type {FORGE.SceneRenderer}
+ * @name FORGE.Viewport#renderer
+ * @type {FORGE.ViewportRenderer}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "renderer",
+Object.defineProperty(FORGE.Viewport.prototype, "renderer",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._viewportRenderer;
@@ -374,13 +374,13 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "renderer",
 
 /**
  * Get size of the viewport.
- * @name FORGE.SceneViewport#size
+ * @name FORGE.Viewport#size
  * @type {FORGE.Size}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "size",
+Object.defineProperty(FORGE.Viewport.prototype, "size",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return new FORGE.Size(this._rectangle.width, this._rectangle.height);
@@ -389,13 +389,13 @@ Object.defineProperty(FORGE.SceneViewport.prototype, "size",
 
 /**
  * Get scene.
- * @name FORGE.SceneViewport#scene
+ * @name FORGE.Viewport#scene
  * @type {FORGE.Scene}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewport.prototype, "scene",
+Object.defineProperty(FORGE.Viewport.prototype, "scene",
 {
-    /** @this {FORGE.SceneViewport} */
+    /** @this {FORGE.Viewport} */
     get: function()
     {
         return this._scene;

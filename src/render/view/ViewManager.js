@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.ViewManager
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @param {FORGE.Viewport} viewport - {@link FORGE.Viewport} reference.
  * @extends {FORGE.BaseObject}
  */
 FORGE.ViewManager = function(viewer, viewport)
@@ -19,7 +19,7 @@ FORGE.ViewManager = function(viewer, viewport)
     /**
      * The scene renderer reference.
      * @name FORGE.ViewManager#_viewport
-     * @type {FORGE.SceneViewport}
+     * @type {FORGE.Viewport}
      * @private
      */
     this._viewport = viewport;

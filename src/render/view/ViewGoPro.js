@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.ViewGoPro
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @param {FORGE.Viewport} viewport - {@link FORGE.Viewport} reference.
  * @param {?ViewOptionsConfig} options - The view options.
  * @extends {FORGE.ViewBase}
  */

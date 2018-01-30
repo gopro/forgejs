@@ -1,16 +1,16 @@
 /**
- * SceneRenderer class.
+ * ViewportRenderer class.
  *
- * @constructor FORGE.SceneRenderer
+ * @constructor FORGE.ViewportRenderer
  * @param {FORGE.Viewer} viewer - viewer reference
- * @param {FORGE.SceneViewport} viewport - viewport parent object
+ * @param {FORGE.Viewport} viewport - viewport parent object
  * @extends {FORGE.BaseObject}
  */
-FORGE.SceneRenderer = function(viewer, viewport)
+FORGE.ViewportRenderer = function(viewer, viewport)
 {
     /**
      * The viewer reference.
-     * @name FORGE.SceneRenderer#_viewer
+     * @name FORGE.ViewportRenderer#_viewer
      * @type {FORGE.Viewer}
      * @private
      */
@@ -18,15 +18,15 @@ FORGE.SceneRenderer = function(viewer, viewport)
 
     /**
      * The scene viewport parent object.
-     * @name FORGE.SceneRenderer#_viewport
-     * @type {FORGE.SceneViewport}
+     * @name FORGE.ViewportRenderer#_viewport
+     * @type {FORGE.Viewport}
      * @private
      */
     this._viewport = viewport;
 
     /**
      * Background renderer.
-     * @name FORGE.SceneRenderer#_backgroundRenderer
+     * @name FORGE.ViewportRenderer#_backgroundRenderer
      * @type {FORGE.BackgroundRenderer}
      * @private
      */
@@ -34,34 +34,34 @@ FORGE.SceneRenderer = function(viewer, viewport)
 
     /**
      * Scene effect Composer.
-     * @name FORGE.SceneRenderer#_composer
-     * @type {FORGE.SceneEffectComposer}
+     * @name FORGE.ViewportRenderer#_composer
+     * @type {FORGE.ViewportComposer}
      * @private
      */
     this._composer = null;
 
     /**
      * Composer input texture.
-     * @name FORGE.SceneRenderer#_composerTexture
+     * @name FORGE.ViewportRenderer#_composerTexture
      * @type {THREE.WebGLRenderTarget}
      * @private
      */
     this._composerTexture = null;
 
-    FORGE.BaseObject.call(this, "SceneRenderer");
+    FORGE.BaseObject.call(this, "ViewportRenderer");
 
     this._boot();
 };
 
-FORGE.SceneRenderer.prototype = Object.create(FORGE.BaseObject.prototype);
-FORGE.SceneRenderer.prototype.constructor = FORGE.SceneRenderer;
+FORGE.ViewportRenderer.prototype = Object.create(FORGE.BaseObject.prototype);
+FORGE.ViewportRenderer.prototype.constructor = FORGE.ViewportRenderer;
 
 /**
  * Boot sequence.
- * @method FORGE.SceneRenderer#_boot
+ * @method FORGE.ViewportRenderer#_boot
  * @private
  */
-FORGE.SceneRenderer.prototype._boot = function()
+FORGE.ViewportRenderer.prototype._boot = function()
 {
     this._createBackgroundRenderer();
     this._createComposer();
@@ -69,10 +69,10 @@ FORGE.SceneRenderer.prototype._boot = function()
 
 /**
  * Create composer and render texture
- * @method FORGE.SceneRenderer#_createComposer
+ * @method FORGE.ViewportRenderer#_createComposer
  * @private
  */
-FORGE.SceneRenderer.prototype._createComposer = function()
+FORGE.ViewportRenderer.prototype._createComposer = function()
 {
     if (this._viewport.fx.length === 0)
     {
@@ -97,7 +97,7 @@ FORGE.SceneRenderer.prototype._createComposer = function()
     this._composerTexture = new THREE.WebGLRenderTarget(this._viewport.size.width, this._viewport.size.height, rtParams);
     this._composerTexture.name = "Viewport-EffectComposer-Target-in-" + this._viewport.uid;
 
-    this._composer = new FORGE.SceneEffectComposer(this._viewer, this._composerTexture, this._viewport.scene.renderTarget, this._viewport.fx);
+    this._composer = new FORGE.ViewportComposer(this._viewer, this._composerTexture, this._viewport.scene.renderTarget, this._viewport.fx);
 };
 
 /**
@@ -117,10 +117,10 @@ FORGE.SceneRenderer.prototype._createComposer = function()
  *
  * - Source format is cube: mesh renderer
  *
- * @method FORGE.SceneRenderer#_createBackgroundRenderer
+ * @method FORGE.ViewportRenderer#_createBackgroundRenderer
  * @private
  */
-FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
+FORGE.ViewportRenderer.prototype._createBackgroundRenderer = function(event)
 {
     var media = this._viewport.scene.media;
     var backgroundRendererRef;
@@ -179,9 +179,9 @@ FORGE.SceneRenderer.prototype._createBackgroundRenderer = function(event)
 
 /**
  * Render routine.
- * @method FORGE.SceneRenderer#render
+ * @method FORGE.ViewportRenderer#render
  */
-FORGE.SceneRenderer.prototype.render = function()
+FORGE.ViewportRenderer.prototype.render = function()
 {
     var target = this._composer !== null ? this._composerTexture : this._viewport.scene.renderTarget;
 
@@ -197,9 +197,9 @@ FORGE.SceneRenderer.prototype.render = function()
 
 /**
  * Destroy sequence.
- * @method FORGE.SceneRenderer#destroy
+ * @method FORGE.ViewportRenderer#destroy
  */
-FORGE.SceneRenderer.prototype.destroy = function()
+FORGE.ViewportRenderer.prototype.destroy = function()
 {
     this._config = null;
     this._viewer = null;
@@ -221,12 +221,12 @@ FORGE.SceneRenderer.prototype.destroy = function()
 
 /**
  * Get the background renderer.
- * @name FORGE.SceneRenderer#backgroundRenderer
+ * @name FORGE.ViewportRenderer#backgroundRenderer
  * @type {FORGE.BackgroundRenderer}
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "background",
+Object.defineProperty(FORGE.ViewportRenderer.prototype, "background",
 {
-    /** @this {FORGE.SceneRenderer} */
+    /** @this {FORGE.ViewportRenderer} */
     get: function()
     {
         return this._backgroundRenderer;

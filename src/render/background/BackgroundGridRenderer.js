@@ -4,7 +4,7 @@
  *
  * @constructor FORGE.BackgroundGridRenderer
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @param {FORGE.Viewport} viewport - {@link FORGE.Viewport} reference.
  * @extends {FORGE.BackgroundMeshRenderer}
  */
 FORGE.BackgroundGridRenderer = function(viewer, viewport)

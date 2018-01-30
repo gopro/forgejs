@@ -4,7 +4,7 @@
  *
  * @constructor FORGE.BackgroundMeshRenderer
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @param {FORGE.Viewport} viewport - {@link FORGE.Viewport} reference.
  * @param {string=} className - The class name of the object as long as many other object inherits from this one.
  * @extends {FORGE.BackgroundRenderer}
  */

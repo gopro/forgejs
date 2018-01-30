@@ -17,7 +17,7 @@ FORGE.Scene = function(viewer)
     /**
      * Scene viewports manager.
      * @name FORGE.Scene#_viewports
-     * @type {FORGE.SceneViewportManager}
+     * @type {FORGE.ViewportManager}
      * @private
      */
     this._viewports = null;
@@ -350,7 +350,7 @@ FORGE.Scene.prototype._createViewports = function(config)
     this._renderTarget = new THREE.WebGLRenderTarget(this._viewer.width, this._viewer.height, rtParams);
     this._renderTarget.name = "Scene-Target-" + this._name.value;
 
-    this._viewports = new FORGE.SceneViewportManager(this._viewer, this);
+    this._viewports = new FORGE.ViewportManager(this._viewer, this);
 };
 
 /**
@@ -711,7 +711,7 @@ Object.defineProperty(FORGE.Scene.prototype, "viewed",
  * Current active viewport.
  * @name FORGE.Scene#camera
  * @readonly
- * @type {FORGE.SceneViewport}
+ * @type {FORGE.Viewport}
  */
 Object.defineProperty(FORGE.Scene.prototype, "activeViewport",
 {
@@ -847,7 +847,7 @@ Object.defineProperty(FORGE.Scene.prototype, "thumbnails",
  * Get the scene viewport manager.
  * @name  FORGE.Scene#viewports
  * @readonly
- * @type {FORGE.SceneViewportManager}
+ * @type {FORGE.ViewportManager}
  */
 Object.defineProperty(FORGE.Scene.prototype, "viewports",
 {

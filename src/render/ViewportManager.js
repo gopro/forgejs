@@ -1,15 +1,15 @@
 /**
  * Scene viewport manager
- * @constructor FORGE.SceneViewportManager
+ * @constructor FORGE.ViewportManager
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
  * @param {FORGE.Scene} scene {@link FORGE.Scene} reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.SceneViewportManager = function(viewer, scene)
+FORGE.ViewportManager = function(viewer, scene)
 {
     /**
      * The viewer reference.
-     * @name FORGE.SceneViewport#_viewer
+     * @name FORGE.ViewportManager#_viewer
      * @type {FORGE.Viewer}
      * @private
      */
@@ -17,7 +17,7 @@ FORGE.SceneViewportManager = function(viewer, scene)
 
     /**
      * The scene reference.
-     * @name FORGE.SceneViewport#_scene
+     * @name FORGE.ViewportManager#_scene
      * @type {FORGE.Scene}
      * @private
      */
@@ -25,7 +25,7 @@ FORGE.SceneViewportManager = function(viewer, scene)
 
     /**
      * The current Forge.Layout uid
-     * @name FORGE.SceneViewportManager#_layoutUid
+     * @name FORGE.ViewportManager#_layoutUid
      * @type {string}
      * @private
      */
@@ -33,15 +33,15 @@ FORGE.SceneViewportManager = function(viewer, scene)
 
     /**
      * Array of scene viewports.
-     * @name FORGE.Scene#_viewports
-     * @type {Array<FORGE.SceneViewport>}
+     * @name FORGE.ViewportManager#_viewports
+     * @type {Array<FORGE.Viewport>}
      * @private
      */
     this._viewports = null;
 
     /**
      * Index of active viewport, where the controller is active.
-     * @name FORGE.Scene#_index
+     * @name FORGE.ViewportManager#_index
      * @type {number}
      * @private
      */
@@ -49,7 +49,7 @@ FORGE.SceneViewportManager = function(viewer, scene)
 
     /**
      * Object renderer.
-     * @name FORGE.SceneRenderer#_objectRenderer
+     * @name FORGE.ViewportManager#_objectRenderer
      * @type {FORGE.ObjectRenderer}
      * @private
      */
@@ -57,25 +57,25 @@ FORGE.SceneViewportManager = function(viewer, scene)
 
     /**
      * Active viewport has changed event dispatcher
-     * @name FORGE.Scene#_onActiveViewportChange
+     * @name FORGE.ViewportManager#_onActiveViewportChange
      * @type {FORGE.EventDispatcher}
      * @private
      */
     this._onActiveViewportChange = null;
 
-    FORGE.BaseObject.call(this, "SceneViewport");
+    FORGE.BaseObject.call(this, "Viewport");
 
     this._boot();
 };
 
-FORGE.SceneViewportManager.prototype = Object.create(FORGE.BaseObject.prototype);
-FORGE.SceneViewportManager.prototype.constructor = FORGE.SceneViewportManager;
+FORGE.ViewportManager.prototype = Object.create(FORGE.BaseObject.prototype);
+FORGE.ViewportManager.prototype.constructor = FORGE.ViewportManager;
 
 /**
  * Boot sequence.
  * @private
  */
-FORGE.SceneViewportManager.prototype._boot = function()
+FORGE.ViewportManager.prototype._boot = function()
 {
     this._viewports = [];
 
@@ -99,11 +99,11 @@ FORGE.SceneViewportManager.prototype._boot = function()
 
 /**
  * Set the current layout.
- * @name FORGE.SceneViewportManager#_setLayout
+ * @name FORGE.ViewportManager#_setLayout
  * @param {string} layoutUid - The layout uid used to create viewports
  * @private
  */
-FORGE.SceneViewportManager.prototype._setLayout = function(layoutUid)
+FORGE.ViewportManager.prototype._setLayout = function(layoutUid)
 {
     var layout = FORGE.UID.get(layoutUid);
     this._createViewports(layout.viewports);
@@ -111,18 +111,18 @@ FORGE.SceneViewportManager.prototype._setLayout = function(layoutUid)
 
 /**
  * Create viewports
- * @name FORGE.SceneViewportManager#_createViewports
+ * @name FORGE.ViewportManager#_createViewports
  * @param {string} layoutUid - The layout uid used to create viewports
  * @private
  */
-FORGE.SceneViewportManager.prototype._createViewports = function(config)
+FORGE.ViewportManager.prototype._createViewports = function(config)
 {
     // Create the viewports
     if (Array.isArray(config) === true)
     {
         for (var i = 0, ii = config.length; i < ii; i++)
         {
-            var viewport = new FORGE.SceneViewport(this._viewer, this._scene, config[i]);
+            var viewport = new FORGE.Viewport(this._viewer, this._scene, config[i]);
             this._viewports.push(viewport);
         }
     }
@@ -133,10 +133,10 @@ FORGE.SceneViewportManager.prototype._createViewports = function(config)
 
 /**
  * Destroy viewports
- * @name FORGE.SceneViewportManager#_destroyViewports
+ * @name FORGE.ViewportManager#_destroyViewports
  * @private
  */
-FORGE.SceneViewportManager.prototype._destroyViewports = function()
+FORGE.ViewportManager.prototype._destroyViewports = function()
 {
     for(var i = 0, ii = this._viewports.length; i < ii; i++)
     {
@@ -148,11 +148,11 @@ FORGE.SceneViewportManager.prototype._destroyViewports = function()
 
 /**
  * Scene load complete handler
- * @method FORGE.SceneViewportManager#_onSceneLoadComplete
+ * @method FORGE.ViewportManager#_onSceneLoadComplete
  * @param {FORGE.Event} event - scene load complete event
  * @private
  */
-FORGE.SceneViewportManager.prototype._onSceneLoadComplete = function(event)
+FORGE.ViewportManager.prototype._onSceneLoadComplete = function(event)
 {
     if (this._viewports.length === 0)
     {
@@ -166,10 +166,10 @@ FORGE.SceneViewportManager.prototype._onSceneLoadComplete = function(event)
 
 /**
  * Canvas resize handler
- * @method FORGE.SceneViewportManager#_canvasResizeHandler
+ * @method FORGE.ViewportManager#_canvasResizeHandler
  * @private
  */
-FORGE.SceneViewportManager.prototype._canvasResizeHandler = function()
+FORGE.ViewportManager.prototype._canvasResizeHandler = function()
 {
     for(var i = 0, ii = this._viewports.length; i < ii; i++)
     {
@@ -179,12 +179,12 @@ FORGE.SceneViewportManager.prototype._canvasResizeHandler = function()
 
 /**
  * Get the index of the scene viewport containing some point
- * @method FORGE.SceneViewportManager#_getSceneViewportIndexContainingPoint
+ * @method FORGE.ViewportManager#_getViewportIndexContainingPoint
  * @param {THREE.Vector2} point - point
- * @return {FORGE.SceneViewport} viewport containing the point (-1 if no viewport does)
+ * @return {FORGE.Viewport} viewport containing the point (-1 if no viewport does)
  * @private
  */
-FORGE.SceneViewportManager.prototype._getSceneViewportIndexContainingPoint = function(point)
+FORGE.ViewportManager.prototype._getViewportIndexContainingPoint = function(point)
 {
     return this._viewports.findIndex(function(viewport) {
         return viewport.rectangle.contains(point);
@@ -193,15 +193,15 @@ FORGE.SceneViewportManager.prototype._getSceneViewportIndexContainingPoint = fun
 
 /**
  * Renew active viewport if needed with pointer event.
- * @method FORGE.SceneViewportManager#_renewActiveViewport
+ * @method FORGE.ViewportManager#_renewActiveViewport
  * @private
  */
-FORGE.SceneViewportManager.prototype._renewActiveViewport = function(event)
+FORGE.ViewportManager.prototype._renewActiveViewport = function(event)
 {
     var px = event.data.clientX || event.data.center.x;
     var py = event.data.clientY || event.data.center.y;
     var point = new THREE.Vector2(px, this._viewer.height - py);
-    var index = this._getSceneViewportIndexContainingPoint(point);
+    var index = this._getViewportIndexContainingPoint(point);
 
     if (index === -1)
     {
@@ -218,9 +218,9 @@ FORGE.SceneViewportManager.prototype._renewActiveViewport = function(event)
 
 /**
  * Render routine.
- * @method FORGE.SceneViewportManager#render
+ * @method FORGE.ViewportManager#render
  */
-FORGE.SceneViewportManager.prototype.render = function()
+FORGE.ViewportManager.prototype.render = function()
 {
     for(var i = 0, ii = this._viewports.length; i < ii; i++)
     {
@@ -230,13 +230,13 @@ FORGE.SceneViewportManager.prototype.render = function()
 
 /**
  * Get the relative mouse position inside the target element of a mouse event
- * @method FORGE.SceneViewportManager#getRelativeMousePosition
+ * @method FORGE.ViewportManager#getRelativeMousePosition
  * @param {THREE.Vector2} mouse - The mouse position in container space
  * @return {THREE.Vector2} relative mouse position in current viewport (null if out of bounds)
  */
-FORGE.SceneViewportManager.prototype.getRelativeMousePosition = function(mouse)
+FORGE.ViewportManager.prototype.getRelativeMousePosition = function(mouse)
 {
-    var index = this._getSceneViewportIndexContainingPoint(mouse);
+    var index = this._getViewportIndexContainingPoint(mouse);
 
     if (index === -1)
     {
@@ -249,9 +249,9 @@ FORGE.SceneViewportManager.prototype.getRelativeMousePosition = function(mouse)
 
 /**
  * Destroy sequence.
- * @method FORGE.SceneViewportManager#destroy
+ * @method FORGE.ViewportManager#destroy
  */
-FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
+FORGE.ViewportManager.prototype.destroy = function(webGLRenderer, target)
 {
     this._viewer.canvas.pointer.onTap.remove(this._renewActiveViewport, this);
     this._viewer.canvas.pointer.onDoubleTap.remove(this._renewActiveViewport, this);
@@ -285,13 +285,13 @@ FORGE.SceneViewportManager.prototype.destroy = function(webGLRenderer, target)
 
 /**
  * Get the viewport list
- * @name  FORGE.SceneViewportManager#all
+ * @name  FORGE.ViewportManager#all
  * @readonly
- * @type {Array<FORGE.SceneViewport>}
+ * @type {Array<FORGE.Viewport>}
  */
-Object.defineProperty(FORGE.SceneViewportManager.prototype, "all",
+Object.defineProperty(FORGE.ViewportManager.prototype, "all",
 {
-    /** @this {FORGE.SceneViewportManager} */
+    /** @this {FORGE.ViewportManager} */
     get: function()
     {
         return this._viewports;
@@ -300,13 +300,13 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "all",
 
 /**
  * Get and set the layout uid.
- * @name FORGE.SceneViewportManager#layoutUid
- * @type {FORGE.SceneViewport}
+ * @name FORGE.ViewportManager#layoutUid
+ * @type {FORGE.Viewport}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewportManager.prototype, "layoutUid",
+Object.defineProperty(FORGE.ViewportManager.prototype, "layoutUid",
 {
-    /** @this {FORGE.SceneViewportManager} */
+    /** @this {FORGE.ViewportManager} */
     get: function()
     {
         return this._layoutUid;
@@ -324,13 +324,13 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "layoutUid",
 
 /**
  * Get the object renderer
- * @name  FORGE.SceneViewportManager#objectRenderer
+ * @name  FORGE.ViewportManager#objectRenderer
  * @readonly
  * @type {FORGE.ObjectRenderer}
  */
-Object.defineProperty(FORGE.SceneViewportManager.prototype, "objectRenderer",
+Object.defineProperty(FORGE.ViewportManager.prototype, "objectRenderer",
 {
-    /** @this {FORGE.SceneViewportManager} */
+    /** @this {FORGE.ViewportManager} */
     get: function()
     {
         return this._objectRenderer;
@@ -339,13 +339,13 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "objectRenderer",
 
 /**
  * Get the active viewport.
- * @name FORGE.SceneViewportManager#active
- * @type {FORGE.SceneViewport}
+ * @name FORGE.ViewportManager#active
+ * @type {FORGE.Viewport}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewportManager.prototype, "active",
+Object.defineProperty(FORGE.ViewportManager.prototype, "active",
 {
-    /** @this {FORGE.SceneViewportManager} */
+    /** @this {FORGE.ViewportManager} */
     get: function()
     {
         return this._viewports[this._index];
@@ -354,19 +354,19 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "active",
 
 /**
  * Get and set the active viewport index.
- * @name FORGE.SceneViewportManager#index
+ * @name FORGE.ViewportManager#index
  * @type {number}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneViewportManager.prototype, "index",
+Object.defineProperty(FORGE.ViewportManager.prototype, "index",
 {
-    /** @this {FORGE.SceneViewportManager} */
+    /** @this {FORGE.ViewportManager} */
     get: function()
     {
         return this._index;
     },
 
-    /** @this {FORGE.SceneViewportManager} */
+    /** @this {FORGE.ViewportManager} */
     set: function(value)
     {
         if (value < 0 || value >= this._viewports.length)
@@ -386,13 +386,13 @@ Object.defineProperty(FORGE.SceneViewportManager.prototype, "index",
 
 /**
  * Get the onActiveViewportChange {@link FORGE.EventDispatcher}.
- * @name  FORGE.SceneViewportManager#onActiveViewportChange
+ * @name  FORGE.ViewportManager#onActiveViewportChange
  * @readonly
  * @type {FORGE.EventDispatcher}
  */
-Object.defineProperty(FORGE.SceneViewportManager.prototype, "onActiveViewportChange",
+Object.defineProperty(FORGE.ViewportManager.prototype, "onActiveViewportChange",
 {
-    /** @this {FORGE.SceneViewportManager} */
+    /** @this {FORGE.ViewportManager} */
     get: function()
     {
         if (this._onActiveViewportChange === null)

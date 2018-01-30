@@ -3,7 +3,7 @@
  *
  * @constructor FORGE.ViewBase
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
- * @param {FORGE.SceneViewport} viewport - {@link FORGE.SceneViewport} reference.
+ * @param {FORGE.Viewport} viewport - {@link FORGE.Viewport} reference.
  * @param {?ViewOptionsConfig} options - The view options.
  * @param {string} className - object className.
  * @param {string} type - object view type.
@@ -22,7 +22,7 @@ FORGE.ViewBase = function(viewer, viewport, options, className, type)
     /**
      * The view manager reference.
      * @name FORGE.ViewBase#_viewport
-     * @type {FORGE.SceneViewport}
+     * @type {FORGE.Viewport}
      * @private
      */
     this._viewport = viewport;
