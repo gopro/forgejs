@@ -224,7 +224,7 @@ FORGE.SceneViewport.prototype.render = function()
     target.scissorTest = true ;
 
     this._viewer.renderer.webGLRenderer.setClearColor(this._background);
-    this._viewer.renderer.webGLRenderer.clearTarget(target, true, true, false);
+    this._viewer.renderer.webGLRenderer.clearTarget(target, true, false, false);
     this._viewportRenderer.render(target);
 };
 
