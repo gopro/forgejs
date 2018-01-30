@@ -162,10 +162,14 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
             mesh.material.side = material.getThreeSide();
             mesh.material.transparent = material.transparent;
             mesh.material.opacity = material.opacity;
-
-            // Update projection uniforms with view update call
-            view.updateUniforms(mesh.material.uniforms);
         }
+    }
+
+    // Update projection uniforms
+    for (var j=0; j<this._objects.length; j++)
+    {
+        var object = this._objects[j];
+        view.updateUniforms(object.mesh.material.uniforms);
     }
 
     this._lastViewport = viewport;
