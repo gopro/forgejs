@@ -74,7 +74,7 @@ FORGE.ShaderLib = {
     {
         rectilinear:
         {            
-            mapping:
+            map:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -83,10 +83,10 @@ FORGE.ShaderLib = {
                     tTexture: { type: "t", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
-                fragmentShader: FORGE.ShaderChunk.wts_frag
+                fragmentShader: FORGE.ShaderChunk.wts_frag_map
             },
 
-            coloring:
+            color:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -98,7 +98,7 @@ FORGE.ShaderLib = {
                 fragmentShader: FORGE.ShaderChunk.wts_frag_color
             },
 
-            picking:
+            pick:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -107,7 +107,7 @@ FORGE.ShaderLib = {
                     tColor: { type: "c", value: new THREE.Color() }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
-                fragmentShader: FORGE.ShaderChunk.wts_frag_picking
+                fragmentShader: FORGE.ShaderChunk.wts_frag_pick
             },
 
             wireframe:
@@ -125,7 +125,7 @@ FORGE.ShaderLib = {
 
         flat:
         {
-            mapping:
+            map:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -134,10 +134,10 @@ FORGE.ShaderLib = {
                     tTexture: { type: "t", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
-                fragmentShader: FORGE.ShaderChunk.wts_frag
+                fragmentShader: FORGE.ShaderChunk.wts_frag_map
             },
 
-            coloring:
+            color:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -149,7 +149,7 @@ FORGE.ShaderLib = {
                 fragmentShader: FORGE.ShaderChunk.wts_frag_color
             },
 
-            picking:
+            pick:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -158,7 +158,7 @@ FORGE.ShaderLib = {
                     tColor: { type: "c", value: new THREE.Color() }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_rectilinear,
-                fragmentShader: FORGE.ShaderChunk.wts_frag_color
+                fragmentShader: FORGE.ShaderChunk.wts_frag_pick
             },
 
             wireframe:
@@ -176,7 +176,7 @@ FORGE.ShaderLib = {
 
         gopro:
         {
-            mapping:
+            map:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -186,10 +186,10 @@ FORGE.ShaderLib = {
                     tTexture: { type: "t", value: null }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_gopro,
-                fragmentShader: FORGE.ShaderChunk.wts_frag
+                fragmentShader: FORGE.ShaderChunk.wts_frag_map
             },
 
-            coloring:
+            color:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -202,7 +202,7 @@ FORGE.ShaderLib = {
                 fragmentShader: FORGE.ShaderChunk.wts_frag_color
             },
 
-            picking:
+            pick:
             {
                 /** @type {FORGEUniform} */
                 uniforms:
@@ -212,7 +212,7 @@ FORGE.ShaderLib = {
                     tColor: { type: "c", value: new THREE.Color() }
                 },
                 vertexShader: FORGE.ShaderChunk.wts_vert_gopro,
-                fragmentShader: FORGE.ShaderChunk.wts_frag_color
+                fragmentShader: FORGE.ShaderChunk.wts_frag_pick
             },
 
             wireframe:

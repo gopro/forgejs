@@ -152,11 +152,11 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 
             if (object.material.type === FORGE.HotspotMaterial.types.GRAPHICS)
             {
-                mesh.material = this._viewer.renderer.getMaterialForView(view.type, "coloring");
+                mesh.material = this._viewer.renderer.getMaterialForView(view.type, "color");
             }
             else
             {
-                mesh.material = this._viewer.renderer.getMaterialForView(view.type, "mapping");
+                mesh.material = this._viewer.renderer.getMaterialForView(view.type, "map");
             }
 
             mesh.material.side = material.getThreeSide();

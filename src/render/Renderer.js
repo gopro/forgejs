@@ -269,7 +269,8 @@ FORGE.Renderer.prototype.changeScene = function(scene)
  * Set a pool of materials with lazy instantiation
  * @method FORGE.Renderer#getMaterialForView
  * @param {FORGE.ViewType} viewType - view type
- * @return {THREE.RawShaderMaterial} world to screen mapping shader for the given view
+ * @param {string} shaderType - type of shader (map, color, pick, wireframe)
+ * @return {THREE.RawShaderMaterial} world to screen shader for the given view
  */
 FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType)
 {
@@ -280,7 +281,7 @@ FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType)
 
     if (typeof shaderType === "undefined")
     {
-        shaderType = "mapping";
+        shaderType = "map";
     }
 
     if (viewType in this._materialPool)
@@ -290,7 +291,7 @@ FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType)
 
     this._materialPool[viewType] = {};
 
-    var shaderTypes = ["mapping", "coloring", "picking", "wireframe"];
+    var shaderTypes = ["map", "color", "pick", "wireframe"];
     for (var i=0, ii=shaderTypes.length; i<ii; i++)
     {
         var type = shaderTypes[i];

@@ -206,7 +206,7 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
 
         if ("tColor" in uMap && "tColor" in material.uniforms)
         {
-            if (material.name.includes("picking") && "pickingColor" in this._mesh.userData)
+            if (material.name.includes("pick") && "pickingColor" in this._mesh.userData)
             {
                 material.uniforms.tColor.value = this._mesh.userData.pickingColor;
                 uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
