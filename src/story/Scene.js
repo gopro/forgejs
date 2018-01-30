@@ -342,7 +342,7 @@ FORGE.Scene.prototype._createViewports = function(config)
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
         format: THREE.RGBAFormat,
-        depthBuffer: false,
+        depthBuffer: true,
         stencilBuffer: false
     };
 
