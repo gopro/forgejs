@@ -137,8 +137,6 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
     }
 
     this._webGLRenderer.autoClear = false;
-    // this._webGLRenderer.autoClearDepth = true;
-    // this._webGLRenderer.autoClearColor = true;
 
     this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
 

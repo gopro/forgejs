@@ -271,6 +271,7 @@ FORGE.Tile.prototype._boot = function()
         transparent: transparent,
         opacity: this._opacity,
         depthTest: false,
+        depthWrite: false,
         side: THREE.FrontSide
     });
 

@@ -46,6 +46,8 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
         uniforms: /** @type {FORGEUniform} */ (shaderSTW.uniforms),
         vertexShader: vertexShader,
         fragmentShader: fragmentShader,
+        depthTest: false,
+        depthWrite: false,
         side: THREE.FrontSide
     });
 

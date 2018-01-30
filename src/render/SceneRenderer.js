@@ -186,10 +186,6 @@ FORGE.SceneRenderer.prototype.render = function()
     var target = this._composer !== null ? this._composerTexture : this._viewport.scene.renderTarget;
 
     this._backgroundRenderer.render(target);
-
-    this._viewer.renderer.webGLRenderer.clearDepth();
-    this._viewer.renderer.webGLRenderer.clearTarget(target, false, true, false);
-
     this._viewport.scene.viewports.objectRenderer.render(this._viewport, target);
 
     if (this._composer !== null)

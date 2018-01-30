@@ -143,6 +143,8 @@ FORGE.BackgroundGridRenderer.prototype._createMaterial = function()
         vertexShader: vertexShader,
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
         name: "BackgroundMeshMaterial",
+        depthTest: false,
+        depthWrite: false,
         transparent: true,
         side: THREE.BackSide
     });

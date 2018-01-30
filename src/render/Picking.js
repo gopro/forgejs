@@ -290,7 +290,7 @@ FORGE.Picking.prototype.render = function(viewport)
 
     view.updateUniforms(scene.overrideMaterial.uniforms);
 
-    this._viewer.renderer.webGLRenderer.clearTarget(this._renderTarget, true, true, true);
+    this._viewer.renderer.webGLRenderer.clearTarget(this._renderTarget, true, true, false);
     this._viewer.renderer.webGLRenderer.render(scene, camera, this._renderTarget, false);
 
     // Restore scene params
