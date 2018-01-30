@@ -30,8 +30,8 @@ void main() {
     // and apply smoothstep for antialiasing
     vec2 amount = smoothstep(vec2(0.0), WIRE_THICKNESS * threshold, vec2(1.0) - abs(vQuadrilateralCoords));
 
-    // Use amount to compute color and alpha and draw the texel
-    float alpha = 1.0 - amount.x * amount.y;
+    // Use amount to compute color and mixAmount and draw the texel
+    float mixAmount = 1.0 - amount.x * amount.y;
 
-    gl_FragColor = vec4(mix(tBackgroundColor, tColor, alpha), 1.);    
+    gl_FragColor = vec4(mix(tBackgroundColor, tColor, mixAmount), 1.);
 }
