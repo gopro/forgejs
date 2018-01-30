@@ -62,14 +62,7 @@ module.exports = function(grunt)
 
         "src/render/postProcessing/FX.js",
         "src/render/postProcessing/FXManager.js",
-        // "src/render/postProcessing/PostProcessing.js",
-        // "src/render/postProcessing/EffectComposerType.js",
-        // "src/render/postProcessing/EffectComposer.js",
-        // "src/render/postProcessing/PassPosition.js",
-        "src/render/postProcessing/TexturePass.js",
         "src/render/postProcessing/ShaderPass.js",
-        "src/render/postProcessing/AdditionPass.js",
-        "src/render/postProcessing/RenderPass.js",
 
         "src/render/shader/ShaderChunk.js",
         "build/tmp/forge.glsl.js",
@@ -90,7 +83,6 @@ module.exports = function(grunt)
 
         "src/3d/Object3D.js",
         "src/3d/ObjectRenderer.js",
-        "src/3d/Raycaster.js",
         "src/3d/Tile.js",
 
         "src/hotspots/HotspotManager.js",
