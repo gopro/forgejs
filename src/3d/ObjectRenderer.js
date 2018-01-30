@@ -38,6 +38,15 @@ FORGE.ObjectRenderer = function(viewer, objects)
     this._lastViewport = null;
 
     /**
+     * Track of last view type
+     * Uniforms should be set of it has changed
+     * @name FORGE.ObjectRenderer#_lastViewType
+     * @type {FORGE.ViewType}
+     * @private
+     */
+    this._lastViewType = FORGE.ViewType.UNDEFINED;
+
+    /**
      * Picking manager
      * @name FORGE.SceneRenderer#_picking
      * @type {FORGE.Picking}
@@ -126,8 +135,13 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
     var view = viewport.view.current;
     var camera = viewport.camera.main;
 
-    if (this._lastViewport === null || viewport.uid !== this._lastViewport.uid)
+    if (this._lastViewport === null ||
+        this._lastViewport.uid !== viewport.uid ||
+        this._lastViewType === FORGE.ViewType.UNDEFINED ||
+        this._lastViewType !== view.type)
     {
+        this._lastViewType = view.type;
+
         for (var i=0; i<this._objects.length; i++)
         {
             var object = this._objects[i];
