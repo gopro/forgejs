@@ -259,7 +259,8 @@ FORGE.Media.prototype._parseConfig = function(config)
                 else if (source.streaming.toLowerCase() === FORGE.VideoFormat.HLS)
                 {
                     // check HLS native support prior any video class creation
-                    if (FORGE.Device.canPlayVideo(FORGE.VideoFormat.HLS) === true)
+                    // and add specific Android Chrome condition to support hls.js with MSE
+                    if (FORGE.Device.canPlayVideo(FORGE.VideoFormat.HLS) === true && ((FORGE.Device.android === true && FORGE.Device.osVersion >= 5 && FORGE.Device.browser === "chrome") !== true))
                     {
                         streamVideoHTML5 = true;
                     }
