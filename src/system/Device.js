@@ -288,7 +288,8 @@ FORGE.Device = (function(c)
                 }
 
                 // native support
-                if ((this._iOS === true && this._osVersion >= 8) || (this._os === "macosx" && this._browser === "safari" && this._browserVersion >= 8) || (this._android === true && this._osVersion >= 5 && this._browser === "chrome"))
+                // TODO: Android native support : (this._android === true && this._osVersion >= 5 && this._browser === "chrome")
+                if ((this._iOS === true && this._osVersion >= 8) || this._edge === true || (this._os === "macosx" && this._browser === "safari" && this._browserVersion >= 8))
                 {
                     this._hlsVideo = true;
                 }
