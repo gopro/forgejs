@@ -267,31 +267,36 @@ FORGE.Device = (function(c)
         {
             if (typeof videoElement.canPlayType === "function")
             {
-                if (videoElement.canPlayType("video/ogg; codecs=\"theora\"").replace(/^no$/, ""))
+                if (videoElement.canPlayType("video/ogg"))
                 {
                     this._oggVideo = true;
                 }
 
-                if (videoElement.canPlayType("video/mp4; codecs=\"avc1.42E01E\"").replace(/^no$/, ""))
+                if (videoElement.canPlayType("video/mp4"))
                 {
-                    // without QuickTime, this value will be "undefined"
-                    this._h264Video = true;
                     this._mp4Video = true;
                 }
 
-                if (videoElement.canPlayType("video/webm; codecs=\"vp8, vorbis\"").replace(/^no$/, ""))
+                if (videoElement.canPlayType("video/webm"))
                 {
                     this._webmVideo = true;
                 }
 
-                if (videoElement.canPlayType("video/webm; codecs=\"vp9\"").replace(/^no$/, ""))
-                {
-                    this._vp9Video = true;
-                }
-
-                if (videoElement.canPlayType("application/x-mpegURL; codecs=\"avc1.42E01E\"").replace(/^no$/, ""))
+                if (videoElement.canPlayType("application/x-mpegURL") || videoElement.canPlayType("application/vnd.apple.mpegurl"))
                 {
                     this._hlsVideo = true;
+                }
+
+                // native support
+                // TODO: Android native support : (this._android === true && this._osVersion >= 5 && this._browser === "chrome")
+                if ((this._iOS === true && this._osVersion >= 8) || this._edge === true || (this._os === "macosx" && this._browser === "safari" && this._browserVersion >= 8))
+                {
+                    this._hlsVideo = true;
+                }
+
+                if (videoElement.canPlayType("application/dash+xml"))
+                {
+                    this._dashVideo = true;
                 }
             }
         }
@@ -400,7 +405,7 @@ FORGE.Device = (function(c)
             this._localStorage = false;
         }
 
-        this._mediaSource = (typeof window.MediaSource === "function");
+        this._mediaSource = (typeof (window.MediaSource || window.WebKitMediaSource) === "function");
 
         this._encryptedMedia = (typeof window.HTMLMediaElement === "function" && typeof window.MediaKeys === "function" && typeof window.MediaKeySystemAccess === "function" && typeof navigator.requestMediaKeySystemAccess === "function");
 
@@ -812,10 +817,10 @@ FORGE.Device = (function(c)
         this._checkOS();
         this._checkBrowsers();
         this._checkDevice();
-        this._checkAudio();
-        this._checkVideo();
         this._checkDeviceFeatures();
         this._checkFeatures();
+        this._checkAudio();
+        this._checkVideo();
         this._checkEnvironment();
         this._checkBrowserApi();
         this._checkFullscreenSupport();
@@ -915,16 +920,16 @@ FORGE.Device = (function(c)
     /**
      * Check If the device can play video files.
      * @method FORGE.Device#canPlayVideo
-     * @param {string} type - One of 'mp4, 'ogg', 'webm' or 'mpeg'.
+     * @param {string} type - One of 'mp4, 'ogg', 'webm', 'mpeg/m3u8', 'mpd'.
      * @return {boolean}
      */
     Tmp.prototype.canPlayVideo = function(type)
     {
-        if (type === "webm" && (this._webmVideo === true || this._vp9Video === true))
+        if (type === "webm" && this._webmVideo === true)
         {
             return true;
         }
-        else if (type === "mp4" && (this._mp4Video === true || this._h264Video === true))
+        else if ((type === "mp4" || type === "m4v" || type === "mov") && (this._mp4Video === true || this._h264Video === true))
         {
             return true;
         }
@@ -932,7 +937,11 @@ FORGE.Device = (function(c)
         {
             return true;
         }
-        else if (type === "mpeg" && this._hlsVideo === true)
+        else if ((type === "mpeg" || type === "m3u8" || type === "hls") && this._hlsVideo === true)
+        {
+            return true;
+        }
+        else if ((type === "mpd" || type === "dash") && this._dashVideo === true)
         {
             return true;
         }
@@ -2033,16 +2042,16 @@ FORGE.Device = (function(c)
     });
 
     /**
-     * Can play vp9 video files?
-     * @name FORGE.Device#vp9Video
+     * Can play Dash video files?
+     * @name FORGE.Device#dashVideo
      * @type {boolean}
      * @readonly
      */
-    Object.defineProperty(Tmp.prototype, "vp9Video",
+    Object.defineProperty(Tmp.prototype, "dashVideo",
     {
         get: function()
         {
-            return this._vp9Video;
+            return this._dashVideo;
         }
     });
 
@@ -3207,12 +3216,12 @@ FORGE.Device = (function(c)
         this._webmVideo = false;
 
         /**
-         * Can play vp9 video files?
-         * @name FORGE.Device#_vp9Video
+         * Can play dash video files?
+         * @name FORGE.Device#_dashVideo
          * @type {boolean}
          * @private
          */
-        this._vp9Video = false;
+        this._dashVideo = false;
 
         /**
          * Can play hls video files?

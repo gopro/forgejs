@@ -159,7 +159,7 @@ FORGE.BackgroundMeshRenderer.prototype._setDisplayObject = function(displayObjec
         this._texture = new THREE.Texture();
         this._texture.image = displayObject.element;
     }
-    else if (FORGE.Utils.isTypeOf(displayObject, ["VideoHTML5", "VideoDash"]))
+    else if (FORGE.Utils.isTypeOf(displayObject, ["VideoHTML5", "VideoDash", "VideoHls"]))
     {
         // Evil hack from Hell
         // Reduce texture size for big videos on safari

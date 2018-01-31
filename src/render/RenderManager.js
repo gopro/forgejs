@@ -274,7 +274,7 @@ FORGE.RenderManager.prototype._setupMedia = function()
     media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
 
     // If media is a video, listen to the quality change event
-    if (FORGE.Utils.isTypeOf(media.displayObject, ["VideoHTML5", "VideoDash"]))
+    if (FORGE.Utils.isTypeOf(media.displayObject, ["VideoHTML5", "VideoDash", "VideoHls"]))
     {
         media.displayObject.onQualityChange.add(this._mediaQualityChangeHandler, this);
     }
@@ -432,7 +432,10 @@ FORGE.RenderManager.prototype._mediaQualityChangeHandler = function(event)
 {
     this.log("Media quality has changed");
 
-    this._backgroundRenderer.displayObject = event.emitter;
+    if (this._backgroundRenderer !== null)
+    {
+        this._backgroundRenderer.displayObject = event.emitter;
+    }
 };
 
 /**

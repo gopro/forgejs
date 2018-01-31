@@ -13,6 +13,13 @@ FORGE.VideoFormat = {};
 FORGE.VideoFormat.DASH = "dash";
 
 /**
+ * @name FORGE.VideoFormat.HLS
+ * @type {string}
+ * @const
+ */
+FORGE.VideoFormat.HLS = "hls";
+
+/**
  * @name FORGE.VideoFormat.HTML5
  * @type {string}
  * @const

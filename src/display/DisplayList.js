@@ -186,6 +186,7 @@ FORGE.DisplayList.types =
     "TextField",
     "Button",
     "VideoDash",
+    "VideoHls",
     "VideoHTML5",
     "Canvas",
     "Sprite",
