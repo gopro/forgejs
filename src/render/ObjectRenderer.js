@@ -70,7 +70,7 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
  */
 FORGE.ObjectRenderer.prototype._boot = function()
 {
-window.scene =     this._scene = new THREE.Scene();
+    this._scene = new THREE.Scene();
 
     for (var i=0; i<this._objects.length; i++)
     {
@@ -135,44 +135,35 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
     var view = viewport.view.current;
     var camera = viewport.camera.main;
 
-    if (this._lastViewport === null ||
-        this._lastViewport.uid !== viewport.uid ||
-        this._lastViewType === FORGE.ViewType.UNDEFINED ||
-        this._lastViewType !== view.type)
-    {
-        this._lastViewType = view.type;
-
-        for (var i=0; i<this._objects.length; i++)
-        {
-            var object = this._objects[i];
-            var material = object.material;
-            var mesh = object.mesh;
-
-            mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR;
-
-            if (object.material.type === FORGE.HotspotMaterial.types.GRAPHICS)
-            {
-                mesh.material = this._viewer.renderer.getMaterialForView(view.type, "color");
-            }
-            else
-            {
-                mesh.material = this._viewer.renderer.getMaterialForView(view.type, "map");
-            }
-
-            mesh.material.side = material.getThreeSide();
-            mesh.material.transparent = material.transparent;
-            mesh.material.opacity = material.opacity;
-        }
-    }
-
     // Update projection uniforms
     for (var j=0; j<this._objects.length; j++)
     {
         var object = this._objects[j];
-        view.updateUniforms(object.mesh.material.uniforms);
-    }
+        var material = object.material;
+        var mesh = object.mesh;
 
-    this._lastViewport = viewport;
+        // Renew material if needed
+        if (this._lastViewport === null ||
+            this._lastViewport.uid !== viewport.uid ||
+            this._lastViewType === FORGE.ViewType.UNDEFINED ||
+            this._lastViewType !== view.type ||
+            mesh.material.transparent !== material.transparent)
+        {
+            // Update culling strategy depending on the projection
+            mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR;
+
+            // Assign the right material reference
+            var shaderType = material.type === FORGE.HotspotMaterial.types.GRAPHICS ? "color" : "map";
+            mesh.material = this._viewer.renderer.getMaterialForView(view.type, shaderType, material.transparent);
+        }
+
+        // Update material attributes and projection uniforms
+        mesh.material.side = material.getThreeSide();
+        mesh.material.transparent = material.transparent;
+        mesh.material.opacity = material.opacity;
+
+        view.updateUniforms(mesh.material.uniforms);
+    }
 
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
     
@@ -182,6 +173,10 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
     {
         this._picking.render(viewport);
     }
+
+    // Update viewport and view references for checks in the next call
+    this._lastViewport = viewport;
+    this._lastViewType = view.type;
 };
 
 /**

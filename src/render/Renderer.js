@@ -270,9 +270,10 @@ FORGE.Renderer.prototype.changeScene = function(scene)
  * @method FORGE.Renderer#getMaterialForView
  * @param {FORGE.ViewType} viewType - view type
  * @param {string} shaderType - type of shader (map, color, pick, wireframe)
+ * @param {boolean} transparent - true if query transparent material, false if opaque
  * @return {THREE.RawShaderMaterial} world to screen shader for the given view
  */
-FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType)
+FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType, transparent)
 {
     if (this._materialPool === null)
     {
@@ -284,9 +285,12 @@ FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType)
         shaderType = "map";
     }
 
+    var t = (typeof transparent === "boolean") ? transparent : false;
+    var shaderTransparency = t ? "transparent" : "opaque";
+
     if (viewType in this._materialPool)
     {
-        return this._materialPool[viewType][shaderType];
+        return this._materialPool[viewType][shaderType][shaderTransparency];
     }
 
     this._materialPool[viewType] = {};
@@ -310,10 +314,17 @@ FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType)
 
         material.needsUpdate = true;
 
-        this._materialPool[viewType][type] = material;
+        this._materialPool[viewType][type] = {};
+
+        material.transparent = false;
+        this._materialPool[viewType][type]["opaque"] = material;
+
+        var tMaterial = material.clone();
+        tMaterial.transparent = true;
+        this._materialPool[viewType][type]["transparent"] = tMaterial;
     }
 
-    return this._materialPool[viewType][shaderType];
+    return this._materialPool[viewType][shaderType][shaderTransparency];
 };
 
  /**

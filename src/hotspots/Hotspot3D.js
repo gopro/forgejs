@@ -199,37 +199,39 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
     var g = group; // Just to avoid the jscs warning about group parameter not used.
     var gl = this._viewer.renderer.webGLRenderer.getContext();
 
-    if (material.program)
+    if (typeof material.program === "undefined")
     {
-        gl.useProgram(material.program.program);
-        var uMap = material.program.getUniforms().map;
+        return;
+    }
 
-        if ("tColor" in uMap && "tColor" in material.uniforms)
+    gl.useProgram(material.program.program);
+    var uMap = material.program.getUniforms().map;
+
+    if ("tColor" in uMap && "tColor" in material.uniforms)
+    {
+        if (material.name.includes("pick") && "pickingColor" in this._mesh.userData)
         {
-            if (material.name.includes("pick") && "pickingColor" in this._mesh.userData)
-            {
-                material.uniforms.tColor.value = this._mesh.userData.pickingColor;
-                uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
-            }
-            
-            else if (this._material.color !== null)
-            {
-                material.uniforms.tColor.value = this._material.color;
-                uMap.tColor.setValue(gl, this._material.color, this._viewer.renderer.webGLRenderer);
-            }
+            material.uniforms.tColor.value = this._mesh.userData.pickingColor;
+            uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
         }
         
-        if ("tOpacity" in uMap  && "tOpacity" in material.uniforms && this._material.opacity !== null)
+        else if (this._material.color !== null)
         {
-            material.uniforms.tOpacity.value = this._material.opacity;
-            uMap.tOpacity.setValue(gl, this._material.opacity, this._viewer.renderer.webGLRenderer);
+            material.uniforms.tColor.value = this._material.color;
+            uMap.tColor.setValue(gl, this._material.color, this._viewer.renderer.webGLRenderer);
         }
+    }
+    
+    if ("tOpacity" in uMap && "tOpacity" in material.uniforms && this._material.opacity !== null)
+    {
+        material.uniforms.tOpacity.value = this._material.opacity;
+        uMap.tOpacity.setValue(gl, this._material.opacity, this._viewer.renderer.webGLRenderer);
+    }
 
-        if ("tTexture" in uMap  && "tTexture" in material.uniforms && this._material.texture !== null)
-        {
-            material.uniforms.tTexture.value = this._material.texture;
-            uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);
-        }
+    if ("tTexture" in uMap && "tTexture" in material.uniforms && this._material.texture !== null)
+    {
+        material.uniforms.tTexture.value = this._material.texture;
+        uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);
     }
 };
 
