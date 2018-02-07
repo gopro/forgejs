@@ -215,7 +215,7 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
             uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
         }
         
-        else if (this._material.color !== null)
+        else if (this._material.color instanceof THREE.Color)
         {
             material.uniforms.tColor.value = this._material.color;
             uMap.tColor.setValue(gl, this._material.color, this._viewer.renderer.webGLRenderer);
