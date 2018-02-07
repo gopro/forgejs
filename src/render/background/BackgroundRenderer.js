@@ -135,7 +135,7 @@ FORGE.BackgroundRenderer.prototype.isObjectInScene = function(object)
  */
 FORGE.BackgroundRenderer.prototype.render = function(target)
 {
-    if(this._ready === false)
+    if (this._ready === false)
     {
         return;
     }
@@ -158,6 +158,20 @@ FORGE.BackgroundRenderer.prototype.destroy = function()
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
+
+/**
+ * Get ready status.
+ * @name FORGE.BackgroundRenderer#ready
+ * @type {THREE.Scene}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "ready",
+{
+    /** @this {FORGE.BackgroundRenderer} */
+    get: function()
+    {
+        return this._ready;
+    }
+});
 
 /**
  * Get background threejs scene.
