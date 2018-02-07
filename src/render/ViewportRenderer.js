@@ -120,7 +120,7 @@ FORGE.ViewportRenderer.prototype._createComposer = function()
  * @method FORGE.ViewportRenderer#_createBackgroundRenderer
  * @private
  */
-FORGE.ViewportRenderer.prototype._createBackgroundRenderer = function(event)
+FORGE.ViewportRenderer.prototype._createBackgroundRenderer = function()
 {
     var media = this._viewport.scene.media;
     var backgroundRendererRef;
@@ -221,7 +221,7 @@ FORGE.ViewportRenderer.prototype.destroy = function()
 
 /**
  * Get the background renderer.
- * @name FORGE.ViewportRenderer#backgroundRenderer
+ * @name FORGE.ViewportRenderer#background
  * @type {FORGE.BackgroundRenderer}
  */
 Object.defineProperty(FORGE.ViewportRenderer.prototype, "background",
