@@ -18,7 +18,7 @@ FORGE.ShaderLib = {
                 tTransitionTexture: { type: "t", value: null },
                 tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
-                tViewport: { type: "v4", value: new THREE.Vector2() },
+                tViewport: { type: "v4", value: new THREE.Vector4() },
                 tViewportRatio: { type: "f", value: 1.0 },
                 tModelViewMatrixInverse: { type: "m4", value: new THREE.Matrix4() },
                 tProjectionScale: { type: "f", value: 1.0 }
@@ -35,7 +35,7 @@ FORGE.ShaderLib = {
             {
                 tTexture: { type: "t", value: null },
                 tTextureRatio: { type: "f", value: 1.0 },
-                tViewport: { type: "v4", value: new THREE.Vector2() },
+                tViewport: { type: "v4", value: new THREE.Vector4() },
                 tViewportRatio: { type: "f", value: 1.0 },
                 tFov: { type: "f", value: 0.0 },
                 tYaw: { type: "f", value: 0.0 },
@@ -58,7 +58,7 @@ FORGE.ShaderLib = {
                 tTransitionTexture: { type: "t", value: null },
                 tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
-                tViewport: { type: "v4", value: new THREE.Vector2() },
+                tViewport: { type: "v4", value: new THREE.Vector4() },
                 tViewportRatio: { type: "f", value: 1.0 },
                 tModelViewMatrixInverse: { type: "m4", value: new THREE.Matrix4() },
                 tProjectionDistance: { type: "f", value: 0.0 },
