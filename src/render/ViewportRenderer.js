@@ -78,26 +78,8 @@ FORGE.ViewportRenderer.prototype._createComposer = function()
     {
         return;
     }
-
-    if (this._composerTexture !== null)
-    {
-        this._composerTexture.dispose();
-        this._composerTexture = null;
-    }
-
-    var rtParams =
-    {
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
-        format: THREE.RGBFormat,
-        stencilBuffer: false
-    };
-
-    // TODO : renderer should expose scene size for each frame, it could change during transitions
-    this._composerTexture = new THREE.WebGLRenderTarget(this._viewport.size.width, this._viewport.size.height, rtParams);
-    this._composerTexture.name = "Viewport-EffectComposer-Target-in-" + this._viewport.uid;
-
-    this._composer = new FORGE.ViewportComposer(this._viewer, this._composerTexture, this._viewport.scene.renderTarget, this._viewport.fx);
+    
+    this._composer = new FORGE.ViewportComposer(this._viewer, this._viewport);
 };
 
 /**
@@ -178,20 +160,38 @@ FORGE.ViewportRenderer.prototype._createBackgroundRenderer = function()
 };
 
 /**
+ * Render background and objects to the given target.
+ * @method FORGE.ViewportRenderer#_renderToTarget
+ * @param {THREE.WebGLRenderTarget} target - render target
+ * @private
+ */
+FORGE.ViewportRenderer.prototype._renderToTarget = function(target)
+{
+    if (this._backgroundRenderer.ready === false)
+    {
+        return;
+    }
+
+    this._backgroundRenderer.render(target);
+    this._viewer.renderer.webGLRenderer.clearTarget(target, false, true, false);
+    this._viewport.scene.viewports.objectRenderer.render(this._viewport, target);
+};
+
+/**
  * Render routine.
  * @method FORGE.ViewportRenderer#render
  */
 FORGE.ViewportRenderer.prototype.render = function()
 {
-    var target = this._composer !== null ? this._composerTexture : this._viewport.scene.renderTarget;
-
-    this._backgroundRenderer.render(target);
-    this._viewer.renderer.webGLRenderer.clearTarget(target, false, true, false);
-    this._viewport.scene.viewports.objectRenderer.render(this._viewport, target);
-
     if (this._composer !== null)
     {
+        this._composer.setSize(this._viewport.rectangle.size);
+        this._renderToTarget(this._composer.texture);
         this._composer.render();
+    }
+    else
+    {
+        this._renderToTarget(this._viewport.scene.renderTarget);
     }
 };
 
