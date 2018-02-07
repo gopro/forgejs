@@ -141,6 +141,8 @@ FORGE.BackgroundMeshRenderer.prototype._createMaterial = function()
         uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
         name: "BackgroundMeshMaterial",
         transparent: false,
+        depthTest: false,
+        depthWrite: false,
         side: THREE.BackSide
     });
 
