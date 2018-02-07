@@ -373,6 +373,7 @@ FORGE.Renderer.prototype.destroy = function()
         this._camera = null;
     }
 
+    this._webGLRenderer.dispose();
     this._webGLRenderer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
