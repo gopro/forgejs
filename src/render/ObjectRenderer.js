@@ -134,6 +134,7 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 
     var view = viewport.view.current;
     var camera = viewport.camera.main;
+    var compilationNeeded = false;
 
     // Update projection uniforms
     for (var j=0; j<this._objects.length; j++)
@@ -141,6 +142,11 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
         var object = this._objects[j];
         var material = object.material;
         var mesh = object.mesh;
+
+        if (typeof mesh.material.program === "undefined")
+        {
+            compilationNeeded = true;
+        }
 
         // Renew material if needed
         if (this._lastViewport === null ||
@@ -163,6 +169,11 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
         mesh.material.opacity = material.opacity;
 
         view.updateUniforms(mesh.material.uniforms);
+    }
+
+    if (compilationNeeded === true)
+    {
+        this._viewer.renderer.webGLRenderer.compile(this._scene, camera);
     }
 
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
