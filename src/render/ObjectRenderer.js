@@ -143,7 +143,8 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
         var material = object.material;
         var mesh = object.mesh;
 
-        if (typeof mesh.material.program === "undefined")
+        if (typeof mesh.material.program === "undefined" ||
+            undefined !== Object.values(mesh.material.uniforms).filter(function(u) { return u.value === undefined; }))
         {
             compilationNeeded = true;
         }
