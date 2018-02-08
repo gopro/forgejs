@@ -42,7 +42,7 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
     var vertexShader = FORGE.ShaderLib.parseIncludes(shaderSTW.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shaderSTW.fragmentShader);
 
-    var material = new THREE.ShaderMaterial({
+    var material = new THREE.RawShaderMaterial({
         uniforms: /** @type {FORGEUniform} */ (shaderSTW.uniforms),
         vertexShader: vertexShader,
         fragmentShader: fragmentShader,
