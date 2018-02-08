@@ -254,7 +254,7 @@ FORGE.HotspotSound.prototype._applyRange = function()
 {
     if(this._isSpatialized() === true && typeof this._range === "number")
     {
-        var camera = this._viewer.renderer.camera;
+        var camera = this._viewer.camera;
         var qCamera = FORGE.Quaternion.fromEuler(FORGE.Math.degToRad(camera.yaw), FORGE.Math.degToRad(camera.pitch), 0);
         var qSound = FORGE.Quaternion.fromEuler(FORGE.Math.degToRad(/** @type {number} */ (this._position.theta)), FORGE.Math.degToRad(/** @type {number} */ (this._position.phi)), 0);
         var distance = FORGE.Quaternion.angularDistance(qSound, qCamera);
