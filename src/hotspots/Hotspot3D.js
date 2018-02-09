@@ -196,32 +196,45 @@ FORGE.Hotspot3D.prototype._parseConfig = function(config)
  */
 FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, geometry, material, group)
 {
-    var g = group; // Just to avoid the jscs warning about group parameter not used.
-    var gl = this._viewer.renderer.webGLRenderer.getContext();
-
     if (typeof material.program === "undefined")
     {
         return;
     }
 
+    // Just to avoid the jscs warning about group parameter not used.
+    var g = group;
+
+    // Are we rendering for picking?
+    // @todo Maybe we can make something more elegant to determine which rendering phase is currently processed.
+    var picking = (material.name.includes("pick") && "pickingColor" in this._mesh.userData);
+
+    // Update the Forge.Material if we are not in a pick render case.
+    // This is important for animated textures like sprtite or video.
+    if(picking === false)
+    {
+        this._material.update();
+    }
+
+    var gl = this._viewer.renderer.webGLRenderer.getContext();
     gl.useProgram(material.program.program);
+
     var uMap = material.program.getUniforms().map;
 
     if ("tColor" in uMap && "tColor" in material.uniforms)
     {
-        if (material.name.includes("pick") && "pickingColor" in this._mesh.userData)
+        if (picking === true)
         {
             material.uniforms.tColor.value = this._mesh.userData.pickingColor;
             uMap.tColor.setValue(gl, this._mesh.userData.pickingColor);
         }
-        
+
         else if (this._material.color instanceof THREE.Color)
         {
             material.uniforms.tColor.value = this._material.color;
             uMap.tColor.setValue(gl, this._material.color, this._viewer.renderer.webGLRenderer);
         }
     }
-    
+
     if ("tOpacity" in uMap && "tOpacity" in material.uniforms && this._material.opacity !== null)
     {
         material.uniforms.tOpacity.value = this._material.opacity;
