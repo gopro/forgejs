@@ -246,6 +246,14 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
         material.uniforms.tTexture.value = this._material.texture;
         uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);
     }
+
+    if (picking === true && "tUseTexture" in uMap && "tUseTexture" in material.uniforms &&
+        this._material.type === FORGE.HotspotMaterial.types.GRAPHICS)
+    {
+        material.uniforms.tUseTexture.value = 0;
+        uMap.tUseTexture.setValue(gl, 0, this._viewer.renderer.webGLRenderer);
+    }
+
 };
 
 /**
