@@ -197,7 +197,8 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
  */
 FORGE.ObjectRenderer.prototype.destroy = function()
 {
-    if (this._picking !== null) {
+    if (this._picking !== null)
+    {
         this._picking.destroy();
         this._picking = null;
     }
