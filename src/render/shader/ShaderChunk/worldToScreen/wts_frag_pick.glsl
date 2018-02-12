@@ -7,13 +7,13 @@
 #include <defines>
 
 uniform sampler2D tTexture;
-uniform int tUseTexture;
+uniform int tUseTextureAlpha;
 uniform vec3 tColor;
 
 varying vec2 vUv;
 
 void main() {
-    if (tUseTexture == 1) {
+    if (tUseTextureAlpha == 1) {
         vec4 texel = texture2D( tTexture, vUv );
         if (texel.a < 0.001) {
             discard;

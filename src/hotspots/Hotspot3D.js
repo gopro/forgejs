@@ -247,13 +247,17 @@ FORGE.Hotspot3D.prototype._onBeforeRender = function(renderer, scene, camera, ge
         uMap.tTexture.setValue(gl, this._material.texture, this._viewer.renderer.webGLRenderer);
     }
 
-    if (picking === true && "tUseTexture" in uMap && "tUseTexture" in material.uniforms &&
-        this._material.type === FORGE.HotspotMaterial.types.GRAPHICS)
+    if (picking === true && "tUseTextureAlpha" in uMap && "tUseTextureAlpha" in material.uniforms)
     {
-        material.uniforms.tUseTexture.value = 0;
-        uMap.tUseTexture.setValue(gl, 0, this._viewer.renderer.webGLRenderer);
-    }
+        var useTextureAlpha = this._material.type === FORGE.HotspotMaterial.types.GRAPHICS ? 0 : 1;
 
+        if (this._material.pickEverywhere === true) {
+            useTextureAlpha = 0;
+        }
+
+        material.uniforms.tUseTextureAlpha.value = useTextureAlpha;
+        uMap.tUseTextureAlpha.setValue(gl, useTextureAlpha, this._viewer.renderer.webGLRenderer);
+    }
 };
 
 /**

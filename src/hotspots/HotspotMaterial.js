@@ -87,6 +87,14 @@ FORGE.HotspotMaterial = function(viewer, hotspotUid)
     this._color = new THREE.Color(0xffffff);
 
     /**
+     * Flag to force the whole geometry to be interactive
+     * @name  FORGE.HotspotMaterial#_pickEverywhere
+     * @type {Boolean}
+     * @private
+     */
+    this._pickEverywhere = false;
+
+    /**
      * The display object used for the texture
      * @name  FORGE.HotspotMaterial#_displayObject
      * @type {FORGE.DisplayObject}
@@ -241,6 +249,7 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
     this._transparent = (typeof config.transparent === "boolean") ? config.transparent : false;
     this._update = (typeof config.update === "boolean") ? config.update : false;
     this._side = (typeof config.side === "string") ? config.side : FORGE.HotspotMaterial.sides.DOUBLE;
+    this._pickEverywhere = (typeof config.pickEverywhere === "boolean") ? config.pickEverywhere : false;
 
     var color = (typeof config.color === "string") ? config.color : 0xff0000;
     this._color = new THREE.Color(color);
@@ -786,6 +795,21 @@ Object.defineProperty(FORGE.HotspotMaterial.prototype, "opacity",
     get: function()
     {
         return this._opacity;
+    }
+});
+
+/**
+ * Get the pickEverywhere flag of this hotspot material.
+ * @name FORGE.HotspotMaterial#pickEverywhere
+ * @readonly
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.HotspotMaterial.prototype, "pickEverywhere",
+{
+    /** @this {FORGE.HotspotMaterial} */
+    get: function()
+    {
+        return this._pickEverywhere;
     }
 });
 

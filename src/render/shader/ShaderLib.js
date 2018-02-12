@@ -103,7 +103,7 @@ FORGE.ShaderLib = {
                 /** @type {FORGEUniform} */
                 uniforms:
                 {
-                    tUseTexture: { type: "i", value: 1 },
+                    tUseTextureAlpha: { type: "i", value: 1 },
                     tTexture: { type: "t", value: null },
                     tColor: { type: "c", value: new THREE.Color() }
                 },
@@ -155,7 +155,7 @@ FORGE.ShaderLib = {
                 /** @type {FORGEUniform} */
                 uniforms:
                 {
-                    tUseTexture: { type: "i", value: 1 },
+                    tUseTextureAlpha: { type: "i", value: 1 },
                     tTexture: { type: "t", value: null },
                     tColor: { type: "c", value: new THREE.Color() }
                 },
@@ -210,7 +210,7 @@ FORGE.ShaderLib = {
                 uniforms:
                 {
                     tProjectionDistance: { type: "f", value: 1 },
-                    tUseTexture: { type: "i", value: 1 },
+                    tUseTextureAlpha: { type: "i", value: 1 },
                     tTexture: { type: "t", value: null },
                     tColor: { type: "c", value: new THREE.Color() }
                 },
