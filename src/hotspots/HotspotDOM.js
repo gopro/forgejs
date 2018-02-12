@@ -178,7 +178,7 @@ FORGE.HotspotDOM.prototype._boot = function()
     this._parseConfig(this._config);
     this._register();
 
-    this._viewer.renderer.view.onChange.add(this._viewChangeHandler, this);
+    this._viewer.view.onChange.add(this._viewChangeHandler, this);
 };
 
 /**
@@ -490,7 +490,7 @@ FORGE.HotspotDOM.prototype.update = function()
  */
 FORGE.HotspotDOM.prototype.destroy = function()
 {
-    this._viewer.renderer.view.onChange.remove(this._viewChangeHandler, this);
+    this._viewer.view.onChange.remove(this._viewChangeHandler, this);
 
     this._dom.removeEventListener("click", this._domClickHandlerBind);
     this._dom.removeEventListener("mouseover", this._domOverHandlerBind);
