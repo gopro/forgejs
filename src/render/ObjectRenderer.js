@@ -116,11 +116,11 @@ FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
  *
  * If viewport has changed since last render
  * Iterate over each object to setup its material and projection uniforms
- * 
+ *
  * Render the scene for the viewport passed as argument
  * Call the picking to draw its pass if current viewport is active and there
  * are pickable objects
- * 
+ *
  * @method FORGE.ObjectRenderer#render
  * @param {FORGE.Viewport} viewport - current rendering viewport
  * @param {FORGE.WebGLRenderTarget} target - render target
@@ -178,7 +178,7 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
     }
 
     this._viewer.renderer.webGLRenderer.render(this._scene, camera, target);
-    
+
     // If current viewport is active and there are some pickable objects, render the picking pass
     var pickable = this._getPickableObjects();
     if (this._viewer.story.scene.activeViewport === viewport && pickable.length > 0)
@@ -208,7 +208,7 @@ FORGE.ObjectRenderer.prototype.destroy = function()
     this._scene = null;
 
     this._lastViewport = null;
-    
+
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);

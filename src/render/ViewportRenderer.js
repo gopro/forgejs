@@ -40,14 +40,6 @@ FORGE.ViewportRenderer = function(viewer, viewport)
      */
     this._composer = null;
 
-    /**
-     * Composer input texture.
-     * @name FORGE.ViewportRenderer#_composerTexture
-     * @type {THREE.WebGLRenderTarget}
-     * @private
-     */
-    this._composerTexture = null;
-
     FORGE.BaseObject.call(this, "ViewportRenderer");
 
     this._boot();
