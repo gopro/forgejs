@@ -190,14 +190,6 @@ FORGE.Scene = function(viewer)
      */
     this._onConfigLoadComplete = null;
 
-    /**
-     * transition create event dispatcher.
-     * @name  FORGE.Scene#_onTransitionCreate
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onTransitionCreate = null;
-
     FORGE.BaseObject.call(this, "Scene");
 };
 
@@ -1054,25 +1046,3 @@ Object.defineProperty(FORGE.Scene.prototype, "onConfigLoadComplete",
         return this._onConfigLoadComplete;
     }
 });
-
-/**
- * Get the onTransitionCreate {@link FORGE.EventDispatcher}.
- * @name  FORGE.Scene#onTransitionCreate
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.Scene.prototype, "onTransitionCreate",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        if (this._onTransitionCreate === null)
-        {
-            this._onTransitionCreate = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onTransitionCreate;
-    }
-});
-
-
