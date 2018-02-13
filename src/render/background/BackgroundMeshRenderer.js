@@ -169,15 +169,24 @@ FORGE.BackgroundMeshRenderer.prototype._onViewChanged = function()
 
 /**
  * Render routine.
- * @param {THREE.WebGLRenderer} webGLRenderer THREE WebGL renderer
  * @param {THREE.WebGLRenderTarget} target WebGL render target
  * @method FORGE.BackgroundMeshRenderer#render
  */
-FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
+FORGE.BackgroundMeshRenderer.prototype.render = function(target)
 {
     if (this._ready == false)
     {
         return;
+    }
+
+    var rectangle = this._viewport.rectangle.vector4.clone();
+
+    // If viewport rectangle and target have the same size, rectangle
+    // offset is forced to zero
+    if (this._viewport.rectangle.size.width  === target.width &&
+        this._viewport.rectangle.size.height === target.height)
+    {
+        rectangle.x = rectangle.y = 0;
     }
 
     // Update common shader material parameters
@@ -185,7 +194,7 @@ FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
 
     if ("tViewport" in uniforms)
     {
-        uniforms.tViewport.value = this._viewport.rectangle.vector4;
+        uniforms.tViewport.value = rectangle;
     }
 
     if ("tViewportRatio" in uniforms)
@@ -200,7 +209,7 @@ FORGE.BackgroundMeshRenderer.prototype.render = function(webGLRenderer, target)
 
     this._viewport.view.current.updateUniforms(uniforms);
 
-    FORGE.BackgroundRenderer.prototype.render.call(this, webGLRenderer, target);
+    FORGE.BackgroundRenderer.prototype.render.call(this, target);
 };
 
 /**

@@ -50,11 +50,10 @@ FORGE.BackgroundTextureRenderer.prototype._mediaLoadCompleteHandler = function()
 
 /**
  * Render routine.
- * @param {THREE.WebGLRenderer} webGLRenderer THREE WebGL renderer
  * @param {THREE.WebGLRenderTarget} target WebGL render target
  * @method FORGE.BackgroundTextureRenderer#render
  */
-FORGE.BackgroundTextureRenderer.prototype.render = function(webGLRenderer, target)
+FORGE.BackgroundTextureRenderer.prototype.render = function(target)
 {
     if (this._ready == false)
     {
@@ -78,7 +77,7 @@ FORGE.BackgroundTextureRenderer.prototype.render = function(webGLRenderer, targe
         uniforms.tTextureRatio.value = this._texture.image.width / this._texture.image.height;
     }
 
-    FORGE.BackgroundMeshRenderer.prototype.render.call(this, webGLRenderer, target);
+    FORGE.BackgroundMeshRenderer.prototype.render.call(this, target);
 };
 
 /**

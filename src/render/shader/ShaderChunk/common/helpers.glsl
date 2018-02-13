@@ -14,7 +14,7 @@ float wrap(in float x, in float min, in float max) {
  * @return {vec2} fragment
  */
 vec2 getScreenPt() {
-    return gl_FragCoord.xy / tViewport.zw;
+    return (gl_FragCoord.xy - tViewport.xy) / tViewport.zw;
 }
 
 /**
@@ -23,7 +23,7 @@ vec2 getScreenPt() {
  * @return {vec2} fragment
  */
 vec2 screenToNDC(vec2 screenPt) {
-    return (2.0 * (gl_FragCoord.xy / tViewport.zw) - 1.0) * vec2(tViewportRatio, 1.0);
+    return (2.0 * ((gl_FragCoord.xy - tViewport.xy) / tViewport.zw) - 1.0) * vec2(tViewportRatio, 1.0);
 }
 
 /**

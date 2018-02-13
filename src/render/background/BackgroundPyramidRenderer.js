@@ -601,10 +601,9 @@ FORGE.BackgroundPyramidRenderer.prototype.addToRenderList = function(tile)
 /**
  * Render routine.
  * @method FORGE.BackgroundPyramidRenderer#render
- * @param {THREE.WebGLRenderer} webGLRenderer - Three WebGL renderer
  * @param {THREE.WebGLRenderTarget} target - render target
  */
-FORGE.BackgroundPyramidRenderer.prototype.render = function(webGLRenderer, target)
+FORGE.BackgroundPyramidRenderer.prototype.render = function(target)
 {
     // Renderer should find if some tile at current level are currently rendered
     this._renderList = [];

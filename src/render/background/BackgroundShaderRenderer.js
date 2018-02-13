@@ -69,10 +69,9 @@ FORGE.BackgroundShaderRenderer.prototype._createGeometry = function()
 /**
  * Do preliminary job of specific background renderer, then summon superclass method
  * @method FORGE.BackgroundShaderRenderer#render
- * @param {THREE.WebGLRenderer} webGLRenderer WebGL renderer
  * @param {THREE.WebGLRenderTarget} target WebGL render target
  */
-FORGE.BackgroundShaderRenderer.prototype.render = function(webGLRenderer, target)
+FORGE.BackgroundShaderRenderer.prototype.render = function(target)
 {
     // var periodMS = 15 * 1000;
 
@@ -82,6 +81,6 @@ FORGE.BackgroundShaderRenderer.prototype.render = function(webGLRenderer, target
     // this._mesh.material.uniforms.tMixRatio.value = ramp;
     // this._mesh.material.uniforms.tTime.value = tn;
 
-    FORGE.BackgroundTextureRenderer.prototype.render.call(this, webGLRenderer, target);
+    FORGE.BackgroundTextureRenderer.prototype.render.call(this, target);
 };
 
