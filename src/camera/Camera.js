@@ -584,18 +584,10 @@ FORGE.Camera.prototype._updateFlatCamera = function()
     this._flat.top = this._flat.position.y + camH / 2;
     this._flat.bottom = this._flat.position.y - camH / 2;
 
-    var max = this._fovMax;
     var view = this._viewport.view.current;
+    var max = Math.min(view.fovMax, this._fovMax);
 
-    if (view !== null && view.fovMax !== null)
-    {
-        max = Math.min(view.fovMax, this._fovMax);
-        this._flat.zoom = max / this._fov;
-    }
-    else
-    {
-        this._flat.zoom = 1;
-    }
+    this._flat.zoom = max / this._fov;
 
     this._flat.updateProjectionMatrix();
 };
@@ -696,12 +688,8 @@ FORGE.Camera.prototype._getYawBoundaries = function(relative, fov)
     }
 
     var view = this._viewport.view.current;
-
-    if (view !== null)
-    {
-        min = Math.max(view.yawMin, min);
-        max = Math.min(view.yawMax, max);
-    }
+    min = Math.max(view.yawMin, min);
+    max = Math.min(view.yawMax, max);
 
     return { min: min, max: max };
 };
@@ -775,12 +763,8 @@ FORGE.Camera.prototype._getPitchBoundaries = function(relative, fov)
     }
 
     var view = this._viewport.view.current;
-
-    if (view !== null)
-    {
-        min = Math.max(view.pitchMin, min);
-        max = Math.min(view.pitchMax, max);
-    }
+    min = Math.max(view.pitchMin, min);
+    max = Math.min(view.pitchMax, max);
 
     return { min: min, max: max };
 };
@@ -830,15 +814,9 @@ FORGE.Camera.prototype._setRoll = function(value, unit)
  */
 FORGE.Camera.prototype._getRollBoundaries = function()
 {
-    var min = this._rollMin;
-    var max = this._rollMax;
     var view = this._viewport.view.current;
-
-    if (view !== null)
-    {
-        min = Math.max(view.rollMin, min);
-        max = Math.min(view.rollMax, max);
-    }
+    var min = Math.max(view.rollMin, this._rollMin);
+    var max = Math.min(view.rollMax, this._rollMax);
 
     return { min: min, max: max };
 };
