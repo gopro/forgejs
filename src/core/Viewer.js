@@ -279,6 +279,14 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._renderer = null;
 
     /**
+     * Transition manager.
+     * @name FORGE.Viewer#_transitions
+     * @type {FORGE.TransitionManager}
+     * @private
+     */
+    this._transitions = null;
+
+    /**
      * Paused state of the main loop.
      * @name FORGE.Viewer#_paused
      * @type {boolean}
@@ -407,6 +415,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._story = new FORGE.Story(this);
     this._media = new FORGE.MediaManager(this);
     this._history = new FORGE.History(this);
+    this._transitions = new FORGE.TransitionManager(this);
     this._renderer = new FORGE.Renderer(this);
     this._controllers = new FORGE.ControllerManager(this);
     // this._playlists = new FORGE.PlaylistManager(this);
@@ -502,56 +511,61 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
 
     this._parseConfig(config.viewer);
 
-    if (typeof config.i18n !== "undefined")
+    if (typeof config.i18n === "object")
     {
         this._i18n.addConfig(config.i18n); //force the parse of the main config
     }
 
+    // @todo Need to align architecture.
+    this._controllers.addConfig(config.controllers);
     this._history.addConfig(config.history);
 
-    if (typeof config.audio !== "undefined")
+    if (typeof config.audio === "object")
     {
         this._audio.addConfig(config.audio);
     }
 
-    if (typeof config.playlists !== "undefined")
+    if (typeof config.playlists === "object")
     {
         this._playlists.addConfig(config.playlists);
     }
 
-    if (typeof config.actions !== "undefined")
+    if (typeof config.actions === "object")
     {
         this._actions.addConfig(config.actions);
     }
 
-    if (typeof config.layouts !== "undefined")
+    if (typeof config.layouts === "object")
     {
         this._layouts.addConfig(config.layouts);
     }
 
-    if (typeof config.fx !== "undefined")
+    if (typeof config.transitions === "object")
+    {
+        this._transitions.addConfig(config.transitions);
+    }
+
+    if (typeof config.fx === "object")
     {
         this._fxs.addConfig(config.fx);
     }
 
-    if (typeof config.director !== "undefined")
+    if (typeof config.director === "object")
     {
         this._director.load(config.director);
     }
 
-    if (typeof config.hotspots !== "undefined")
+    if (typeof config.hotspots === "object")
     {
         this._hotspots.addTracks(config.hotspots);
     }
 
-    if (typeof config.plugins !== "undefined")
+    if (typeof config.plugins === "object")
     {
         this._plugins.addConfig(config.plugins);
     }
 
-    this._controllers.addConfig(config.controllers);
-
-    if (typeof config.story !== "undefined")
+    if (typeof config.story === "object")
     {
         this._story.load(config.story);
     }
@@ -657,6 +671,7 @@ FORGE.Viewer.prototype._updateLogic = function()
     this._tween.update();
     this._hotspots.update();
     this._controllers.update();
+    this._transitions.update();
 
     if (this._callbacks !== null && typeof this._callbacks.update === "function")
     {
@@ -844,6 +859,12 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._director.destroy();
         this._director = null;
+    }
+
+    if (this._transitions !== null)
+    {
+        this._transitions.destroy();
+        this._transitions = null;
     }
 
     if(this._renderer !== null)
@@ -1443,6 +1464,21 @@ Object.defineProperty(FORGE.Viewer.prototype, "renderer",
     get: function()
     {
         return this._renderer;
+    }
+});
+
+/**
+ * Get the {@link FORGE.TransitionManager}.
+ * @name FORGE.Viewer#transitions
+ * @readonly
+ * @type {FORGE.TransitionManager}
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "transitions",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._transitions;
     }
 });
 
