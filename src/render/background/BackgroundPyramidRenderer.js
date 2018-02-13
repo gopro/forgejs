@@ -609,7 +609,7 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(target)
     this._renderList = [];
     this._renderNeighborList = [];
 
-    FORGE.BackgroundRenderer.prototype.render.call(this, webGLRenderer, target);
+    FORGE.BackgroundRenderer.prototype.render.call(this, target);
 
     this._renderNeighborList = FORGE.Utils.arrayUnique(this._renderNeighborList);
     this._clearTiles();
