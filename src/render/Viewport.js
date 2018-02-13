@@ -85,6 +85,22 @@ FORGE.Viewport = function(viewer, scene, config)
      */
     this._viewportRenderer = null;
 
+    /**
+     * Viewport ready flag.
+     * @name FORGE.Viewport#_ready
+     * @type {boolean}
+     * @private
+     */
+    this._ready = false;
+
+    /**
+     * On ready {@link FORGE.EventDispatcher}
+     * @name FORGE.Viewport#_onReady
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onReady = null;
+
     FORGE.BaseObject.call(this, "Viewport");
 
     this._boot();
@@ -114,10 +130,21 @@ FORGE.Viewport.DEFAULT_CONFIG =
  */
 FORGE.Viewport.prototype._boot = function()
 {
+    this._onReady = new FORGE.EventDispatcher(this, true);
+
     this._config = FORGE.Utils.extendSimpleObject(FORGE.Viewport.DEFAULT_CONFIG, this._config);
     this._parseConfig(this._config);
 
+    this._camera = new FORGE.Camera(this._viewer, this);
+    this._loadCameraConfig(this._config.camera);
+
+    this._viewManager = new FORGE.ViewManager(this._viewer, this);
+    this._loadViewConfig(this._config.view);
+
     this._viewportRenderer = new FORGE.ViewportRenderer(this._viewer, this);
+
+    this._ready = true;
+    this._onReady.dispatch();
 };
 
 /**
@@ -143,11 +170,7 @@ FORGE.Viewport.prototype._parseConfig = function(config)
     var background = typeof viewportBG === "string" ? viewportBG : typeof sceneBG === "string" ? sceneBG : viewerBG;
     this._background = new THREE.Color(background);
 
-    this._createViewManager(config.view);
-
-    this._createCamera(config.camera);
-
-    //@ todo : find better for fx parse
+    //@ todo : find better for fx parse (An fx manager that deals with configs would be cool)
     this._fx = [];
 
     if (typeof config.fx !== "undefined")
@@ -165,15 +188,13 @@ FORGE.Viewport.prototype._parseConfig = function(config)
 };
 
 /**
- * Create and init a camera with info contained in the scene and story configurations
- * @method FORGE.Viewport#_createCamera
+ * Compute and load the camera configuration.
+ * @method FORGE.Viewport#_loadCameraConfig
  * @param {CameraConfig} config - The camera viewport configuration
  * @private
  */
-FORGE.Viewport.prototype._createCamera = function(config)
+FORGE.Viewport.prototype._loadCameraConfig = function(config)
 {
-    this._camera = new FORGE.Camera(this._viewer, this);
-
     var storyCameraConfig = /** @type {CameraConfig} */ (this._viewer.mainConfig.camera);
     var sceneCameraConfig = /** @type {CameraConfig} */ (this._scene.config.camera);
     var viewportCameraConfig = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(storyCameraConfig, sceneCameraConfig, config));
@@ -182,15 +203,13 @@ FORGE.Viewport.prototype._createCamera = function(config)
 };
 
 /**
- * Create view manager
+ * Compute and load view configuration.
  * @method FORGE.Viewport#_createViewManager
  * @param {ViewConfig} config - The view config
  * @private
  */
-FORGE.Viewport.prototype._createViewManager = function(config)
+FORGE.Viewport.prototype._loadViewConfig = function(config)
 {
-    this._viewManager = new FORGE.ViewManager(this._viewer, this);
-
     var storyViewConfig = /** @type {ViewConfig} */ (this._viewer.mainConfig.view);
     var sceneViewConfig = /** @type {ViewConfig} */ (this._scene.config.view);
     var viewportViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(storyViewConfig, sceneViewConfig, config));
@@ -243,14 +262,16 @@ FORGE.Viewport.prototype.destroy = function()
     if (this._camera !== null)
     {
         this._camera.destroy();
-        this._camera = null;
+        // Do not nullify the camera here!
     }
 
     if (this._viewManager !== null)
     {
         this._viewManager.destroy();
-        this._viewManager = null;
     }
+
+    this._camera = null;
+    this._viewManager = null;
 
     this._fx = null;
     this._rectangle = null;
@@ -399,5 +420,21 @@ Object.defineProperty(FORGE.Viewport.prototype, "scene",
     get: function()
     {
         return this._scene;
+    }
+});
+
+/**
+ * Get the "onReady" {@link FORGE.EventDispatcher} of this viewport.
+ * @name FORGE.Viewport#onReady
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Viewport.prototype, "onReady",
+{
+    /** @this {FORGE.Viewport} */
+    get: function()
+    {
+        // No lazy here
+        return this._onReady;
     }
 });

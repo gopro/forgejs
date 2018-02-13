@@ -326,6 +326,8 @@ FORGE.Camera.DEFAULT_CONFIG =
  */
 FORGE.Camera.prototype._boot = function()
 {
+    this._viewport.onReady.addOnce(this._viewportReadyHandler, this);
+
     this._resetChangelog();
 
     this._modelView = new THREE.Matrix4();
@@ -334,18 +336,20 @@ FORGE.Camera.prototype._boot = function()
 
     this._gaze = new FORGE.CameraGaze(this._viewer, FORGE.Camera.DEFAULT_CONFIG.gaze);
 
-    this._viewport.view.onChange.add(this._updateInternals, this);
-
     this._createMainCamera();
     this._createFlatCamera();
+};
 
-    // Check config to allow default to be set if they were depending
-    // on some parameter external to the camera. For example: multiresolution fovMin set
-    // by the background renderer
-    if (this._config !== null)
-    {
-        this._parseConfig(this._config);
-    }
+/**
+ * Viewport ready handler.
+ * @method FORGE.Camera#_viewportReadyHandler
+ * @private
+ */
+FORGE.Camera.prototype._viewportReadyHandler = function()
+{
+    this._viewport.view.onChange.add(this._updateInternals, this);
+
+    this._parseConfig(this._config);
 };
 
 /**
@@ -431,6 +435,8 @@ FORGE.Camera.prototype._parseConfig = function(config)
     this._updateFlatCamera();
 
     this._gaze.load(/** @type {CameraGazeConfig} */ (config.gaze));
+
+    this._initialized = true;
 };
 
 /**
@@ -984,9 +990,10 @@ FORGE.Camera.prototype.load = function(config)
 {
     this._config = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(FORGE.Camera.DEFAULT_CONFIG, config));
 
-    this._parseConfig(this._config);
-
-    this._initialized = true;
+    if(this._viewport.ready === true)
+    {
+        this._parseConfig(this._config);
+    }
 };
 
 /**
