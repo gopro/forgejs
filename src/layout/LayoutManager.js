@@ -15,9 +15,9 @@ FORGE.LayoutManager = function(viewer)
     this._viewer = viewer;
 
     /**
-     * Camera reference.
+     * layouts config array.
      * @name FORGE.LayoutManager#_layouts
-     * @type {Array}
+     * @type {Array<FORGE.Layout>}
      * @private
      */
     this._layouts = null;
@@ -114,6 +114,11 @@ FORGE.LayoutManager.prototype.destroy = function()
             layout = null;
         }
     }
+
+    this._layouts = null;
+    this._viewer = null;
+
+    FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**
