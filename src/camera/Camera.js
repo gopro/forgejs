@@ -869,29 +869,20 @@ FORGE.Camera.prototype._setFov = function(value, unit)
  */
 FORGE.Camera.prototype._getFovBoundaries = function()
 {
-    var min = this._fovMin;
-    var max = this._fovMax;
+    //In most case the fov boundaries are provided by the view or camera limits config.
     var view = this._viewport.view.current;
+    var min = Math.max(view.fovMin, this._fovMin);
+    var max = Math.min(view.fovMax, this._fovMax);
 
-
-    /*
-    // if JSON specifies a fov min (not default 0 value), use it
-    // useful for multiresolution where fov limit will be computed depending
-    // on max level of resolution available and stored in JSON
-    if (this._viewport.renderer.backgroundRenderer !== null && "fovMin" in this._viewport.renderer.backgroundRenderer)
+    // In tiled media case the fov boundaries will be computed depending on max level of resolution available.
+    // So we override the fov min value of the view here!
+    if (typeof this._viewport.renderer.background.fovMin === "number")
     {
-        min = Math.max(this._viewport.renderer.backgroundRenderer.fovMin, min);
-    }
-    else if (min === 0)
-    {
-        if (view !== null)
-        {
-            min = Math.max(view.fovMin, min);
-            max = Math.min(view.fovMax, max);
-        }
+        min = Math.max(this._viewport.renderer.background.fovMin, this._fovMin);
     }
 
-    if (view !== null && view.type !== FORGE.ViewType.FLAT)
+    // If the view type is not flat, the fov boundaries are calculated in a different way
+    if (view.type !== FORGE.ViewType.FLAT)
     {
         // if there are limits, we may need to limit the maximum fov
         var pitchBoundaries = this._getPitchBoundaries(false);
@@ -917,7 +908,6 @@ FORGE.Camera.prototype._getFovBoundaries = function()
             min = max;
         }
     }
-    */
 
     return { min: min, max: max };
 };
