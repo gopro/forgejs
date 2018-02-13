@@ -56,7 +56,11 @@ FORGE.ViewportRenderer.prototype.constructor = FORGE.ViewportRenderer;
 FORGE.ViewportRenderer.prototype._boot = function()
 {
     this._createBackgroundRenderer();
-    this._createComposer();
+
+    if (this._viewport.fx.length > 0)
+    {
+        this._createComposer();
+    }
 };
 
 /**
@@ -66,11 +70,6 @@ FORGE.ViewportRenderer.prototype._boot = function()
  */
 FORGE.ViewportRenderer.prototype._createComposer = function()
 {
-    if (this._viewport.fx.length === 0)
-    {
-        return;
-    }
-    
     this._composer = new FORGE.ViewportComposer(this._viewer, this._viewport);
 };
 
