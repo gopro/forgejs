@@ -145,18 +145,27 @@ FORGE.ViewBase.prototype.constructor = FORGE.ViewBase;
  */
 FORGE.ViewBase.prototype._boot = function()
 {
-    //@todo Check the utility of this call.
-    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
+    this._viewport.camera.onFovChange.add(this._fovChangeHandler, this);
 };
 
 /**
- * Scene load complete handler.
- * @method FORGE.ViewBase#_sceneLoadCompleteHandler
+ * Camera fov change handler
+ * @method FORGE.ViewBase#_fovChangeHandler
  * @private
  */
-FORGE.ViewBase.prototype._sceneLoadCompleteHandler = function()
+FORGE.ViewBase.prototype._fovChangeHandler = function()
 {
-    this.updateUniforms();
+    this._updateViewParams();
+};
+
+/**
+ * Update view params.
+ * @method FORGE.ViewBase#_updateViewParams
+ * @private
+ */
+FORGE.ViewBase.prototype._updateViewParams = function()
+{
+    throw "Please implement " + this._className + "::_updateViewParams";
 };
 
 /**
@@ -251,7 +260,7 @@ FORGE.ViewBase.prototype.getProjectionFov = function()
  */
 FORGE.ViewBase.prototype.destroy = function()
 {
-    this._viewer.story.onSceneLoadComplete.remove(this._sceneLoadCompleteHandler, this);
+    this._viewport.camera.onFovChange.remove(this._fovChangeHandler, this);
 
     this._viewer = null;
     this._camera = null;
