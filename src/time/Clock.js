@@ -155,7 +155,7 @@ FORGE.Clock.prototype.update = function(time)
     this._rafTime = time;
 
     var currentTime = Date.now();
-    
+
     this._deltaTime = currentTime - this._time;
 
     this._time = currentTime;

@@ -8,7 +8,7 @@
  * @param {number} tick - The current clock tick.
  * @param {number} repeatCount - The number of time the timer should repeat itself.
  * @param {boolean} loop - Does the timer have to loop?
- * @param {Function} callback - The callback function for this timer timer event complete.
+ * @param {Function} callback - The callback function for this timer event complete.
  * @param {Object} callbackContext - The context in which the callback have to be executed.
  * @param {Array<*>} args - The arguments to pass to the callback.
  */
@@ -90,5 +90,8 @@ FORGE.TimerEvent.prototype.constructor = FORGE.TimerEvent;
  */
 FORGE.TimerEvent.prototype.execute = function()
 {
-    this._callback.apply(this._callbackContext, this._args);
+    if (typeof this._callback === "function")
+    {
+        this._callback.apply(this._callbackContext, this._args);
+    }
 };
