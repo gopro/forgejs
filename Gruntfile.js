@@ -52,6 +52,7 @@ module.exports = function(grunt)
         "src/render/Picking.js",
 
         "src/transition/TransitionManager.js",
+        "src/transition/Transition.js",
 
         "src/render/background/BackgroundRenderer.js",
         "src/render/background/BackgroundMeshRenderer.js",

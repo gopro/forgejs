@@ -1,5 +1,5 @@
 /**
- * Layout manager
+ * Transition manager
  * @constructor FORGE.TransitionManager
  * @param {FORGE.Viewer} viewer - viewer reference.
  * @extends {FORGE.BaseObject}
@@ -22,14 +22,6 @@ FORGE.TransitionManager = function(viewer)
      */
     this._transitions = null;
 
-    /**
-     * Default transition UID
-     * @name  FORGE.TransitionManager#_default
-     * @type {string}
-     * @private
-     */
-    this._defaultUid = "";
-
     FORGE.BaseObject.call(this, "TransitionManager");
 
     this._boot();
@@ -46,19 +38,7 @@ FORGE.TransitionManager.prototype.constructor = FORGE.TransitionManager;
 FORGE.TransitionManager.prototype._boot = function()
 {
    this._transitions = [];
-
-    // var preset, layout;
-    // for (i in FORGE.LayoutPresets)
-    // {
-    //     preset = FORGE.LayoutPresets[i];
-    //     layout = new FORGE.Layout(this._viewer, preset);
-    //     this._layouts.push(layout);
-    // }
-
-    // // Set the preset single as the default layout
-    // this._defaultUid = FORGE.LayoutPresets.SINGLE.uid;
 };
-
 
 /**
  * Add a transition configuration
@@ -76,7 +56,7 @@ FORGE.TransitionManager.prototype.addConfig = function(config)
         for (var i = 0, ii = config.length; i < ii; i++)
         {
             transition = new FORGE.Transition(this._viewer, /** @type {TransitionConfig} */ (config[i]));
-            this._layouts.push(transition);
+            this._transitions.push(transition);
         }
     }
     // If it is a single transition
@@ -86,7 +66,7 @@ FORGE.TransitionManager.prototype.addConfig = function(config)
         this._transitions.push(transition);
     }
 
-    return layout;
+    return transition;
 };
 
 /**
@@ -105,7 +85,7 @@ FORGE.TransitionManager.prototype.update = function()
  */
 FORGE.TransitionManager.prototype.get = function(uid)
 {
-    return FORGE.UID.get(uid, "Layout");
+    return FORGE.UID.get(uid, "Transition");
 };
 
 /**
@@ -129,32 +109,3 @@ FORGE.TransitionManager.prototype.destroy = function()
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
-
-// /**
-//  * Get the default layout Uid.
-//  * @name FORGE.TransitionManager#defaultUid
-//  * @type {FORGE.Layout}
-//  */
-// Object.defineProperty(FORGE.TransitionManager.prototype, "defaultUid",
-// {
-//     /** @this {FORGE.Viewport} */
-//     get: function()
-//     {
-//         return this._defaultUid;
-//     }
-// });
-
-// *
-//  * Get the default layout.
-//  * @name FORGE.TransitionManager#default
-//  * @type {FORGE.Layout}
- 
-// Object.defineProperty(FORGE.TransitionManager.prototype, "default",
-// {
-//     /** @this {FORGE.Viewport} */
-//     get: function()
-//     {
-//         return FORGE.UID.get(this._defaultUid);
-//     }
-// });
-
