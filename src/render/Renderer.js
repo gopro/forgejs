@@ -52,11 +52,27 @@ FORGE.Renderer = function(viewer)
 
     /**
      * Material pool
-     * @name FORGE.Viewer#_materialPool
+     * @name FORGE.Renderer#_materialPool
      * @type {Array<THREE.Material>}
      * @private
      */
     this._materialPool = null;
+
+    /**
+     * Scene Renderer pool
+     * @name FORGE.Renderer#_sceneRendererPool
+     * @type {FORGE.SceneRendererPool}
+     * @private
+     */
+    this._sceneRendererPool = null;
+
+    /**
+     * Active viewport has changed
+     * @name FORGE.Renderer#_onActiveViewportChange
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onActiveViewportChange = null;
 
     /**
      * Event dispatcher for the scene transition start event.
@@ -109,6 +125,8 @@ FORGE.Renderer.DEPTH_FAR = 10000;
  */
 FORGE.Renderer.prototype._boot = function()
 {
+    this._sceneRendererPool = new FORGE.SceneRendererPool(this._viewer);
+
     this._viewer.onConfigLoadComplete.add(this._onViewerConfigLoadComplete, this, 1000);
 };
 
@@ -199,11 +217,21 @@ FORGE.Renderer.prototype._buildMaterial = function(canvas)
         "uniform float tOpacity;",
         "uniform vec2 tResolution;",
 
+        // "void main() {",
+        // "   gl_FragColor = texture2D(tTexture1, gl_FragCoord.xy / tResolution);",
+        // // "   gl_FragColor = texture2D(tTexture1, vUv);",
+        // "}"
         "void main() {",
-        "   gl_FragColor = texture2D(tTexture1, gl_FragCoord.xy / tResolution);",
-        // "   gl_FragColor = texture2D(tTexture1, vUv);",
+            // "gl_FragColor = mix(texture2D(tTexture1, vUv), texture2D(tTexture2, vUv), tMixRatio);",
+
+            "vec2 xy = gl_FragCoord.xy / tResolution.xy;",
+
+            "float edgeMix = step(tMixRatio, xy.x);",
+            "vec4 texelR = texture2D( tTexture1, vUv - vec2(tMixRatio, 0.0));",
+            "vec4 texelL = texture2D( tTexture1, clamp(vUv + vec2(1.0 - tMixRatio, 0.0), vec2(0.0), vec2(1.0)));",
+            "gl_FragColor = mix( texelL, texelR, edgeMix );",
+
         "}"
-        // "void main() { gl_FragColor = mix(texture2D(tTexture1, vUv), texture2D(tTexture2, vUv), tMixRatio); }"
         // "void main() { gl_FragColor = vec4(0.8, 0.8, 0.2, 1.); }"
 
     ].join("\n");
@@ -222,27 +250,33 @@ FORGE.Renderer.prototype._buildMaterial = function(canvas)
  */
 FORGE.Renderer.prototype.render = function()
 {
+    var targets = this._sceneRendererPool.render();
+
     // Update time (increasing ramp in [0..1]) and mix ratio increasing and decreasing ramp in [[0..1]]
-    // var periodMS = 15 * 1000;
-    // var tn = (this._clock.elapsedTime % periodMS) / periodMS;
-    // this._quad.material.uniforms.tMixRatio.value = tn < 0.5 ? 2 * tn : 2 - 2 * tn;
-    // this._quad.material.uniforms.tTime.value = tn;
-
-    var currentScene = this._viewer.story.scene;
-
-    // Ask current scene (and transition if any) to render
-    // They will change the renderer viewport, we'll set it back once it's done
-    currentScene.render();
+    var periodMS = 15 * 1000;
+    var tn = (this._viewer.clock.elapsedTime % periodMS) / periodMS;
+    this._quad.material.uniforms.tMixRatio.value = tn < 0.5 ? 2 * tn : 2 - 2 * tn;
+    this._quad.material.uniforms.tTime.value = tn;
 
     // Assign textures from the scene and render the whole scene
-    this._quad.material.uniforms.tTexture1.value = currentScene.renderTarget;
+    if (targets[0] instanceof THREE.WebGLRenderTarget)
+    {
+        this._quad.material.uniforms.tTexture1.value = targets[0];
+    }
+
+    if (targets[1] instanceof THREE.WebGLRenderTarget)
+    {
+        this._quad.material.uniforms.tTexture2.value = targets[1];
+    }
+
     this._quad.material.uniforms.tResolution.value = new THREE.Vector2(this._viewer.width, this._viewer.height);
     this._webGLRenderer.setViewport(0, 0, this._viewer.width, this._viewer.height);
+
     this._webGLRenderer.render(this._scene, this._camera);
 };
 
 /**
- * Change current scene with or without transition
+ * Change current scene with or without tran   sition
  * @method FORGE.Renderer#changeScene
  * @param {FORGE.Something} scene new scene
  */
@@ -327,14 +361,49 @@ FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType, tra
     return this._materialPool[viewType][shaderType][shaderTransparency];
 };
 
- /**
+/**
+ * Add a scene to the render pool
+ * @method FORGE.Renderer#addScene
+ */
+FORGE.Renderer.prototype.addScene = function(sceneUID)
+{
+    this._sceneRendererPool.addScene(sceneUID);
+};
+
+/**
+ * Remove a scene to the render pool
+ * @method FORGE.Renderer#removeScene
+ */
+FORGE.Renderer.prototype.removeScene = function(sceneUID)
+{
+    this._sceneRendererPool.removeScene(sceneUID);
+};
+
+/**
+ * Notify the active viewport has changed
+ * @method FORGE.Renderer#notifyActiveViewportChange
+ */
+FORGE.Renderer.prototype.notifyActiveViewportChange = function()
+{
+    if (this._onActiveViewportChange !== null)
+    {
+        this._onActiveViewportChange.dispatch();
+    }
+};
+
+/**
  * Renderer destroy sequence
- *
  * @method FORGE.Renderer#destroy
  */
 FORGE.Renderer.prototype.destroy = function()
 {
     this._viewer.onConfigLoadComplete.remove(this._onViewerConfigLoadComplete, this);
+
+    if (this._onActiveViewportChange !== null)
+    {
+        this._onActiveViewportChange.destroy();
+        this._onActiveViewportChange = null;
+    }
 
     this._onSceneTransitionStart = null;
     this._onSceneTransitionProgress = null;
@@ -376,6 +445,9 @@ FORGE.Renderer.prototype.destroy = function()
     this._webGLRenderer.dispose();
     this._webGLRenderer = null;
 
+    this._sceneRendererPool.destroy();
+    this._sceneRendererPool = null;
+
     FORGE.BaseObject.prototype.destroy.call(this);
 };
 
@@ -391,6 +463,21 @@ Object.defineProperty(FORGE.Renderer.prototype, "webGLRenderer",
     get: function()
     {
         return this._webGLRenderer;
+    }
+});
+
+/**
+ * Get the scene renderer pool
+ * @name FORGE.Renderer#sceneRendererPool
+ * @type {FORGE.SceneRendererPool}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "sceneRendererPool",
+{
+    /** @this {FORGE.Renderer} */
+    get: function()
+    {
+        return this._sceneRendererPool;
     }
 });
 
@@ -414,3 +501,37 @@ Object.defineProperty(FORGE.Renderer.prototype, "vr",
     }
 });
 
+/**
+ * Get the active viewport
+ * @name FORGE.Renderer#activeViewport
+ * @type {FORGE.Viewport}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "activeViewport",
+{
+    /** @this {FORGE.Renderer} */
+    get: function()
+    {
+        return this._sceneRendererPool.activeViewport;
+    }
+});
+
+/**
+ * Get the onActiveViewportChange {@link FORGE.EventDispatcher}.
+ * @name  FORGE.Renderer#onActiveViewportChange
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "onActiveViewportChange",
+{
+    /** @this {FORGE.Renderer} */
+    get: function()
+    {
+        if (this._onActiveViewportChange === null)
+        {
+            this._onActiveViewportChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onActiveViewportChange;
+    }
+});

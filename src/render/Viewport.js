@@ -2,11 +2,12 @@
  * viewport - part of a layout
  * @constructor FORGE.Viewport
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
+ * @param {FORGE.ViewportManager} viewportManager {@link FORGE.ViewportManager} reference.
  * @param {FORGE.Scene} scene {@link FORGE.Scene} reference.
  * @param {!ViewportConfig} config scene layout config.
  * @extends {FORGE.BaseObject}
  */
-FORGE.Viewport = function(viewer, scene, config)
+FORGE.Viewport = function(viewer, viewportManager, scene, config)
 {
     /**
      * The viewer reference.
@@ -15,6 +16,14 @@ FORGE.Viewport = function(viewer, scene, config)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * The viewport manager reference.
+     * @name FORGE.Viewport#_viewportManager
+     * @type {FORGE.SceneRenderer}
+     * @private
+     */
+    this._viewportManager = viewportManager;
 
     /**
      * The scene reference.
@@ -231,20 +240,20 @@ FORGE.Viewport.prototype.updateRectangle = function()
 /**
  * Render routine.
  * @method FORGE.Viewport#render
- * @param {THREE.WebGLRenderer} webGLRenderer
+ * @param {FORGE.ObjectRenderer} objectRenderer - object renderer
+ * @param {THREE.WebGLRenderTarget} target - render target
  */
-FORGE.Viewport.prototype.render = function()
+FORGE.Viewport.prototype.render = function(objectRenderer, target)
 {
     this._camera.update();
 
-    var target = this._scene.renderTarget;
     target.viewport.set(this._rectangle.x, this._rectangle.y, this._rectangle.width, this._rectangle.height);
     target.scissor.set(this._rectangle.x, this._rectangle.y, this._rectangle.width, this._rectangle.height);
     target.scissorTest = true ;
 
     this._viewer.renderer.webGLRenderer.setClearColor(this._background);
     this._viewer.renderer.webGLRenderer.clearTarget(target, true, false, false);
-    this._viewportRenderer.render(target);
+    this._viewportRenderer.render(objectRenderer, target);
 };
 
 /**
@@ -272,6 +281,7 @@ FORGE.Viewport.prototype.destroy = function()
 
     this._camera = null;
     this._viewManager = null;
+    this._viewportManager = null;
 
     this._fx = null;
     this._rectangle = null;
@@ -315,6 +325,21 @@ Object.defineProperty(FORGE.Viewport.prototype, "rectangle",
     set: function(value)
     {
         this._rectangle = value;
+    }
+});
+
+/**
+ * Get the viewport manager
+ * @name  FORGE.Viewport#viewportManager
+ * @type {FORGE.ViewportManager}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewport.prototype, "viewportManager",
+{
+    /** @this {FORGE.ViewportManager} */
+    get: function()
+    {
+        return this._viewportManager;
     }
 });
 

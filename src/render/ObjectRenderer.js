@@ -3,7 +3,7 @@
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ObjectRenderer = function(viewer, objects)
+FORGE.ObjectRenderer = function(viewer)
 {
     /**
      * Viewer reference
@@ -27,7 +27,7 @@ FORGE.ObjectRenderer = function(viewer, objects)
      * @type {Array<FORGE.Object3D>}
      * @private
      */
-    this._objects = objects;
+    this._objects = null;
 
     /**
      * Reference on last renderer viewport
@@ -71,6 +71,8 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
 FORGE.ObjectRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
+
+    this._objects = this._viewer.hotspots.getByType("Hotspot3D");
 
     for (var i=0; i<this._objects.length; i++)
     {
@@ -181,7 +183,12 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 
     // If current viewport is active and there are some pickable objects, render the picking pass
     var pickable = this._getPickableObjects();
-    if (this._viewer.story.scene.activeViewport === viewport && pickable.length > 0)
+
+    // If scene is active and viewport is active and there are pickable objects
+    // @todo add a test for scene active (this._viewer.activeScene === this._scene)
+    if (this._viewer.renderer.activeViewport === this._viewport &&
+        pickable.length > 0)
+    // if (this._viewer.story.scene.activeViewport === viewport && pickable.length > 0)
     {
         this._picking.render(viewport);
     }

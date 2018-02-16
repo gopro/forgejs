@@ -2,10 +2,10 @@
  * Scene viewport manager
  * @constructor FORGE.ViewportManager
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
- * @param {FORGE.Scene} scene {@link FORGE.Scene} reference.
+ * @param {FORGE.SceneRenderer} sceneRenderer {@link FORGE.SceneRenderer} reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ViewportManager = function(viewer, scene)
+FORGE.ViewportManager = function(viewer, sceneRenderer)
 {
     /**
      * The viewer reference.
@@ -16,12 +16,12 @@ FORGE.ViewportManager = function(viewer, scene)
     this._viewer = viewer;
 
     /**
-     * The scene reference.
-     * @name FORGE.ViewportManager#_scene
-     * @type {FORGE.Scene}
+     * The scene renderer reference.
+     * @name FORGE.ViewportManager#_sceneRenderer
+     * @type {FORGE.SceneRenderer}
      * @private
      */
-    this._scene = scene;
+    this._sceneRenderer = sceneRenderer;
 
     /**
      * The current Forge.Layout uid
@@ -48,14 +48,6 @@ FORGE.ViewportManager = function(viewer, scene)
     this._index = 0;
 
     /**
-     * Object renderer.
-     * @name FORGE.ViewportManager#_objectRenderer
-     * @type {FORGE.ObjectRenderer}
-     * @private
-     */
-    this._objectRenderer = null;
-
-    /**
      * Active viewport has changed event dispatcher
      * @name FORGE.ViewportManager#_onActiveViewportChange
      * @type {FORGE.EventDispatcher}
@@ -79,8 +71,8 @@ FORGE.ViewportManager.prototype._boot = function()
 {
     this._viewports = [];
 
-    // Parse config for screen rendering
-    this._setLayout(this._scene.layoutUid);
+    // Parse config for the rendering
+    this._setLayout(this._sceneRenderer.scene.layoutUid);
 
     // @todo enable this finally instead of all the canvas pointers
     // this._viewer.controllers.onActivate.add(this._renewActiveViewport, this)
@@ -93,8 +85,6 @@ FORGE.ViewportManager.prototype._boot = function()
     this._viewer.canvas.pointer.onWheel.add(this._renewActiveViewport, this);
 
     this._viewer.canvas.onResize.add(this._canvasResizeHandler, this);
-
-    this._scene.onLoadComplete.addOnce(this._onSceneLoadComplete, this);
 };
 
 /**
@@ -122,7 +112,7 @@ FORGE.ViewportManager.prototype._createViewports = function(config)
     {
         for (var i = 0, ii = config.length; i < ii; i++)
         {
-            var viewport = new FORGE.Viewport(this._viewer, this._scene, config[i]);
+            var viewport = new FORGE.Viewport(this._viewer, this, this._sceneRenderer.scene, config[i]);
             this._viewports.push(viewport);
         }
     }
@@ -144,24 +134,6 @@ FORGE.ViewportManager.prototype._destroyViewports = function()
     }
 
     this._viewports = [];
-};
-
-/**
- * Scene load complete handler
- * @method FORGE.ViewportManager#_onSceneLoadComplete
- * @param {FORGE.Event} event - scene load complete event
- * @private
- */
-FORGE.ViewportManager.prototype._onSceneLoadComplete = function(event)
-{
-    if (this._viewports.length === 0)
-    {
-        this.warn("Cannot setup hotspots, no viewport created.")
-        return;
-    }
-
-    var hotspots = this._viewer.hotspots.getByType("Hotspot3D");
-    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer, hotspots);
 };
 
 /**
@@ -219,12 +191,14 @@ FORGE.ViewportManager.prototype._renewActiveViewport = function(event)
 /**
  * Render routine.
  * @method FORGE.ViewportManager#render
+ * @param {FORGE.ObjectRenderer} objectRenderer - object renderer
+ * @param {THREE.WebGLRenderTarget} target - render target
  */
-FORGE.ViewportManager.prototype.render = function()
+FORGE.ViewportManager.prototype.render = function(objectRenderer, target)
 {
     for(var i = 0, ii = this._viewports.length; i < ii; i++)
     {
-        this._viewports[i].render();
+        this._viewports[i].render(objectRenderer, target);
     }
 };
 
@@ -263,12 +237,6 @@ FORGE.ViewportManager.prototype.destroy = function(webGLRenderer, target)
 
     this._viewer.canvas.onResize.remove(this._canvasResizeHandler, this);
 
-    if (this._objectRenderer !== null)
-    {
-        this._objectRenderer.destroy();
-        this._objectRenderer = null;
-    }
-
     if (this._onActiveViewportChange !== null)
     {
         this._onActiveViewportChange.destroy();
@@ -277,6 +245,7 @@ FORGE.ViewportManager.prototype.destroy = function(webGLRenderer, target)
 
     this._destroyViewports();
 
+    this._sceneRenderer = null;
     this._viewer = null;
     this._scene = null;
 
@@ -319,21 +288,6 @@ Object.defineProperty(FORGE.ViewportManager.prototype, "layoutUid",
             this._destroyViewports();
             this._setLayout(value);
         }
-    }
-});
-
-/**
- * Get the object renderer
- * @name  FORGE.ViewportManager#objectRenderer
- * @readonly
- * @type {FORGE.ObjectRenderer}
- */
-Object.defineProperty(FORGE.ViewportManager.prototype, "objectRenderer",
-{
-    /** @this {FORGE.ViewportManager} */
-    get: function()
-    {
-        return this._objectRenderer;
     }
 });
 

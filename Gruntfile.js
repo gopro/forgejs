@@ -50,6 +50,8 @@ module.exports = function(grunt)
         "src/render/ViewportRenderer.js",
         "src/render/ObjectRenderer.js",
         "src/render/Picking.js",
+        "src/render/SceneRenderer.js",
+        "src/render/SceneRendererPool.js",
 
         "src/render/background/BackgroundRenderer.js",
         "src/render/background/BackgroundMeshRenderer.js",

@@ -83,7 +83,7 @@ FORGE.ControllerBase.prototype.constructor = FORGE.ControllerBase;
 FORGE.ControllerBase.prototype._boot = function()
 {
     this._viewer.canvas.pointer.enabled = true;
-    
+
     this._viewer.story.onSceneLoadComplete.add(this._onSceneLoadComplete, this);
 };
 
@@ -95,7 +95,7 @@ FORGE.ControllerBase.prototype._boot = function()
  */
 FORGE.ControllerBase.prototype._onSceneLoadComplete = function(event)
 {
-    this._viewer.story.scene.viewports.onActiveViewportChange.add(this._onSceneActiveViewportChange, this);
+    this._viewer.renderer.onActiveViewportChange.add(this._onSceneActiveViewportChange, this);
 
     this._camera = this._viewer.camera;
 };
@@ -147,7 +147,7 @@ FORGE.ControllerBase.prototype.disable = function()
 FORGE.ControllerBase.prototype.destroy = function()
 {
     this._viewer.story.onSceneLoadComplete.remove(this._onSceneLoadComplete, this);
-    this._viewer.story.scene.viewports.onActiveViewportChange.remove(this._onSceneActiveViewportChange, this);
+    this._viewer.renderer.onActiveViewportChange.remove(this._onSceneActiveViewportChange, this);
 
     this._camera = null;
     this._viewer = null;
