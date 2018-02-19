@@ -366,6 +366,8 @@ FORGE.Story.prototype._addScene = function(scene)
  */
 FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
 {
+    this.log("scene load request handler");
+
     var previousScene = this.scene;
     var nextScene = event.emitter;
     var time = NaN;
@@ -385,8 +387,6 @@ FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
     this._sceneUid = nextScene.uid;
 
     nextScene.loadStart(time);
-
-    this.log("scene load request");
 
     //The scene has no group so nullify the _groupUid
     if(nextScene.hasGroups() === false)

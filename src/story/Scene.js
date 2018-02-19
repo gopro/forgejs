@@ -221,11 +221,12 @@ FORGE.Scene.prototype._parseConfig = function(config)
     // Set the default layout
     this._layoutUid = this._viewer.layouts.defaultUid;
 
-    // If there is a specified layout uid, use it !
+    // If there is a specified layout uid, use it!
     if (typeof config.layout === "string" && config.layout !== "")
     {
         this._layoutUid = config.layout;
     }
+    // Else if its a layout object, then add it to the layout manager and use it!
     else if (typeof config.layout === "object" && config.layout !== null)
     {
         var layout = this._viewer.layouts.addConfig(config.layout);
