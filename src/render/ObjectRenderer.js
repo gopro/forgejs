@@ -74,7 +74,7 @@ FORGE.ObjectRenderer.prototype._boot = function()
 
     this._objects = this._viewer.hotspots.getByType("Hotspot3D");
 
-    for (var i=0; i<this._objects.length; i++)
+    for (var i = 0; i < this._objects.length; i++)
     {
         var mesh = this._objects[i].mesh;
         mesh.userData.pickingColor = FORGE.Picking.colorFromObjectID(mesh.id);
@@ -93,10 +93,10 @@ FORGE.ObjectRenderer.prototype._boot = function()
  */
 FORGE.ObjectRenderer.prototype._getPickableObjects = function()
 {
-    return this._objects.filter(function(object) {
+    return this._objects.filter(function(object)
+    {
         return object.ready === true && object.interactive === true;
-    })
-
+    });
 };
 
 /**
@@ -108,9 +108,11 @@ FORGE.ObjectRenderer.prototype._getPickableObjects = function()
  */
 FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
 {
-    return this._getPickableObjects().find(function(object) {
+    return this._getPickableObjects().find(function(object)
+    {
         return object.mesh.id === id;
-    })
+    });
+};
 };
 
 /**
