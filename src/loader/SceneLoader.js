@@ -31,9 +31,7 @@ FORGE.SceneLoader = function(viewer)
     this._onTransitionComplete = null;
 
 
-
-
-    FORGE.BaseObject.call(this, className || "SceneLoader");
+    FORGE.BaseObject.call(this, "SceneLoader");
 
     this._boot();
 };
@@ -56,6 +54,8 @@ FORGE.SceneLoader.prototype._boot = function()
  */
 FORGE.SceneLoader.prototype._loadMedia = function()
 {
+    this.log("load media starts");
+
     var scene = FORGE.UID.get(this._sceneUid);
     scene.media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
     scene.media.load();
@@ -72,6 +72,8 @@ FORGE.SceneLoader.prototype._loadMedia = function()
  */
 FORGE.SceneLoader.prototype._mediaLoadCompleteHandler = function()
 {
+    this.log("load media complete");
+
     if(this._onMediaLoadComplete !== null)
     {
         this._onMediaLoadComplete.dispatch();
@@ -86,14 +88,18 @@ FORGE.SceneLoader.prototype._mediaLoadCompleteHandler = function()
  */
 FORGE.SceneLoader.prototype._startTransition = function()
 {
+    this.log("transition starts");
+
     if(this._onTransitionStart !== null)
     {
         this._onTransitionStart.dispatch();
     }
 
+    this._viewer.renderer.addScene(this._sceneUid);
+
     var transition = FORGE.UID.get(this._transitionUid);
-    transition.onComplete.addonce(this._transitionCompleteHandler, this);
-    trnsition.start();
+    transition.onComplete.addOnce(this._transitionCompleteHandler, this);
+    transition.start();
 };
 
 /**
@@ -102,12 +108,19 @@ FORGE.SceneLoader.prototype._startTransition = function()
  */
 FORGE.SceneLoader.prototype._transitionCompleteHandler = function()
 {
+    this.log("transition complete");
+
     if(this._onTransitionComplete !== null)
     {
         this._onTransitionComplete.dispatch();
     }
 
     this._loading = false;
+
+    if (this._onLoadComplete !== null)
+    {
+        this._onLoadComplete.dispatch();
+    }
 };
 
 /**
@@ -123,21 +136,26 @@ FORGE.SceneLoader.prototype.load = function(sceneUid, transitionUid)
         return;
     }
 
-    if (FORGE.UID.istypeOf(sceneUid, "Scene") === false)
+    if (FORGE.UID.isTypeOf(sceneUid, "Scene") === false)
     {
         this.warn("the scene uid "+sceneUid+" does not exists");
         return;
     }
 
-    if (FORGE.UID.istypeOf(transitionUid, "Transition") === false)
+    if (FORGE.UID.isTypeOf(transitionUid, "Transition") === false)
     {
         this.warn("the transition uid "+transitionUid+" does not exists");
-        return;
+        // return;
     }
 
     this._loading = true;
     this._sceneUid = sceneUid;
-    this._transitionUid = transitionUid;
+    this._transitionUid = transitionUid || "trans-screen";
+
+    if (this._onLoadStart !== null)
+    {
+        this._onLoadStart.dispatch();
+    }
 
     this._loadMedia();
 };
@@ -154,38 +172,157 @@ FORGE.SceneLoader.prototype.destroy = function()
 };
 
 /**
- * description
- * @name FORGE.SceneLoader#prop
+ * Get the loading flag
+ * @name FORGE.SceneLoader#loading
  * @readonly
- * @type {void}
+ * @type {boolean}
   */
-Object.defineProperty(FORGE.SceneLoader.prototype, "prop",
+Object.defineProperty(FORGE.SceneLoader.prototype, "loading",
 {
     /** @this {FORGE.SceneLoader} */
     get: function()
     {
-        return;
+        return this._loading;
     }
 });
 
+/**
+ * Get the current transition.
+ * @name FORGE.SceneLoader#transition
+ * @readonly
+ * @type {FORGE.Transition}
+  */
+Object.defineProperty(FORGE.SceneLoader.prototype, "transition",
+{
+    /** @this {FORGE.SceneLoader} */
+    get: function()
+    {
+        if (FORGE.UID.isTypeOf(this._transitionUid, "Transition") === true)
+        {
+            return FORGE.UID.get(this._transitionUid);
+        }
+
+        return null;
+    }
+});
 
 /**
- * Get the onReady {@link FORGE.EventDispatcher}.
- * @name FORGE.Object3D#onReady
+ * Get the onLoadStart {@link FORGE.EventDispatcher}.
+ * @name FORGE.SceneLoader#onLoadStart
  * @readonly
  * @type {FORGE.EventDispatcher}
  */
-Object.defineProperty(FORGE.SceneLoader.prototype, "onReady",
+Object.defineProperty(FORGE.SceneLoader.prototype, "onLoadStart",
 {
     /** @this {FORGE.Object3D} */
     get: function()
     {
-        if (this._onReady === null)
+        if (this._onLoadStart === null)
         {
-            this._onReady = new FORGE.EventDispatcher(this);
+            this._onLoadStart = new FORGE.EventDispatcher(this);
         }
 
-        return this._onReady;
+        return this._onLoadStart;
+    }
+});
+
+/**
+ * Get the onLoadComplete {@link FORGE.EventDispatcher}.
+ * @name FORGE.SceneLoader#onLoadComplete
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.SceneLoader.prototype, "onLoadComplete",
+{
+    /** @this {FORGE.Object3D} */
+    get: function()
+    {
+        if (this._onLoadComplete === null)
+        {
+            this._onLoadComplete = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onLoadComplete;
+    }
+});
+
+/**
+ * Get the onMediaLoadStart {@link FORGE.EventDispatcher}.
+ * @name FORGE.SceneLoader#onMediaLoadStart
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.SceneLoader.prototype, "onMediaLoadStart",
+{
+    /** @this {FORGE.Object3D} */
+    get: function()
+    {
+        if (this._onMediaLoadStart === null)
+        {
+            this._onMediaLoadStart = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onMediaLoadStart;
+    }
+});
+
+/**
+ * Get the onMediaLoadComplete {@link FORGE.EventDispatcher}.
+ * @name FORGE.SceneLoader#onMediaLoadComplete
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.SceneLoader.prototype, "onMediaLoadComplete",
+{
+    /** @this {FORGE.Object3D} */
+    get: function()
+    {
+        if (this._onMediaLoadComplete === null)
+        {
+            this._onMediaLoadComplete = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onMediaLoadComplete;
+    }
+});
+
+/**
+ * Get the onTransitionStart {@link FORGE.EventDispatcher}.
+ * @name FORGE.SceneLoader#onTransitionStart
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.SceneLoader.prototype, "onTransitionStart",
+{
+    /** @this {FORGE.Object3D} */
+    get: function()
+    {
+        if (this._onTransitionStart === null)
+        {
+            this._onTransitionStart = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onTransitionStart;
+    }
+});
+
+/**
+ * Get the onTransitionComplete {@link FORGE.EventDispatcher}.
+ * @name FORGE.SceneLoader#onTransitionComplete
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.SceneLoader.prototype, "onTransitionComplete",
+{
+    /** @this {FORGE.Object3D} */
+    get: function()
+    {
+        if (this._onTransitionComplete === null)
+        {
+            this._onTransitionComplete = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onTransitionComplete;
     }
 });
 
