@@ -39,6 +39,18 @@ FORGE.HotspotManager.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.HotspotManager.prototype.constructor = FORGE.HotspotManager;
 
 /**
+ * Boot sequence. Called by the viewer by the exposed boot method.
+ * @method FORGE.HotspotManager#_boot
+ * @private
+ */
+FORGE.HotspotManager.prototype._boot = function(config)
+{
+    this._config = [];
+
+    this._viewer.story.onSceneLoadStart.add(this._sceneLoadStartHandler, this);
+};
+
+/**
  * Parse a hotspots config object.
  * @method FORGE.HotspotManager#_parseConfig
  * @private
@@ -145,7 +157,7 @@ FORGE.HotspotManager.prototype._checkHotspotsReady = function()
  */
 FORGE.HotspotManager.prototype._sceneLoadStartHandler = function()
 {
-    var scene = this._viewer.story.scene;
+    var scene = this._viewer.story.loadingScene;
     scene.onUnloadStart.addOnce(this._sceneUnloadStartHandler, this);
 
     if (typeof scene.config.hotspots !== "undefined")
@@ -171,9 +183,7 @@ FORGE.HotspotManager.prototype._sceneUnloadStartHandler = function()
  */
 FORGE.HotspotManager.prototype.boot = function()
 {
-    this._config = [];
-
-    this._viewer.story.onSceneLoadStart.add(this._sceneLoadStartHandler, this);
+    this._boot();
 };
 
 /**
@@ -271,6 +281,8 @@ FORGE.HotspotManager.prototype.dump = function()
 FORGE.HotspotManager.prototype.destroy = function()
 {
     this.clear();
+
+    this._viewer.story.onSceneLoadStart.remove(this._sceneLoadStartHandler, this);
 
     this._viewer = null;
     this._hotspots = null;
