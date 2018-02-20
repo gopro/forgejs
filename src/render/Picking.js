@@ -57,7 +57,7 @@ FORGE.Picking = function(viewer, objectRenderer)
     /**
      * Picking render target
      * @name FORGE.Picking#_renderTarget
-     * @type {FORGE.WebGLRenderTarget}
+     * @type {THREE.WebGLRenderTarget}
      * @private
      */
     this._renderTarget = null;
@@ -225,6 +225,7 @@ FORGE.Picking.prototype._canvasPointerMoveHandler = function(event)
     }
 
     this._hovered = object;
+
     if (typeof this._hovered.over === "function")
     {
         this._hovered.over();
