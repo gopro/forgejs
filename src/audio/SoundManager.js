@@ -267,15 +267,15 @@ FORGE.SoundManager.prototype.boot = function()
         this._context.listener.setOrientation(0, 0, -1, 0, 1, 0);
     }
 
-    this._viewer.story.onSceneLoadStart.add(this._sceneLoadStartHandler, this);
+    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
 };
 
 /**
  * Event handler for scene start.
- * @method FORGE.SoundManager#_sceneLoadStartHandler
+ * @method FORGE.SoundManager#_sceneLoadCompleteHandler
  * @private
  */
-FORGE.SoundManager.prototype._sceneLoadStartHandler = function()
+FORGE.SoundManager.prototype._sceneLoadCompleteHandler = function()
 {
     if(typeof this._viewer.story.scene.config.audio !== "undefined")
     {
@@ -666,7 +666,7 @@ FORGE.SoundManager.prototype._setContextListenerOrientation = function()
  */
 FORGE.SoundManager.prototype.destroy = function()
 {
-    this._viewer.story.onSceneLoadStart.remove(this._sceneLoadStartHandler, this);
+    this._viewer.story.onSceneLoadComplete.remove(this._sceneLoadCompleteHandler, this);
 
     this._viewer = null;
     this._config = null;
