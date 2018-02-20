@@ -179,14 +179,14 @@ FORGE.MediaVideo.prototype.load = function()
     }
     else
     {
-        var scene = this._viewer.story.scene;
+        // var scene = this._viewer.story.scene;
 
         // check of the ambisonic state of the video sound prior to the video instanciation
-        this._video = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
+        // this._video = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
+        this._video = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, false);
     }
 
-    // At this point, source.url is either a streaming address, a simple
-    // url, or an array of url
+    // At this point, source.url is either a streaming address, a simple url, or an array of url
     this._video.load(this._source.url);
 
     this._video.onLoadedMetaData.addOnce(this._onLoadedMetaDataHandler, this);
