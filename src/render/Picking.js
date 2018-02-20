@@ -16,14 +16,14 @@
  * alpha into account.
  *
  * The picking instance listens to pointer events (click/over) and fetchs the point
- * matching the event coordinates from the picking texture. Picking is then able to 
+ * matching the event coordinates from the picking texture. Picking is then able to
  * get an object id from the color. Object renderer owning the picking is asked for
  * the object once the id is computed.
  *
  * Objects events supported: click, over, out.
  *
  * @constructor FORGE.Picking
- * 
+ *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
  * @param {FORGE.ObjectRenderer} objectRenderer - {@link FORGE.ObjectRenderer} reference
  * @extends {FORGE.BaseObject}
@@ -168,15 +168,17 @@ FORGE.Picking.prototype._removeHandlers = function(event)
 FORGE.Picking.prototype._canvasPointerClickHandler = function(event)
 {
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-    var viewportPosition = this._viewer.story.scene.viewports.getRelativeMousePosition(screenPosition);
-    var viewportSize = this._viewer.story.scene.viewports.active.rectangle.size;
+
+    var viewport = this._viewer.renderer.activeViewport;
+    var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
+    var viewportSize = viewport.rectangle.size;
 
     var object = this._getObjectAtNormalizedPosition(viewportPosition.divide(viewportSize.vector2));
     if (typeof object === "undefined" || !object.interactive)
     {
         return;
     }
-    
+
     if (typeof object.click === "function")
     {
         object.click();
@@ -192,8 +194,10 @@ FORGE.Picking.prototype._canvasPointerClickHandler = function(event)
 FORGE.Picking.prototype._canvasPointerMoveHandler = function(event)
 {
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-    var viewportPosition = this._viewer.story.scene.viewports.getRelativeMousePosition(screenPosition);
-    var viewportSize = this._viewer.story.scene.viewports.active.rectangle.size;
+
+    var viewport = this._viewer.renderer.activeViewport;
+    var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
+    var viewportSize = viewport.rectangle.size;
 
     var object = this._getObjectAtNormalizedPosition(viewportPosition.divide(viewportSize.vector2));
     if (typeof object === "undefined" || !object.interactive)
@@ -210,7 +214,7 @@ FORGE.Picking.prototype._canvasPointerMoveHandler = function(event)
 
         return;
     }
-    
+
     // Test if hovered object is still the same, if it has changed, call previous out function
     if (this._hovered !== null && this._hovered !== object)
     {

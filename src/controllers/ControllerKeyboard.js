@@ -479,7 +479,7 @@ FORGE.ControllerKeyboard.prototype.disable = function()
  */
 FORGE.ControllerKeyboard.prototype.update = function()
 {
-    var size = this._viewer.story.scene.viewports.active.size;
+    var size = this._viewer.renderer.activeViewport.size;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
 
     this._velocity.subVectors(this._positionCurrent, this._positionStart);

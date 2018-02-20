@@ -153,10 +153,11 @@ FORGE.ViewportRenderer.prototype._createBackgroundRenderer = function()
 /**
  * Render background and objects to the given target.
  * @method FORGE.ViewportRenderer#_renderToTarget
+ * @param {FORGE.ObjectRenderer} objectRenderer - object renderer
  * @param {THREE.WebGLRenderTarget} target - render target
  * @private
  */
-FORGE.ViewportRenderer.prototype._renderToTarget = function(target)
+FORGE.ViewportRenderer.prototype._renderToTarget = function(objectRenderer, target)
 {
     if (this._backgroundRenderer.ready === false)
     {
@@ -165,24 +166,26 @@ FORGE.ViewportRenderer.prototype._renderToTarget = function(target)
 
     this._backgroundRenderer.render(target);
     this._viewer.renderer.webGLRenderer.clearTarget(target, false, true, false);
-    this._viewport.scene.viewports.objectRenderer.render(this._viewport, target);
+    objectRenderer.render(this._viewport, target);
 };
 
 /**
  * Render routine.
  * @method FORGE.ViewportRenderer#render
+ * @param {FORGE.ObjectRenderer} objectRenderer - object renderer
+ * @param {THREE.WebGLRenderTarget} target - render target
  */
-FORGE.ViewportRenderer.prototype.render = function()
+FORGE.ViewportRenderer.prototype.render = function(objectRenderer, target)
 {
     if (this._composer !== null)
     {
         this._composer.setSize(this._viewport.rectangle.size);
-        this._renderToTarget(this._composer.texture);
+        this._renderToTarget(objectRenderer, this._composer.texture);
         this._composer.render();
     }
     else
     {
-        this._renderToTarget(this._viewport.scene.renderTarget);
+        this._renderToTarget(objectRenderer, target);
     }
 };
 

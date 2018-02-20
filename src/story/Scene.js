@@ -15,14 +15,6 @@ FORGE.Scene = function(viewer)
     this._viewer = viewer;
 
     /**
-     * Scene viewports manager.
-     * @name FORGE.Scene#_viewports
-     * @type {FORGE.ViewportManager}
-     * @private
-     */
-    this._viewports = null;
-
-    /**
      * The scene config object.
      * @name FORGE.Scene#_sceneConfig
      * @type {?SceneConfig}
@@ -125,14 +117,6 @@ FORGE.Scene = function(viewer)
      * @private
      */
     this._mediaUid = "";
-
-    /**
-     * The scene render target (texture)
-     * @name FORGE.Scene#_renderTarget
-     * @type {THREE.WebGLRenderTarget}
-     * @private
-     */
-    this._renderTarget = null;
 
     /**
      * FX manager.
@@ -317,56 +301,6 @@ FORGE.Scene.prototype._clearEvents = function()
 };
 
 /**
- * Create viewports and renderers based on layout definition in config
- * @method FORGE.Scene#_createViewports
- * @private
- * @param {!SceneConfig} config - Scene config
- */
-FORGE.Scene.prototype._createViewports = function(config)
-{
-    if (this._renderTarget !== null)
-    {
-        this._renderTarget.dispose();
-        this._renderTarget = null;
-    }
-
-    var rtParams =
-    {
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
-        format: THREE.RGBAFormat,
-        depthBuffer: true,
-        stencilBuffer: false
-    };
-
-    // TODO : renderer should expose scene size for each frame, it could change during transitions
-    this._renderTarget = new THREE.WebGLRenderTarget(this._viewer.width, this._viewer.height, rtParams);
-    this._renderTarget.name = "Scene-Target-" + this._name.value;
-
-    this._viewports = new FORGE.ViewportManager(this._viewer, this);
-};
-
-/**
- * Destroy viewports and renderers
- * @method FORGE.Scene#_destroyViewports
- * @private
- */
-FORGE.Scene.prototype._destroyViewports = function()
-{
-    if (this._renderTarget !== null)
-    {
-        this._renderTarget.dispose();
-        this._renderTarget = null;
-    }
-
-    if (this._viewports !== null)
-    {
-        this._viewports.destroy();
-        this._viewports = null;
-    }
-};
-
-/**
  * Add a scene configuration object.
  * @method  FORGE.Scene#addConfig
  * @param {SceneConfig} config - The scene configuration object to add.
@@ -423,8 +357,6 @@ FORGE.Scene.prototype.loadStart = function(time)
     // Trigger the media load
     this.media.load(this._mediaUid);
 
-    this._createViewports(this._config);
-
     if (this._onLoadStart !== null)
     {
         this._onLoadStart.dispatch();
@@ -434,6 +366,8 @@ FORGE.Scene.prototype.loadStart = function(time)
     {
         this._events.onLoadStart.dispatch();
     }
+
+    this._viewer.renderer.addScene(this._uid);
 
     this._viewCount++;
 
@@ -446,6 +380,7 @@ FORGE.Scene.prototype.loadStart = function(time)
     {
         this._events.onLoadComplete.dispatch();
     }
+
 };
 
 /**
@@ -580,18 +515,6 @@ FORGE.Scene.prototype.isAmbisonic = function()
 };
 
 /**
- * Render routine.
- * @method FORGE.Scene#render
- * @private
- */
-FORGE.Scene.prototype.render = function()
-{
-    this._viewer.renderer.webGLRenderer.setSize(this._viewer.width, this._viewer.height);
-    this._renderTarget.setSize(this._viewer.width, this._viewer.height);
-    this._viewports.render();
-};
-
-/**
  * Destroy method
  * @method FORGE.Scene#destroy
  */
@@ -697,21 +620,6 @@ Object.defineProperty(FORGE.Scene.prototype, "viewed",
     get: function()
     {
         return this._viewCount !== 0;
-    }
-});
-
-/**
- * Current active viewport.
- * @name FORGE.Scene#camera
- * @readonly
- * @type {FORGE.Viewport}
- */
-Object.defineProperty(FORGE.Scene.prototype, "activeViewport",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        return this._viewports.active;
     }
 });
 
@@ -837,21 +745,6 @@ Object.defineProperty(FORGE.Scene.prototype, "thumbnails",
 });
 
 /**
- * Get the scene viewport manager.
- * @name  FORGE.Scene#viewports
- * @readonly
- * @type {FORGE.ViewportManager}
- */
-Object.defineProperty(FORGE.Scene.prototype, "viewports",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        return this._viewports;
-    }
-});
-
-/**
  * Get the scene media.
  * @name  FORGE.Scene#media
  * @readonly
@@ -895,21 +788,6 @@ Object.defineProperty(FORGE.Scene.prototype, "layout",
     {
         var layout = FORGE.UID.get(this._layoutUid);
         return layout;
-    }
-});
-
-/**
- * Get the scene render target.
- * @name  FORGE.Scene#renderTarget
- * @readonly
- * @type {THREE.RenderTarget}
- */
-Object.defineProperty(FORGE.Scene.prototype, "renderTarget",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        return this._renderTarget;
     }
 });
 
