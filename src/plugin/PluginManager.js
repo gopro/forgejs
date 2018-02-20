@@ -71,6 +71,20 @@ FORGE.PluginManager.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.PluginManager.prototype.constructor = FORGE.PluginManager;
 
 /**
+ * Boot sequence. Called by the viewer by the exposed boot method.
+ * @method FORGE.PluginManager#_boot
+ * @private
+ */
+FORGE.PluginManager.prototype._boot = function(config)
+{
+    this._engines = new FORGE.Collection();
+    this._plugins = new FORGE.Collection();
+
+    this._viewer.story.onSceneLoadStart.add(this._sceneLoadStartHandler, this);
+    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
+};
+
+/**
  * Parse the main plugin config.
  * @method FORGE.PluginManager#_parseMainConfig
  * @param {PluginsConfig} config - The configuration of the main plugins node to parse.
@@ -103,14 +117,20 @@ FORGE.PluginManager.prototype._parseConfig = function(config)
  * @method FORGE.PluginManager#_sceneLoadStartHandler
  * @private
  */
-FORGE.PluginManager.prototype._sceneLoadStartHandler = function()
+FORGE.PluginManager.prototype._sceneLoadStartHandler = function(event)
 {
     //Remove plugin that have keep = false and plugin that have scene restrictions.
+    this._removeUnkeptPlugins(this._viewer.story.loadingSceneUid);
+};
 
-    this._removeUnkeptPlugins(this._viewer.story.sceneUid);
-
-    //Add plugins =============================================
-
+/**
+ * Event handler for scene load complete.
+ * @method FORGE.PluginManager#_sceneLoadCompleteHandler
+ * @private
+ */
+FORGE.PluginManager.prototype._sceneLoadCompleteHandler = function(event)
+{
+    //Add plugins
     if(this._enabled === true && typeof this._config !== "undefined")
     {
         this._parseConfig(this._config);
@@ -121,8 +141,7 @@ FORGE.PluginManager.prototype._sceneLoadStartHandler = function()
         this._parseConfig(this._viewer.story.scene.config.plugins);
     }
 
-    //Reset plugins ============================================
-
+    //Reset plugins
     this._resetPlugins();
 };
 
@@ -355,11 +374,7 @@ FORGE.PluginManager.prototype._onInstanceCreateHandler = function(event)
  */
 FORGE.PluginManager.prototype.boot = function()
 {
-    this._engines = new FORGE.Collection();
-
-    this._plugins = new FORGE.Collection();
-
-    this._viewer.story.onSceneLoadStart.add(this._sceneLoadStartHandler, this);
+    this._boot();
 };
 
 /**
@@ -479,7 +494,8 @@ FORGE.PluginManager.prototype.render = function()
  */
 FORGE.PluginManager.prototype.destroy = function()
 {
-
+    this._viewer.story.onSceneLoadStart.remove(this._sceneLoadStartHandler, this);
+    this._viewer.story.onSceneLoadComplete.remove(this._sceneLoadCompleteHandler, this);
     this._viewer = null;
 
     if(this._onInstanceCreate !== null)
