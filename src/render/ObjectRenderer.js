@@ -114,6 +114,14 @@ FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
     });
 };
 
+
+FORGE.ObjectRenderer.prototype.clear = function()
+{
+    this._objects = [];
+    this._scene = new THREE.Scene();
+};
+
+
 /**
  * Render routine
  *
