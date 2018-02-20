@@ -94,18 +94,6 @@ FORGE.BackgroundRenderer.prototype._boot = function()
     this._camera = this._viewport.camera.main;
 
     this._frustum = new THREE.Frustum();
-
-    this._media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
-};
-
-/**
- * Media load complete handler.
- * @method FORGE.BackgroundRenderer#_mediaLoadCompleteHandler
- * @private
- */
-FORGE.BackgroundRenderer.prototype._mediaLoadCompleteHandler = function()
-{
-    this._ready = true;
 };
 
 /**

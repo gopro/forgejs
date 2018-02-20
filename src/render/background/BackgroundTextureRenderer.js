@@ -34,18 +34,8 @@ FORGE.BackgroundTextureRenderer.prototype.constructor = FORGE.BackgroundTextureR
 FORGE.BackgroundTextureRenderer.prototype._boot = function()
 {
     FORGE.BackgroundMeshRenderer.prototype._boot.call(this);
-};
 
-/**
- * Media load complete handler.
- * @method FORGE.BackgroundTextureRenderer#_mediaLoadCompleteHandler
- * @private
- */
-FORGE.BackgroundTextureRenderer.prototype._mediaLoadCompleteHandler = function()
-{
     this._texture = this._media.texture.texture;
-
-    FORGE.BackgroundRenderer.prototype._mediaLoadCompleteHandler.call(this);
 };
 
 /**

@@ -76,6 +76,8 @@ FORGE.BackgroundMeshRenderer.prototype._bootComplete = function()
 {
     this._createMesh();
     this._onMeshCreated();
+
+    this._ready = true;
 };
 
 /**

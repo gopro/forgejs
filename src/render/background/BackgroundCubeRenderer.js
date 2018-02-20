@@ -69,14 +69,12 @@ FORGE.BackgroundCubeRenderer.prototype._boot = function()
 };
 
 /**
- * Media load complete handler.
- * @method FORGE.BackgroundCubeRenderer#_mediaLoadCompleteHandler
+ * On mesh created callback called by the parent class
+ * @method FORGE.BackgroundMeshRenderer#_onMeshCreated
  * @private
  */
-FORGE.BackgroundCubeRenderer.prototype._mediaLoadCompleteHandler = function()
+FORGE.BackgroundCubeRenderer.prototype._onMeshCreated = function()
 {
-    FORGE.BackgroundTextureRenderer.prototype._mediaLoadCompleteHandler.call(this);
-
     if (this._texture.image !== null)
     {
         this._faces.x = this._texture.image.width / this._tile;

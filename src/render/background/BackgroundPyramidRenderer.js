@@ -153,6 +153,8 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
             }
         }
     }
+
+    this._ready = true;
 };
 
 /**
