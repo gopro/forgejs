@@ -73,7 +73,7 @@ FORGE.History.prototype._parseConfig = function(config)
  */
 FORGE.History.prototype._enable = function()
 {
-    this._viewer.story.onSceneLoadStart.add(this._sceneLoadStartHandler, this);
+    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
     this._viewer.i18n.onLocaleChangeComplete.add(this._localeChangeCompleteHandler, this);
     window.addEventListener("popstate", this._onPopStateHandler, false);
 };
@@ -85,17 +85,17 @@ FORGE.History.prototype._enable = function()
  */
 FORGE.History.prototype._disable = function()
 {
-    this._viewer.story.onSceneLoadStart.remove(this._sceneLoadStartHandler, this);
+    this._viewer.story.onSceneLoadStart.remove(this._sceneLoadCompleteHandler, this);
     this._viewer.i18n.onLocaleChangeComplete.remove(this._localeChangeCompleteHandler, this);
     window.removeEventListener("popstate", this._onPopStateHandler, false);
 };
 
 /**
  * Internal handler for scene load start.
- * @method FORGE.History#_sceneLoadStartHandler
+ * @method FORGE.History#_sceneLoadCompleteHandler
  * @private
  */
-FORGE.History.prototype._sceneLoadStartHandler = function()
+FORGE.History.prototype._sceneLoadCompleteHandler = function()
 {
     this._addState();
 };
