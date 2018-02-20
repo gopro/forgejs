@@ -113,7 +113,6 @@ FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
         return object.mesh.id === id;
     });
 };
-};
 
 /**
  * Render routine
