@@ -112,7 +112,7 @@ FORGE.ViewportManager.prototype._createViewports = function(config)
     {
         for (var i = 0, ii = config.length; i < ii; i++)
         {
-            var viewport = new FORGE.Viewport(this._viewer, this, this._sceneRenderer.scene, config[i]);
+            var viewport = new FORGE.Viewport(this._viewer, this._sceneRenderer, config[i]);
             this._viewports.push(viewport);
         }
     }
@@ -218,6 +218,7 @@ FORGE.ViewportManager.prototype.getRelativeMousePosition = function(mouse)
     }
 
     var rectangle = this._viewports[index].rectangle;
+
     return new THREE.Vector2(mouse.x - rectangle.x, mouse.y - rectangle.y);
 };
 

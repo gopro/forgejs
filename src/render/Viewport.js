@@ -2,12 +2,11 @@
  * viewport - part of a layout
  * @constructor FORGE.Viewport
  * @param {FORGE.Viewer} viewer {@link FORGE.Viewer} reference.
- * @param {FORGE.ViewportManager} viewportManager {@link FORGE.ViewportManager} reference.
- * @param {FORGE.Scene} scene {@link FORGE.Scene} reference.
+ * @param {FORGE.SceneRenderer} sceneRenderer {@link FORGE.SceneRenderer} reference.
  * @param {!ViewportConfig} config scene layout config.
  * @extends {FORGE.BaseObject}
  */
-FORGE.Viewport = function(viewer, viewportManager, scene, config)
+FORGE.Viewport = function(viewer, sceneRenderer, config)
 {
     /**
      * The viewer reference.
@@ -18,20 +17,12 @@ FORGE.Viewport = function(viewer, viewportManager, scene, config)
     this._viewer = viewer;
 
     /**
-     * The viewport manager reference.
-     * @name FORGE.Viewport#_viewportManager
+     * The scene renderer reference.
+     * @name FORGE.Viewport#_sceneRenderer
      * @type {FORGE.SceneRenderer}
      * @private
      */
-    this._viewportManager = viewportManager;
-
-    /**
-     * The scene reference.
-     * @name FORGE.Viewport#_scene
-     * @type {FORGE.Scene}
-     * @private
-     */
-    this._scene = scene;
+    this._sceneRenderer = sceneRenderer;
 
     /**
      * Input layout configuration to setup the viewport.
@@ -174,7 +165,7 @@ FORGE.Viewport.prototype._parseConfig = function(config)
     this._rectangle = new FORGE.Rectangle(x, y, w, h);
 
     var viewerBG = this._viewer.background;
-    var sceneBG = this._scene.background;
+    var sceneBG = this._sceneRenderer.scene.background;
     var viewportBG = config.background;
     var background = typeof viewportBG === "string" ? viewportBG : typeof sceneBG === "string" ? sceneBG : viewerBG;
     this._background = new THREE.Color(background);
@@ -186,9 +177,9 @@ FORGE.Viewport.prototype._parseConfig = function(config)
     {
         this._fx = config.fx;
     }
-    else if (typeof this._scene.config.fx !== "undefined")
+    else if (typeof this._sceneRenderer.scene.config.fx !== "undefined")
     {
-        this._fx = this._scene.config.fx;
+        this._fx = this._sceneRenderer.scene.config.fx;
     }
     else if (typeof this._viewer.story.config.fx !== "undefined")
     {
@@ -205,7 +196,7 @@ FORGE.Viewport.prototype._parseConfig = function(config)
 FORGE.Viewport.prototype._loadCameraConfig = function(config)
 {
     var storyCameraConfig = /** @type {CameraConfig} */ (this._viewer.mainConfig.camera);
-    var sceneCameraConfig = /** @type {CameraConfig} */ (this._scene.config.camera);
+    var sceneCameraConfig = /** @type {CameraConfig} */ (this._sceneRenderer.scene.config.camera);
     var viewportCameraConfig = /** @type {CameraConfig} */ (FORGE.Utils.extendMultipleObjects(storyCameraConfig, sceneCameraConfig, config));
 
     this._camera.load(viewportCameraConfig);
@@ -220,7 +211,7 @@ FORGE.Viewport.prototype._loadCameraConfig = function(config)
 FORGE.Viewport.prototype._loadViewConfig = function(config)
 {
     var storyViewConfig = /** @type {ViewConfig} */ (this._viewer.mainConfig.view);
-    var sceneViewConfig = /** @type {ViewConfig} */ (this._scene.config.view);
+    var sceneViewConfig = /** @type {ViewConfig} */ (this._sceneRenderer.scene.config.view);
     var viewportViewConfig = /** @type {ViewConfig} */ (FORGE.Utils.extendMultipleObjects(storyViewConfig, sceneViewConfig, config));
 
     this._viewManager.load(viewportViewConfig);
@@ -281,12 +272,11 @@ FORGE.Viewport.prototype.destroy = function()
 
     this._camera = null;
     this._viewManager = null;
-    this._viewportManager = null;
+    this._sceneRenderer = null;
 
     this._fx = null;
     this._rectangle = null;
     this._background = null;
-    this._scene = null;
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
@@ -329,6 +319,7 @@ Object.defineProperty(FORGE.Viewport.prototype, "rectangle",
 });
 
 /**
+ * @todo  remove this accessor !!!
  * Get the viewport manager
  * @name  FORGE.Viewport#viewportManager
  * @type {FORGE.ViewportManager}
@@ -339,7 +330,7 @@ Object.defineProperty(FORGE.Viewport.prototype, "viewportManager",
     /** @this {FORGE.ViewportManager} */
     get: function()
     {
-        return this._viewportManager;
+        return this._sceneRenderer.viewports;
     }
 });
 
@@ -444,7 +435,7 @@ Object.defineProperty(FORGE.Viewport.prototype, "scene",
     /** @this {FORGE.Viewport} */
     get: function()
     {
-        return this._scene;
+        return this._sceneRenderer.scene;
     }
 });
 
