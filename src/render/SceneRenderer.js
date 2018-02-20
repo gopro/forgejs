@@ -21,18 +21,10 @@ FORGE.SceneRenderer = function(viewer, sceneUID)
     /**
      * The scene UID.
      * @name FORGE.SceneRenderer#_sceneUID
-     * @type {FORGE.UID}
+     * @type {string}
      * @private
      */
     this._sceneUID = sceneUID;
-
-    /**
-     * The scene reference.
-     * @name FORGE.SceneRenderer#_scene
-     * @type {FORGE.UID}
-     * @private
-     */
-    this._scene = null;
 
     /**
      * The viewport manager reference.
@@ -53,7 +45,7 @@ FORGE.SceneRenderer = function(viewer, sceneUID)
     /**
      * The render target.
      * @name FORGE.SceneRenderer#_renderTarget
-     * @type {FORGE.Viewer}
+     * @type {THREE.WebGLRenderTarget}
      * @private
      */
     this._renderTarget = null;
@@ -73,17 +65,10 @@ FORGE.SceneRenderer.prototype.constructor = FORGE.SceneRenderer;
  */
 FORGE.SceneRenderer.prototype._boot = function()
 {
-    this._scene = FORGE.UID.get(this._sceneUID);
-    if (this._scene === null)
+    if (FORGE.UID.isTypeOf(this._sceneUID, "Scene") === false)
     {
         this.warn("Cannot get scene reference.");
         return;
-    }
-
-    if (this._renderTarget !== null)
-    {
-        this._renderTarget.dispose();
-        this._renderTarget = null;
     }
 
     var rtParams =
@@ -96,7 +81,7 @@ FORGE.SceneRenderer.prototype._boot = function()
     };
 
     this._renderTarget = new THREE.WebGLRenderTarget(this._viewer.width, this._viewer.height, rtParams);
-    this._renderTarget.name = "RenderScene-" + this._scene.name;
+    this._renderTarget.name = "SceneRenderer-" + this.scene.name;
 
     this._viewportManager = new FORGE.ViewportManager(this._viewer, this);
 
@@ -138,8 +123,6 @@ FORGE.SceneRenderer.prototype.destroy = function()
         this._objectRenderer = null;
     }
 
-    this._sceneUID = null;
-    this._scene = null;
     this._viewer = null;
 };
 
@@ -154,7 +137,7 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "scene",
     /** @this {FORGE.SceneRenderer} */
     get: function()
     {
-        return this._scene;
+        return FORGE.UID.get(this._sceneUID);
     }
 });
 
