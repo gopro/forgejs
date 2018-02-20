@@ -59,6 +59,14 @@ FORGE.Renderer = function(viewer)
     this._materialPool = null;
 
     /**
+     * Scene Loader.
+     * @name FORGE.Renderer#_sceneLoader
+     * @type {FORGE.SceneLoader}
+     * @private
+     */
+    this._sceneLoader = null;
+
+    /**
      * Scene Renderer pool
      * @name FORGE.Renderer#_sceneRendererPool
      * @type {FORGE.SceneRendererPool}
@@ -125,6 +133,8 @@ FORGE.Renderer.DEPTH_FAR = 10000;
  */
 FORGE.Renderer.prototype._boot = function()
 {
+    this._sceneLoader = new FORGE.SceneLoader(this._viewer);
+
     this._sceneRendererPool = new FORGE.SceneRendererPool(this._viewer);
 
     this._viewer.onConfigLoadComplete.add(this._onViewerConfigLoadComplete, this, 1000);
@@ -252,11 +262,20 @@ FORGE.Renderer.prototype.render = function()
 {
     var targets = this._sceneRendererPool.render();
 
+    // if (this._sceneLoader.loading === true && this._sceneLoader.transition !== null)
+    // {
+        var time = this._sceneLoader.transition.time;
+        this._quad.material.uniforms.tMixRatio.value = time;
+    // }
+
     // Update time (increasing ramp in [0..1]) and mix ratio increasing and decreasing ramp in [[0..1]]
-    var periodMS = 15 * 1000;
-    var tn = (this._viewer.clock.elapsedTime % periodMS) / periodMS;
-    this._quad.material.uniforms.tMixRatio.value = tn < 0.5 ? 2 * tn : 2 - 2 * tn;
-    this._quad.material.uniforms.tTime.value = tn;
+    // var periodMS = 15 * 1000;
+    // var tn = (this._viewer.clock.elapsedTime % periodMS) / periodMS;
+    // this._quad.material.uniforms.tMixRatio.value = tn < 0.5 ? 2 * tn : 2 - 2 * tn;
+    // this._quad.material.uniforms.tTime.value = tn;
+
+    // this._quad.material.uniforms.tMixRatio.value = 0;
+
 
     // Assign textures from the scene and render the whole scene
     if (targets[0] instanceof THREE.WebGLRenderTarget)
@@ -273,29 +292,6 @@ FORGE.Renderer.prototype.render = function()
     this._webGLRenderer.setViewport(0, 0, this._viewer.width, this._viewer.height);
 
     this._webGLRenderer.render(this._scene, this._camera);
-};
-
-/**
- * Change current scene with or without tran   sition
- * @method FORGE.Renderer#changeScene
- * @param {FORGE.Something} scene new scene
- */
-FORGE.Renderer.prototype.changeScene = function(scene)
-{
-    if (this._onSceneTransitionStart !== null)
-    {
-        this._onSceneTransitionStart.dispatch();
-    }
-
-    if (this._onSceneTransitionProgress !== null)
-    {
-        this._onSceneTransitionProgress.dispatch({ progress: 0.5});
-    }
-
-    if (this._onSceneTransitionComplete !== null)
-    {
-        this._onSceneTransitionComplete.dispatch();
-    }
 };
 
 /**
@@ -362,21 +358,30 @@ FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType, tra
 };
 
 /**
+ * Load a scene.
+ * @method FORGE.Renderer#load
+ */
+FORGE.Renderer.prototype.load = function(sceneUid)
+{
+    this._sceneLoader.load(sceneUid);
+};
+
+/**
  * Add a scene to the render pool
  * @method FORGE.Renderer#addScene
  */
-FORGE.Renderer.prototype.addScene = function(sceneUID)
+FORGE.Renderer.prototype.addScene = function(sceneUid)
 {
-    this._sceneRendererPool.addScene(sceneUID);
+    this._sceneRendererPool.addScene(sceneUid);
 };
 
 /**
  * Remove a scene to the render pool
  * @method FORGE.Renderer#removeScene
  */
-FORGE.Renderer.prototype.removeScene = function(sceneUID)
+FORGE.Renderer.prototype.removeScene = function(sceneUid)
 {
-    this._sceneRendererPool.removeScene(sceneUID);
+    this._sceneRendererPool.removeScene(sceneUid);
 };
 
 /**
@@ -433,12 +438,14 @@ FORGE.Renderer.prototype.destroy = function()
         }
     }
 
-    if (this._scene !== null) {
+    if (this._scene !== null)
+    {
         this._scene.children = 0;
         this._scene = null;
     }
 
-    if (this._camera !== null) {
+    if (this._camera !== null)
+    {
         this._camera = null;
     }
 
@@ -478,6 +485,36 @@ Object.defineProperty(FORGE.Renderer.prototype, "sceneRendererPool",
     get: function()
     {
         return this._sceneRendererPool;
+    }
+});
+
+/**
+ * Get the scene loader reference.
+ * @name FORGE.Renderer#loader
+ * @type {FORGE.SceneLoader}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "loader",
+{
+    /** @this {FORGE.Renderer} */
+    get: function()
+    {
+        return this._sceneLoader;
+    }
+});
+
+/**
+ * Get the loading flag.
+ * @name FORGE.Renderer#loading
+ * @type {FORGE.SceneLoader}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "loading",
+{
+    /** @this {FORGE.Renderer} */
+    get: function()
+    {
+        return this._sceneLoader.loading;
     }
 });
 

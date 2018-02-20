@@ -199,6 +199,7 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._description = new FORGE.LocaleString(this._viewer, this._config.description);
     this._background = config.background;
     this._layoutUid = typeof config.layout === "string" && config.layout !== "" ? config.layout : this._viewer.layouts.defaultUid;
+    this._mediaUid = this._viewer.media.add(this._config.media);
     this._sync = (FORGE.Utils.isArrayOf(this._config.sync, "string") === true) ? this._config.sync : [];
 
 
@@ -266,6 +267,27 @@ FORGE.Scene.prototype._configLoadComplete = function(file)
 };
 
 /**
+ * Event handler for the load of the scene.
+ * @method FORGE.Scene#_loadCompleteHandler
+ * @private
+ */
+FORGE.Scene.prototype._loadCompleteHandler = function()
+{
+    // Add a view to this scene
+    this._viewCount++;
+
+    if (this._onLoadComplete !== null)
+    {
+        this._onLoadComplete.dispatch();
+    }
+
+    if(FORGE.Utils.isTypeOf(this._events.onLoadComplete, "ActionEventDispatcher") === true)
+    {
+        this._events.onLoadComplete.dispatch();
+    }
+};
+
+/**
  * Create events dispatchers.
  * @method FORGE.Scene#_createEvents
  * @private
@@ -323,14 +345,17 @@ FORGE.Scene.prototype.load = function()
         return;
     }
 
-    if (this._onLoadRequest !== null)
+    this._viewer.renderer.loader.onLoadComplete.addOnce(this._loadCompleteHandler, this);
+    this._viewer.renderer.loader.load(this._uid);
+
+    if (this._onLoadStart !== null)
     {
-        this._onLoadRequest.dispatch();
+        this._onLoadStart.dispatch();
     }
 
-    if(FORGE.Utils.isTypeOf(this._events.onLoadRequest, "ActionEventDispatcher") === true)
+    if (FORGE.Utils.isTypeOf(this._events.onLoadStart, "ActionEventDispatcher") === true)
     {
-        this._events.onLoadRequest.dispatch();
+        this._events.onLoadStart.dispatch();
     }
 };
 
@@ -339,49 +364,49 @@ FORGE.Scene.prototype.load = function()
  * @method FORGE.Scene#loadStart
  * @param {number} time - The time of the media (if video)
  */
-FORGE.Scene.prototype.loadStart = function(time)
-{
-    if(typeof time === "number" && isNaN(time) === false && typeof this._config.media !== "undefined")
-    {
-        if(typeof this._config.media.options === "undefined")
-        {
-            this._config.media.options = {};
-        }
+// FORGE.Scene.prototype.loadStart = function(time)
+// {
+//     if(typeof time === "number" && isNaN(time) === false && typeof this._config.media !== "undefined")
+//     {
+//         if(typeof this._config.media.options === "undefined")
+//         {
+//             this._config.media.options = {};
+//         }
 
-        this._config.media.options.startTime = time;
-    }
+//         this._config.media.options.startTime = time;
+//     }
 
-    // Add the media to the manager and get its uid
-    this._mediaUid = this._viewer.media.add(this._config.media);
+//     // Add the media to the manager and get its uid
+//     this._mediaUid = this._viewer.media.add(this._config.media);
 
-    // Trigger the media load
-    this.media.load(this._mediaUid);
+//     // Trigger the media load
+//     this.media.load(this._mediaUid);
 
-    if (this._onLoadStart !== null)
-    {
-        this._onLoadStart.dispatch();
-    }
+//     if (this._onLoadStart !== null)
+//     {
+//         this._onLoadStart.dispatch();
+//     }
 
-    if(FORGE.Utils.isTypeOf(this._events.onLoadStart, "ActionEventDispatcher") === true)
-    {
-        this._events.onLoadStart.dispatch();
-    }
+//     if(FORGE.Utils.isTypeOf(this._events.onLoadStart, "ActionEventDispatcher") === true)
+//     {
+//         this._events.onLoadStart.dispatch();
+//     }
 
-    this._viewer.renderer.addScene(this._uid);
+//     this._viewer.renderer.addScene(this._uid);
 
-    this._viewCount++;
+//     this._viewCount++;
 
-    if (this._onLoadComplete !== null)
-    {
-        this._onLoadComplete.dispatch();
-    }
+//     if (this._onLoadComplete !== null)
+//     {
+//         this._onLoadComplete.dispatch();
+//     }
 
-    if(FORGE.Utils.isTypeOf(this._events.onLoadComplete, "ActionEventDispatcher") === true)
-    {
-        this._events.onLoadComplete.dispatch();
-    }
+//     if(FORGE.Utils.isTypeOf(this._events.onLoadComplete, "ActionEventDispatcher") === true)
+//     {
+//         this._events.onLoadComplete.dispatch();
+//     }
 
-};
+// };
 
 /**
  * Unload the scene.
@@ -401,8 +426,6 @@ FORGE.Scene.prototype.unload = function()
     {
         this._events.onUnloadStart.dispatch();
     }
-
-    this._destroyViewports();
 
     this._viewer.media.unload(this._mediaUid);
 

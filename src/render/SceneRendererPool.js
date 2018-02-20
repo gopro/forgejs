@@ -92,13 +92,15 @@ FORGE.SceneRendererPool.prototype.addScene = function(sceneUID)
 
     // First scene renderer becomes the active one
     // That means we listen to active viewport change event and keep its sceneUID
-    if (this._sceneRenderers.length === 0)
-    {
-        this._activeSceneUID = sceneUID;
-        sceneRenderer.viewports.onActiveViewportChange.add(this._onActiveViewportChanged, this);
-    }
+    // if (this._sceneRenderers.length === 0)
+    // {
+    //     this._activeSceneUID = sceneUID;
+    //     sceneRenderer.viewports.onActiveViewportChange.add(this._onActiveViewportChanged, this);
+    // }
+
 
     this._sceneRenderers.push(sceneRenderer);
+    this._activeSceneUID = sceneUID;
 };
 
 /**
@@ -130,6 +132,7 @@ FORGE.SceneRendererPool.prototype.removeScene = function(sceneUID)
 FORGE.SceneRendererPool.prototype.render = function()
 {
     var renderTargets = [];
+
     for (var i=0; i<this._sceneRenderers.length; i++)
     {
         renderTargets.push(this._sceneRenderers[i].render());

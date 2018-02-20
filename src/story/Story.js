@@ -64,6 +64,15 @@ FORGE.Story = function(viewer)
     this._scenes = null;
 
     /**
+     * Uid of the scene being loading.
+     * If no scene is loading it will be an empty string.
+     * @name FORGE.Story#_loadingSceneUid
+     * @type {string}
+     * @private
+     */
+    this._loadingSceneUid = "";
+
+    /**
      * Uid of the current scene.
      * @name FORGE.Story#_sceneUid
      * @type {string}
@@ -351,7 +360,7 @@ FORGE.Story.prototype._createScenes = function(config)
  */
 FORGE.Story.prototype._addScene = function(scene)
 {
-    scene.onLoadRequest.add(this._sceneLoadRequestHandler, this);
+    // scene.onLoadRequest.add(this._sceneLoadRequestHandler, this);
     scene.onLoadStart.add(this._sceneLoadStartHandler, this);
     scene.onLoadComplete.add(this._sceneLoadCompleteHandler, this);
 
@@ -364,73 +373,147 @@ FORGE.Story.prototype._addScene = function(scene)
  * @param  {FORGE.Event} event - The {@link FORGE.Event} emitted by the scene that its load method is requested.
  * @private
  */
-FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
-{
-    this.log("scene load request handler");
+// FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
+// {
+//     this.log("scene load request handler");
 
-    var previousScene = this.scene;
-    var nextScene = event.emitter;
-    var time = NaN;
+//     var previousScene = this.scene;
+//     var nextScene = event.emitter;
+//     var time = NaN;
 
-    //Unload the previous scene
-    if(previousScene !== null)
-    {
-        // If the next scene have to be sync with the previous one
-        if(nextScene.sync.indexOf(previousScene.uid) !== -1 && previousScene.media.type === FORGE.MediaType.VIDEO)
-        {
-            time = previousScene.media.displayObject.currentTime;
-        }
+//     //Unload the previous scene
+//     // if(previousScene !== null)
+//     // {
+//     //     // If the next scene have to be sync with the previous one
+//     //     if(nextScene.sync.indexOf(previousScene.uid) !== -1 && previousScene.media.type === FORGE.MediaType.VIDEO)
+//     //     {
+//     //         time = previousScene.media.displayObject.currentTime;
+//     //     }
 
-        previousScene.unload();
-    }
+//     //     previousScene.unload();
+//     // }
 
-    this._sceneUid = nextScene.uid;
+//     this._viewer.renderer.loader.onLoadComplete.addOnce(this._sceneLoadCompleteHandler, this);
+//     this._viewer.renderer.loader.load(nextScene.uid);
 
-    nextScene.loadStart(time);
 
-    //The scene has no group so nullify the _groupUid
-    if(nextScene.hasGroups() === false)
-    {
-        this._groupUid = null;
 
-        if(this._onGroupChange !== null)
-        {
-            this._onGroupChange.dispatch(/** @type {StoryEvent} */({ groupUid: this._groupUid }));
-        }
+//     this._sceneUid = nextScene.uid;
 
-        if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
-        {
-            this._events.onGroupChange.dispatch();
-        }
-    }
-    else if (nextScene.hasGroups() === true && nextScene.hasGroup(this._groupUid) === false)
-    {
-        this._setGroupUid(nextScene.groups[0].uid);
-    }
+//     // nextScene.loadStart(time);
 
-    if(this._onSceneLoadRequest !== null)
-    {
-        this._onSceneLoadRequest.dispatch(/** @type {StoryEvent} */({ sceneUid: this._sceneUid }));
-    }
+//     //The scene has no group so nullify the _groupUid
+//     if(nextScene.hasGroups() === false)
+//     {
+//         this._groupUid = null;
 
-    if(FORGE.Utils.isTypeOf(this._events.onSceneLoadRequest, "ActionEventDispatcher") === true)
-    {
-        this._events.onSceneLoadRequest.dispatch();
-    }
-};
+//         if(this._onGroupChange !== null)
+//         {
+//             this._onGroupChange.dispatch(/** @type {StoryEvent} */({ groupUid: this._groupUid }));
+//         }
+
+//         if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
+//         {
+//             this._events.onGroupChange.dispatch();
+//         }
+//     }
+//     else if (nextScene.hasGroups() === true && nextScene.hasGroup(this._groupUid) === false)
+//     {
+//         this._setGroupUid(nextScene.groups[0].uid);
+//     }
+
+//     if(this._onSceneLoadRequest !== null)
+//     {
+//         this._onSceneLoadRequest.dispatch(/** @type {StoryEvent} */({ sceneUid: this._sceneUid }));
+//     }
+
+//     if(FORGE.Utils.isTypeOf(this._events.onSceneLoadRequest, "ActionEventDispatcher") === true)
+//     {
+//         this._events.onSceneLoadRequest.dispatch();
+//     }
+// };
+
+// /**
+//  * Internal envent handler for scene load request.
+//  * @method FORGE.Story#_sceneLoadRequestHandler
+//  * @param  {FORGE.Event} event - The {@link FORGE.Event} emitted by the scene that its load method is requested.
+//  * @private
+//  */
+// FORGE.Story.prototype._sceneLoadRequestHandler = function(event)
+// {
+//     this.log("scene load request handler");
+
+//     var previousScene = this.scene;
+//     var nextScene = event.emitter;
+//     var time = NaN;
+
+//     //Unload the previous scene
+//     if(previousScene !== null)
+//     {
+//         // If the next scene have to be sync with the previous one
+//         if(nextScene.sync.indexOf(previousScene.uid) !== -1 && previousScene.media.type === FORGE.MediaType.VIDEO)
+//         {
+//             time = previousScene.media.displayObject.currentTime;
+//         }
+
+//         previousScene.unload();
+//     }
+
+//     this._sceneUid = nextScene.uid;
+
+//     nextScene.loadStart(time);
+
+//     //The scene has no group so nullify the _groupUid
+//     if(nextScene.hasGroups() === false)
+//     {
+//         this._groupUid = null;
+
+//         if(this._onGroupChange !== null)
+//         {
+//             this._onGroupChange.dispatch(/** @type {StoryEvent} */({ groupUid: this._groupUid }));
+//         }
+
+//         if(FORGE.Utils.isTypeOf(this._events.onGroupChange, "ActionEventDispatcher") === true)
+//         {
+//             this._events.onGroupChange.dispatch();
+//         }
+//     }
+//     else if (nextScene.hasGroups() === true && nextScene.hasGroup(this._groupUid) === false)
+//     {
+//         this._setGroupUid(nextScene.groups[0].uid);
+//     }
+
+//     if(this._onSceneLoadRequest !== null)
+//     {
+//         this._onSceneLoadRequest.dispatch(/** @type {StoryEvent} */({ sceneUid: this._sceneUid }));
+//     }
+
+//     if(FORGE.Utils.isTypeOf(this._events.onSceneLoadRequest, "ActionEventDispatcher") === true)
+//     {
+//         this._events.onSceneLoadRequest.dispatch();
+//     }
+// };
 
 /**
  * Internal envent handler for scene load start, updates the group index, re-dispatch scene load start at the story level.
  * @method FORGE.Story#_sceneLoadStartHandler
  * @private
  */
-FORGE.Story.prototype._sceneLoadStartHandler = function()
+FORGE.Story.prototype._sceneLoadStartHandler = function(event)
 {
-    this.log("scene load start");
+    // Unload the previous scene if any
+    if(this.scene !== null)
+    {
+        this.scene.unload();
+    }
+
+    this._loadingSceneUid = event.emitter.uid;
+
+    this.log("scene "+this._loadingSceneUid+" load start");
 
     if(this._onSceneLoadStart !== null)
     {
-        this._onSceneLoadStart.dispatch(/** @type {StoryEvent} */({ sceneUid: this._sceneUid }));
+        this._onSceneLoadStart.dispatch(/** @type {StoryEvent} */({ sceneUid: this._loadingSceneUid }));
     }
 
     if(FORGE.Utils.isTypeOf(this._events.onSceneLoadStart, "ActionEventDispatcher") === true)
@@ -444,9 +527,15 @@ FORGE.Story.prototype._sceneLoadStartHandler = function()
  * @method FORGE.Story#_sceneLoadCompleteHandler
  * @private
  */
-FORGE.Story.prototype._sceneLoadCompleteHandler = function()
+FORGE.Story.prototype._sceneLoadCompleteHandler = function(event)
 {
-    this.log("scene load complete");
+    // Set the current scene uid on load complete
+    this._sceneUid = this._loadingSceneUid;
+
+    // No scene is loading so I reset the loadingSceneUid to an empty string
+    this._loadingSceneUid = "";
+
+    this.log("scene "+this._loadingSceneUid+" load complete");
 
     if(this._onSceneLoadComplete !== null)
     {
@@ -845,6 +934,26 @@ Object.defineProperty(FORGE.Story.prototype, "scenes",
 });
 
 /**
+ * Get the loading {@link FORGE.Scene} object.
+ * Returns null if there no scene being loaded.
+ * @name FORGE.Story#loadingScene
+ * @type  {FORGE.Scene}
+ */
+Object.defineProperty(FORGE.Story.prototype, "loadingScene",
+{
+    /** @this {FORGE.Story} */
+    get: function()
+    {
+        if(this._loadingSceneUid === null || this._loadingSceneUid === "")
+        {
+            return null;
+        }
+
+        return FORGE.UID.get(this._loadingSceneUid);
+    }
+});
+
+/**
  * Get the current {@link FORGE.Scene} object, or set the current scene passing the {@link FORGE.Scene} object itself, its index or uid.
  * @name FORGE.Story#scene
  * @type  {FORGE.Scene}
@@ -881,6 +990,21 @@ Object.defineProperty(FORGE.Story.prototype, "sceneUids",
     get: function()
     {
         return this._scenes;
+    }
+});
+
+/**
+* Get the loading scene uid.
+* if no scene are loading, this will be equal to an empty string.
+* @name FORGE.Story#loadingSceneUid
+* @type {string}
+*/
+Object.defineProperty(FORGE.Story.prototype, "loadingSceneUid",
+{
+    /** @this {FORGE.Story} */
+    get: function()
+    {
+        return this._loadingSceneUid;
     }
 });
 
