@@ -299,6 +299,13 @@ FORGE.ControllerPointer.prototype._onSceneActiveViewportChange = function(event)
  */
 FORGE.ControllerPointer.prototype._updateCameraWithDrag = function()
 {
+    var camera = this._viewer.camera;
+
+    if (camera === null)
+    {
+        return;
+    }
+
     var stw0 = this._viewer.view.screenToWorld(this._positionPrevious);
     var stw1 = this._viewer.view.screenToWorld(this._positionCurrent);
 
@@ -314,9 +321,9 @@ FORGE.ControllerPointer.prototype._updateCameraWithDrag = function()
     var spherical1 = FORGE.Math.cartesianToSpherical(stw1.x, stw1.y, stw1.z);
     var quat1 = FORGE.Quaternion.fromEuler(spherical1.theta, spherical1.phi, 0);
 
-    this._camera.yaw += FORGE.Math.radToDeg(spherical0.theta - spherical1.theta);
-    this._camera.pitch += FORGE.Math.radToDeg(spherical0.phi - spherical1.phi);
-    this._camera.roll = 0;
+    camera.yaw += FORGE.Math.radToDeg(spherical0.theta - spherical1.theta);
+    camera.pitch += FORGE.Math.radToDeg(spherical0.phi - spherical1.phi);
+    camera.roll = 0;
 };
 
 /**
@@ -326,10 +333,17 @@ FORGE.ControllerPointer.prototype._updateCameraWithDrag = function()
  */
 FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
 {
+    var camera = this._viewer.camera;
+
+    if (camera === null)
+    {
+        return;
+    }
+
     var size = this._viewer.renderer.activeViewport.size;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
 
-    var logZoomFactor = Math.min(1, this._camera.fov / 90) / Math.LN2;
+    var logZoomFactor = Math.min(1, camera.fov / 90) / Math.LN2;
 
     this._velocity.subVectors(this._positionCurrent, this._positionStart);
 
@@ -361,16 +375,16 @@ FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
     //Do not move the camera anymore if the modifier is too low, this prevent the camera onChange event to be fired too much times
     if(Math.abs(yaw) > threshold)
     {
-        this._camera.yaw += yaw;
-        this._camera.flat.position.x += dx;
+        camera.yaw += yaw;
+        camera.flat.position.x += dx;
     }
 
     var pitch = invertY * dy;
     //Do not move the camera anymore if the modifier is too low, this prevent the camera onChange to be fired too much times
     if(Math.abs(pitch) > threshold)
     {
-        this._camera.pitch -= pitch;
-        this._camera.flat.position.y -= dy;
+        camera.pitch -= pitch;
+        camera.flat.position.y -= dy;
     }
 
     // Damping 1 -> stops instantly, 0 infinite rebounds
@@ -385,12 +399,14 @@ FORGE.ControllerPointer.prototype._updateCameraWithVelocity = function()
  */
 FORGE.ControllerPointer.prototype._pinchStartHandler = function(event)
 {
-    if(this._viewer.controllers.enabled === false)
+    var camera = this._viewer.camera;
+
+    if(this._viewer.controllers.enabled === false || camera === null)
     {
         return;
     }
 
-    this._pinchStartFov = this._camera.fov;
+    this._pinchStartFov = camera.fov;
     this._pinchScaleFactorCorrection = 1;
 
     this._viewer.canvas.pointer.onPinchMove.add(this._pinchMoveHandler, this);
@@ -405,7 +421,9 @@ FORGE.ControllerPointer.prototype._pinchStartHandler = function(event)
  */
 FORGE.ControllerPointer.prototype._pinchMoveHandler = function(event)
 {
-    if(this._viewer.controllers.enabled === false)
+    var camera = this._viewer.camera;
+
+    if(this._viewer.controllers.enabled === false || camera === null)
     {
         return;
     }
@@ -413,8 +431,8 @@ FORGE.ControllerPointer.prototype._pinchMoveHandler = function(event)
     event.data.preventDefault();
 
     var scale = this._zoom.invert ? event.data.scale : 1 / event.data.scale;
-    var fovMin = this._camera.fovMin;
-    var fovMax = this._camera.fovMax;
+    var fovMin = camera.fovMin;
+    var fovMax = camera.fovMax;
 
     var tmpFov = this._pinchStartFov * scale / this._pinchScaleFactorCorrection;
 
@@ -429,7 +447,7 @@ FORGE.ControllerPointer.prototype._pinchMoveHandler = function(event)
 
     tmpFov = this._pinchStartFov * scale / this._pinchScaleFactorCorrection;
 
-    this._camera.fov = tmpFov;
+    camera.fov = tmpFov;
 };
 
 /**
@@ -452,7 +470,9 @@ FORGE.ControllerPointer.prototype._pinchEndHandler = function(event)
  */
 FORGE.ControllerPointer.prototype._wheelHandler = function(event)
 {
-    if(this._viewer.controllers.enabled === false)
+    var camera = this._viewer.camera;
+
+    if(this._viewer.controllers.enabled === false || camera === null)
     {
         return;
     }
@@ -483,13 +503,14 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         delta *= (event.data.deltaY * factorDeltaY) / 5;
     }
 
-    var logZoomFactor = Math.min(1, this._camera.fov / 90) / Math.LN2;
-    this._camera.fov -= delta * logZoomFactor;
+    var logZoomFactor = Math.min(1, camera.fov / 90) / Math.LN2;
+    camera.fov -= delta * logZoomFactor;
 
     if(this._zoom.toPointer === true)
     {
         var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
         var viewportPosition = this._viewer.viewport.viewportManager.getRelativeMousePosition(screenPosition);
+
         if (viewportPosition === null)
         {
             return;
@@ -508,11 +529,11 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
         var quat = FORGE.Quaternion.diffBetweenQuaternions(quat1, quat0);
         var euler = FORGE.Quaternion.toEuler(quat);
 
-        this._camera.yaw += FORGE.Math.radToDeg(euler.yaw);
-        this._camera.pitch += FORGE.Math.radToDeg(euler.pitch);
+        camera.yaw += FORGE.Math.radToDeg(euler.yaw);
+        camera.pitch += FORGE.Math.radToDeg(euler.pitch);
     }
 
-    this.log("_wheelHandler (fov:" + this._camera.fov + ")");
+    this.log("_wheelHandler (fov:" + camera.fov + ")");
 };
 
 /**

@@ -422,6 +422,13 @@ FORGE.ControllerKeyboard.prototype._zoomUpHandler = function()
  */
 FORGE.ControllerKeyboard.prototype._zoomProcessBinding = function(binding)
 {
+    var camera = this._viewer.camera;
+
+    if (camera === null)
+    {
+        return;
+    }
+
     var invert = this._zoom.invert ? 1 : -1;
     var delta = invert / this._zoom.hardness;
 
@@ -436,7 +443,7 @@ FORGE.ControllerKeyboard.prototype._zoomProcessBinding = function(binding)
             break;
     }
 
-    this._camera.fov = this._camera.fov - delta;
+    camera.fov = camera.fov - delta;
 };
 
 /**
@@ -479,6 +486,13 @@ FORGE.ControllerKeyboard.prototype.disable = function()
  */
 FORGE.ControllerKeyboard.prototype.update = function()
 {
+    var camera = this._viewer.camera;
+
+    if (camera === null)
+    {
+        return;
+    }
+
     var size = this._viewer.renderer.activeViewport.size;
     var hardness = 1 / (this._orientation.hardness * Math.min(size.width, size.height));
 
@@ -502,8 +516,8 @@ FORGE.ControllerKeyboard.prototype.update = function()
     }
 
     var invert = this._orientation.invert ? -1 : 1;
-    this._camera.yaw += invert * dx;
-    this._camera.pitch -= invert * dy;
+    camera.yaw += invert * dx;
+    camera.pitch -= invert * dy;
 
     // Damping 1 -> stops instantly, 0 infinite rebounds
     this._inertia.add(this._velocity).multiplyScalar(FORGE.Math.clamp(1 - this._orientation.damping, 0, 1));
