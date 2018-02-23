@@ -124,6 +124,15 @@ FORGE.SceneRendererPool.prototype.removeScene = function(sceneUID)
     }
 };
 
+FORGE.SceneRendererPool.prototype.get = function(sceneUID)
+{
+    var index = this._sceneRenderers.findIndex(function(sceneRenderer) {
+        return sceneRenderer.scene.uid === sceneUID;
+    });
+
+    return this._sceneRenderers[index];
+};
+
 /**
  * Render routine.
  * @method FORGE.SceneRendererPool#render
