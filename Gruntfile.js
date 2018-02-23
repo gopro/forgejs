@@ -55,6 +55,7 @@ module.exports = function(grunt)
         "src/render/ObjectMaterialType.js",
         "src/render/ObjectMaterial.js",
         "src/render/Picking.js",
+        "src/render/SceneLoader.js",
         "src/render/SceneRenderer.js",
         "src/render/SceneRendererPool.js",
 
@@ -191,7 +192,6 @@ module.exports = function(grunt)
         "src/loader/Cache.js",
         "src/loader/File.js",
         "src/loader/Loader.js",
-        "src/loader/SceneLoader.js",
 
         "src/time/Clock.js",
         "src/time/Timer.js",
