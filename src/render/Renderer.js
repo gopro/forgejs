@@ -82,30 +82,6 @@ FORGE.Renderer = function(viewer)
      */
     this._onActiveViewportChange = null;
 
-    /**
-     * Event dispatcher for the scene transition start event.
-     * @name FORGE.Viewer#_onSceneTransitionStart
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onSceneTransitionStart = null;
-
-    /**
-     * Event dispatcher for the scene transition progress event.
-     * @name FORGE.Viewer#_onSceneTransitionProgress
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onSceneTransitionProgress = null;
-
-    /**
-     * Event dispatcher for the scene transition complete event.
-     * @name FORGE.Viewer#_onSceneTransitionComplete
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onSceneTransitionComplete = null;
-
     FORGE.BaseObject.call(this, "Renderer");
 
     this._boot();
@@ -409,10 +385,6 @@ FORGE.Renderer.prototype.destroy = function()
         this._onActiveViewportChange.destroy();
         this._onActiveViewportChange = null;
     }
-
-    this._onSceneTransitionStart = null;
-    this._onSceneTransitionProgress = null;
-    this._onSceneTransitionComplete = null;
 
     if (this._materialPool !== null)
     {
