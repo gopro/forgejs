@@ -44,6 +44,8 @@ module.exports = function(grunt)
         "src/media/MediaTiled.js",
 
         "src/render/Renderer.js",
+        "src/render/ScreenRenderer.js",
+        "src/render/ScreenMaterial.js",
         "src/render/Viewport.js",
         "src/render/ViewportManager.js",
         "src/render/ViewportComposer.js",

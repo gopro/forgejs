@@ -147,7 +147,7 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "scene",
  * @type {THREE.WebGLRenderTarget}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "renderTarget",
+Object.defineProperty(FORGE.SceneRenderer.prototype, "target",
 {
     /** @this {FORGE.SceneRenderer} */
     get: function()

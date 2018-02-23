@@ -27,28 +27,12 @@ FORGE.Renderer = function(viewer)
     this._webGLRenderer = null;
 
     /**
-     * THREE Scene to render the final screen result
-     * @name  FORGE.Renderer#_scene
-     * @type {THREE.Scene}
+     * Screen renderer
+     * @name FORGE.Renderer#_screenRenderer
+     * @type {FORGE.ScreenRenderer}
      * @private
      */
-    this._scene = null;
-
-    /**
-     * THREE Mesh used to render the final screen result
-     * @name  FORGE.Renderer#_quad
-     * @type {THREE.Mesh}
-     * @private
-     */
-    this._quad = null;
-
-    /**
-     * THREE OrthographicCamera used to render the final screen result
-     * @name  FORGE.Renderer#_camera
-     * @type {THREE.OrthographicCamera}
-     * @private
-     */
-    this._camera = null;
+    this._screenRenderer = null;
 
     /**
      * Material pool
@@ -113,6 +97,8 @@ FORGE.Renderer.prototype._boot = function()
 
     this._sceneRendererPool = new FORGE.SceneRendererPool(this._viewer);
 
+    this._screenRenderer = new FORGE.ScreenRenderer(this._viewer);
+
     this._viewer.onConfigLoadComplete.add(this._onViewerConfigLoadComplete, this, 1000);
 };
 
@@ -141,92 +127,6 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
     }
 
     this._webGLRenderer.autoClear = false;
-
-    this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
-
-    var geometry = new THREE.PlaneBufferGeometry(2, 2);
-    var material = this._buildMaterial(canvas);
-    this._quad = new THREE.Mesh(geometry, material);
-
-    this._scene = new THREE.Scene();
-    this._scene.add(this._quad);
-};
-
-/**
- * Build material object.
- * @method FORGE.Renderer#_buildMaterial
- * @param {HTMLCanvasElement} canvas
- * @return {THREE.RawShaderMaterial} shader material
- * @private
- */
-FORGE.Renderer.prototype._buildMaterial = function(canvas)
-{
-    var uniforms =
-    {
-        tTime: {
-            value: 1.0
-        },
-
-        tMixRatio: {
-            value: 1.0
-        },
-
-        tTexture1: {
-            value: null
-        },
-
-        tTexture2: {
-            value: null
-        },
-
-        tOpacity: {
-            value: 1.0
-        },
-
-        tResolution: {
-            value: new THREE.Vector2(canvas.clientWidth, canvas.clientHeight)
-        }
-    };
-
-    var vertexShader = FORGE.ShaderLib.parseIncludes(FORGE.ShaderChunk.wts_vert_rectilinear);
-    // var fragmentShader = FORGE.ShaderLib.parseIncludes(FORGE.ShaderChunk.wts_frag);
-
-    var fragmentShader = [
-        "precision highp float;",
-
-        "varying vec2 vUv;",
-
-        "uniform float tTime;",
-        "uniform float tMixRatio;",
-        "uniform sampler2D tTexture1;",
-        "uniform sampler2D tTexture2;",
-        "uniform float tOpacity;",
-        "uniform vec2 tResolution;",
-
-        // "void main() {",
-        // "   gl_FragColor = texture2D(tTexture1, gl_FragCoord.xy / tResolution);",
-        // // "   gl_FragColor = texture2D(tTexture1, vUv);",
-        // "}"
-        "void main() {",
-            // "gl_FragColor = mix(texture2D(tTexture1, vUv), texture2D(tTexture2, vUv), tMixRatio);",
-
-            "vec2 xy = gl_FragCoord.xy / tResolution.xy;",
-
-            "float edgeMix = step(tMixRatio, xy.x);",
-            "vec4 texelR = texture2D( tTexture1, vUv - vec2(tMixRatio, 0.0));",
-            "vec4 texelL = texture2D( tTexture1, clamp(vUv + vec2(1.0 - tMixRatio, 0.0), vec2(0.0), vec2(1.0)));",
-            "gl_FragColor = mix( texelL, texelR, edgeMix );",
-
-        "}"
-        // "void main() { gl_FragColor = vec4(0.8, 0.8, 0.2, 1.); }"
-
-    ].join("\n");
-
-    return new THREE.RawShaderMaterial({
-        uniforms: uniforms,
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader
-    });
 };
 
 /**
@@ -236,38 +136,37 @@ FORGE.Renderer.prototype._buildMaterial = function(canvas)
  */
 FORGE.Renderer.prototype.render = function()
 {
-    var targets = this._sceneRendererPool.render();
+    this._sceneRendererPool.render();
 
-    // if (this._sceneLoader.loading === true && this._sceneLoader.transition !== null)
-    // {
-        var time = this._sceneLoader.transition.time;
-        this._quad.material.uniforms.tMixRatio.value = time;
-    // }
+    var ratio = this._sceneLoader.transition.time;
+    this._screenRenderer.material.mixRatio = ratio;
 
-    // Update time (increasing ramp in [0..1]) and mix ratio increasing and decreasing ramp in [[0..1]]
-    // var periodMS = 15 * 1000;
-    // var tn = (this._viewer.clock.elapsedTime % periodMS) / periodMS;
-    // this._quad.material.uniforms.tMixRatio.value = tn < 0.5 ? 2 * tn : 2 - 2 * tn;
-    // this._quad.material.uniforms.tTime.value = tn;
-
-    // this._quad.material.uniforms.tMixRatio.value = 0;
-
-
-    // Assign textures from the scene and render the whole scene
-    if (targets[0] instanceof THREE.WebGLRenderTarget)
+    if(this._viewer.story.sceneUid !== "")
     {
-        this._quad.material.uniforms.tTexture1.value = targets[0];
+        var renderer = this._sceneRendererPool.get(this._viewer.story.sceneUid);
+
+        if(typeof renderer !== "undefined")
+        {
+            this._screenRenderer.material.textureOne = renderer.target;
+        }
     }
 
-    if (targets[1] instanceof THREE.WebGLRenderTarget)
+    if(this._viewer.story.loadingSceneUid !== "")
     {
-        this._quad.material.uniforms.tTexture2.value = targets[1];
+        var loadingRenderer = this._sceneRendererPool.get(this._viewer.story.loadingSceneUid);
+
+        if(typeof loadingRenderer !== "undefined")
+        {
+            this._screenRenderer.material.textureTwo = loadingRenderer.target;
+        }
     }
 
-    this._quad.material.uniforms.tResolution.value = new THREE.Vector2(this._viewer.width, this._viewer.height);
+    this._screenRenderer.material.resolution.x = this._viewer.width;
+    this._screenRenderer.material.resolution.y = this._viewer.height;
+
     this._webGLRenderer.setViewport(0, 0, this._viewer.width, this._viewer.height);
 
-    this._webGLRenderer.render(this._scene, this._camera);
+    this._webGLRenderer.render(this._screenRenderer.scene, this._screenRenderer.camera);
 };
 
 /**
@@ -395,30 +294,6 @@ FORGE.Renderer.prototype.destroy = function()
         }
 
         this._materialPool = null;
-    }
-
-    if (this._quad !== null)
-    {
-        if (this._quad.material !== null) {
-            this._quad.material.dispose();
-            this._quad.material = null;
-        }
-
-        if (this._quad.geometry !== null) {
-            this._quad.geometry.dispose();
-            this._quad.geometry = null;
-        }
-    }
-
-    if (this._scene !== null)
-    {
-        this._scene.children = 0;
-        this._scene = null;
-    }
-
-    if (this._camera !== null)
-    {
-        this._camera = null;
     }
 
     this._webGLRenderer.dispose();
