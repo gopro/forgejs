@@ -27,7 +27,7 @@ FORGE.ObjectRenderer = function(viewer)
      * @type {Array<FORGE.Object3D>}
      * @private
      */
-    this._objects = null;
+    // this._objects = null;
 
     /**
      * Reference on last renderer viewport
@@ -72,11 +72,12 @@ FORGE.ObjectRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
 
-    this._objects = this._viewer.hotspots.getByType("Hotspot3D");
+    // this._objects = this._viewer.hotspots.getByType("Hotspot3D");
+    var objects = this._viewer.hotspots.getByType("Hotspot3D");
 
-    for (var i = 0; i < this._objects.length; i++)
+    for (var i = 0; i < objects.length; i++)
     {
-        var mesh = this._objects[i].mesh;
+        var mesh = objects[i].mesh;
         mesh.userData.pickingColor = FORGE.Picking.colorFromObjectID(mesh.id);
         this._scene.add(mesh);
     }
@@ -93,7 +94,9 @@ FORGE.ObjectRenderer.prototype._boot = function()
  */
 FORGE.ObjectRenderer.prototype._getPickableObjects = function()
 {
-    return this._objects.filter(function(object)
+    var objects = this._viewer.hotspots.getByType("Hotspot3D");
+
+    return objects.filter(function(object)
     {
         return object.ready === true && object.interactive === true;
     });
@@ -117,7 +120,7 @@ FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
 
 FORGE.ObjectRenderer.prototype.clear = function()
 {
-    this._objects = [];
+    // this._objects = [];
     this._scene = new THREE.Scene();
 };
 
@@ -138,19 +141,22 @@ FORGE.ObjectRenderer.prototype.clear = function()
  */
 FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 {
-    if (this._scene.children.length === 0)
+    var objects = this._viewer.hotspots.getByType("Hotspot3D");
+
+    if (this._scene.children.length === 0 || objects.length === 0)
     {
         return;
     }
+
 
     var view = viewport.view.current;
     var camera = viewport.camera.main;
     var compilationNeeded = false;
 
     // Update projection uniforms
-    for (var j=0; j<this._objects.length; j++)
+    for (var j=0; j<objects.length; j++)
     {
-        var object = this._objects[j];
+        var object = objects[j];
         var material = object.material;
         var mesh = object.mesh;
 
@@ -224,7 +230,7 @@ FORGE.ObjectRenderer.prototype.destroy = function()
         this._picking = null;
     }
 
-    this._objects = null;
+    // this._objects = null;
 
     this._scene.children = null;
     this._scene = null;
@@ -246,7 +252,7 @@ Object.defineProperty(FORGE.ObjectRenderer.prototype, "all",
     /** @this {FORGE.ObjectRenderer} */
     get: function()
     {
-        return this._objects;
+        // return this._objects;
     }
 });
 
