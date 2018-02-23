@@ -127,14 +127,6 @@ FORGE.Scene = function(viewer)
     this._fxs = null;
 
     /**
-     * Load request event dispatcher.
-     * @name  FORGE.Scene#_onLoadRequest
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onLoadRequest = null;
-
-    /**
      * Load start event dispatcher.
      * @name  FORGE.Scene#_onLoadStart
      * @type {FORGE.EventDispatcher}
@@ -348,6 +340,7 @@ FORGE.Scene.prototype.load = function()
     this._viewer.renderer.loader.onLoadComplete.addOnce(this._loadCompleteHandler, this);
     this._viewer.renderer.loader.load(this._uid);
 
+    // The loading has started
     if (this._onLoadStart !== null)
     {
         this._onLoadStart.dispatch();
@@ -358,55 +351,6 @@ FORGE.Scene.prototype.load = function()
         this._events.onLoadStart.dispatch();
     }
 };
-
-/**
- * Create the media and start to load.
- * @method FORGE.Scene#loadStart
- * @param {number} time - The time of the media (if video)
- */
-// FORGE.Scene.prototype.loadStart = function(time)
-// {
-//     if(typeof time === "number" && isNaN(time) === false && typeof this._config.media !== "undefined")
-//     {
-//         if(typeof this._config.media.options === "undefined")
-//         {
-//             this._config.media.options = {};
-//         }
-
-//         this._config.media.options.startTime = time;
-//     }
-
-//     // Add the media to the manager and get its uid
-//     this._mediaUid = this._viewer.media.add(this._config.media);
-
-//     // Trigger the media load
-//     this.media.load(this._mediaUid);
-
-//     if (this._onLoadStart !== null)
-//     {
-//         this._onLoadStart.dispatch();
-//     }
-
-//     if(FORGE.Utils.isTypeOf(this._events.onLoadStart, "ActionEventDispatcher") === true)
-//     {
-//         this._events.onLoadStart.dispatch();
-//     }
-
-//     this._viewer.renderer.addScene(this._uid);
-
-//     this._viewCount++;
-
-//     if (this._onLoadComplete !== null)
-//     {
-//         this._onLoadComplete.dispatch();
-//     }
-
-//     if(FORGE.Utils.isTypeOf(this._events.onLoadComplete, "ActionEventDispatcher") === true)
-//     {
-//         this._events.onLoadComplete.dispatch();
-//     }
-
-// };
 
 /**
  * Unload the scene.
@@ -426,8 +370,6 @@ FORGE.Scene.prototype.unload = function()
     {
         this._events.onUnloadStart.dispatch();
     }
-
-    this._viewer.media.unload(this._mediaUid);
 
     if (this._onUnloadComplete !== null)
     {
@@ -826,26 +768,6 @@ Object.defineProperty(FORGE.Scene.prototype, "background",
     get: function()
     {
         return this._background;
-    }
-});
-
-/**
- * Get the onLoadRequest {@link FORGE.EventDispatcher}.
- * @name  FORGE.Scene#onLoadRequest
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.Scene.prototype, "onLoadRequest",
-{
-    /** @this {FORGE.Scene} */
-    get: function()
-    {
-        if (this._onLoadRequest === null)
-        {
-            this._onLoadRequest = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onLoadRequest;
     }
 });
 
