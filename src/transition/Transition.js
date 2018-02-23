@@ -45,7 +45,7 @@ FORGE.Transition = function(viewer, config)
      * @type {number}
      * @private
      */
-    this._duration = 15000;
+    this._duration = 500;
 
     /**
      * {@link FORGE.EventDispatcher} for the start event.
