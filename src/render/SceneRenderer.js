@@ -91,12 +91,10 @@ FORGE.SceneRenderer.prototype._boot = function()
 /**
  * Render routine.
  * @method FORGE.SceneRenderer#render
- * @return {THREE.WebGLRenderTarget} render target
  */
 FORGE.SceneRenderer.prototype.render = function()
 {
     this._viewportManager.render(this._objectRenderer, this._renderTarget);
-    return this._renderTarget;
 };
 
 /**
