@@ -23,11 +23,11 @@ FORGE.SceneRendererPool = function(viewer)
 
     /**
      * Pool of FORGE.SceneRenderer objects.
-     * @name FORGE.SceneRendererPool#_sceneRenderers
+     * @name FORGE.SceneRendererPool#_pool
      * @type {FORGE.Viewer}
      * @private
      */
-    this._sceneRenderers = null;
+    this._pool = null;
 
     /**
      * Active scene UID
@@ -53,23 +53,9 @@ FORGE.SceneRendererPool.prototype.constructor = FORGE.SceneRendererPool;
  */
 FORGE.SceneRendererPool.prototype._boot = function()
 {
-    this._sceneRenderers = [];
+    this._pool = {};
 };
 
-/**
- * Remove all scene renderers.
- * @method FORGE.SceneRendererPool#_removeAllScenes
- * @private
- */
-FORGE.SceneRendererPool.prototype._removeAllScenes = function(sceneUID)
-{
-    while (this._sceneRenderers.length > 0)
-    {
-        var sceneRenderer = this._sceneRenderers.pop();
-        sceneRenderer.viewports.onActiveViewportChange.remove(this._onActiveViewportChanged, this);
-        sceneRenderer.destroy();
-    }
-};
 
 /**
  * Active viewport change handler.
@@ -82,55 +68,66 @@ FORGE.SceneRendererPool.prototype._onActiveViewportChanged = function()
 };
 
 /**
+ * Remove all scene renderers.
+ * @method FORGE.SceneRendererPool#has
+ * @param {string} sceneUID - The scene uinque identifier you are looking for.
+ * @return {boolean} return true if the pool has a renderer for a given uid, false if not.
+ */
+FORGE.SceneRendererPool.prototype.has = function(sceneUID)
+{
+    return typeof this._pool[sceneUID] !== "undefined";
+};
+
+/**
  * Add scene renderer.
- * @method FORGE.SceneRendererPool#addScene
+ * @method FORGE.SceneRendererPool#add
  * @param {FORE.UID} sceneUID - scene unique identifier
  */
-FORGE.SceneRendererPool.prototype.addScene = function(sceneUID)
+FORGE.SceneRendererPool.prototype.add = function(sceneUID)
 {
     var sceneRenderer = new FORGE.SceneRenderer(this._viewer, sceneUID);
+    this._pool[sceneUID] = sceneRenderer;
 
-    // First scene renderer becomes the active one
-    // That means we listen to active viewport change event and keep its sceneUID
-    // if (this._sceneRenderers.length === 0)
-    // {
-    //     this._activeSceneUID = sceneUID;
-    //     sceneRenderer.viewports.onActiveViewportChange.add(this._onActiveViewportChanged, this);
-    // }
-
-
-    this._sceneRenderers.push(sceneRenderer);
     this._activeSceneUID = sceneUID;
 };
 
 /**
  * Remove scene renderer.
- * @method FORGE.SceneRendererPool#removeScene
+ * @method FORGE.SceneRendererPool#remove
  * @param {FORE.UID} sceneUID - scene unique identifier
  */
-FORGE.SceneRendererPool.prototype.removeScene = function(sceneUID)
+FORGE.SceneRendererPool.prototype.remove = function(sceneUID)
 {
-    var index = this._sceneRenderers.findIndex(function(sceneRenderer) {
-        return sceneRenderer.scene.uid === sceneUID;
-    });
-
-    var sceneRenderer = this._sceneRenderers.splice(index, 1);
-    sceneRenderer.viewports.onActiveViewportChange.remove(this._onActiveViewportChanged, this);
-    sceneRenderer.destroy();
-
-    if (this._sceneRenderers.length === 1)
+    if (this.has(sceneUID) === false)
     {
-        this._activeSceneUID = this._sceneRenderers[0].sceneUID;
+        return;
     }
+
+    var renderer = this.get(sceneUID);
+    renderer.viewports.onActiveViewportChange.remove(this._onActiveViewportChanged, this);
+    renderer.destroy();
+
+    this._pool[sceneUID] = null;
+    delete this._pool[sceneUID];
+};
+
+/**
+ * Remove all scene renderers.
+ * @method FORGE.SceneRendererPool#clear
+ */
+FORGE.SceneRendererPool.prototype.clear = function()
+{
+    for(uid in this._pool)
+    {
+        this.remove(uid);
+    }
+
+    this._pool = {};
 };
 
 FORGE.SceneRendererPool.prototype.get = function(sceneUID)
 {
-    var index = this._sceneRenderers.findIndex(function(sceneRenderer) {
-        return sceneRenderer.scene.uid === sceneUID;
-    });
-
-    return this._sceneRenderers[index];
+    return this._pool[sceneUID];
 };
 
 /**
@@ -140,14 +137,10 @@ FORGE.SceneRendererPool.prototype.get = function(sceneUID)
  */
 FORGE.SceneRendererPool.prototype.render = function()
 {
-    var renderTargets = [];
-
-    for (var i=0; i<this._sceneRenderers.length; i++)
+    for (uid in this._pool)
     {
-        renderTargets.push(this._sceneRenderers[i].render());
+        this._pool[uid].render();
     }
-
-    return renderTargets;
 };
 
 /**
@@ -156,9 +149,9 @@ FORGE.SceneRendererPool.prototype.render = function()
  */
 FORGE.SceneRendererPool.prototype.destroy = function()
 {
-    this._removeAllScenes();
+    this.clear();
 
-    this._sceneRenderers = null;
+    this._pool = null;
 
     if (this._onActiveViewportChange !== null)
     {
@@ -180,15 +173,6 @@ Object.defineProperty(FORGE.SceneRendererPool.prototype, "activeViewport",
     /** @this {FORGE.SceneRendererPool} */
     get: function()
     {
-        var sceneRenderer = this._sceneRenderers.find(function(r) {
-            return r.scene.uid === this._activeSceneUID;
-        }.bind(this));
-
-        if (sceneRenderer === undefined)
-        {
-            return null;
-        }
-
-        return sceneRenderer.viewports.active;
+        return this._pool[this._activeSceneUID].viewports.active;
     }
 });

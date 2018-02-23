@@ -16,7 +16,8 @@ FORGE.SceneLoader = function(viewer)
     this._viewer = viewer;
 
 
-    this._sceneUid = "";
+    this._from ="";
+    this._to = "";
     this._transitionUid = "";
 
     this._loading = false;
@@ -56,7 +57,7 @@ FORGE.SceneLoader.prototype._loadMedia = function()
 {
     this.log("load media starts");
 
-    var scene = FORGE.UID.get(this._sceneUid);
+    var scene = FORGE.UID.get(this._to);
     scene.media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
     scene.media.load();
 
@@ -95,7 +96,7 @@ FORGE.SceneLoader.prototype._startTransition = function()
         this._onTransitionStart.dispatch();
     }
 
-    this._viewer.renderer.addScene(this._sceneUid);
+    this._viewer.renderer.scenes.add(this._to);
 
     var transition = FORGE.UID.get(this._transitionUid);
     transition.onComplete.addOnce(this._transitionCompleteHandler, this);
@@ -121,6 +122,8 @@ FORGE.SceneLoader.prototype._transitionCompleteHandler = function()
     {
         this._onLoadComplete.dispatch();
     }
+
+    this._viewer.renderer.scenes.remove(this._from);
 };
 
 /**
@@ -132,7 +135,7 @@ FORGE.SceneLoader.prototype.load = function(sceneUid, transitionUid)
 {
     if (this._loading === true)
     {
-        this.warn("Can't load multiple scene, scene "+this._sceneUid+" is already loading");
+        this.warn("Can't load multiple scene, scene "+this._to+" is already loading");
         return;
     }
 
@@ -149,7 +152,8 @@ FORGE.SceneLoader.prototype.load = function(sceneUid, transitionUid)
     }
 
     this._loading = true;
-    this._sceneUid = sceneUid;
+    this._from = this._viewer.story.sceneUid;
+    this._to = sceneUid;
     this._transitionUid = transitionUid || "trans-screen";
 
     if (this._onLoadStart !== null)

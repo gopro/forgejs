@@ -171,34 +171,6 @@ FORGE.Renderer.prototype.render = function()
     this._webGLRenderer.render(this._screenRenderer.scene, this._screenRenderer.camera);
 };
 
-
-/**
- * Load a scene.
- * @method FORGE.Renderer#load
- */
-FORGE.Renderer.prototype.load = function(sceneUid)
-{
-    this._sceneLoader.load(sceneUid);
-};
-
-/**
- * Add a scene to the render pool
- * @method FORGE.Renderer#addScene
- */
-FORGE.Renderer.prototype.addScene = function(sceneUid)
-{
-    this._sceneRendererPool.addScene(sceneUid);
-};
-
-/**
- * Remove a scene to the render pool
- * @method FORGE.Renderer#removeScene
- */
-FORGE.Renderer.prototype.removeScene = function(sceneUid)
-{
-    this._sceneRendererPool.removeScene(sceneUid);
-};
-
 /**
  * Notify the active viewport has changed
  * @method FORGE.Renderer#notifyActiveViewportChange
@@ -260,11 +232,11 @@ Object.defineProperty(FORGE.Renderer.prototype, "webGLRenderer",
 
 /**
  * Get the scene renderer pool
- * @name FORGE.Renderer#sceneRendererPool
+ * @name FORGE.Renderer#scenes
  * @type {FORGE.SceneRendererPool}
  * @readonly
  */
-Object.defineProperty(FORGE.Renderer.prototype, "sceneRendererPool",
+Object.defineProperty(FORGE.Renderer.prototype, "scenes",
 {
     /** @this {FORGE.Renderer} */
     get: function()
