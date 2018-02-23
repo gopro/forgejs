@@ -182,8 +182,9 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
             mesh.frustumCulled = view.type === FORGE.ViewType.RECTILINEAR;
 
             // Assign the right material reference
-            var shaderType = material.type === FORGE.HotspotMaterial.types.GRAPHICS ? "color" : "map";
-            mesh.material = this._viewer.renderer.getMaterialForView(view.type, shaderType, material.transparent);
+            var shaderType = material.type === FORGE.HotspotMaterial.types.GRAPHICS ? FORGE.ObjectMaterialType.COLOR : FORGE.ObjectMaterialType.MAP;
+            var objectMaterial = this._viewer.renderer.materials.get(view.type, shaderType, material.transparent);
+            mesh.material = objectMaterial.shaderMaterial;
         }
 
         // Update material attributes and projection uniforms
@@ -206,7 +207,7 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 
     // If scene is active and viewport is active and there are pickable objects
     // @todo add a test for scene active (this._viewer.activeScene === this._scene)
-    if (this._viewer.renderer.activeViewport === this._viewport &&
+    if (this._viewer.renderer.activeViewport === viewport &&
         pickable.length > 0)
     // if (this._viewer.story.scene.activeViewport === viewport && pickable.length > 0)
     {

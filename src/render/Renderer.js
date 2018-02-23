@@ -37,7 +37,7 @@ FORGE.Renderer = function(viewer)
     /**
      * Material pool
      * @name FORGE.Renderer#_materialPool
-     * @type {Array<THREE.Material>}
+     * @type {FORGE.ObjectMaterialPool}
      * @private
      */
     this._materialPool = null;
@@ -97,6 +97,8 @@ FORGE.Renderer.prototype._boot = function()
 
     this._sceneRendererPool = new FORGE.SceneRendererPool(this._viewer);
 
+    this._materialPool = new FORGE.ObjectMaterialPool();
+
     this._screenRenderer = new FORGE.ScreenRenderer(this._viewer);
 
     this._viewer.onConfigLoadComplete.add(this._onViewerConfigLoadComplete, this, 1000);
@@ -147,7 +149,7 @@ FORGE.Renderer.prototype.render = function()
 
         if(typeof renderer !== "undefined")
         {
-            this._screenRenderer.material.textureOne = renderer.target;
+            this._screenRenderer.material.textureOne = renderer.target.texture;
         }
     }
 
@@ -157,7 +159,7 @@ FORGE.Renderer.prototype.render = function()
 
         if(typeof loadingRenderer !== "undefined")
         {
-            this._screenRenderer.material.textureTwo = loadingRenderer.target;
+            this._screenRenderer.material.textureTwo = loadingRenderer.target.texture;
         }
     }
 
@@ -169,68 +171,6 @@ FORGE.Renderer.prototype.render = function()
     this._webGLRenderer.render(this._screenRenderer.scene, this._screenRenderer.camera);
 };
 
-/**
- * Get material for a given view type
- * Set a pool of materials with lazy instantiation
- * @method FORGE.Renderer#getMaterialForView
- * @param {FORGE.ViewType} viewType - view type
- * @param {string} shaderType - type of shader (map, color, pick, wireframe)
- * @param {boolean} transparent - true if query transparent material, false if opaque
- * @return {THREE.RawShaderMaterial} world to screen shader for the given view
- */
-FORGE.Renderer.prototype.getMaterialForView = function(viewType, shaderType, transparent)
-{
-    if (this._materialPool === null)
-    {
-        this._materialPool = {};
-    }
-
-    if (typeof shaderType === "undefined")
-    {
-        shaderType = "map";
-    }
-
-    var t = (typeof transparent === "boolean") ? transparent : false;
-    var shaderTransparency = t ? "transparent" : "opaque";
-
-    if (viewType in this._materialPool)
-    {
-        return this._materialPool[viewType][shaderType][shaderTransparency];
-    }
-
-    this._materialPool[viewType] = {};
-
-    var shaderTypes = ["map", "color", "pick", "wireframe"];
-    for (var i=0, ii=shaderTypes.length; i<ii; i++)
-    {
-        var type = shaderTypes[i];
-        var shader = FORGE.Utils.clone(FORGE.ShaderLib.worldToScreen[viewType][type]);
-        var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
-        var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
-
-        var material = new THREE.RawShaderMaterial(
-        {
-            fragmentShader: fragmentShader,
-            vertexShader: vertexShader,
-            uniforms: /** @type {FORGEUniform} */ (shader.uniforms),
-            side: THREE.FrontSide,
-            name: viewType + "." + type
-        });
-
-        material.needsUpdate = true;
-
-        this._materialPool[viewType][type] = {};
-
-        material.transparent = false;
-        this._materialPool[viewType][type]["opaque"] = material;
-
-        var tMaterial = material.clone();
-        tMaterial.transparent = true;
-        this._materialPool[viewType][type]["transparent"] = tMaterial;
-    }
-
-    return this._materialPool[viewType][shaderType][shaderTransparency];
-};
 
 /**
  * Load a scene.
@@ -285,22 +225,20 @@ FORGE.Renderer.prototype.destroy = function()
         this._onActiveViewportChange = null;
     }
 
-    if (this._materialPool !== null)
-    {
-        while (this._materialPool.length > 0)
-        {
-            var material = this._materialPool.shift();
-            material.dispose();
-        }
-
-        this._materialPool = null;
-    }
-
     this._webGLRenderer.dispose();
     this._webGLRenderer = null;
 
+    this._screenRenderer.destroy();
+    this._screenRenderer = null;
+
     this._sceneRendererPool.destroy();
     this._sceneRendererPool = null;
+
+    this._sceneLoader.destroy();
+    this._sceneLoader = null;
+
+    this._materialPool.detroy();
+    this._materialPool = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
@@ -332,6 +270,21 @@ Object.defineProperty(FORGE.Renderer.prototype, "sceneRendererPool",
     get: function()
     {
         return this._sceneRendererPool;
+    }
+});
+
+/**
+ * Get the material pool reference.
+ * @name FORGE.Renderer#materials
+ * @type {FORGE.ObjectMaterialPool}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "materials",
+{
+    /** @this {FORGE.Renderer} */
+    get: function()
+    {
+        return this._materialPool;
     }
 });
 

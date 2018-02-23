@@ -291,7 +291,8 @@ FORGE.Picking.prototype.render = function(viewport)
     // with the new size stored
     this._renderTarget.setSize(w, h);
 
-    scene.overrideMaterial = this._viewer.renderer.getMaterialForView(view.type, "pick");
+    var objectMaterial = this._viewer.renderer.materials.get(view.type, FORGE.ObjectMaterialType.PICK);
+    scene.overrideMaterial = objectMaterial.shaderMaterial;
 
     view.updateUniforms(scene.overrideMaterial.uniforms);
 
