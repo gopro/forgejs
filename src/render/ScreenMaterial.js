@@ -2,11 +2,16 @@
  * ScreenMaterial class.
  *
  * @constructor FORGE.ScreenMaterial
- * @param {FORGE.Viewer} viewer - viewer reference
  * @extends {FORGE.BaseObject}
  */
 FORGE.ScreenMaterial = function()
 {
+    /**
+     * The raw shader material.
+     * @name FORGE.ScreenMaterial#_shaderMaterial
+     * @type {THREE.RawShaderMaterial}
+     * @private
+     */
     this._shaderMaterial = null;
 
     FORGE.BaseObject.call(this, "ScreenMaterial");
