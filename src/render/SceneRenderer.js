@@ -85,7 +85,7 @@ FORGE.SceneRenderer.prototype._boot = function()
 
     this._viewportManager = new FORGE.ViewportManager(this._viewer, this);
 
-    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer);
+    this._objectRenderer = new FORGE.ObjectRenderer(this._viewer, this);
 };
 
 /**

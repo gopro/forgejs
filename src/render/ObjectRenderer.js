@@ -1,9 +1,10 @@
 /**
  * @constructor FORGE.ObjectRenderer
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference.
+ * @param {FORGE.SceneRenderer} sceneRenderer {@link FORGE.SceneRenderer} reference.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ObjectRenderer = function(viewer)
+FORGE.ObjectRenderer = function(viewer, sceneRenderer)
 {
     /**
      * Viewer reference
@@ -12,6 +13,14 @@ FORGE.ObjectRenderer = function(viewer)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * The scene renderer reference.
+     * @name FORGE.ObjectRenderer#_sceneRenderer
+     * @type {FORGE.SceneRenderer}
+     * @private
+     */
+    this._sceneRenderer = sceneRenderer;
 
     /**
      * Scene where all objects are renderered (whatever the viewport)
