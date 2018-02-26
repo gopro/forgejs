@@ -36,7 +36,7 @@ FORGE.ObjectRenderer = function(viewer, sceneRenderer)
      * @type {Array<FORGE.Object3D>}
      * @private
      */
-    // this._objects = null;
+    this._objects = null;
 
     /**
      * Reference on last renderer viewport
@@ -63,6 +63,8 @@ FORGE.ObjectRenderer = function(viewer, sceneRenderer)
      */
     this._picking = null;
 
+    this._ready = false;
+
     FORGE.BaseObject.call(this, "ObjectRenderer");
 
     this._boot();
@@ -80,18 +82,47 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
 FORGE.ObjectRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
+    this._sceneRenderer.scene.onLoadComplete.addOnce(this._sceneLoadCompleteHandler, this);
+    this._sceneRenderer.scene.onUnloadComplete.addOnce(this._sceneUnloadCompleteHandler, this);
+};
 
-    // this._objects = this._viewer.hotspots.getByType("Hotspot3D");
-    var objects = this._viewer.hotspots.getByType("Hotspot3D");
+/**
+ * SceneLoadCompleteHandler
+ * @method FORGE.ObjectRenderer#_sceneLoadCompleteHandler
+ * @private
+ */
+FORGE.ObjectRenderer.prototype._sceneLoadCompleteHandler = function()
+{
+    this._objects = this._viewer.hotspots.getByType("Hotspot3D");
 
-    for (var i = 0; i < objects.length; i++)
+    for (var i = 0; i < this._objects.length; i++)
     {
-        var mesh = objects[i].mesh;
+        var mesh = this._objects[i].mesh;
         mesh.userData.pickingColor = FORGE.Picking.colorFromObjectID(mesh.id);
         this._scene.add(mesh);
     }
 
     this._picking = new FORGE.Picking(this._viewer, this);
+
+    this._ready = true;
+};
+
+/**
+ * SceneUnLoadCompleteHandler
+ * @method FORGE.ObjectRenderer#_sceneUnloadCompleteHandler
+ * @private
+ */
+FORGE.ObjectRenderer.prototype._sceneUnloadCompleteHandler = function()
+{
+    this._ready = false;
+
+    if (this._picking !== null)
+    {
+        this._picking.destroy();
+        this._picking = null;
+    }
+
+    this._objects = null;
 };
 
 /**
@@ -103,9 +134,7 @@ FORGE.ObjectRenderer.prototype._boot = function()
  */
 FORGE.ObjectRenderer.prototype._getPickableObjects = function()
 {
-    var objects = this._viewer.hotspots.getByType("Hotspot3D");
-
-    return objects.filter(function(object)
+    return this._objects.filter(function(object)
     {
         return object.ready === true && object.interactive === true;
     });
@@ -126,14 +155,6 @@ FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
     });
 };
 
-
-FORGE.ObjectRenderer.prototype.clear = function()
-{
-    // this._objects = [];
-    this._scene = new THREE.Scene();
-};
-
-
 /**
  * Render routine
  *
@@ -150,22 +171,19 @@ FORGE.ObjectRenderer.prototype.clear = function()
  */
 FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 {
-    var objects = this._viewer.hotspots.getByType("Hotspot3D");
-
-    if (this._scene.children.length === 0 || objects.length === 0)
+    if(this._ready === false)
     {
         return;
     }
-
 
     var view = viewport.view.current;
     var camera = viewport.camera.main;
     var compilationNeeded = false;
 
     // Update projection uniforms
-    for (var j=0; j<objects.length; j++)
+    for (var j = 0; j < this._objects.length; j++)
     {
-        var object = objects[j];
+        var object = this._objects[j];
         var material = object.material;
         var mesh = object.mesh;
 
@@ -234,19 +252,22 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
  */
 FORGE.ObjectRenderer.prototype.destroy = function()
 {
+    this._ready = false;
+
     if (this._picking !== null)
     {
         this._picking.destroy();
         this._picking = null;
     }
 
-    // this._objects = null;
+    this._objects = null;
 
     this._scene.children = null;
     this._scene = null;
 
     this._lastViewport = null;
 
+    this._sceneRenderer = null;
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
@@ -262,7 +283,7 @@ Object.defineProperty(FORGE.ObjectRenderer.prototype, "all",
     /** @this {FORGE.ObjectRenderer} */
     get: function()
     {
-        // return this._objects;
+        return this._objects;
     }
 });
 
