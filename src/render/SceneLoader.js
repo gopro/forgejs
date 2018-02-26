@@ -141,20 +141,26 @@ FORGE.SceneLoader.prototype.load = function(sceneUid, transitionUid)
 
     if (FORGE.UID.isTypeOf(sceneUid, "Scene") === false)
     {
-        this.warn("the scene uid "+sceneUid+" does not exists");
+        this.warn("the scene uid "+sceneUid+" does not exists, aborting");
         return;
     }
 
-    if (FORGE.UID.isTypeOf(transitionUid, "Transition") === false)
+    if (FORGE.UID.isTypeOf(transitionUid, "Transition") === true)
     {
-        this.warn("the transition uid "+transitionUid+" does not exists");
-        // return;
+        this._transitionUid = transitionUid;
+    }
+    else
+    {
+        this.warn("the transition uid "+transitionUid+" does not exists, fallback to the default transition");
+        this._transitionUid = this._viewer.transitions.defaultUid;
     }
 
     this._loading = true;
+
     this._from = this._viewer.story.sceneUid;
     this._to = sceneUid;
-    this._transitionUid = transitionUid || "trans-screen";
+
+    this._transitionUid = transitionUid || this._viewer.transitions.defaultUid;
 
     if (this._onLoadStart !== null)
     {
