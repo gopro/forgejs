@@ -60,6 +60,7 @@ module.exports = function(grunt)
         "src/render/SceneRendererPool.js",
 
         "src/transition/TransitionManager.js",
+        "src/transition/TransitionPresets.js",
         "src/transition/Transition.js",
 
         "src/render/background/BackgroundRenderer.js",
