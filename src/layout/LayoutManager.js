@@ -24,7 +24,7 @@ FORGE.LayoutManager = function(viewer)
 
     /**
      * Default layout UID
-     * @name  FORGE.LayoutManager#_default
+     * @name  FORGE.LayoutManager#_defaultUid
      * @type {string}
      * @private
      */
@@ -124,11 +124,11 @@ FORGE.LayoutManager.prototype.destroy = function()
 /**
  * Get the default layout Uid.
  * @name FORGE.LayoutManager#defaultUid
- * @type {FORGE.Layout}
+ * @type {string}
  */
 Object.defineProperty(FORGE.LayoutManager.prototype, "defaultUid",
 {
-    /** @this {FORGE.Viewport} */
+    /** @this {FORGE.LayoutManager} */
     get: function()
     {
         return this._defaultUid;
@@ -142,7 +142,7 @@ Object.defineProperty(FORGE.LayoutManager.prototype, "defaultUid",
  */
 Object.defineProperty(FORGE.LayoutManager.prototype, "default",
 {
-    /** @this {FORGE.Viewport} */
+    /** @this {FORGE.LayoutManager} */
     get: function()
     {
         return FORGE.UID.get(this._defaultUid);
