@@ -134,17 +134,17 @@ Object.defineProperty(FORGE.SceneRenderer.prototype, "scene",
 });
 
 /**
- * Get the render target.
- * @name FORGE.SceneRenderer#renderTarget
- * @type {THREE.WebGLRenderTarget}
+ * Get the render target's texture.
+ * @name FORGE.SceneRenderer#texture
+ * @type {THREE.Texture}
  * @readonly
  */
-Object.defineProperty(FORGE.SceneRenderer.prototype, "target",
+Object.defineProperty(FORGE.SceneRenderer.prototype, "texture",
 {
     /** @this {FORGE.SceneRenderer} */
     get: function()
     {
-        return this._renderTarget;
+        return this._renderTarget.texture;
     }
 });
 

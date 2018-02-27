@@ -149,7 +149,7 @@ FORGE.Renderer.prototype.render = function()
 
         if(typeof renderer !== "undefined")
         {
-            this._screenRenderer.material.textureOne = renderer.target.texture;
+            this._screenRenderer.material.textureOne = renderer.texture;
         }
     }
 
@@ -159,7 +159,7 @@ FORGE.Renderer.prototype.render = function()
 
         if(typeof loadingRenderer !== "undefined")
         {
-            this._screenRenderer.material.textureTwo = loadingRenderer.target.texture;
+            this._screenRenderer.material.textureTwo = loadingRenderer.texture;
         }
     }
 
