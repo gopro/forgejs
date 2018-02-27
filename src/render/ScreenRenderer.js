@@ -98,22 +98,14 @@ FORGE.ScreenRenderer.prototype.destroy = function()
         }
     }
 
-    if (this._scene !== null)
-    {
-        this._scene.children = 0;
-        this._scene = null;
-    }
-
-    if (this._camera !== null)
-    {
-        this._camera = null;
-    }
-
     if (this._material !== null)
     {
         this._material.destroy();
         this._material = null;
     }
+
+    this._scene = null;
+    this._camera = null;
 
     this._viewer = null;
 };
