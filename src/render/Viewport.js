@@ -44,6 +44,7 @@ FORGE.Viewport = function(viewer, sceneRenderer, config)
      * Viewport background color
      * @name FORGE.Viewport#_background
      * @type {THREE.Color}
+     * @private
      */
     this._background = null;
 
@@ -65,7 +66,9 @@ FORGE.Viewport = function(viewer, sceneRenderer, config)
 
     /**
      * FX Pipeline definition
+     * @name FORGE.Viewport#_fx
      * @type {Array<string>}
+     * @private
      */
     this._fx = null;
 
