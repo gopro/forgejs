@@ -55,7 +55,7 @@ FORGE.SceneLoader.prototype._boot = function()
  */
 FORGE.SceneLoader.prototype._loadMedia = function()
 {
-    this.log("load media starts");
+    this.log("load media");
 
     var scene = FORGE.UID.get(this._to);
     scene.media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
@@ -73,7 +73,7 @@ FORGE.SceneLoader.prototype._loadMedia = function()
  */
 FORGE.SceneLoader.prototype._mediaLoadCompleteHandler = function()
 {
-    this.log("load media complete");
+    this.log("media load complete");
 
     if(this._onMediaLoadComplete !== null)
     {
@@ -89,7 +89,7 @@ FORGE.SceneLoader.prototype._mediaLoadCompleteHandler = function()
  */
 FORGE.SceneLoader.prototype._startTransition = function()
 {
-    this.log("transition starts");
+    this.log("start transition");
 
     if(this._onTransitionStart !== null)
     {
@@ -123,16 +123,26 @@ FORGE.SceneLoader.prototype._transitionCompleteHandler = function()
         this._onLoadComplete.dispatch();
     }
 
-    this._viewer.renderer.scenes.remove(this._from);
+    if (FORGE.UID.isTypeOf(this._from, "Scene") === true)
+    {
+        var scene = FORGE.UID.get(this._from);
+        scene.unload();
+    }
+
+    this._from = "";
+    this._to = "";
 };
 
 /**
  * Load a scene by its uid.
  * @method FORGE.SceneLoader#load
  * @param {string} sceneUid - The scene uid to load
+ * @param {string} transitionUid - The transition uid to use
  */
 FORGE.SceneLoader.prototype.load = function(sceneUid, transitionUid)
 {
+    this.log("load");
+
     if (this._loading === true)
     {
         this.warn("Can't load multiple scene, scene "+this._to+" is already loading");
@@ -141,7 +151,7 @@ FORGE.SceneLoader.prototype.load = function(sceneUid, transitionUid)
 
     if (FORGE.UID.isTypeOf(sceneUid, "Scene") === false)
     {
-        this.warn("the scene uid "+sceneUid+" does not exists, aborting");
+        this.warn("the scene uid "+sceneUid+" does not exists, load aborting");
         return;
     }
 
@@ -168,6 +178,29 @@ FORGE.SceneLoader.prototype.load = function(sceneUid, transitionUid)
     }
 
     this._loadMedia();
+};
+
+/**
+ * Unload a scene by its uid.
+ * @method FORGE.SceneLoader#unload
+ * @param {string} sceneUid - The scene uid to unload
+ */
+FORGE.SceneLoader.prototype.unload = function(sceneUid)
+{
+    this.log("unload");
+
+    if (FORGE.UID.isTypeOf(sceneUid, "Scene") === false)
+    {
+        this.warn("the scene uid "+sceneUid+" does not exists, unload aborting");
+        return;
+    }
+
+    // Remove the render used for the scene
+    this._viewer.renderer.scenes.remove(sceneUid);
+
+    // Unload the scene media
+    var scene = FORGE.UID.get(sceneUid);
+    scene.media.unload();
 };
 
 /**

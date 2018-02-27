@@ -371,6 +371,8 @@ FORGE.Scene.prototype.unload = function()
         this._events.onUnloadStart.dispatch();
     }
 
+    this._viewer.renderer.loader.unload(this._uid);
+
     if (this._onUnloadComplete !== null)
     {
         this._onUnloadComplete.dispatch();
