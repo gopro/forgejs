@@ -175,7 +175,7 @@ FORGE.MediaVideo.prototype.load = function()
 {
     if (typeof this._source.streaming !== "undefined" && this._source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
     {
-        this._video = new FORGE.VideoDash(this._viewer, this._uid);
+        this._video = new FORGE.VideoDash(this._viewer);
     }
     else
     {
@@ -183,7 +183,7 @@ FORGE.MediaVideo.prototype.load = function()
 
         // check of the ambisonic state of the video sound prior to the video instanciation
         // this._video = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, (scene.hasSoundTarget(this._uid) === true && scene.isAmbisonic() === true ? true : false));
-        this._video = new FORGE.VideoHTML5(this._viewer, this._uid, null, null, false);
+        this._video = new FORGE.VideoHTML5(this._viewer, null, null, null, false);
     }
 
     // At this point, source.url is either a streaming address, a simple url, or an array of url
