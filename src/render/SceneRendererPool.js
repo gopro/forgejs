@@ -85,8 +85,11 @@ FORGE.SceneRendererPool.prototype.has = function(sceneUID)
  */
 FORGE.SceneRendererPool.prototype.add = function(sceneUID)
 {
-    var sceneRenderer = new FORGE.SceneRenderer(this._viewer, sceneUID);
-    this._pool[sceneUID] = sceneRenderer;
+    // Create a renderer for this scene if it does not exist
+    if(typeof this._pool[sceneUID] === "undefined")
+    {
+        this._pool[sceneUID] = new FORGE.SceneRenderer(this._viewer, sceneUID);
+    }
 
     this._activeSceneUID = sceneUID;
 };
