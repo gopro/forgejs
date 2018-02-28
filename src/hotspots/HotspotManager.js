@@ -29,7 +29,7 @@ FORGE.HotspotManager = function(viewer)
      * @type {Array<(FORGE.Hotspot3D|FORGE.HotspotDOM)>}
      * @private
      */
-    this._hotspots = [];
+    this._hotspots = {};
 
     FORGE.BaseObject.call(this, "HotspotManager");
 
@@ -37,32 +37,6 @@ FORGE.HotspotManager = function(viewer)
 
 FORGE.HotspotManager.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.HotspotManager.prototype.constructor = FORGE.HotspotManager;
-
-/**
- * Boot sequence. Called by the viewer by the exposed boot method.
- * @method FORGE.HotspotManager#_boot
- * @private
- */
-FORGE.HotspotManager.prototype._boot = function(config)
-{
-    this._config = [];
-
-    this._viewer.story.onSceneLoadStart.add(this._sceneLoadStartHandler, this);
-};
-
-/**
- * Parse a hotspots config object.
- * @method FORGE.HotspotManager#_parseConfig
- * @private
- * @param {Array<HotspotConfig>} config - The array of hotspot config you want to parse.
- */
-FORGE.HotspotManager.prototype._parseConfig = function(config)
-{
-    for (var i = 0, ii = config.length; i < ii; i++)
-    {
-        this.create(config[i]);
-    }
-};
 
 /**
  * Create a hotspot from a hotpsot config object.
@@ -88,7 +62,7 @@ FORGE.HotspotManager.prototype.create = function(config)
 
     if (hotspot !== null)
     {
-        this._hotspots.push(hotspot);
+        this._hotspots[hotspot.uid] = hotspot;
         return hotspot;
     }
 
@@ -100,19 +74,14 @@ FORGE.HotspotManager.prototype.create = function(config)
  * @method FORGE.HotspotManager#remove
  * @param  {(string|FORGE.Hotspot3D)} hotspot - the hotspot or its uid to remove
  */
-FORGE.HotspotManager.prototype.remove = function(hotspot)
+FORGE.HotspotManager.prototype.remove = function(hotspotUid)
 {
-    if(FORGE.Utils.isTypeOf(hotspot, "string") === true)
-    {
-        hotspot = FORGE.UID.get(hotspot);
-    }
-
-    if(FORGE.Utils.isTypeOf(hotspot, "Hotspot3D") === true)
-    {
-        var index = this._hotspots.indexOf(hotspot);
-        this._hotspots.splice(index, 1);
-        hotspot.destroy();
-    }
+   if (typeof this._hotspots[hotspotUid] !== "undefined")
+   {
+        this._hotspots[hotspotUid].destroy();
+        this._hotspots[hotspotUid] = null;
+        delete this._hotspots[hotspotUid];
+   }
 };
 
 /**
@@ -130,44 +99,6 @@ FORGE.HotspotManager.prototype._parseTracks = function(tracks)
 };
 
 /**
- * Check if all hotspots are ready
- * @method FORGE.HotspotManager#_checkHotspotsReady
- * @return boolean true if all hotspots are ready, false otherwise
- * @private
- */
-FORGE.HotspotManager.prototype._checkHotspotsReady = function()
-{
-    for (var i = 0, ii = this._hotspots.length; i < ii; i++)
-    {
-        var hotspot = this._hotspots[i];
-
-        if (hotspot.ready === false)
-        {
-            return false;
-        }
-    }
-
-    return true;
-};
-
-/**
- * Event handler for scene load start.
- * @method  FORGE.HotspotManager#_sceneLoadStartHandler
- * @private
- */
-FORGE.HotspotManager.prototype._sceneLoadStartHandler = function()
-{
-    var scene = this._viewer.story.loadingScene;
-    scene.onUnloadStart.addOnce(this._sceneUnloadStartHandler, this);
-
-    if (typeof scene.config.hotspots !== "undefined")
-    {
-        var hotspots = scene.config.hotspots;
-        this.addConfig(hotspots);
-    }
-};
-
-/**
  * Event handler for scene unload start.
  * @method  FORGE.HotspotManager#_sceneUnloadStartHandler
  * @private
@@ -178,38 +109,13 @@ FORGE.HotspotManager.prototype._sceneUnloadStartHandler = function()
 };
 
 /**
- * Boot sequence.
- * @method FORGE.HotspotManager#boot
- */
-FORGE.HotspotManager.prototype.boot = function()
-{
-    this._boot();
-};
-
-/**
- * Get hotspots by type
- * @method  FORGE.HotspotManager#getByType
- * @param  {string} type - The type of hotspots you want to get.
- * @return {Array<(FORGE.Hotspot3D|FORGE.HotspotDOM)>}
- */
-FORGE.HotspotManager.prototype.getByType = function(type)
-{
-    var result = this._hotspots.filter(function(hotspot)
-    {
-        return FORGE.Utils.isTypeOf(hotspot, type);
-    });
-
-    return result;
-};
-
-/**
  * Add a hotspots config to the manager.
  * @method FORGE.HotspotManager#addConfig
  * @param {Array<HotspotConfig>} config - The config you want to add.
  */
 FORGE.HotspotManager.prototype.addConfig = function(config)
 {
-    this._parseConfig(config);
+    return this.create(config);
 };
 
 /**
@@ -231,9 +137,9 @@ FORGE.HotspotManager.prototype.addTracks = function(config)
  */
 FORGE.HotspotManager.prototype.update = function()
 {
-    for (var i = 0, ii = this._hotspots.length; i < ii; i++)
+    for (uid in this._hotspots)
     {
-        this._hotspots[i].update();
+        this._hotspots[uid].update();
     }
 };
 
@@ -244,17 +150,11 @@ FORGE.HotspotManager.prototype.update = function()
  */
 FORGE.HotspotManager.prototype.clear = function(type)
 {
-    this._hotspots = this._hotspots.filter(function(hs)
+    for (uid in this._hotspots)
     {
-        var keep = (typeof type === "string" && hs.type !== type);
+        this.remove(uid);
+    }
 
-        if (keep === false)
-        {
-            hs.destroy();
-        }
-
-        return keep;
-    });
 };
 
 /**
@@ -266,9 +166,9 @@ FORGE.HotspotManager.prototype.dump = function()
 {
     var dump = [];
 
-    for(var i = 0, ii = this._hotspots.length; i < ii; i++)
+    for (uid in this._hotspots)
     {
-        dump.push(this._hotspots[i].dump());
+        dump.push(this._hotspots[uid].dump());
     }
 
     return dump;
@@ -281,9 +181,6 @@ FORGE.HotspotManager.prototype.dump = function()
 FORGE.HotspotManager.prototype.destroy = function()
 {
     this.clear();
-
-    this._viewer.story.onSceneLoadStart.remove(this._sceneLoadStartHandler, this);
-
     this._viewer = null;
     this._hotspots = null;
 
@@ -316,14 +213,7 @@ Object.defineProperty(FORGE.HotspotManager.prototype, "uids",
     /** @this {FORGE.HotspotManager} */
     get: function()
     {
-        var uids = [];
-
-        for(var i = 0, ii = this._hotspots.length; i < ii; i++)
-        {
-            uids.push(this._hotspots[i].uid);
-        }
-
-        return uids;
+        return Object.keys(this._hotspots);
     }
 });
 
@@ -338,6 +228,6 @@ Object.defineProperty(FORGE.HotspotManager.prototype, "count",
     /** @this {FORGE.HotspotManager} */
     get: function()
     {
-        return this._hotspots.length;
+        return this.uids.length;
     }
 });

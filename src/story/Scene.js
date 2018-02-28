@@ -111,6 +111,14 @@ FORGE.Scene = function(viewer)
     this._mediaUid = "";
 
     /**
+     * The uids of Object3D of the scene
+     * @name FORGE.Scene#_objectsUid
+     * @type {Array<string>}
+     * @private
+     */
+    this._objectsUid = [];
+
+    /**
      * FX manager.
      * @name  FORGE.Viewer#_fxs
      * @type {FORGE.FXManager}
@@ -199,6 +207,18 @@ FORGE.Scene.prototype._parseConfig = function(config)
     {
         var layout = this._viewer.layouts.addConfig(config.layout);
         this._layoutUid = layout.uid;
+    }
+
+
+    if(Array.isArray(config.hotspots) === true)
+    {
+        // var object;
+
+        for (var i = 0, ii = config.hotspots.length; i < ii; i++)
+        {
+            this._viewer.hotspots.addConfig(config.hotspots[i]);
+            this._objectsUid.push(config.hotspots[i].uid);
+        }
     }
 
     if (typeof config.events === "object" && config.events !== null)
@@ -682,6 +702,36 @@ Object.defineProperty(FORGE.Scene.prototype, "groups",
     get: function()
     {
         return FORGE.UID.get(this.groupsUid);
+    }
+});
+
+/**
+ * Get the Array of objects uids that are in this scene.
+ * @name FORGE.Scene#objectsUid
+ * @readonly
+ * @type {Array<string>}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "objectsUid",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._objectsUid;
+    }
+});
+
+/**
+ * Get the Array of {@link FORGE.Object3D} that are in this scene.
+ * @name FORGE.Scene#objects
+ * @readonly
+ * @type {Array<FORGE.Object3D>}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "objects",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return FORGE.UID.get(this._objectsUid);
     }
 });
 

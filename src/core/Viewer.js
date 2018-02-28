@@ -439,7 +439,6 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._story.boot();
     // this._playlists.boot();
     this._plugins.boot();
-    this._hotspots.boot();
 
     this.log("ForgeJS " + FORGE.VERSION);
 

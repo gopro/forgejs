@@ -63,8 +63,6 @@ FORGE.ObjectRenderer = function(viewer, sceneRenderer)
      */
     this._picking = null;
 
-    this._ready = false;
-
     FORGE.BaseObject.call(this, "ObjectRenderer");
 
     this._boot();
@@ -82,18 +80,8 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
 FORGE.ObjectRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
-    this._sceneRenderer.scene.onLoadComplete.addOnce(this._sceneLoadCompleteHandler, this);
-    this._sceneRenderer.scene.onUnloadComplete.addOnce(this._sceneUnloadCompleteHandler, this);
-};
 
-/**
- * SceneLoadCompleteHandler
- * @method FORGE.ObjectRenderer#_sceneLoadCompleteHandler
- * @private
- */
-FORGE.ObjectRenderer.prototype._sceneLoadCompleteHandler = function()
-{
-    this._objects = this._viewer.hotspots.getByType("Hotspot3D");
+    this._objects = this._sceneRenderer.scene.objects;
 
     for (var i = 0; i < this._objects.length; i++)
     {
@@ -104,7 +92,7 @@ FORGE.ObjectRenderer.prototype._sceneLoadCompleteHandler = function()
 
     this._picking = new FORGE.Picking(this._viewer, this);
 
-    this._ready = true;
+    this._sceneRenderer.scene.onUnloadComplete.addOnce(this._sceneUnloadCompleteHandler, this);
 };
 
 /**
@@ -114,8 +102,6 @@ FORGE.ObjectRenderer.prototype._sceneLoadCompleteHandler = function()
  */
 FORGE.ObjectRenderer.prototype._sceneUnloadCompleteHandler = function()
 {
-    this._ready = false;
-
     if (this._picking !== null)
     {
         this._picking.destroy();
@@ -171,11 +157,6 @@ FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
  */
 FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 {
-    if(this._ready === false)
-    {
-        return;
-    }
-
     var view = viewport.view.current;
     var camera = viewport.camera.main;
     var compilationNeeded = false;
@@ -252,8 +233,6 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
  */
 FORGE.ObjectRenderer.prototype.destroy = function()
 {
-    this._ready = false;
-
     if (this._picking !== null)
     {
         this._picking.destroy();
@@ -262,7 +241,11 @@ FORGE.ObjectRenderer.prototype.destroy = function()
 
     this._objects = null;
 
-    this._scene.children = null;
+    while(this._scene.children.length > 0)
+    {
+        this._scene.remove(this._scene.children[0]);
+    }
+
     this._scene = null;
 
     this._lastViewport = null;
