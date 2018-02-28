@@ -79,14 +79,6 @@ FORGE.Scene = function(viewer)
     this._viewCount = 0;
 
     /**
-     * Array of group uids this scene belongs to. aka "parents".
-     * @name FORGE.Scene#_groups
-     * @type {?Array<string>}
-     * @private
-     */
-    this._groups = null;
-
-    /**
      * Is booted flag.
      * @name FORGE.Scene#_booted
      * @type {boolean}
@@ -546,7 +538,7 @@ Object.defineProperty(FORGE.Scene.prototype, "booted",
 });
 
 /**
-* Get the group config object.
+* Get the config object.
 * @name FORGE.Scene#config
 * @readonly
 * @type {SceneConfig}
@@ -561,7 +553,7 @@ Object.defineProperty(FORGE.Scene.prototype, "config",
 });
 
 /**
- * Get the count of how many times this group has been viewed.
+ * Get the count of how many times this scene has been viewed.
  * @name FORGE.Scene#viewCount
  * @readonly
  * @type {number}
