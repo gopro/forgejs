@@ -178,14 +178,13 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._tags = config.tags;
     this._register();
 
-    this._name = new FORGE.LocaleString(this._viewer, this._config.name);
-    this._slug = new FORGE.LocaleString(this._viewer, this._config.slug);
-    this._description = new FORGE.LocaleString(this._viewer, this._config.description);
+    this._name = new FORGE.LocaleString(this._viewer, config.name);
+    this._slug = new FORGE.LocaleString(this._viewer, config.slug);
+    this._description = new FORGE.LocaleString(this._viewer, config.description);
     this._background = config.background;
     this._layoutUid = typeof config.layout === "string" && config.layout !== "" ? config.layout : this._viewer.layouts.defaultUid;
-    this._mediaUid = this._viewer.media.add(this._config.media);
-    this._sync = (FORGE.Utils.isArrayOf(this._config.sync, "string") === true) ? this._config.sync : [];
-
+    this._mediaUid = this._viewer.media.add(config.media);
+    this._sync = (FORGE.Utils.isArrayOf(config.sync, "string") === true) ? config.sync : [];
 
     // Set the default layout
     this._layoutUid = this._viewer.layouts.defaultUid;
@@ -646,7 +645,7 @@ Object.defineProperty(FORGE.Scene.prototype, "sync",
  * Get the Array of groups uids to which this scene belongs to.
  * @name FORGE.Scene#groupsUid
  * @readonly
- * @type {?Array<FORGE.Group>}
+ * @type {Array<string>}
  */
 Object.defineProperty(FORGE.Scene.prototype, "groupsUid",
 {
@@ -675,7 +674,7 @@ Object.defineProperty(FORGE.Scene.prototype, "groupsUid",
  * Get the Array of {@link FORGE.Group} to which this scene belongs to.
  * @name FORGE.Scene#groups
  * @readonly
- * @type {?Array<FORGE.Group>}
+ * @type {Array<FORGE.Group>}
  */
 Object.defineProperty(FORGE.Scene.prototype, "groups",
 {
