@@ -366,12 +366,6 @@ FORGE.Story.prototype._addScene = function(scene)
  */
 FORGE.Story.prototype._sceneLoadStartHandler = function(event)
 {
-    // Unload the previous scene if any
-    if(this.scene !== null)
-    {
-        this.scene.unload();
-    }
-
     this._loadingSceneUid = event.emitter.uid;
 
     this.log("scene "+this._loadingSceneUid+" load start");
