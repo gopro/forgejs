@@ -2,10 +2,20 @@
  * ScreenMaterial class.
  *
  * @constructor FORGE.ScreenMaterial
+ * @param {FORGE.Viewer} viewer - The viewer reference.
+ * @param {string} className - The name of the class for child classes.
  * @extends {FORGE.BaseObject}
  */
-FORGE.ScreenMaterial = function()
+FORGE.ScreenMaterial = function(viewer, className)
 {
+    /**
+     * The viewer reference.
+     * @name FORGE.SceneRendererPool#_viewer
+     * @type {FORGE.Viewer}
+     * @private
+     */
+    this._viewer = viewer;
+
     /**
      * The raw shader material.
      * @name FORGE.ScreenMaterial#_shaderMaterial
@@ -14,7 +24,15 @@ FORGE.ScreenMaterial = function()
      */
     this._shaderMaterial = null;
 
-    FORGE.BaseObject.call(this, "ScreenMaterial");
+    /**
+     * On ready event dispatcher
+     * @name FORGE.ScreenMaterial#_onReady
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onReady = null;
+
+    FORGE.BaseObject.call(this, className || "ScreenMaterial");
 
     this._boot();
 };
@@ -29,7 +47,22 @@ FORGE.ScreenMaterial.prototype.constructor = FORGE.ScreenMaterial;
  */
 FORGE.ScreenMaterial.prototype._boot = function()
 {
+    this._onReady = new FORGE.EventDispatcher(this, true);
+
+    this._load();
+};
+
+/**
+ * Method used to load assets for the material if any.
+ * builds the material once load complete and dispatch ready.
+ * @method FORGE.ScreenMaterial#_load
+ * @private
+ */
+FORGE.ScreenMaterial.prototype._load = function()
+{
     this._shaderMaterial = this._build();
+
+    this._onReady.dispatch();
 };
 
 /**
@@ -42,9 +75,7 @@ FORGE.ScreenMaterial.prototype._build = function()
 {
     var uniforms =
     {
-        tMixRatio: { value: 1.0 },
         tTextureOne: { value: null },
-        tTextureTwo: { value: null },
         tResolution: { value: new THREE.Vector2() }
     };
 
@@ -56,19 +87,12 @@ FORGE.ScreenMaterial.prototype._build = function()
 
         "varying vec2 vUv;",
 
-        "uniform float tMixRatio;",
         "uniform sampler2D tTextureOne;",
-        "uniform sampler2D tTextureTwo;",
         "uniform vec2 tResolution;",
 
         "void main() {",
 
-            "vec2 xy = gl_FragCoord.xy / tResolution.xy;",
-
-            "float edgeMix = step(tMixRatio, xy.x);",
-            "vec4 texelR = texture2D( tTextureOne, vUv - vec2(tMixRatio, 0.0));",
-            "vec4 texelL = texture2D( tTextureTwo, clamp(vUv + vec2(1.0 - tMixRatio, 0.0), vec2(0.0), vec2(1.0)));",
-            "gl_FragColor = mix( texelL, texelR, edgeMix );",
+            "gl_FragColor = texture2D(tTextureOne, gl_FragCoord.xy / tResolution);",
 
         "}"
 
@@ -76,7 +100,6 @@ FORGE.ScreenMaterial.prototype._build = function()
 
     return new THREE.RawShaderMaterial({ uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader });
 };
-
 
 /**
  * Destroy sequence.
@@ -104,29 +127,6 @@ Object.defineProperty(FORGE.ScreenMaterial.prototype, "shaderMaterial",
 });
 
 /**
- * Get and set the mix ratio uniform.
- * @name FORGE.ScreenMaterial#mixRatio
- * @type {number}
- */
-Object.defineProperty(FORGE.ScreenMaterial.prototype, "mixRatio",
-{
-    /** @this {FORGE.ScreenMaterial} */
-    get: function()
-    {
-        return this._shaderMaterial.uniforms.tMixRatio.value;
-    },
-
-    /** @this {FORGE.ScreenMaterial} */
-    set: function(value)
-    {
-        if (typeof value === "number")
-        {
-            this._shaderMaterial.uniforms.tMixRatio.value = FORGE.Math.clamp(value, 0, 1);
-        }
-    }
-});
-
-/**
  * Get and set the texture one uniform.
  * @name FORGE.ScreenMaterial#textureOne
  * @type {THREE.WebGLRenderTarget}
@@ -147,26 +147,6 @@ Object.defineProperty(FORGE.ScreenMaterial.prototype, "textureOne",
 });
 
 /**
- * Get and set the texture two uniform.
- * @name FORGE.ScreenMaterial#textureTwo
- * @type {THREE.WebGLRenderTarget}
- */
-Object.defineProperty(FORGE.ScreenMaterial.prototype, "textureTwo",
-{
-    /** @this {FORGE.ScreenMaterial} */
-    get: function()
-    {
-        return this._shaderMaterial.uniforms.tTextureTwo.value;
-    },
-
-    /** @this {FORGE.ScreenMaterial} */
-    set: function(value)
-    {
-        this._shaderMaterial.uniforms.tTextureTwo.value = value;
-    }
-});
-
-/**
  * Get and set the resolution uniform.
  * @name FORGE.ScreenMaterial#resolution
  * @type {THREE.Vector2}
@@ -183,5 +163,20 @@ Object.defineProperty(FORGE.ScreenMaterial.prototype, "resolution",
     set: function(value)
     {
         this._shaderMaterial.uniforms.tResolution.value = value;
+    }
+});
+
+/**
+ * Get the onReady {@link FORGE.EventDispatcher}.
+ * @name FORGE.ScreenMaterial#onReady
+ * @type {FORGE.EventDispatcher}
+ * @readonly
+ */
+Object.defineProperty(FORGE.ScreenMaterial.prototype, "onReady",
+{
+    /** @this {FORGE.ScreenMaterial} */
+    get: function()
+    {
+        return this._onReady;
     }
 });

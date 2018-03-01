@@ -47,6 +47,14 @@ FORGE.ScreenRenderer = function(viewer)
      */
     this._material = null;
 
+    /**
+     * Ready flag.
+     * @name  FORGE.ScreenRenderer#_ready
+     * @type {boolean}
+     * @private
+     */
+    this._ready = false;
+
     FORGE.BaseObject.call(this, "ScreenRenderer");
 
     this._boot();
@@ -64,14 +72,22 @@ FORGE.ScreenRenderer.prototype._boot = function()
 {
     this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
     this._scene = new THREE.Scene();
-
-    this._material = new FORGE.ScreenMaterial();
-
-    var geometry = new THREE.PlaneBufferGeometry(2, 2);
-    var material = this._material.shaderMaterial;
-    this._quad = new THREE.Mesh(geometry, material);
+    this._quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2));
 
     this._scene.add(this._quad);
+
+    this.material = new FORGE.ScreenMaterial(this._viewer);
+};
+
+/**
+ * Material ready handler.
+ * When material is ready, create the quad and add it to the scene.
+ * @method FORGE.ScreenRenderer#_materialReadyHandler
+ */
+FORGE.ScreenRenderer.prototype._materialReadyHandler = function()
+{
+    this._quad.material = this._material.shaderMaterial;
+    this._ready = true;
 };
 
 /**
@@ -152,6 +168,27 @@ Object.defineProperty(FORGE.ScreenRenderer.prototype, "material",
     get: function()
     {
         return this._material;
-    }
+    },
+
+    /** @this {FORGE.ScreenRenderer} */
+    set: function(value)
+    {
+        this._material = value;
+        this._material.onReady.addOnce(this._materialReadyHandler, this);
+    },
 });
 
+/**
+ * Get the ready flag.
+ * @name FORGE.ScreenRenderer#ready
+ * @type {boolean}
+ * @readonly
+ */
+Object.defineProperty(FORGE.ScreenRenderer.prototype, "ready",
+{
+    /** @this {FORGE.ScreenRenderer} */
+    get: function()
+    {
+        return this._ready;
+    }
+});
