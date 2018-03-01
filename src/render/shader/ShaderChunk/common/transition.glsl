@@ -2,7 +2,7 @@
  * Get fragment color
  * @param  {vec3} spherePT - sphere point (world space)
  * @param  {vec2} texCoords -  texture coordinates (uv space)
- * @return {vec4} fragement color 
+ * @return {vec4} fragment color
  */
 vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords) {
 
@@ -71,8 +71,8 @@ vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords) {
         highEdge -= 0.05;
         float fiboMaskMix = smoothstep(lowEdge - dss, lowEdge + dss / 2., tMixRatio) * (1.0 - smoothstep(highEdge - dss, highEdge + dss, tMixRatio));
         vec4 fiboMask = mix(vec4(1.0), clamp(vec4(vec3(smoothstep( 0.0, 0.001, dis)), 1.0), 0., 1.), fiboMaskMix);
-    
-        vec2 fiboTexCoords = toEquirectangularTexCoords(toSpherical(cartesianPT).yz);
+
+        vec2 fiboTexCoords = getTexCoords(toSpherical(cartesianPT));
         vec4 fiboFg = texture2D(tTexture, fiboTexCoords);
         vec4 fiboBg = texture2D(tTransitionTexture, fiboTexCoords);
 

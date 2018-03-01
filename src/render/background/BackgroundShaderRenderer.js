@@ -51,6 +51,22 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
         side: THREE.FrontSide
     });
 
+    switch (this._media.source.format)
+    {
+        case FORGE.MediaFormat.EQUIRECTANGULAR:
+        default:
+            material.uniforms.tMediaFormat.value = 0;
+        break;
+
+        case FORGE.MediaFormat.CUBE:
+            material.uniforms.tMediaFormat.value = 1;
+        break;
+
+        case FORGE.MediaFormat.FLAT:
+            material.uniforms.tMediaFormat.value = 2;
+        break;
+    }
+
     material.needsUpdate = true;
 
     return material;

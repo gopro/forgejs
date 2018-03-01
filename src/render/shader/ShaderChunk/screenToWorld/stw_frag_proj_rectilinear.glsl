@@ -5,6 +5,8 @@
 
 #include <defines>
 
+uniform int tMediaFormat;
+
 uniform int tTransition;
 uniform float tTime;
 uniform float tMixRatio;
@@ -22,7 +24,12 @@ uniform float tProjectionScale;
 #include <fibonacci>
 #include <transition>
 
-vec3 projection(vec2 screenPT) {
+/**
+ * Rectilinear view screen to world inverse projection
+ * @param  {vec2} screenPT - screen pt
+ * @return {vec3} world pt
+ */
+vec3 projectionInverse(vec2 screenPT) {
     // Screen point is on the zn plane, expressed it in clip space [-1 .. 1 , -1 .. 1]
     vec4 clipPT = vec4(tProjectionScale * screenToNDC(screenPT), -1.0, 1.0);
 
@@ -35,7 +42,7 @@ vec3 projection(vec2 screenPT) {
 
 void main() {
     vec2 screenPT = getScreenPt();
-    vec3 spherePT = normalize(projection(screenPT));
-    vec2 texCoords = toEquirectangularTexCoords(toSpherical(spherePT).yz);
+    vec3 spherePT = normalize(projectionInverse(screenPT));
+    vec2 texCoords = getTexCoords(spherePT);
     gl_FragColor = getFragColor(spherePT, screenPT, texCoords);
 }

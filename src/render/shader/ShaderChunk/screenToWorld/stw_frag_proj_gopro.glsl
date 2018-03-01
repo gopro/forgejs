@@ -5,6 +5,8 @@
 
 #include <defines>
 
+uniform int tMediaFormat;
+
 uniform int tTransition;
 uniform float tTime;
 uniform float tMixRatio;
@@ -23,30 +25,37 @@ uniform float tProjectionScale;
 #include <fibonacci>
 #include <transition>
 
-vec3 projection(vec2 screenPT) {
+/**
+ * GoPro view screen to world inverse projection
+ * @param  {vec2} screenPT - screen pt
+ * @return {vec3} world pt
+ */
+vec3 projectionInverse(vec2 screenPT) {
+    // Screen point is on the zn plane, expressed it in clip space [-1 .. 1 , -1 .. 1]
+    vec4 clipPT = vec4(tProjectionScale * screenToNDC(screenPT), -1.0, 1.0);
 
-    vec2 frag = screenToNDC(screenPT);
-    vec2 c = tProjectionScale * frag;
     float zs = tProjectionDistance;
-    
-    float xy2 = dot(c,c);
     float zs12 = (zs + 1.0) * (zs + 1.0);
-    
+
+    float xy2 = dot(clipPT.xy, clipPT.xy);
     float delta = 4.0 * (zs * zs * xy2 * xy2 - (xy2 + zs12) * (xy2 * zs * zs - zs12));
     if (delta < 0.0) {
         return vec3(-1.);
     }
-    
-    float z = (2.0 * zs * xy2 - sqrt(delta)) / (2.0 * (zs12 + xy2));
-    float x = c.x * ((zs - z) / (zs + 1.0));
-    float y = c.y * ((zs - z) / (zs + 1.0));
 
-    return vec3(tModelViewMatrixInverse * vec4(x, y, z, 1.0));
+    float z = (2.0 * zs * xy2 - sqrt(delta)) / (2.0 * (zs12 + xy2));
+    float x = clipPT.x * ((zs - z) / (zs + 1.0));
+    float y = clipPT.y * ((zs - z) / (zs + 1.0));
+
+    vec4 worldPT = tModelViewMatrixInverse * vec4(x, y, z, 1.0);
+
+    // Spherical point for texture lookup
+    return worldPT.xyz;
 }
 
 void main() {
     vec2 screenPT = getScreenPt();
-    vec3 spherePT = normalize(projection(screenPT));
-    vec2 texCoords = toEquirectangularTexCoords(toSpherical(spherePT).yz);
+    vec3 spherePT = normalize(projectionInverse(screenPT));
+    vec2 texCoords = getTexCoords(spherePT);
     gl_FragColor = getFragColor(spherePT, screenPT, texCoords);
 }
