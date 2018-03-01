@@ -57,6 +57,9 @@ FORGE.ObjectMaterial.prototype.constructor = FORGE.ObjectMaterial;
  */
 FORGE.ObjectMaterial.prototype._boot = function()
 {
+    this._uid = FORGE.ObjectMaterial.generateUid(this._view, this._type, this._transparent);
+    this._register();
+
     this._shaderMaterial = this._build();
 };
 
@@ -96,18 +99,18 @@ FORGE.ObjectMaterial.prototype.destroy = function()
 };
 
 /**
- * Generate a name for an object material based on its view, type and transparency.
+ * Generate a uid for an object material based on its view, type and transparency.
  * This will compute view + type + transparent (output example: rectilinear-map-opaque)
- * @method FORGE.ObjectMaterial.getName
+ * @method FORGE.ObjectMaterial.generateUid
  * @param {string} view - The view type of the material.
  * @param {string} type - The shader type of the material. (map, color, pick, wireframe)
  * @param {boolean} transparent - Is the material is transparent?
  * @static
- * @return {string} - Returns the computed name
+ * @return {string} - Returns the computed uid
  */
-FORGE.ObjectMaterial.getName = function(view, type, transparent)
+FORGE.ObjectMaterial.generateUid = function(view, type, transparent)
 {
-    return view + "-" + type + "-" + (transparent === true ? "transparent" : "opaque");
+    return "forgejs-material-" + view + "-" + type + "-" + (transparent === true ? "transparent" : "opaque");
 };
 
 /**
@@ -169,19 +172,3 @@ Object.defineProperty(FORGE.ObjectMaterial.prototype, "transparent",
         return this._transparent;
     }
 });
-
-/**
- * Get the name of this material.
- * @name FORGE.ObjectMaterial#name
- * @type {string}
- * @readonly
- */
-Object.defineProperty(FORGE.ObjectMaterial.prototype, "name",
-{
-    /** @this {FORGE.ObjectMaterial} */
-    get: function()
-    {
-        return FORGE.ObjectMaterial.getName(this._view, this._type, this._transparent);
-    }
-});
-

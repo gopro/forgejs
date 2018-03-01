@@ -6,14 +6,6 @@
  */
 FORGE.ObjectMaterialPool = function()
 {
-    /**
-     * The materials pool object.
-     * @name FORGE.ObjectMaterialPool#_pool
-     * @type {Object}
-     * @private
-     */
-    this._pool = {};
-
     FORGE.BaseObject.call(this, "ObjectMaterialPool");
 };
 
@@ -27,7 +19,7 @@ FORGE.ObjectMaterialPool.prototype.constructor = FORGE.ObjectMaterialPool;
  * @param {string} view - The view type
  * @param {string} type - The type of the shader listed in {@link FORGE.ObjectMaterialType}
  * @param {boolean} transparent - true if transparent material, false if opaque
- * @return {THREE.RawShaderMaterial} world to screen raw shader material.
+ * @return {FORGE.ObjectMaterial} Returns the ObjectMaterial.
  */
 FORGE.ObjectMaterialPool.prototype.get = function(view, type, transparent)
 {
@@ -35,21 +27,17 @@ FORGE.ObjectMaterialPool.prototype.get = function(view, type, transparent)
     type = (typeof type === "string") ? type : FORGE.ObjectMaterialType.MAP;
 
     // Compute the name of the material based on the view, the type and the transparency
-    var name = FORGE.ObjectMaterial.getName(view, type, transparent);
+    var uid = FORGE.ObjectMaterial.generateUid(view, type, transparent);
 
-    // If the material exists in the pool, return it
-    if(name in this._pool)
+     // If the material exists in the pool, return it
+    if (FORGE.UID.isTypeOf(uid, "ObjectMaterial") === true)
     {
-        return this._pool[name];
+        return FORGE.UID.get(uid);
     }
     // Else, create it, add it to the pool and return it
     else
     {
-        var material = new FORGE.ObjectMaterial(view, type, transparent);
-
-        this._pool[name] = material;
-
-        return material;
+        return new FORGE.ObjectMaterial(view, type, transparent);
     }
 };
 
@@ -59,11 +47,10 @@ FORGE.ObjectMaterialPool.prototype.get = function(view, type, transparent)
  */
 FORGE.ObjectMaterialPool.prototype.destroy = function()
 {
-    for (name in this._pool)
-    {
-        this._pool[name].dispose();
-        this._pool[name] = null;
-    }
+    var materials = FORGE.UID.get(null, "ObjectMaterial");
 
-    this._pool = null;
+    for (var i = 0, ii = materials.length; i < ii; i++)
+    {
+        materials[i].destroy();
+    }
 };
