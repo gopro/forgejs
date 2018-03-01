@@ -96,6 +96,8 @@ FORGE.PluginManager.prototype._parseMainConfig = function(config)
 
     this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
     this._prefix = (typeof config.prefix === "string") ? config.prefix : "./plugins/";
+
+    this._parseConfig(this._config);
 };
 
 /**
