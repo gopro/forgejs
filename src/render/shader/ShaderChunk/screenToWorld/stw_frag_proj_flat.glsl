@@ -5,6 +5,8 @@
 
 #include <defines>
 
+uniform int tMediaFormat;
+
 uniform sampler2D tTexture;
 uniform vec4 tViewport;
 uniform float tViewportRatio;
