@@ -32,6 +32,7 @@ FORGE.MediaManager.prototype.constructor = FORGE.MediaManager;
  * Update the media
  * @method FORGE.MediaManager#add
  * @param {SceneMediaConfig} config - The config of the media to add.
+ * @return {FORGE.Media} Returns the created media.
  */
 FORGE.MediaManager.prototype.add = function(config)
 {
@@ -73,7 +74,7 @@ FORGE.MediaManager.prototype.add = function(config)
 
     this._media.push(media);
 
-    return media.uid;
+    return media;
 };
 
 /**

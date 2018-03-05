@@ -191,7 +191,7 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._description = new FORGE.LocaleString(this._viewer, config.description);
     this._background = config.background;
     this._layoutUid = typeof config.layout === "string" && config.layout !== "" ? config.layout : this._viewer.layouts.defaultUid;
-    this._mediaUid = this._viewer.media.add(config.media);
+    this._mediaUid = this._viewer.media.add(config.media).uid;
     this._sync = (FORGE.Utils.isArrayOf(config.sync, "string") === true) ? config.sync : [];
 
     // Set the default layout
