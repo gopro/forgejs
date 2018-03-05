@@ -410,6 +410,12 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._system = new FORGE.System(this);
     this._clock = new FORGE.Clock(this);
     this._audio = new FORGE.SoundManager(this);
+    this._keyboard = new FORGE.Keyboard(this);
+    this._gyroscope = new FORGE.Gyroscope(this);
+    this._gamepad = new FORGE.GamepadsManager(this);
+    this._cache = new FORGE.Cache(this);
+    this._load = new FORGE.Loader(this);
+    this._tween = new FORGE.TweenManager(this);
     this._raf = new FORGE.RequestAnimationFrame(this);
     this._i18n = new FORGE.LocaleManager(this);
     this._story = new FORGE.Story(this);
@@ -425,14 +431,6 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._layouts = new FORGE.LayoutManager(this);
     // this._director = new FORGE.Director(this);
     this._fxs = new FORGE.FXManager(this);
-
-    this._keyboard = new FORGE.Keyboard(this);
-    this._gyroscope = new FORGE.Gyroscope(this);
-    this._gamepad = new FORGE.GamepadsManager(this);
-    this._cache = new FORGE.Cache(this);
-    this._load = new FORGE.Loader(this);
-    this._tween = new FORGE.TweenManager(this);
-
     this._system.boot();
     this._audio.boot();
     this._raf.boot();
