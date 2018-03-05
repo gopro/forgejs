@@ -138,6 +138,11 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
  */
 FORGE.Renderer.prototype.render = function()
 {
+    if(this._screenRenderer.ready === false)
+    {
+        return;
+    }
+
     this._sceneRendererPool.render();
 
     var ratio = this._sceneLoader.transition.time;
