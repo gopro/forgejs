@@ -231,6 +231,21 @@ Object.defineProperty(FORGE.Renderer.prototype, "webGLRenderer",
 });
 
 /**
+ * Get the screen renderer.
+ * @name FORGE.Renderer#screen
+ * @type {FORGE.ScreenRenderer}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "screen",
+{
+    /** @this {FORGE.Renderer} */
+    get: function()
+    {
+        return this._screenRenderer;
+    }
+});
+
+/**
  * Get the scene renderer pool
  * @name FORGE.Renderer#scenes
  * @type {FORGE.SceneRendererPool}
