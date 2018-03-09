@@ -100,12 +100,12 @@ vec2 cubefaceTexCoords(in vec3 spherePT) {
  * @param  {vec3} spherePT - point on a sphere (cartesian coordinates)
  * @return {vec2} UV texture coordinates
  */
-vec2 getTexCoords(vec3 spherePT) {
+vec2 getTexCoords(vec3 spherePT, int mediaFormat) {
 
-    if (tMediaFormat == 1) {
+    if (mediaFormat == 1) {
         return cubefaceTexCoords(spherePT);
     }
 
-    // tMediaFormat is 0 or default value
+    // mediaFormat is 0 or default value
     return equirectangularTexCoords(spherePT);
 }

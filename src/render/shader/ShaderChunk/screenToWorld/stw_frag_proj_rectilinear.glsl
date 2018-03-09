@@ -6,11 +6,14 @@
 #include <defines>
 
 uniform int tMediaFormat;
+uniform int tMediaFormatTransition;
 
 uniform int tTransition;
-uniform float tTime;
 uniform float tMixRatio;
-uniform sampler2D tTransitionTexture;
+uniform sampler2D tTextureTransition;
+
+uniform vec3 tColor;
+uniform vec3 tColorTransition;
 
 uniform sampler2D tTexture;
 uniform vec4 tViewport;
@@ -43,6 +46,7 @@ vec3 projectionInverse(vec2 screenPT) {
 void main() {
     vec2 screenPT = getScreenPt();
     vec3 spherePT = normalize(projectionInverse(screenPT));
-    vec2 texCoords = getTexCoords(spherePT);
-    gl_FragColor = getFragColor(spherePT, screenPT, texCoords);
+    vec2 texCoords = getTexCoords(spherePT, tMediaFormat);
+    vec2 texTransitionCoords = getTexCoords(spherePT, tMediaFormatTransition);
+    gl_FragColor = getFragColor(spherePT, screenPT, texCoords, texTransitionCoords);
 }
