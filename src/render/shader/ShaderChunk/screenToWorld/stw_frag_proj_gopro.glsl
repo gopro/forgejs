@@ -56,6 +56,7 @@ vec3 projectionInverse(vec2 screenPT) {
 void main() {
     vec2 screenPT = getScreenPt();
     vec3 spherePT = normalize(projectionInverse(screenPT));
-    vec2 texCoords = getTexCoords(spherePT);
-    gl_FragColor = getFragColor(spherePT, screenPT, texCoords);
+    vec2 texCoords = getTexCoords(spherePT, tMediaFormat);
+    vec2 texTransitionCoords = getTexCoords(spherePT, tMediaFormatTransition);
+    gl_FragColor = getFragColor(spherePT, screenPT, texCoords, texTransitionCoords);
 }

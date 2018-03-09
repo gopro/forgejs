@@ -67,6 +67,8 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
         break;
     }
 
+    material.uniforms.tTransition.value = 0;
+
     material.needsUpdate = true;
 
     return material;
@@ -83,19 +85,72 @@ FORGE.BackgroundShaderRenderer.prototype._createGeometry = function()
 };
 
 /**
+ * Set the media for the transition
+ * @method FORGE.BackgroundShaderRenderer#setMediaTransition
+ * @param {FORGE.Media} media - transition media
+ * @param {number} transitionType - transition type @todo: create an enum mapped on GLSL definition
+ */
+FORGE.BackgroundShaderRenderer.prototype.setMediaTransition = function(media, transitionType)
+{
+    // Stop the transition
+    if (media === null)
+    {
+        if ("tTextureTransition" in this._mesh.material.uniforms)
+        {
+            this._mesh.material.uniforms.tTextureTransition.value = null;
+        }
+
+        if ("tTransition" in this._mesh.material.uniforms)
+        {
+            this._mesh.material.uniforms.tTransition.value = 0;
+        }
+    }
+
+    // Start the transition
+    else
+    {
+        if ("tTextureTransition" in this._mesh.material.uniforms)
+        {
+            this._mesh.material.uniforms.tTextureTransition.value = media.texture.texture;
+        }
+
+        if ("tTransition" in this._mesh.material.uniforms)
+        {
+            this._mesh.material.uniforms.tTransition.value = transitionType;
+        }
+
+        switch (media.source.format)
+        {
+            case FORGE.MediaFormat.EQUIRECTANGULAR:
+            default:
+                this._mesh.material.uniforms.tMediaFormatTransition.value = 0;
+            break;
+
+            case FORGE.MediaFormat.CUBE:
+                this._mesh.material.uniforms.tMediaFormatTransition.value = 1;
+            break;
+
+            case FORGE.MediaFormat.FLAT:
+                this._mesh.material.uniforms.tMediaFormatTransition.value = 2;
+            break;
+        }
+    }
+};
+
+/**
  * Do preliminary job of specific background renderer, then summon superclass method
  * @method FORGE.BackgroundShaderRenderer#render
  * @param {THREE.WebGLRenderTarget} target WebGL render target
  */
 FORGE.BackgroundShaderRenderer.prototype.render = function(target)
 {
-    // var periodMS = 15 * 1000;
-
-    // var tn = (this._viewer.clock.elapsedTime % periodMS) / periodMS;
-    // var ramp = tn < 0.5 ? 2 * tn : 2 - 2 * tn;
-
-    // this._mesh.material.uniforms.tMixRatio.value = ramp;
-    // this._mesh.material.uniforms.tTime.value = tn;
+    if (this._mesh.material.uniforms.tTransition !== 0)
+    {
+        if ("tMixRatio" in this._mesh.material.uniforms)
+        {
+            this._mesh.material.uniforms.tMixRatio.value = this._viewer.renderer.loader.transition.time;
+        }
+    }
 
     FORGE.BackgroundTextureRenderer.prototype.render.call(this, target);
 };

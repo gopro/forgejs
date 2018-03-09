@@ -1,16 +1,18 @@
 /**
  * Get fragment color
  * @param  {vec3} spherePT - sphere point (world space)
+ * @param  {vec2} screenPT - screen point
  * @param  {vec2} texCoords -  texture coordinates (uv space)
+ * @param  {vec2} texCoordsTransition - transition texture coordinates (uv space)
  * @return {vec4} fragment color
  */
-vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords) {
+vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords, vec2 texCoordsTransition) {
 
     // Fade between 1 and 2
     if (tTransition == 1) {
 
         vec4 texel1 = texture2D( tTexture, texCoords );
-        vec4 texel2 = texture2D( tTransitionTexture, texCoords );
+        vec4 texel2 = texture2D( tTextureTransition, texCoordsTransition );
         return mix( texel1, texel2, 1.0 - tMixRatio );
 
     }
@@ -18,9 +20,9 @@ vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords) {
     // Slide H
     else if (tTransition == 2) {
 
-        float edgeMix = smoothstep(tMixRatio - 0.01, tMixRatio + 0.01, screenPT.x);
+        float edgeMix = 1.0 - smoothstep(tMixRatio - 0.01, tMixRatio + 0.01, screenPT.x);
         vec4 texel1 = texture2D( tTexture, texCoords );
-        vec4 texel2 = texture2D( tTransitionTexture, texCoords );
+        vec4 texel2 = texture2D( tTextureTransition, texCoordsTransition );
         return mix( texel1, texel2, edgeMix );
 
     }
@@ -28,9 +30,9 @@ vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords) {
     // Slide V
     else if (tTransition == 3) {
 
-        float edgeMix = smoothstep(tMixRatio - 0.01, tMixRatio + 0.01, screenPT.y);
+        float edgeMix = 1.0 - smoothstep(tMixRatio - 0.01, tMixRatio + 0.01, screenPT.y);
         vec4 texel1 = texture2D( tTexture, texCoords );
-        vec4 texel2 = texture2D( tTransitionTexture, texCoords );
+        vec4 texel2 = texture2D( tTextureTransition, texCoordsTransition );
         return mix( texel1, texel2, edgeMix );
 
     }
@@ -39,14 +41,13 @@ vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords) {
     else if (tTransition == 4) {
 
         vec4 texel1 = texture2D( tTexture, texCoords );
-        vec4 texel2 = texture2D( tTransitionTexture, texCoords );
+        vec4 texel2 = texture2D( tTextureTransition, texCoordsTransition );
 
         float ratioSineInOut =  0.5 * (1.0 + sin(PI_OVER_TWO * (2.0 * tMixRatio - 1.0)));
         float zn = 2.0 * ratioSineInOut - 1.0;
 
-        float edgeMix = 1.0 - smoothstep(zn - 0.2, zn + 0.2, spherePT.z);
+        float edgeMix = 1.0 - smoothstep(zn - 0.05, zn + 0.05, spherePT.z);
         return mix(texel1, texel2, edgeMix);
-
     }
 
     // Fibonnaci sphere mapping
@@ -55,7 +56,10 @@ vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords) {
         float dss = 0.1;
         float lowEdge = 0.4;
         float highEdge = 0.6;
-        float fiboMix = smoothstep(lowEdge - dss, lowEdge + dss, tMixRatio) * (1.0 - smoothstep(highEdge - dss, highEdge + dss, tMixRatio));
+
+        float fiboMix = smoothstep(lowEdge - dss, lowEdge + dss, tMixRatio) *
+                        (1.0 - smoothstep(highEdge - dss, highEdge + dss, tMixRatio));
+
         float colorMix = smoothstep(lowEdge, highEdge, tMixRatio);
 
         float nPts = (1.0 - fiboMix) * 8000. + 8000.;
@@ -67,17 +71,20 @@ vec4 getFragColor(vec3 spherePT, vec2 screenPT, vec2 texCoords) {
         vec3 cartesianPT = s2c(closePt);
         float dis = dist.y - dist.x;
 
+        // Force fiboMask to 1 to remove the black lines between Fibonnaci cells
         lowEdge += 0.05;
         highEdge -= 0.05;
         float fiboMaskMix = smoothstep(lowEdge - dss, lowEdge + dss / 2., tMixRatio) * (1.0 - smoothstep(highEdge - dss, highEdge + dss, tMixRatio));
         vec4 fiboMask = mix(vec4(1.0), clamp(vec4(vec3(smoothstep( 0.0, 0.001, dis)), 1.0), 0., 1.), fiboMaskMix);
+        // fiboMask = vec4(1.);
 
-        vec2 fiboTexCoords = getTexCoords(toSpherical(cartesianPT));
+        vec2 fiboTexCoords = getTexCoords(cartesianPT, tMediaFormat);
         vec4 fiboFg = texture2D(tTexture, fiboTexCoords);
-        vec4 fiboBg = texture2D(tTransitionTexture, fiboTexCoords);
-
         vec4 fg = texture2D(tTexture, texCoords);
-        vec4 bg = texture2D(tTransitionTexture, texCoords);
+
+        vec2 fiboTexCoordsTransition = getTexCoords(cartesianPT, tMediaFormatTransition);
+        vec4 fiboBg = texture2D(tTextureTransition, fiboTexCoordsTransition);
+        vec4 bg = texture2D(tTextureTransition, texCoordsTransition);
 
         vec4 color = mix(fg, bg, colorMix);
         vec4 fiboColor = mix(fiboFg, fiboBg, colorMix);

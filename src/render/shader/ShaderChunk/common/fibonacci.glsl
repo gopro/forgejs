@@ -58,34 +58,33 @@ float angdist(vec2 sp1, vec2 sp2)
 }
 
 // distance to nearest cell on a fibonacci sphere
-void fibspheren(vec3 p, float n, 
+void fibspheren(vec3 p, float n,
                 out vec4 minDist,
                 out vec4 minIdx)
-{    
+{
     // get spherical coords for point p on surface of unit sphere
     vec2 sp = c2s(p);
 
     // calc the dominant zone number
-    float k = max(2.0, floor(log(ROOT_5 * n * PI * (1.0 - sp.y * sp.y)) / LOG_PHI_PLUS_ONE));   
-    
+    float k = max(2.0, floor(log(ROOT_5 * n * PI * (1.0 - sp.y * sp.y)) / LOG_PHI_PLUS_ONE));
+
     // calc basis vectors for this zone
     // [could all be precalculated and looked up for k,n]
     vec2 f = vec2(calcfk(k), calcfk(k + 1.0));
-
 
     vec2 bk = calcbk(f[0], n);
     vec2 bk1 = calcbk(f[1], n);
 
     mat2 b = mat2(bk, bk1);
     mat2 invb = inverse(b);
-    
+
     // change of basis for point sp to local grid uv
     float z0 = 1.0 - 1.0 / n;
     vec2 c = floor(invb * (sp - vec2(0.0, z0)));
 
     // minDist.x = idx;
     // return;
-    
+
     // for k<=4 paper suggests using (-1,0,+1)^2 offset factors but we'll
     // stick with (0,1)^2 and live with the occasional glitches
     minDist = vec4(PI);
@@ -95,7 +94,7 @@ void fibspheren(vec3 p, float n,
         float idx = floor(dot(f, c + o));
 
         //float idx = floor(n*0.5 - o.y*n*0.5);
-        if (idx > n) continue;        
+        if (idx > n) continue;
         vec2 isp = calcpoint(idx, n);
 
         // closest?
