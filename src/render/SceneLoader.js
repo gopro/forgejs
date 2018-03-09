@@ -96,7 +96,27 @@ FORGE.SceneLoader.prototype._startTransition = function()
         this._onTransitionStart.dispatch();
     }
 
-    this._viewer.renderer.scenes.add(this._to);
+    var transitionScreen = false;
+    // spherical transition
+    if (!transitionScreen && this._from.length > 0)
+    {
+        var sceneRendererFrom = this._viewer.renderer.scenes.get(this._from);
+        var viewports = sceneRendererFrom.viewports.all;
+        var sceneToMedia = FORGE.UID.get(this._to).media;
+        for (var i=0; i<viewports.length; i++)
+        {
+            var viewport = viewports[i];
+            var backgroundRenderer = viewport.renderer.background;
+            if (typeof backgroundRenderer.setMediaTransition === "function")
+            {
+                backgroundRenderer.setMediaTransition(sceneToMedia, 5);
+            }
+        }
+    }
+    else
+    {
+        this._viewer.renderer.scenes.add(this._to);
+    }
 
     var transition = FORGE.UID.get(this._transitionUid);
     transition.onComplete.addOnce(this._transitionCompleteHandler, this);
@@ -121,6 +141,68 @@ FORGE.SceneLoader.prototype._transitionCompleteHandler = function()
     if (this._onLoadComplete !== null)
     {
         this._onLoadComplete.dispatch();
+    }
+
+    var transitionScreen = false;
+    if (!transitionScreen)
+    {
+        this._viewer.renderer.scenes.add(this._to);
+        if (this._from.length > 0)
+        {
+            var sceneRendererFrom = this._viewer.renderer.scenes.get(this._from);
+            var viewports = sceneRendererFrom.viewports.all;
+            for (var i=0; i<viewports.length; i++)
+            {
+                var viewport = viewports[i];
+
+                // We store camera of the first background renderer to apply orientation/fov to the next scene
+                if (i === 0)
+                {
+                    var camera = viewport.camera;
+                    this._transitionYaw = camera.yaw;
+                    this._transitionPitch = camera.pitch;
+                    this._transitionRoll = camera.roll;
+                    this._transitionFov = camera.fov;
+                }
+
+                var backgroundRenderer = viewport.renderer.background;
+                if (typeof backgroundRenderer.setMediaTransition === "function")
+                {
+                    var sceneTo = FORGE.UID.get(this._to);
+                    backgroundRenderer.setMediaTransition(null);
+                }
+            }
+        }
+
+        // Apply camera stored settings to sceneTo
+        var sceneRendererTo = this._viewer.renderer.scenes.get(this._to);
+        var viewports = sceneRendererTo.viewports.all;
+        for (var i=0; i<viewports.length; i++)
+        {
+            var viewport = viewports[i];
+            var backgroundRenderer = viewport.renderer.background;
+
+            if (typeof this._transitionYaw === "number")
+            {
+                viewport.camera.yaw = this._transitionYaw;
+            }
+
+            if (typeof this._transitionPitch === "number")
+            {
+                viewport.camera.pitch = this._transitionPitch;
+            }
+
+            if (typeof this._transitionRoll === "number")
+            {
+                viewport.camera.roll = this._transitionRoll;
+            }
+
+            if (typeof this._transitionFov === "number")
+            {
+                viewport.camera.fov = this._transitionFov;
+            }
+        }
+
     }
 
     if (FORGE.UID.isTypeOf(this._from, "Scene") === true)
@@ -195,8 +277,12 @@ FORGE.SceneLoader.prototype.unload = function(sceneUid)
         return;
     }
 
-    // Remove the render used for the scene
-    this._viewer.renderer.scenes.remove(sceneUid);
+    var transitionScreen = true;
+    if (transitionScreen === true)
+    {
+        // Remove the render used for the scene
+        this._viewer.renderer.scenes.remove(sceneUid);
+    }
 
     // Unload the scene media
     var scene = FORGE.UID.get(sceneUid);
