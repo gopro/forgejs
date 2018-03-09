@@ -62,6 +62,7 @@ module.exports = function(grunt)
         "src/transition/TransitionManager.js",
         "src/transition/TransitionPresets.js",
         "src/transition/Transition.js",
+        "src/transition/TransitionType.js",
 
         "src/render/background/BackgroundRenderer.js",
         "src/render/background/BackgroundMeshRenderer.js",
