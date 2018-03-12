@@ -8,7 +8,7 @@
 FORGE.TweenManager = function(viewer)
 {
     /**
-     * The viewer reference. 
+     * The viewer reference.
      * @name FORGE.TweenManager#_viewer
      * @type {FORGE.Viewer}
      * @private
@@ -16,7 +16,7 @@ FORGE.TweenManager = function(viewer)
     this._viewer = viewer;
 
     /**
-     * The list of {FORGE.Tween}. 
+     * The list of {FORGE.Tween}.
      * @name FORGE.TweenManager#_tweens
      * @type {Array<FORGE.Tween>}
      * @private
