@@ -56,7 +56,6 @@ FORGE.SceneRendererPool.prototype._boot = function()
     this._pool = {};
 };
 
-
 /**
  * Active viewport change handler.
  * @method FORGE.SceneRendererPool#_onActiveViewportChanged
@@ -164,6 +163,21 @@ FORGE.SceneRendererPool.prototype.destroy = function()
 
     this._viewer = null;
 };
+
+/**
+ * Get all the scenes renderers
+ * @name FORGE.SceneRendererPool#all
+ * @type {Array<FORGE.SceneRenderer>}
+ * @readonly
+ */
+Object.defineProperty(FORGE.SceneRendererPool.prototype, "all",
+{
+    /** @this {FORGE.SceneRendererPool} */
+    get: function()
+    {
+        return Object.values(this._pool);
+    }
+});
 
 /**
  * Get the active viewport
