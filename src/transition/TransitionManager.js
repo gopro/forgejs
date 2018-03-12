@@ -53,7 +53,7 @@ FORGE.TransitionManager.prototype._boot = function()
     }
 
     // Set the preset single as the default layout
-    this._defaultUid = FORGE.TransitionPresets.SLIDE.uid;
+    this._defaultUid = FORGE.TransitionPresets.SPHERICAL.uid;
 };
 
 /**
