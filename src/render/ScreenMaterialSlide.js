@@ -46,12 +46,45 @@ FORGE.ScreenMaterialSlide.prototype._build = function()
 
             "vec2 xy = gl_FragCoord.xy / tResolution.xy;",
 
-            "float mixf = step(tMixRatio, xy.x);",
+            "float mixf = 1.0 - step(tMixRatio, xy.x);",
             "vec4 texelOne = texture2D(tTextureOne, vUv - vec2(tMixRatio, 0.0));",
-            "vec4 texelTwo = texture2D(tTextureTwo, clamp(vUv + vec2(1.0 - tMixRatio, 0.0), vec2(0.0), vec2(1.0)));",
-            "gl_FragColor = mix(texelTwo, texelOne, mixf);",
+            "vec4 texelTwo = texture2D(tTextureTwo, vUv + vec2(1.0 - tMixRatio, 0.0));",
+            "gl_FragColor = mix(texelOne, texelTwo, mixf);",
 
         "}"
+
+        // "void main() {",
+
+        //     "vec2 xy = gl_FragCoord.xy / tResolution.xy;",
+
+        //     "float mixf = 1.0 - step(1.0 - tMixRatio, xy.x);",
+        //     "vec4 texelOne = texture2D(tTextureOne, vUv - vec2(1.0 - tMixRatio, 0.0));",
+        //     "vec4 texelTwo = texture2D(tTextureTwo, vUv + vec2(tMixRatio, 0.0));",
+        //     "gl_FragColor = mix(texelOne, texelTwo, mixf);",
+
+        // "}"
+
+        // "void main() {",
+
+        //     "vec2 xy = gl_FragCoord.xy / tResolution.xy;",
+
+        //     "float mixf = 1.0 - step(1.0 - tMixRatio, xy.x);",
+        //     "vec4 texelOne = texture2D(tTextureOne, vUv + vec2(tMixRatio, 0.0));",
+        //     "vec4 texelTwo = texture2D(tTextureTwo, vUv - vec2(1.0 - tMixRatio, 0.0));",
+        //     "gl_FragColor = mix(texelOne, texelTwo, mixf);",
+
+        // "}"
+
+        // "void main() {",
+
+        //     "vec2 xy = gl_FragCoord.xy / tResolution.xy;",
+
+        //     "float mixf = 1.0 - step(1.0 - tMixRatio, xy.x);",
+        //     "vec4 texelOne = vec4(1, 0, 0, 1);",
+        //     "vec4 texelTwo = vec4(0, 1, 0, 1);",
+        //     "gl_FragColor = mix(texelOne, texelTwo, mixf);",
+
+        // "}"
 
     ].join("\n");
 
@@ -59,44 +92,29 @@ FORGE.ScreenMaterialSlide.prototype._build = function()
 };
 
 /**
- * Get and set the mix ratio uniform.
- * @name FORGE.ScreenMaterialSlide#mixRatio
- * @type {number}
+ * Update sequence.
+ * @method FORGE.ScreenMaterialSlide#update
  */
-Object.defineProperty(FORGE.ScreenMaterialSlide.prototype, "mixRatio",
+FORGE.ScreenMaterialSlide.prototype.update = function()
 {
-    /** @this {FORGE.ScreenMaterialSlide} */
-    get: function()
-    {
-        return this._shaderMaterial.uniforms.tMixRatio.value;
-    },
+    this._shaderMaterial.uniforms.tMixRatio.value = this._viewer.transitions.current.ratio;
 
-    /** @this {FORGE.ScreenMaterialSlide} */
-    set: function(value)
+    if(this._viewer.story.sceneUid !== "")
     {
-        if (typeof value === "number")
+        var rendererOne = this._viewer.renderer.scenes.get(this._viewer.story.sceneUid);
+        this._shaderMaterial.uniforms.tTextureOne.value = rendererOne.texture;
+    }
+
+    if(this._viewer.story.loadingSceneUid !== "")
+    {
+        var rendererTwo = this._viewer.renderer.scenes.get(this._viewer.story.loadingSceneUid);
+
+        if (typeof rendererTwo !== "undefined")
         {
-            this._shaderMaterial.uniforms.tMixRatio.value = FORGE.Math.clamp(value, 0, 1);
+            this._shaderMaterial.uniforms.tTextureTwo.value = rendererTwo.texture;
         }
     }
-});
 
-/**
- * Get and set the texture two uniform.
- * @name FORGE.ScreenMaterialSlide#textureTwo
- * @type {THREE.WebGLRenderTarget}
- */
-Object.defineProperty(FORGE.ScreenMaterialSlide.prototype, "textureTwo",
-{
-    /** @this {FORGE.ScreenMaterialSlide} */
-    get: function()
-    {
-        return this._shaderMaterial.uniforms.tTextureTwo.value;
-    },
-
-    /** @this {FORGE.ScreenMaterialSlide} */
-    set: function(value)
-    {
-        this._shaderMaterial.uniforms.tTextureTwo.value = value;
-    }
-});
+    this._shaderMaterial.uniforms.tResolution.value.x = this._viewer.width;
+    this._shaderMaterial.uniforms.tResolution.value.y = this._viewer.height;
+};

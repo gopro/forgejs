@@ -1,5 +1,9 @@
 /**
- * A Transition is a description of how to go from a scene to another
+ * A Transition is a description of how to go from a scene to another.
+ *
+ * Always starts with a background transition, then a screen transition.
+ * Most of the time there will be only one of these with a duration.
+ *
  * @constructor FORGE.Transition
  * @param {FORGE.Viewer} viewer - The {@link FORGE.Viewer} reference.
  * @param {TransitionConfig} config - The config of the Transition.
@@ -24,28 +28,70 @@ FORGE.Transition = function(viewer, config)
     this._config = config;
 
     /**
-     * Type of the transition (screen | spherical)
-     * @name FORGE.Transition#_type
-     * @type {string}
+     * Tween used for the transition
+     * @name FORGE.Transition#_tween
+     * @type {Forge.Tween}
      * @private
      */
-    this._type = "";
+    this._tween = null;
 
     /**
-     * Timer used for the transition
-     * @name FORGE.Transition#_timer
-     * @type {Forge.Timer}
-     * @private
-     */
-    this._timer = null;
-
-    /**
-     * Duration of the transition in milliseconds.
-     * @name FORGE.Transition#_duration
+     * The normalized ratio of the transition [0 ... 1]
+     * @name FORGE.Transition#_ratio
      * @type {number}
      * @private
      */
-    this._duration = 500;
+    this._ratio = 0;
+
+    /**
+     * Screen material configuration for this transition.
+     * @name FORGE.Transition#_screen
+     * @type {ScreenMaterialConfig}
+     * @private
+     */
+    this._background = null;
+
+    /**
+     * Screen material configuration for this transition.
+     * @name FORGE.Transition#_screen
+     * @type {ScreenMaterialConfig}
+     * @private
+     */
+    this._screen = null;
+
+    /**
+     * The scene uid to transition from.
+     * @name FORGE.Transition#_from
+     * @type {string}
+     * @private
+     */
+    this._from = "";
+
+    /**
+     * The scene uid to transition to.
+     * @name FORGE.Transition#_to
+     * @type {string}
+     * @private
+     */
+    this._to = "";
+
+    /**
+     * The current transition phase we are in.
+     * Can be "background" or "screen".
+     * Listed on {@link FORGE.TransitionType}
+     * @name FORGE.Transition#_phase
+     * @type {string}
+     * @private
+     */
+    this._phase = "";
+
+    /**
+     * Flag to know if this transition is running.
+     * @name FORGE.Transition#_running
+     * @type {boolean}
+     * @private
+     */
+    this._running = false;
 
     /**
      * {@link FORGE.EventDispatcher} for the start event.
@@ -54,22 +100,6 @@ FORGE.Transition = function(viewer, config)
      * @private
      */
     this._onStart = null;
-
-    /**
-     * {@link FORGE.EventDispatcher} for the pause event.
-     * @name FORGE.Transition#_onPause
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onPause = null;
-
-    /**
-     * {@link FORGE.EventDispatcher} for the resume event.
-     * @name FORGE.Transition#_onResume
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onResume = null;
 
     /**
      * {@link FORGE.EventDispatcher} for the stop event.
@@ -95,6 +125,7 @@ FORGE.Transition = function(viewer, config)
 FORGE.Transition.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.Transition.prototype.constructor = FORGE.Transition;
 
+
 /**
  * Boot sequence.
  * @method FORGE.Transition#_boot
@@ -102,15 +133,10 @@ FORGE.Transition.prototype.constructor = FORGE.Transition;
  */
 FORGE.Transition.prototype._boot = function()
 {
-    this._timer = this._viewer.clock.create(false);
-    this._timer.onStart.add(this._timerStartHandler, this);
-    this._timer.onPause.add(this._timerPauseHandler, this);
-    this._timer.onResume.add(this._timerResumeHandler, this);
-    this._timer.onStop.add(this._timerStopHandler, this);
-    this._timer.onComplete.add(this._timerCompleteHandler, this);
-
     this._parseConfig(this._config);
     this._register();
+
+    this._createTween();
 };
 
 /**
@@ -121,24 +147,39 @@ FORGE.Transition.prototype._boot = function()
  */
 FORGE.Transition.prototype._parseConfig = function(config)
 {
-    if(typeof config === "object" && config !== null)
+    if (typeof config.uid !== "undefined" && config.uid !== null)
     {
-        if (typeof config.uid !== "undefined" && config.uid !== null)
-        {
-            this._uid = config.uid;
-        }
-
-       this._type = config.type || "screen";
+        this._uid = config.uid;
     }
+
+    // Configuration of a transition made in the background renderer.
+    this._background = config.background;
+
+    // Configuration of a transition made in the screen renderer.
+    this._screen = config.screen;
 };
 
 /**
- * Timer start handler
- * @method  FORGE.Transition#_timerStartHandler
+ * Create the tween
+ * @method  FORGE.Transition#_createTween
  */
-FORGE.Transition.prototype._timerStartHandler = function()
+FORGE.Transition.prototype._createTween = function()
 {
-    this.log("on start");
+    this._tween = new FORGE.Tween(this._viewer, this);
+    this._tween.onStart.add(this._tweenStartHandler, this);
+    this._tween.onStop.add(this._tweenStopHandler, this);
+    this._tween.onComplete.add(this._tweenCompleteHandler, this);
+
+    this._viewer.tween.add(this._tween);
+};
+
+/**
+ * Tween start handler
+ * @method  FORGE.Transition#_tweenStartHandler
+ */
+FORGE.Transition.prototype._tweenStartHandler = function()
+{
+    this.log("tween start");
 
     if(this._onStart !== null)
     {
@@ -147,40 +188,12 @@ FORGE.Transition.prototype._timerStartHandler = function()
 };
 
 /**
- * Timer pause handler
- * @method  FORGE.Transition#_timerPauseHandler
+ * Tween stop handler
+ * @method  FORGE.Transition#_tweenStopHandler
  */
-FORGE.Transition.prototype._timerPauseHandler = function()
+FORGE.Transition.prototype._tweenStopHandler = function()
 {
-    this.log("on pause");
-
-    if(this._onPause !== null)
-    {
-        this._onPause.dispatch();
-    }
-};
-
-/**
- * Timer resume handler
- * @method  FORGE.Transition#_timerResumeHandler
- */
-FORGE.Transition.prototype._timerResumeHandler = function()
-{
-    this.log("on resume");
-
-    if(this._onResume !== null)
-    {
-        this._onResume.dispatch();
-    }
-};
-
-/**
- * Timer stop handler
- * @method  FORGE.Transition#_timerStopHandler
- */
-FORGE.Transition.prototype._timerStopHandler = function()
-{
-    this.log("on stop");
+    this.log("tween stop");
 
     if(this._onStop !== null)
     {
@@ -188,60 +201,134 @@ FORGE.Transition.prototype._timerStopHandler = function()
     }
 };
 
+/**
+ * Tween complete handler
+ * @method  FORGE.Transition#_tweenCompleteHandler
+ */
+FORGE.Transition.prototype._tweenCompleteHandler = function()
+{
+    this.log("tween complete");
+
+    if (this._phase === FORGE.TransitionType.BACKGROUND)
+    {
+        this._backgroundComplete();
+    }
+    else if (this._phase === FORGE.TransitionType.SCREEN)
+    {
+        this._screenComplete();
+    }
+    else
+    {
+        this.warn("Lost in transition time corridor");
+    }
+};
 
 /**
- * Timer complete handler
- * @method  FORGE.Transition#_timerCompleteHandler
+ * Starts the background transition.
+ * @method  FORGE.Transition#_backgroundStart
  */
-FORGE.Transition.prototype._timerCompleteHandler = function()
+FORGE.Transition.prototype._backgroundStart = function()
 {
-    this.log("on complete");
+    this.log("background start");
 
-    if(this._onComplete !== null)
+    this._phase = FORGE.TransitionType.BACKGROUND;
+
+    if (this._background === null || this._background.duration === 0)
+    {
+        this._backgroundComplete();
+        return;
+    }
+
+    // STUB METHOD TO BE COMPLETED WITH YG
+};
+
+/**
+ * Complete the background transition.
+ * @method  FORGE.Transition#_backgroundComplete
+ */
+FORGE.Transition.prototype._backgroundComplete = function()
+{
+    this.log("background complete");
+
+    // Create the renderer for scene "to".
+    this._viewer.renderer.scenes.add(this._to);
+
+    // Starts the screen transition.
+    this._screenStart();
+};
+
+/**
+ * Starts the screen transition.
+ * @method  FORGE.Transition#_screenStart
+ */
+FORGE.Transition.prototype._screenStart = function()
+{
+    this.log("screen start");
+
+    this._phase = FORGE.TransitionType.SCREEN;
+
+    // If there is no screen transition config or its duration equal 0 then skip to screen complete
+    if (this._screen === null || this._screen.duration === 0)
+    {
+        this._screenComplete();
+    }
+    else
+    {
+        this._viewer.renderer.screen.load(this._screen.material);
+        this._tween.to({ ratio: 1 }, this._screen.duration, FORGE.Easing.LINEAR).start();
+    }
+};
+
+/**
+ * Complete the screen transition.
+ * @method  FORGE.Transition#_screenComplete
+ */
+FORGE.Transition.prototype._screenComplete = function()
+{
+    this.log("screen complete");
+
+    // Load the default screen material
+    this._viewer.renderer.screen.load();
+
+    this._complete();
+};
+
+/**
+ * Complete global transition.
+ * @method  FORGE.Transition#_complete
+ */
+FORGE.Transition.prototype._complete = function()
+{
+    this.log("global complete");
+
+    // Unload the from scene
+    // ....
+
+    // Transition is complete
+    this._running = false;
+
+    if (this._onComplete !== null)
     {
         this._onComplete.dispatch();
     }
 };
 
-
 /**
  * Start the transition.
  * @method  FORGE.Transition#start
  */
-FORGE.Transition.prototype.start = function()
+FORGE.Transition.prototype.start = function(sceneToUid)
 {
     this.log("start");
 
-    this._timer.add(this._duration);
-    this._timer.start();
+    this._running = true;
 
-    return this;
-};
+    this._from = this._viewer.story.sceneUid;
+    this._to = sceneToUid;
 
-/**
- * Pause the transition.
- * @method  FORGE.Transition#pause
- */
-FORGE.Transition.prototype.pause = function()
-{
-    this.log("pause");
+    this._ratio = 0;
 
-    this._timer.pause();
-
-    return this;
-};
-
-/**
- * Resume the transition.
- * @method  FORGE.Transition#resume
- */
-FORGE.Transition.prototype.resume = function()
-{
-    this.log("resume");
-
-    this._timer.resume();
-
-    return this;
+    this._backgroundStart();
 };
 
 /**
@@ -252,9 +339,7 @@ FORGE.Transition.prototype.stop = function()
 {
     this.log("stop");
 
-    this._timer.stop(true);
-
-    return this;
+    this._tween.stop(true);
 };
 
 /**
@@ -263,7 +348,7 @@ FORGE.Transition.prototype.stop = function()
  */
 FORGE.Transition.prototype.reset = function(restart)
 {
-    this._timer.stop(true);
+    this._tween.stop();
 
     if (restart === true)
     {
@@ -277,8 +362,8 @@ FORGE.Transition.prototype.reset = function(restart)
  */
 FORGE.Transition.prototype.destroy = function()
 {
-    this._timer.destroy();
-    this._timer = null;
+    this._tween.destroy();
+    this._tween = null;
 
     this._viewer = null;
 
@@ -286,36 +371,22 @@ FORGE.Transition.prototype.destroy = function()
 };
 
 /**
- * Get the normalized time of the transition between 0 and 1.
- * @name FORGE.Transition#time
+ * Get the normalized ratio of the transition between 0 and 1.
+ * @name FORGE.Transition#ratio
  * @readonly
  * @type {number}
  */
-Object.defineProperty(FORGE.Transition.prototype, "time",
+Object.defineProperty(FORGE.Transition.prototype, "ratio",
 {
     /** @this {FORGE.Transition} */
     get: function()
     {
-        // Compute normalized time
-        var n = this._timer.ms / this._duration;
+        return this._ratio;
+    },
 
-        // Returns 1 if we are close to 0.99
-        return n < 0.99 ? n : 1;
-    }
-});
-
-/**
- * Get the running flag of the transition.
- * @name FORGE.Transition#running
- * @readonly
- * @type {boolean}
- */
-Object.defineProperty(FORGE.Transition.prototype, "running",
-{
-    /** @this {FORGE.Transition} */
-    get: function()
+    set: function(value)
     {
-        return this._timer.running;
+        this._ratio = FORGE.Math.clamp(value, 0, 1);
     }
 });
 
@@ -336,46 +407,6 @@ Object.defineProperty(FORGE.Transition.prototype, "onStart",
         }
 
         return this._onStart;
-    }
-});
-
-/**
- * Get the "onPause" event {@link FORGE.EventDispatcher} of the Transition.
- * @name FORGE.Transition#onPause
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.Transition.prototype, "onPause",
-{
-    /** @this {FORGE.Transition} */
-    get: function()
-    {
-        if(this._onPause === null)
-        {
-            this._onPause = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onPause;
-    }
-});
-
-/**
- * Get the "onResume" event {@link FORGE.EventDispatcher} of the Transition.
- * @name FORGE.Transition#onResume
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.Transition.prototype, "onResume",
-{
-    /** @this {FORGE.Transition} */
-    get: function()
-    {
-        if(this._onResume === null)
-        {
-            this._onResume = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onResume;
     }
 });
 

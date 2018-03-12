@@ -32,6 +32,11 @@ module.exports = function(grunt)
         "src/geom/Rectangle.js",
         "src/geom/Size.js",
 
+        "src/tween/TweenManager.js",
+        "src/tween/Tween.js",
+        "src/tween/Easing.js",
+        "src/tween/EasingType.js",
+
         "src/media/MediaType.js",
         "src/media/MediaFormat.js",
         "src/media/MediaStore.js",
@@ -200,11 +205,6 @@ module.exports = function(grunt)
         "src/time/Clock.js",
         "src/time/Timer.js",
         "src/time/TimerEvent.js",
-
-        "src/tween/TweenManager.js",
-        "src/tween/Tween.js",
-        "src/tween/Easing.js",
-        "src/tween/EasingType.js",
 
         "src/utils/Utils.js",
         "src/utils/Dom.js",

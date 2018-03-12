@@ -659,7 +659,7 @@ FORGE.Viewer.prototype._createCanvas = function()
  */
 FORGE.Viewer.prototype._updateLogic = function()
 {
-    if (this._renderer.loading === false)
+    if (this._transitions.running === false && this._story.scene !== null)
     {
         this._display.update();
         this._media.update();
@@ -667,12 +667,11 @@ FORGE.Viewer.prototype._updateLogic = function()
         this._gamepad.update();
         this._audio.update();
         this._plugins.update();
-        this._tween.update();
         this._hotspots.update();
         this._controllers.update();
     }
 
-    this._transitions.update();
+    this._tween.update();
 
     if (this._callbacks !== null && typeof this._callbacks.update === "function")
     {

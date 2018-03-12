@@ -15,12 +15,12 @@ FORGE.TransitionManager = function(viewer)
     this._viewer = viewer;
 
     /**
-     * Transition array
-     * @name FORGE.TransitionManager#_transitions
-     * @type {Array<FORGE.Transition>}
+     * Current transition UID
+     * @name  FORGE.TransitionManager#_runningUid
+     * @type {string}
      * @private
      */
-    this._transitions = null;
+    this._currentUid = "";
 
     /**
      * Default transition UID
@@ -45,18 +45,25 @@ FORGE.TransitionManager.prototype.constructor = FORGE.TransitionManager;
  */
 FORGE.TransitionManager.prototype._boot = function()
 {
-   this._transitions = [];
-
     var preset, transition;
     for (i in FORGE.TransitionPresets)
     {
         preset = FORGE.TransitionPresets[i];
         transition = new FORGE.Transition(this._viewer, preset);
-        this._transitions.push(transition);
     }
 
     // Set the preset single as the default layout
     this._defaultUid = FORGE.TransitionPresets.SLIDE.uid;
+};
+
+/**
+ * Transition complete handler
+ * @method FORGE.TransitionManager#_transitionCompleteHandler
+ * @private
+ */
+FORGE.TransitionManager.prototype._transitionCompleteHandler = function()
+{
+    this._currentUid = "";
 };
 
 /**
@@ -75,26 +82,33 @@ FORGE.TransitionManager.prototype.addConfig = function(config)
         for (var i = 0, ii = config.length; i < ii; i++)
         {
             transition = new FORGE.Transition(this._viewer, /** @type {TransitionConfig} */ (config[i]));
-            this._transitions.push(transition);
         }
     }
     // If it is a single transition
     else
     {
         transition = new FORGE.Transition(this._viewer, /** @type {TransitionConfig} */ (config));
-        this._transitions.push(transition);
     }
 
     return transition;
 };
 
 /**
- * Update routine of the transition manager, called by the viewer update.
- * @method FORGE.TransitionManager#update
+ * Engage a transition to a scene.
+ * @method FORGE.TransitionManager#to
+ * @return {FORGE.Transition}
  */
-FORGE.TransitionManager.prototype.update = function()
+FORGE.TransitionManager.prototype.to = function(sceneUid, transitionUid)
 {
-    // do update stuff
+    // @todo resolve the transition uid to use according to the scene uid
+    var transition = this.get(this._defaultUid);
+
+    transition.start(sceneUid);
+    transition.onComplete.addOnce(this._transitionCompleteHandler, this);
+
+    this._currentUid = transition.uid;
+
+    return transition;
 };
 
 /**
@@ -113,17 +127,15 @@ FORGE.TransitionManager.prototype.get = function(uid)
  */
 FORGE.TransitionManager.prototype.destroy = function()
 {
-    if (FORGE.Utils.isArrayOf(this._transitions, "Transition"))
+    var transitions = FORGE.UID.get(null, "Transition");
+
+    while (transitions.length > 0)
     {
-        while (this._transitions.length > 0)
-        {
-            var transition = this._transitions.pop();
-            transition.destroy();
-            transition = null;
-        }
+        var transition = transitions.pop();
+        transition.destroy();
+        transition = null;
     }
 
-    this._transitions = null;
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
@@ -133,6 +145,7 @@ FORGE.TransitionManager.prototype.destroy = function()
  * Get the default transition Uid.
  * @name FORGE.TransitionManager#defaultUid
  * @type {string}
+ * @readonly
  */
 Object.defineProperty(FORGE.TransitionManager.prototype, "defaultUid",
 {
@@ -147,6 +160,7 @@ Object.defineProperty(FORGE.TransitionManager.prototype, "defaultUid",
  * Get the default tansition.
  * @name FORGE.TransitionManager#default
  * @type {FORGE.Transition}
+ * @readonly
  */
 Object.defineProperty(FORGE.TransitionManager.prototype, "default",
 {
@@ -154,5 +168,50 @@ Object.defineProperty(FORGE.TransitionManager.prototype, "default",
     get: function()
     {
         return FORGE.UID.get(this._defaultUid);
+    }
+});
+
+/**
+ * Get the current transition uid
+ * @name FORGE.TransitionManager#currentUid
+ * @type {string}
+ * @readonly
+ */
+Object.defineProperty(FORGE.TransitionManager.prototype, "currentUid",
+{
+    /** @this {FORGE.TransitionManager} */
+    get: function()
+    {
+        return this._currentUid;
+    }
+});
+
+/**
+ * Get the current transition.
+ * @name FORGE.TransitionManager#current
+ * @type {FORGE.Transition}
+ * @readonly
+ */
+Object.defineProperty(FORGE.TransitionManager.prototype, "current",
+{
+    /** @this {FORGE.TransitionManager} */
+    get: function()
+    {
+        return FORGE.UID.get(this._currentUid);
+    }
+});
+
+/**
+ * Is a transition running?
+ * @name FORGE.TransitionManager#running
+ * @type {boolean}
+ * @readonly
+ */
+Object.defineProperty(FORGE.TransitionManager.prototype, "running",
+{
+    /** @this {FORGE.TransitionManager} */
+    get: function()
+    {
+        return (this._currentUid !== "" && this.current.running == true);
     }
 });

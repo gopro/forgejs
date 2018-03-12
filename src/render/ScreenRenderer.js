@@ -63,6 +63,13 @@ FORGE.ScreenRenderer = function(viewer)
 FORGE.ScreenRenderer.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.ScreenRenderer.prototype.constructor = FORGE.ScreenRenderer;
 
+
+FORGE.ScreenRenderer.DEFAULT_MATERIAL =
+{
+    type: "basic",
+    options: null
+};
+
 /**
  * Boot sequence.
  * @method FORGE.ScreenRenderer#_boot
@@ -76,7 +83,36 @@ FORGE.ScreenRenderer.prototype._boot = function()
 
     this._scene.add(this._quad);
 
-    this.material = new FORGE.ScreenMaterial(this._viewer);
+    // this.material = new FORGE.ScreenMaterial(this._viewer);
+    this._createMaterial(FORGE.ScreenRenderer.DEFAULT_MATERIAL);
+};
+
+/**
+ * Create material from a material config.
+ * @method FORGE.ScreenRenderer#_createMaterial
+ */
+FORGE.ScreenRenderer.prototype._createMaterial = function(config)
+{
+    config = config || {};
+
+    var materialRef;
+
+    switch (config.type)
+    {
+        case "slide":
+            materialRef = FORGE.ScreenMaterialSlide;
+            break;
+
+        case "blend":
+            materialRef = FORGE.ScreenMaterialBlend;
+            break;
+
+        default:
+            materialRef = FORGE.ScreenMaterial;
+    }
+
+    this._material = new materialRef(this._viewer);
+    this._material.onReady.addOnce(this._materialReadyHandler, this);
 };
 
 /**
@@ -88,6 +124,17 @@ FORGE.ScreenRenderer.prototype._materialReadyHandler = function()
 {
     this._quad.material = this._material.shaderMaterial;
     this._ready = true;
+};
+
+/**
+ * Load a screen material config.
+ * @method FORGE.ScreenRenderer#load
+ */
+FORGE.ScreenRenderer.prototype.load = function(config)
+{
+    this._ready = false;
+
+    this._createMaterial(config);
 };
 
 /**

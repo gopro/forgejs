@@ -270,11 +270,28 @@ FORGE.Scene.prototype._configLoadComplete = function(file)
 };
 
 /**
- * Event handler for the load of the scene.
- * @method FORGE.Scene#_loadCompleteHandler
+ * Event handler for the media load complete.
+ * @method FORGE.Scene#_mediaLoadCompleteHandler
  * @private
  */
-FORGE.Scene.prototype._loadCompleteHandler = function()
+FORGE.Scene.prototype._mediaLoadCompleteHandler = function()
+{
+    //which transition to engage ?
+    // .....
+
+    // Ask the transition manager to engage the transition to this scene
+    var transition = this._viewer.transitions.to(this._uid);
+
+    // Listen to the end of the transition to dispatch the scene load complete
+    transition.onComplete.addOnce(this._transitionCompleteHandler, this);
+};
+
+/**
+ * Event handler for the completion of the transition to this scene.
+ * @method FORGE.Scene#_transitionCompleteHandler
+ * @private
+ */
+FORGE.Scene.prototype._transitionCompleteHandler = function()
 {
     // Add a view to this scene
     this._viewCount++;
@@ -341,15 +358,17 @@ FORGE.Scene.prototype.addConfig = function(config)
  */
 FORGE.Scene.prototype.load = function()
 {
-    this.log("load");
+    this.log(this._uid + " load");
 
     if (this._viewer.story.scene === this)
     {
+        this.log(this._uid + " load abort, this is already the current scene");
         return;
     }
 
-    this._viewer.renderer.loader.onLoadComplete.addOnce(this._loadCompleteHandler, this);
-    this._viewer.renderer.loader.load(this._uid);
+    // Load its media and waits media load complete to engage a transition.
+    this.media.load();
+    this.media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
 
     // The loading has started
     if (this._onLoadStart !== null)

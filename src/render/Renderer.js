@@ -27,6 +27,14 @@ FORGE.Renderer = function(viewer)
     this._webGLRenderer = null;
 
     /**
+     * Scene Renderer pool
+     * @name FORGE.Renderer#_sceneRendererPool
+     * @type {FORGE.SceneRendererPool}
+     * @private
+     */
+    this._sceneRendererPool = null;
+
+    /**
      * Screen renderer
      * @name FORGE.Renderer#_screenRenderer
      * @type {FORGE.ScreenRenderer}
@@ -41,22 +49,6 @@ FORGE.Renderer = function(viewer)
      * @private
      */
     this._materialPool = null;
-
-    /**
-     * Scene Loader.
-     * @name FORGE.Renderer#_sceneLoader
-     * @type {FORGE.SceneLoader}
-     * @private
-     */
-    this._sceneLoader = null;
-
-    /**
-     * Scene Renderer pool
-     * @name FORGE.Renderer#_sceneRendererPool
-     * @type {FORGE.SceneRendererPool}
-     * @private
-     */
-    this._sceneRendererPool = null;
 
     /**
      * Active viewport has changed
@@ -93,8 +85,6 @@ FORGE.Renderer.DEPTH_FAR = 10000;
  */
 FORGE.Renderer.prototype._boot = function()
 {
-    this._sceneLoader = new FORGE.SceneLoader(this._viewer);
-
     this._sceneRendererPool = new FORGE.SceneRendererPool(this._viewer);
 
     this._materialPool = new FORGE.ObjectMaterialPool();
@@ -177,9 +167,6 @@ FORGE.Renderer.prototype.destroy = function()
     this._sceneRendererPool.destroy();
     this._sceneRendererPool = null;
 
-    this._sceneLoader.destroy();
-    this._sceneLoader = null;
-
     this._materialPool.detroy();
     this._materialPool = null;
 
@@ -243,36 +230,6 @@ Object.defineProperty(FORGE.Renderer.prototype, "materials",
     get: function()
     {
         return this._materialPool;
-    }
-});
-
-/**
- * Get the scene loader reference.
- * @name FORGE.Renderer#loader
- * @type {FORGE.SceneLoader}
- * @readonly
- */
-Object.defineProperty(FORGE.Renderer.prototype, "loader",
-{
-    /** @this {FORGE.Renderer} */
-    get: function()
-    {
-        return this._sceneLoader;
-    }
-});
-
-/**
- * Get the loading flag.
- * @name FORGE.Renderer#loading
- * @type {FORGE.SceneLoader}
- * @readonly
- */
-Object.defineProperty(FORGE.Renderer.prototype, "loading",
-{
-    /** @this {FORGE.Renderer} */
-    get: function()
-    {
-        return this._sceneLoader.loading;
     }
 });
 
