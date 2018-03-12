@@ -100,8 +100,23 @@ FORGE.TransitionManager.prototype.addConfig = function(config)
  */
 FORGE.TransitionManager.prototype.to = function(sceneUid, transitionUid)
 {
-    // @todo resolve the transition uid to use according to the scene uid
-    var transition = this.get(this._defaultUid);
+    // If transition uid is undefined or is not a transition, choose the default one.
+    if(FORGE.UID.isTypeOf(transitionUid, "Transition") === false)
+    {
+        // If there is no current scene then choose a none transition.
+        if (this._viewer.story.scene === null)
+        {
+            transitionUid = FORGE.TransitionPresets.NONE.uid;
+        }
+        // Else pick the default transition
+        else
+        {
+            transitionUid = this._defaultUid;
+        }
+    }
+
+    // Get the transition object
+    var transition = this.get(transitionUid);
 
     transition.start(sceneUid);
     transition.onComplete.addOnce(this._transitionCompleteHandler, this);
