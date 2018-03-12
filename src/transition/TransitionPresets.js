@@ -11,21 +11,7 @@ FORGE.TransitionPresets = {};
  */
 FORGE.TransitionPresets.NONE =
 {
-    uid: "forge-transition-preset-none",
-
-    background:
-    {
-        type: null,
-        easing: null,
-        duration: 0,
-    },
-
-    screen:
-    {
-        material: { type: "basic" },
-        easing: null,
-        duration: 0
-    }
+    uid: "forge-transition-preset-none"
 };
 
 /**
@@ -83,9 +69,11 @@ FORGE.TransitionPresets.BLEND =
  */
 FORGE.TransitionPresets.SPHERICAL =
 {
+    uid: "forge-transition-preset-spherical",
+
     background:
     {
-        type: "@todo to be defined",
+        type: 1,
         easing: FORGE.Easing.LINEAR,
         duration: 2000
     },
