@@ -155,10 +155,10 @@ FORGE.Transition.prototype._parseConfig = function(config)
     }
 
     // Configuration of a transition made in the background renderer.
-    this._background = config.background;
+    this._background = typeof config.background === "object" ? config.background : null;
 
     // Configuration of a transition made in the screen renderer.
-    this._screen = config.screen;
+    this._screen = typeof config.screen === "object" ? config.screen : null;
 };
 
 /**
