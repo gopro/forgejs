@@ -96,7 +96,15 @@ FORGE.ScreenRenderer.prototype._materialReadyHandler = function()
  */
 FORGE.ScreenRenderer.prototype.render = function()
 {
-    // pouet
+    if (this._ready === false)
+    {
+        return;
+    }
+
+    this._material.update();
+
+    this._viewer.renderer.webGLRenderer.setViewport(0, 0, this._viewer.width, this._viewer.height);
+    this._viewer.renderer.webGLRenderer.render(this._scene, this._camera);
 };
 
 /**
@@ -154,28 +162,6 @@ Object.defineProperty(FORGE.ScreenRenderer.prototype, "camera",
     {
         return this._camera;
     }
-});
-
-/**
- * Get the screen material reference.
- * @name FORGE.ScreenRenderer#material
- * @type {FORGE.ScreenMaterial}
- * @readonly
- */
-Object.defineProperty(FORGE.ScreenRenderer.prototype, "material",
-{
-    /** @this {FORGE.ScreenRenderer} */
-    get: function()
-    {
-        return this._material;
-    },
-
-    /** @this {FORGE.ScreenRenderer} */
-    set: function(value)
-    {
-        this._material = value;
-        this._material.onReady.addOnce(this._materialReadyHandler, this);
-    },
 });
 
 /**

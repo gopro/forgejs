@@ -138,42 +138,8 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
  */
 FORGE.Renderer.prototype.render = function()
 {
-    if(this._screenRenderer.ready === false)
-    {
-        return;
-    }
-
     this._sceneRendererPool.render();
-
-    var ratio = this._sceneLoader.transition.time;
-    this._screenRenderer.material.mixRatio = ratio;
-
-    if(this._viewer.story.sceneUid !== "")
-    {
-        var renderer = this._sceneRendererPool.get(this._viewer.story.sceneUid);
-
-        if(typeof renderer !== "undefined")
-        {
-            this._screenRenderer.material.textureOne = renderer.texture;
-        }
-    }
-
-    if(this._viewer.story.loadingSceneUid !== "")
-    {
-        var loadingRenderer = this._sceneRendererPool.get(this._viewer.story.loadingSceneUid);
-
-        if(typeof loadingRenderer !== "undefined")
-        {
-            this._screenRenderer.material.textureTwo = loadingRenderer.texture;
-        }
-    }
-
-    this._screenRenderer.material.resolution.x = this._viewer.width;
-    this._screenRenderer.material.resolution.y = this._viewer.height;
-
-    this._webGLRenderer.setViewport(0, 0, this._viewer.width, this._viewer.height);
-
-    this._webGLRenderer.render(this._screenRenderer.scene, this._screenRenderer.camera);
+    this._screenRenderer.render();
 };
 
 /**

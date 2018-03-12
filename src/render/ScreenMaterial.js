@@ -102,6 +102,22 @@ FORGE.ScreenMaterial.prototype._build = function()
 };
 
 /**
+ * Update sequence.
+ * @method FORGE.ScreenMaterial#update
+ */
+FORGE.ScreenMaterial.prototype.update = function()
+{
+    if(this._viewer.story.sceneUid !== "")
+    {
+        var renderer = this._viewer.renderer.scenes.get(this._viewer.story.sceneUid);
+        this._shaderMaterial.uniforms.tTextureOne.value = renderer.texture;
+    }
+
+    this._shaderMaterial.uniforms.tResolution.value.x = this._viewer.width;
+    this._shaderMaterial.uniforms.tResolution.value.y = this._viewer.height;
+};
+
+/**
  * Destroy sequence.
  * @method FORGE.ScreenMaterial#destroy
  */
@@ -123,46 +139,6 @@ Object.defineProperty(FORGE.ScreenMaterial.prototype, "shaderMaterial",
     get: function()
     {
         return this._shaderMaterial;
-    }
-});
-
-/**
- * Get and set the texture one uniform.
- * @name FORGE.ScreenMaterial#textureOne
- * @type {THREE.WebGLRenderTarget}
- */
-Object.defineProperty(FORGE.ScreenMaterial.prototype, "textureOne",
-{
-    /** @this {FORGE.ScreenMaterial} */
-    get: function()
-    {
-        return this._shaderMaterial.uniforms.tTextureOne.value;
-    },
-
-    /** @this {FORGE.ScreenMaterial} */
-    set: function(value)
-    {
-        this._shaderMaterial.uniforms.tTextureOne.value = value;
-    }
-});
-
-/**
- * Get and set the resolution uniform.
- * @name FORGE.ScreenMaterial#resolution
- * @type {THREE.Vector2}
- */
-Object.defineProperty(FORGE.ScreenMaterial.prototype, "resolution",
-{
-    /** @this {FORGE.ScreenMaterial} */
-    get: function()
-    {
-        return this._shaderMaterial.uniforms.tResolution.value;
-    },
-
-    /** @this {FORGE.ScreenMaterial} */
-    set: function(value)
-    {
-        this._shaderMaterial.uniforms.tResolution.value = value;
     }
 });
 

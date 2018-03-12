@@ -46,6 +46,8 @@ module.exports = function(grunt)
         "src/render/Renderer.js",
         "src/render/ScreenRenderer.js",
         "src/render/ScreenMaterial.js",
+        "src/render/ScreenMaterialBlend.js",
+        "src/render/ScreenMaterialSlide.js",
         "src/render/Viewport.js",
         "src/render/ViewportManager.js",
         "src/render/ViewportComposer.js",
