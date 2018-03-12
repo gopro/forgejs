@@ -375,6 +375,21 @@ FORGE.Transition.prototype.destroy = function()
 };
 
 /**
+ * Get the running flag.
+ * @name FORGE.Transition#running
+ * @readonly
+ * @type {number}
+ */
+Object.defineProperty(FORGE.Transition.prototype, "running",
+{
+    /** @this {FORGE.Transition} */
+    get: function()
+    {
+        return this._running;
+    }
+});
+
+/**
  * Get the normalized ratio of the transition between 0 and 1.
  * @name FORGE.Transition#ratio
  * @readonly
