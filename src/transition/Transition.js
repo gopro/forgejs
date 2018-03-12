@@ -240,8 +240,29 @@ FORGE.Transition.prototype._backgroundStart = function()
         this._backgroundComplete();
         return;
     }
+    else
+    {
+        // POC code to be reworked ==========================================
 
-    // STUB METHOD TO BE COMPLETED WITH YG
+        var sceneRendererFrom = this._viewer.renderer.scenes.get(this._from);
+        var viewports = sceneRendererFrom.viewports.all;
+        var sceneToMedia = FORGE.UID.get(this._to).media;
+
+        for (var i=0; i<viewports.length; i++)
+        {
+            var viewport = viewports[i];
+            var backgroundRenderer = viewport.renderer.background;
+
+            if (typeof backgroundRenderer.setMediaTransition === "function")
+            {
+                backgroundRenderer.setMediaTransition(sceneToMedia, 5);
+            }
+        }
+
+        // ==================================================================
+
+        this._tween.to({ ratio: 1 }, this._background.duration, FORGE.Easing.LINEAR).start();
+    }
 };
 
 /**
