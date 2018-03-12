@@ -133,6 +133,8 @@ FORGE.Transition.prototype.constructor = FORGE.Transition;
  */
 FORGE.Transition.prototype._boot = function()
 {
+    this._onComplete = new FORGE.EventDispatcher(this, true);
+
     this._parseConfig(this._config);
     this._register();
 
@@ -321,6 +323,8 @@ FORGE.Transition.prototype.start = function(sceneToUid)
 {
     this.log("start");
 
+    this._onComplete.reset();
+
     this._running = true;
 
     this._from = this._viewer.story.sceneUid;
@@ -441,11 +445,6 @@ Object.defineProperty(FORGE.Transition.prototype, "onComplete",
     /** @this {FORGE.Transition} */
     get: function()
     {
-        if(this._onComplete === null)
-        {
-            this._onComplete = new FORGE.EventDispatcher(this);
-        }
-
         return this._onComplete;
     }
 });
