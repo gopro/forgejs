@@ -146,9 +146,9 @@ FORGE.BackgroundShaderRenderer.prototype.render = function(target)
 {
     if (this._mesh.material.uniforms.tTransition !== 0)
     {
-        if ("tMixRatio" in this._mesh.material.uniforms)
+        if (this._viewer.transitions.running === true && "tMixRatio" in this._mesh.material.uniforms)
         {
-            this._mesh.material.uniforms.tMixRatio.value = this._viewer.renderer.loader.transition.time;
+            this._mesh.material.uniforms.tMixRatio.value = this._viewer.transitions.current.ratio;
         }
     }
 
