@@ -144,12 +144,9 @@ FORGE.BackgroundShaderRenderer.prototype.setMediaTransition = function(media, tr
  */
 FORGE.BackgroundShaderRenderer.prototype.render = function(target)
 {
-    if (this._mesh.material.uniforms.tTransition !== 0)
+    if (this._viewer.transitions.running === true && "tMixRatio" in this._mesh.material.uniforms)
     {
-        if (this._viewer.transitions.running === true && "tMixRatio" in this._mesh.material.uniforms)
-        {
-            this._mesh.material.uniforms.tMixRatio.value = this._viewer.transitions.current.ratio;
-        }
+        this._mesh.material.uniforms.tMixRatio.value = this._viewer.transitions.current.ratio;
     }
 
     FORGE.BackgroundTextureRenderer.prototype.render.call(this, target);
