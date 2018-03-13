@@ -71,6 +71,14 @@ FORGE.Scene = function(viewer)
     this._sync = [];
 
     /**
+     * The transition to use to go to this scene depending on the origin.
+     * @name FORGE.Scene#_transitions
+     * @type {Object}
+     * @private
+     */
+    this._transitions = {};
+
+    /**
      * The number of times this has been viewed.
      * @name  FORGE.Scene#_viewCount
      * @type {number}
@@ -193,6 +201,7 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._layoutUid = typeof config.layout === "string" && config.layout !== "" ? config.layout : this._viewer.layouts.defaultUid;
     this._mediaUid = this._viewer.media.add(config.media).uid;
     this._sync = (FORGE.Utils.isArrayOf(config.sync, "string") === true) ? config.sync : [];
+    this._transitions = config.transitions || {};
 
     // Set the default layout
     this._layoutUid = this._viewer.layouts.defaultUid;
@@ -815,6 +824,21 @@ Object.defineProperty(FORGE.Scene.prototype, "layout",
     {
         var layout = FORGE.UID.get(this._layoutUid);
         return layout;
+    }
+});
+
+/**
+ * Get the trasitions graph.
+ * @name  FORGE.Scene#transitions
+ * @readonly
+ * @type {Object}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "transitions",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._transitions;
     }
 });
 
