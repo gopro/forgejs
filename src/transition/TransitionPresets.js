@@ -45,7 +45,7 @@ FORGE.TransitionPresets.SLIDE =
  */
 FORGE.TransitionPresets.BLEND =
 {
-    uid: "forge-transition-preset-slide",
+    uid: "forge-transition-preset-blend",
 
     background:
     {
