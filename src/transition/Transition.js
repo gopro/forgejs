@@ -235,12 +235,7 @@ FORGE.Transition.prototype._backgroundStart = function()
 
     this._phase = FORGE.TransitionType.BACKGROUND;
 
-    if (this._background === null || this._background.duration === 0)
-    {
-        this._backgroundComplete();
-        return;
-    }
-    else
+    if (this.has(this._phase) === true)
     {
         // POC code to be reworked ==========================================
 
@@ -262,6 +257,10 @@ FORGE.Transition.prototype._backgroundStart = function()
         // ==================================================================
 
         this._tween.to({ ratio: 1 }, this._background.duration, FORGE.Easing.LINEAR).start();
+    }
+    else
+    {
+        this._backgroundComplete();
     }
 };
 
@@ -291,14 +290,14 @@ FORGE.Transition.prototype._screenStart = function()
     this._phase = FORGE.TransitionType.SCREEN;
 
     // If there is no screen transition config or its duration equal 0 then skip to screen complete
-    if (this._screen === null || this._screen.duration === 0)
-    {
-        this._screenComplete();
-    }
-    else
+    if (this.has(this._phase) === true)
     {
         this._viewer.renderer.screen.load(this._screen.material);
         this._tween.to({ ratio: 1 }, this._screen.duration, FORGE.Easing.LINEAR).start();
+    }
+    else
+    {
+        this._screenComplete();
     }
 };
 
@@ -337,14 +336,35 @@ FORGE.Transition.prototype._complete = function()
 };
 
 /**
+ * Is the transition has a specific transition phase?
+ * @method  FORGE.Transition#has
+ * @param {string} type - the type of transition phase you want to test (background or screen)
+ * @return {boolean} Returns true if the transition has a transition of the specified type and its duration is > 0
+ */
+FORGE.Transition.prototype.has = function(type)
+{
+    var phase = null;
+
+    switch (type)
+    {
+        case FORGE.TransitionType.BACKGROUND:
+            phase = this._background;
+            break;
+
+        case FORGE.TransitionType.SCREEN:
+            phase = this._screen;
+    }
+
+    return (phase !== null && phase.duration > 0);
+};
+
+/**
  * Start the transition.
  * @method  FORGE.Transition#start
  */
 FORGE.Transition.prototype.start = function(sceneToUid)
 {
     this.log("start");
-
-    this._onComplete.reset();
 
     this._running = true;
 
@@ -373,7 +393,10 @@ FORGE.Transition.prototype.stop = function()
  */
 FORGE.Transition.prototype.reset = function(restart)
 {
-    this._tween.stop();
+    this.stop();
+
+    this._ratio = 0;
+    this._onComplete.reset();
 
     if (restart === true)
     {

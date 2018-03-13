@@ -539,7 +539,7 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
 
     if (typeof config.transitions === "object")
     {
-        this._transitions.addConfig(config.transitions);
+        this._transitions.loadConfig(config.transitions);
     }
 
     if (typeof config.fx === "object")

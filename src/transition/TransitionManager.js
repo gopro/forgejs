@@ -15,6 +15,22 @@ FORGE.TransitionManager = function(viewer)
     this._viewer = viewer;
 
     /**
+     * Initial configuration of the transition manager.
+     * @name FORGE.TransitionManager#_config
+     * @type {TransitionsConfig}
+     * @private
+     */
+    this._config = null;
+
+    /**
+     * The available default transition oredered by preference.
+     * @name FORGE.TransitionManager#_default
+     * @type {Array<string>}
+     * @private
+     */
+    this._default = [];
+
+    /**
      * Current transition UID
      * @name  FORGE.TransitionManager#_runningUid
      * @type {string}
@@ -23,12 +39,12 @@ FORGE.TransitionManager = function(viewer)
     this._currentUid = "";
 
     /**
-     * Default transition UID
+     * Ultimate default transition UID
      * @name  FORGE.TransitionManager#_defaultUid
      * @type {string}
      * @private
      */
-    this._defaultUid = "";
+    this._defaultUid = FORGE.TransitionPresets.NONE.uid;
 
     FORGE.BaseObject.call(this, "TransitionManager");
 
@@ -45,15 +61,45 @@ FORGE.TransitionManager.prototype.constructor = FORGE.TransitionManager;
  */
 FORGE.TransitionManager.prototype._boot = function()
 {
-    var preset, transition;
+    // Add presets items
     for (i in FORGE.TransitionPresets)
     {
-        preset = FORGE.TransitionPresets[i];
-        transition = new FORGE.Transition(this._viewer, preset);
+        new FORGE.Transition(this._viewer, FORGE.TransitionPresets[i]);
+    }
+};
+
+/**
+ * Parse a main configuration.
+ * @method FORGE.TransitionManager#_parseConfig
+ * @param {TransitionsConfig} config - The main transitions configuration.
+ * @private
+ */
+FORGE.TransitionManager.prototype._parseConfig = function(config)
+{
+    if (typeof config === "undefined" || config === null)
+    {
+        return;
     }
 
-    // Set the preset single as the default layout
-    this._defaultUid = FORGE.TransitionPresets.SPHERICAL.uid;
+    // If default is a string then push it into the default array
+    if (typeof config.default === "string")
+    {
+        this._default.push(config.default);
+    }
+    // Else if default is an an array then add it to the existing default array
+    else if (Array.isArray(config.default) === true)
+    {
+        this._default = this._default.concat(config.default);
+    }
+
+    // If there are items then add them
+    if (Array.isArray(config.items) === true)
+    {
+        for (var i = 0, ii = config.items.length; i < ii; i++)
+        {
+            this.addItem(config.items[i]);
+        }
+    }
 };
 
 /**
@@ -67,12 +113,109 @@ FORGE.TransitionManager.prototype._transitionCompleteHandler = function()
 };
 
 /**
+ * Select the right transition uid to go FROM a scene TO another.
+ * @method FORGE.TransitionManager#_resolve
+ * @param {string} fromUid - The scene uid where we come from.
+ * @param {string} toUid - The scene uid where we want to transition to.
+ * @param {string} transitionUid - The prefered transition uid.
+ * @return {string} Returns the transition uid to use
+ * @private
+ */
+FORGE.TransitionManager.prototype._resolve = function(fromUid, toUid, transitionUid)
+{
+    // if the provided transition uid is legel then go for it
+    if (this._isLegal(fromUid, toUid, transitionUid) === true)
+    {
+        return transitionUid;
+    }
+    // Else we try to resolve the transitions graph of the scene
+    else
+    {
+        var sceneTo = FORGE.UID.get(toUid);
+
+        // If a legal transition is set in the transitions graph of the scene then go
+        if (this._isLegal(fromUid, toUid, sceneTo.transitions[fromUid]) === true)
+        {
+            return sceneTo.transitions[fromUid];
+        }
+    }
+
+    // in any other case return the default
+    return this._getDefault(fromUid, toUid);
+};
+
+/**
+ * Get the default transiton uid to go FROM a scene TO another.
+ * @method FORGE.TransitionManager#_getDefault
+ * @param {string} fromUid - The scene uid where we come from.
+ * @param {string} toUid - The scene uid where we want to transition to.
+ * @param {string} transitionUid - The prefered transition uid.
+ * @return {string} Returns the default transition uid for a given FROM > TO scenario
+ * @private
+ */
+FORGE.TransitionManager.prototype._getDefault = function(fromUid, toUid)
+{
+    var transitionUid;
+
+    for (var i = 0, ii = this._default.length; i < ii; i++)
+    {
+        transitionUid = this._default[i];
+
+        if (this._isLegal(fromUid, toUid, transitionUid) === true)
+        {
+            return transitionUid;
+        }
+    }
+
+    // If no legal transition in the user default array, return the ultimate default uid.
+    return this._defaultUid;
+};
+
+/**
+ * Is a transiton uid to go FROM a scene TO another is legal?
+ * @method FORGE.TransitionManager#_isLegal
+ * @param {string} fromUid - The scene uid where we come from.
+ * @param {string} toUid - The scene uid where we want to transition to.
+ * @param {string} transitionUid - The prefered transition uid.
+ * @return {boolean} Returns true  if the transition is legal
+ * @private
+ */
+FORGE.TransitionManager.prototype._isLegal = function(fromUid, toUid, transitionUid)
+{
+    if (FORGE.UID.isTypeOf(transitionUid, "Transition") === true)
+    {
+        var transiton = FORGE.UID.get(transitionUid);
+
+        if (fromUid === "" && transiton.has(FORGE.TransitionType.BACKGROUND) === true)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    return false;
+};
+
+/**
+ * Load the main transitions configuration
+ * @method FORGE.TransitionManager#loadConfig
+ * @param {TransitionsConfig} config - The main transitions module configuration.
+ */
+FORGE.TransitionManager.prototype.loadConfig = function(config)
+{
+    this._config = config;
+
+    this._parseConfig(config);
+};
+
+/**
  * Add a transition configuration
  * @method FORGE.TransitionManager#addConfig
  * @param {(Array<TransitionConfig>|TransitionConfig)} config - Array of transition configurations or a single transition configuration.
  * @return {FORGE.Transition} Returns the last created {@link FORGE.Transition} object.
  */
-FORGE.TransitionManager.prototype.addConfig = function(config)
+FORGE.TransitionManager.prototype.addItem = function(config)
 {
     var transition = null;
 
@@ -100,26 +243,13 @@ FORGE.TransitionManager.prototype.addConfig = function(config)
  */
 FORGE.TransitionManager.prototype.to = function(sceneUid, transitionUid)
 {
-    // If transition uid is undefined or is not a transition, choose the default one.
-    if(FORGE.UID.isTypeOf(transitionUid, "Transition") === false)
-    {
-        // If there is no current scene then choose a none transition.
-        if (this._viewer.story.scene === null)
-        {
-            transitionUid = FORGE.TransitionPresets.NONE.uid;
-        }
-        // Else pick the default transition
-        else
-        {
-            transitionUid = this._defaultUid;
-        }
-    }
+    transitionUid = this._resolve(this._viewer.story.sceneUid, sceneUid, transitionUid);
 
-    // Get the transition object
+    // Get the transition object to use
     var transition = this.get(transitionUid);
-
-    transition.start(sceneUid);
+    transition.reset();
     transition.onComplete.addOnce(this._transitionCompleteHandler, this);
+    transition.start(sceneUid);
 
     this._currentUid = transition.uid;
 
