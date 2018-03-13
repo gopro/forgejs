@@ -106,7 +106,7 @@ FORGE.ScreenMaterialBlend.prototype._build = function()
  */
 FORGE.ScreenMaterialBlend.prototype.update = function()
 {
-    this._shaderMaterial.uniforms.tMixRatio.value = this._viewer.renderer.loader.transition.ratio;
+    this._shaderMaterial.uniforms.tMixRatio.value = this._viewer.transitions.current.ratio;
 
     if(this._viewer.story.sceneUid !== "")
     {
