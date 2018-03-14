@@ -246,6 +246,9 @@ FORGE.Transition.prototype._backgroundStart = function()
         for (var i=0; i<viewports.length; i++)
         {
             var viewport = viewports[i];
+
+            viewport.renderer.switchToShaderRenderer();
+
             var backgroundRenderer = viewport.renderer.background;
 
             if (typeof backgroundRenderer.setMediaTransition === "function")
