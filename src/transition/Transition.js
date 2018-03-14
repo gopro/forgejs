@@ -326,8 +326,15 @@ FORGE.Transition.prototype._complete = function()
 {
     this.log("global complete");
 
-    // Unload the from scene
-    // ....
+    // Unload the from scene if it exists
+
+    if (this._fromUid !== "")
+    {
+        // Remove the scene renderer of the from scene
+        this._viewer.renderer.scenes.remove(this._fromUid);
+        // Unload its media
+        this._viewer.media.unload(this.from.mediaUid);
+    }
 
     // Transition is complete
     this._running = false;
