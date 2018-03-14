@@ -51,13 +51,6 @@ FORGE.BackgroundRenderer = function(viewer, viewport, className)
     this._camera = null;
 
     /**
-     * @name FORGE.BackgroundRenderer#_frustum
-     * @type {THREE.Frustum}
-     * @private
-     */
-    this._frustum = null;
-
-    /**
      * Is the background is ready for render, this mean is the media is loaded ?
      * @name FORGE.BackgroundRenderer#_ready
      * @type {boolean}
@@ -92,28 +85,6 @@ FORGE.BackgroundRenderer.prototype._boot = function()
     this._media = this._viewport.scene.media;
 
     this._camera = this._viewport.camera.main;
-
-    this._frustum = new THREE.Frustum();
-};
-
-/**
- * Check if some 3D object is interesecting the rendering frustum.
- * @method FORGE.BackgroundRenderer#isObjectInFrustum
- * @param {THREE.Object3D} object - 3D object
- */
-FORGE.BackgroundRenderer.prototype.isObjectInFrustum = function(object)
-{
-    return this._frustum.intersectsObject(object);
-};
-
-/**
- * Check if some 3D object is in the scene
- * @method FORGE.BackgroundRenderer#isObjectInScene
- * @param {THREE.Object3D} object - 3D object
- */
-FORGE.BackgroundRenderer.prototype.isObjectInScene = function(object)
-{
-    return typeof this._scene.getObjectByName(object.name) !== "undefined";
 };
 
 /**
@@ -128,8 +99,6 @@ FORGE.BackgroundRenderer.prototype.render = function(target)
         return;
     }
 
-    this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this._camera.projectionMatrix, this._camera.matrixWorldInverse ) );
-
     this._viewer.renderer.webGLRenderer.render(this._scene, this._camera, target, false);
 };
 
@@ -142,7 +111,6 @@ FORGE.BackgroundRenderer.prototype.destroy = function()
     this._scene = null;
     this._media = null;
     this._camera = null;
-    this._frustum = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
@@ -172,19 +140,5 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "scene",
     get: function()
     {
         return this._scene;
-    }
-});
-
-/**
- * Get camera threejs frustum.
- * @name FORGE.BackgroundRenderer#frustum
- * @type {THREE.Frustum}
- */
-Object.defineProperty(FORGE.BackgroundRenderer.prototype, "frustum",
-{
-    /** @this {FORGE.BackgroundRenderer} */
-    get: function()
-    {
-        return this._frustum;
     }
 });

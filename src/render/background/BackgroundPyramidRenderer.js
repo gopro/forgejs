@@ -9,6 +9,14 @@
  */
 FORGE.BackgroundPyramidRenderer = function(viewer, viewport)
 {
+
+    /**
+     * @name FORGE.BackgroundRenderer#_frustum
+     * @type {THREE.Frustum}
+     * @private
+     */
+    this._frustum = null;
+
     /**
      * Current level of the pyramid
      * @name FORGE.BackgroundPyramidRenderer#_level
@@ -132,6 +140,8 @@ FORGE.BackgroundPyramidRenderer.prototype._boot = function()
 
     this._tileCache = {};
     this._textureStore = this._media.store;
+
+    this._frustum = new THREE.Frustum();
 
     this._camera = this._viewport.camera.main;
     this._viewport.camera.onFovChange.add(this._fovChangeHandler, this);
@@ -388,7 +398,7 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
         // Tile is out of delay and could be cleared
         // This flag will force clearing tiles with lower levels not displayed for a while
         // Tiles at lower level (parents) rendered but hidden by current level tiles should not
-        // be cleared to keep them available immediatly when zooming out 
+        // be cleared to keep them available immediatly when zooming out
         var tileOutOfDelay = tileNeverDisplayedAndTTLExceeded || tileNotDisplayedRecentlyEnough;
 
         // Always clear all tiles from higher levels (performance and aliasing issues)
@@ -406,6 +416,26 @@ FORGE.BackgroundPyramidRenderer.prototype._clearTiles = function()
     {
         this._scene.remove(tile);
     }.bind(this));
+};
+
+/**
+ * Check if some 3D object is interesecting the rendering frustum.
+ * @method FORGE.BackgroundPyramidRenderer#isObjectInFrustum
+ * @param {THREE.Object3D} object - 3D object
+ */
+FORGE.BackgroundPyramidRenderer.prototype.isObjectInFrustum = function(object)
+{
+    return this._frustum.intersectsObject(object);
+};
+
+/**
+ * Check if some 3D object is in the scene
+ * @method FORGE.BackgroundPyramidRenderer#isObjectInScene
+ * @param {THREE.Object3D} object - 3D object
+ */
+FORGE.BackgroundPyramidRenderer.prototype.isObjectInScene = function(object)
+{
+    return typeof this._scene.getObjectByName(object.name) !== "undefined";
 };
 
 /**
@@ -611,6 +641,8 @@ FORGE.BackgroundPyramidRenderer.prototype.render = function(target)
     this._renderList = [];
     this._renderNeighborList = [];
 
+    this._frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this._camera.projectionMatrix, this._camera.matrixWorldInverse ) );
+
     FORGE.BackgroundRenderer.prototype.render.call(this, target);
 
     this._renderNeighborList = FORGE.Utils.arrayUnique(this._renderNeighborList);
@@ -641,9 +673,25 @@ FORGE.BackgroundPyramidRenderer.prototype.destroy = function()
     this._tileCache = null;
     this._renderNeighborList = null;
     this._renderList = null;
+    this._frustum = null;
 
     FORGE.BackgroundRenderer.prototype.destroy.call(this);
 };
+
+/**
+ * Get camera threejs frustum.
+ * @name FORGE.BackgroundPyramidRenderer#frustum
+ * @type {THREE.Frustum}
+ */
+Object.defineProperty(FORGE.BackgroundPyramidRenderer.prototype, "frustum",
+{
+    /** @this {FORGE.BackgroundPyramidRenderer} */
+    get: function()
+    {
+        return this._frustum;
+    }
+});
+
 
 /**
  * Get cube size in world units.
