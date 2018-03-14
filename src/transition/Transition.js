@@ -61,19 +61,19 @@ FORGE.Transition = function(viewer, config)
 
     /**
      * The scene uid to transition from.
-     * @name FORGE.Transition#_from
+     * @name FORGE.Transition#_fromUid
      * @type {string}
      * @private
      */
-    this._from = "";
+    this._fromUid = "";
 
     /**
      * The scene uid to transition to.
-     * @name FORGE.Transition#_to
+     * @name FORGE.Transition#_toUid
      * @type {string}
      * @private
      */
-    this._to = "";
+    this._toUid = "";
 
     /**
      * The current transition phase we are in.
@@ -239,9 +239,9 @@ FORGE.Transition.prototype._backgroundStart = function()
     {
         // POC code to be reworked ==========================================
 
-        var sceneRendererFrom = this._viewer.renderer.scenes.get(this._from);
+        var sceneRendererFrom = this._viewer.renderer.scenes.get(this._fromUid);
         var viewports = sceneRendererFrom.viewports.all;
-        var sceneToMedia = FORGE.UID.get(this._to).media;
+        var sceneToMedia = FORGE.UID.get(this._toUid).media;
 
         for (var i=0; i<viewports.length; i++)
         {
@@ -273,7 +273,7 @@ FORGE.Transition.prototype._backgroundComplete = function()
     this.log("background complete");
 
     // Create the renderer for scene "to".
-    this._viewer.renderer.scenes.add(this._to);
+    this._viewer.renderer.scenes.add(this._toUid);
 
     // Starts the screen transition.
     this._screenStart();
@@ -368,8 +368,8 @@ FORGE.Transition.prototype.start = function(sceneToUid)
 
     this._running = true;
 
-    this._from = this._viewer.story.sceneUid;
-    this._to = sceneToUid;
+    this._fromUid = this._viewer.story.sceneUid;
+    this._toUid = sceneToUid;
 
     this._ratio = 0;
 
@@ -430,6 +430,36 @@ Object.defineProperty(FORGE.Transition.prototype, "running",
     get: function()
     {
         return this._running;
+    }
+});
+
+/**
+ * Get the from scene.
+ * @name FORGE.Transition#from
+ * @readonly
+ * @type {FORGE.Scene}
+ */
+Object.defineProperty(FORGE.Transition.prototype, "from",
+{
+    /** @this {FORGE.Transition} */
+    get: function()
+    {
+        return FORGE.UID.get(this._fromUid);
+    }
+});
+
+/**
+ * Get the to scene.
+ * @name FORGE.Transition#to
+ * @readonly
+ * @type {FORGE.Scene}
+ */
+Object.defineProperty(FORGE.Transition.prototype, "to",
+{
+    /** @this {FORGE.Transition} */
+    get: function()
+    {
+        return FORGE.UID.get(this._toUid);
     }
 });
 
