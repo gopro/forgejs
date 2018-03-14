@@ -364,7 +364,7 @@ FORGE.Transition.prototype.has = function(type)
  */
 FORGE.Transition.prototype.start = function(sceneToUid)
 {
-    this.log("start");
+    this.log("start "+this._uid);
 
     this._running = true;
 
