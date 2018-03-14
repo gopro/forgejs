@@ -375,11 +375,8 @@ FORGE.Scene.prototype.load = function()
         return;
     }
 
-    // Load its media and waits media load complete to engage a transition.
-    this.media.load();
-    this.media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
-
     // The loading has started
+    // it is is important to dispatch this one before starting the media load to update the story properly
     if (this._onLoadStart !== null)
     {
         this._onLoadStart.dispatch();
@@ -389,6 +386,10 @@ FORGE.Scene.prototype.load = function()
     {
         this._events.onLoadStart.dispatch();
     }
+
+    // Load its media and waits media load complete to engage a transition.
+    this.media.load();
+    this.media.onLoadComplete.addOnce(this._mediaLoadCompleteHandler, this);
 };
 
 /**
