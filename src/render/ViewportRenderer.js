@@ -170,6 +170,27 @@ FORGE.ViewportRenderer.prototype._renderToTarget = function(objectRenderer, targ
 };
 
 /**
+ * Destroy the current background renderer and force a background shader renderer.
+ * @method FORGE.ViewportRenderer#switchToShaderRenderer
+ * @private
+ */
+FORGE.ViewportRenderer.prototype.switchToShaderRenderer = function()
+{
+    // If the current background renderer is not a shader renderer
+    if (this._backgroundRenderer.className !== "BackgroundShaderRenderer")
+    {
+        // Destroys the current background renderer
+        if (this._backgroundRenderer !== null)
+        {
+            this._backgroundRenderer.destroy();
+        }
+
+        // Recreate a background shader renderer
+        this._backgroundRenderer = new FORGE.BackgroundShaderRenderer(this._viewer, this._viewport);
+    }
+};
+
+/**
  * Render routine.
  * @method FORGE.ViewportRenderer#render
  * @param {FORGE.ObjectRenderer} objectRenderer - object renderer
