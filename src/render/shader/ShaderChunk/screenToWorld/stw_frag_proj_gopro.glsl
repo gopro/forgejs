@@ -6,11 +6,11 @@
 #include <defines>
 
 uniform int tMediaFormat;
+uniform int tMediaFormatTransition;
 
 uniform int tTransition;
-uniform float tTime;
 uniform float tMixRatio;
-uniform sampler2D tTransitionTexture;
+uniform sampler2D tTextureTransition;
 
 uniform sampler2D tTexture;
 uniform vec4 tViewport;
