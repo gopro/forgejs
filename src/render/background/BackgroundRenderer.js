@@ -108,6 +108,8 @@ FORGE.BackgroundRenderer.prototype.render = function(target)
  */
 FORGE.BackgroundRenderer.prototype.destroy = function()
 {
+    this._ready = false;
+
     this._scene = null;
     this._media = null;
     this._camera = null;
