@@ -184,11 +184,32 @@ FORGE.TransitionManager.prototype._isLegal = function(fromUid, toUid, transition
 {
     if (FORGE.UID.isTypeOf(transitionUid, "Transition") === true)
     {
-        var transiton = FORGE.UID.get(transitionUid);
+        var transition = FORGE.UID.get(transitionUid);
+        var background = transition.has(FORGE.TransitionType.BACKGROUND);
 
-        if (fromUid === "" && transiton.has(FORGE.TransitionType.BACKGROUND) === true)
+        if(background === true)
         {
-            return false;
+             // If it is the first scene loaded, we can't do a background transition
+            if (fromUid === "")
+            {
+                // Return the opposite value of background
+                return false;
+            }
+
+            var mediaFrom = FORGE.UID.get(fromUid).media;
+            var mediaTo = FORGE.UID.get(toUid).media;
+            var types = [FORGE.MediaType.UNDEFINED, FORGE.MediaType.GRID, FORGE.MediaType.TILED];
+
+            // If the media type of one of the two scene is forbidden then we can't do a background transition!
+            // If the media source format is flat, we can't do a background transition!
+            if (types.indexOf(mediaFrom.type) > -1 || types.indexOf(mediaTo.type) > -1
+                || mediaFrom.source !== null && mediaFrom.source.format === FORGE.MediaFormat.FLAT)
+            {
+                return false;
+            }
+
+            // In other cases it is ok :)
+            return true;
         }
 
         return true;
