@@ -404,16 +404,19 @@ module.exports = function(grunt)
             {
                 src: "src/render/shader/ShaderChunk/**/*.glsl",
                 dest: "build/tmp/forge.glsl.js",
-                options: {
-                    process: function(src, filepath) {
+                options:
+                {
+                    process: function(src, filepath)
+                    {
                         var pathComponents = filepath.split("/");
                         var filename = pathComponents[pathComponents.length - 1].split(".")[0];
-                        var out = "var " + filename + " = " + JSON.stringify(
-                                src .replace( /[ \t]*\/\/.*\n/g, "" )
-                                    .replace( /[ \t]*\/\*[\s\S]*?\*\//g, "" )
-                                    .replace( /\n{2,}/g, "\n" )
-                        ) + ";\n\n";
-                        return out + "FORGE.ShaderChunk[\"" + filename + "\"] = " + filename + ";\n";
+
+                        var out = JSON.stringify(src .replace( /[ \t]*\/\/.*\n/g, "" )
+                                                .replace( /[ \t]*\/\*[\s\S]*?\*\//g, "" )
+                                                .replace( /\n{2,}/g, "\n" )
+                        );
+
+                        return "FORGE.ShaderChunk[\"" + filename + "\"] = " + out + ";\n";
                     }
                 }
             },
