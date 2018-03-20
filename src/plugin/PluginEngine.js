@@ -464,13 +464,18 @@ FORGE.PluginEngine.prototype._loadSource = function(url)
 {
     var parsedURL = FORGE.URL.parse(url);
 
-    if( parsedURL.extension === "css")
+    switch(parsedURL.extension)
     {
-        this._viewer.load.css(url, this._loadSourceComplete, this);
-    }
-    else
-    {
-        this._viewer.load.script(url, this._loadSourceComplete, this);
+        case "js":
+            this._viewer.load.script(url, this._loadSourceComplete, this);
+            break;
+
+        case "css":
+            this._viewer.load.css(url, this._loadSourceComplete, this);
+            break;
+
+        case "glsl":
+            this._viewer.load.glsl(url, this._loadSourceComplete, this);
     }
 };
 
