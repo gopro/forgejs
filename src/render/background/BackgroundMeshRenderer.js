@@ -131,8 +131,6 @@ FORGE.BackgroundMeshRenderer.prototype._createGeometry = function()
 FORGE.BackgroundMeshRenderer.prototype._createMaterial = function()
 {
     var shader = FORGE.Utils.clone(this._viewport.view.current.shaderWTS).map;
-    this.log("Media " + this._media.type + ", use mapping shader");
-
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
 

@@ -132,8 +132,6 @@ FORGE.BackgroundGridRenderer.prototype._createGeometry = function()
 FORGE.BackgroundGridRenderer.prototype._createMaterial = function()
 {
     var shader = FORGE.Utils.clone(this._viewport.view.current.shaderWTS).wireframe;
-    this.log("Media " + this._media.type + ", use wireframe shader");
-
     var vertexShader = FORGE.ShaderLib.parseIncludes(shader.vertexShader);
     var fragmentShader = FORGE.ShaderLib.parseIncludes(shader.fragmentShader);
 
