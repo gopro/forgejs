@@ -10,7 +10,7 @@ FORGE.ScreenMaterial = function(viewer, className)
 {
     /**
      * The viewer reference.
-     * @name FORGE.SceneRendererPool#_viewer
+     * @name FORGE.ScreenMaterial#_viewer
      * @type {FORGE.Viewer}
      * @private
      */
@@ -90,10 +90,9 @@ FORGE.ScreenMaterial.prototype._build = function()
         "uniform sampler2D tTextureOne;",
         "uniform vec2 tResolution;",
 
-        "void main() {",
-
+        "void main()",
+        "{",
             "gl_FragColor = texture2D(tTextureOne, gl_FragCoord.xy / tResolution);",
-
         "}"
 
     ].join("\n");
