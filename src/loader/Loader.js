@@ -502,6 +502,78 @@ FORGE.Loader.prototype.css = function(url, callback, context)
 };
 
 /**
+ * Load a glsl file.
+ * @method FORGE.Loader#glsl
+ * @param  {string} key - The key for the glsl file.
+ * @param  {string} url - URL of the file.
+ * @param  {Function} onCompleteCallback - The callback function called when file is completed.
+ * @param  {Object} onCompleteContext - The callback context when file is completed.
+ * @param  {Function=} onErrorCallback - The callback function called on file error.
+ * @param  {Object=} onErrorContext - The callback context for file error.
+ */
+FORGE.Loader.prototype.glsl = function(url, callback, context)
+{
+    var path = url.split("/");
+    var key = path[path.length - 1].split(".")[0];
+
+    var file = new FORGE.File();
+    file.type = "text";
+    file.key = key;
+    file.url = url;
+    file.onCompleteCallback = callback;
+    file.onCompleteContext = context;
+
+    this._xhr(file, "text", this._glslLoadComplete, this._glslLoadError);
+};
+
+/**
+ * Internal method called when a glsl file is completed.
+ * @method FORGE.Loader#_glslLoadComplete
+ * @private
+ * @param {FORGE.File} file - The {@link FORGE.File} corresponding to the glsl file.
+ * @param {XMLHttpRequest} xhr - The XMLHttpRequest response.
+ */
+FORGE.Loader.prototype._glslLoadComplete = function(file, xhr)
+{
+    if (xhr.responseText)
+    {
+        file.data = xhr.responseText;
+
+        FORGE.ShaderLib.addChunk(file.data, file.key);
+
+        if (typeof file.onCompleteCallback === "function" && file.onCompleteContext !== null)
+        {
+            var callback = file.onCompleteCallback;
+            var context = file.onCompleteContext;
+
+            file.onCompleteCallback = null;
+            file.onCompleteContext = null;
+
+            callback.call(context, file);
+        }
+    }
+    else
+    {
+        throw "FORGE.Loader.glsl : GLSL file empty ?";
+    }
+};
+
+/**
+ * Internal method called when the load of a glsl file return error.
+ * @method FORGE.Loader#_glslLoadError
+ * @private
+ * @param {FORGE.File} file - The {@link FORGE.File} corresponding to the glsl file.
+ * @param {XMLHttpRequest} xhr - The XMLHttpRequest response.
+ */
+FORGE.Loader.prototype._glslLoadError = function(file, xhr)
+{
+    if (!xhr.responseText)
+    {
+        throw "FORGE.Loader.glsl : GLSL file empty ?";
+    }
+};
+
+/**
  * Destroy sequence.
  * @method FORGE.Loader#destroy
  */
