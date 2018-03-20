@@ -23,6 +23,86 @@ FORGE.Loader.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.Loader.prototype.constructor = FORGE.Loader;
 
 /**
+ * Internal method to load data from XMLHttpRequest.
+ * @method FORGE.Loader#_xhr
+ * @private
+ * @param {FORGE.File} file - The {@link FORGE.File} corresponding to the file to load.
+ * @param {string} type - The type of the object to load.
+ * @param {Function} onComplete - The callback function called when file is completed.
+ * @param {Function=} onError - The callback function for error during the load.
+ * @param {Function=} onProgress - The callback function for the progress of the load.
+ */
+FORGE.Loader.prototype._xhr = function(file, type, onComplete, onError, onProgress)
+{
+    file.loading = true;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", file.url, true);
+    xhr.responseType = type;
+
+    var length = 0;
+
+    /** @this {XMLHttpRequest} */
+    xhr.onreadystatechange = function()
+    {
+        if (xhr.readyState === XMLHttpRequest.DONE)
+        {
+            if (xhr.status === 200 || xhr.status === 0)
+            {
+                this.onreadystatechange = null;
+
+                if (typeof onComplete === "function")
+                {
+                    file.loaded = true;
+                    onComplete.call(this, file, xhr);
+                }
+            }
+            else
+            {
+                throw "FORGE.Loader._xhr : Could not load " + file.url;
+            }
+        }
+        else if (xhr.readyState === XMLHttpRequest.LOADING)
+        {
+            if (onProgress !== null && typeof onProgress !== "undefined")
+            {
+                if (length === 0)
+                {
+                    length = xhr.getResponseHeader("Content-Length");
+                }
+
+                if (typeof onProgress !== "undefined")
+                {
+                    onProgress(
+                    {
+                        "total": length,
+                        "loaded": xhr.responseText.length
+                    });
+                }
+            }
+        }
+        else if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED)
+        {
+            if (onProgress !== null && typeof onProgress !== "undefined")
+            {
+                length = xhr.getResponseHeader("Content-Length");
+            }
+        }
+
+    }.bind(this);
+
+    xhr.onerror = function()
+    {
+        if (typeof onError === "function")
+        {
+            onError.call(this, file, xhr);
+        }
+    }.bind(this);
+
+    xhr.send();
+};
+
+/**
  * Load a json file.
  * @method FORGE.Loader#json
  * @param  {string} key - The key for the json file.
@@ -302,86 +382,6 @@ FORGE.Loader.prototype._loadAudioTag = function(file, callback, context)
     audioElement.crossOrigin = "anonymous";
     audioElement.src = file.url;
     audioElement.load();
-};
-
-/**
- * Internal method to load data from XMLHttpRequest.
- * @method FORGE.Loader#_xhr
- * @private
- * @param {FORGE.File} file - The {@link FORGE.File} corresponding to the file to load.
- * @param {string} type - The type of the object to load.
- * @param {Function} onComplete - The callback function called when file is completed.
- * @param {Function=} onError - The callback function for error during the load.
- * @param {Function=} onProgress - The callback function for the progress of the load.
- */
-FORGE.Loader.prototype._xhr = function(file, type, onComplete, onError, onProgress)
-{
-    file.loading = true;
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", file.url, true);
-    xhr.responseType = type;
-
-    var length = 0;
-
-    /** @this {XMLHttpRequest} */
-    xhr.onreadystatechange = function()
-    {
-        if (xhr.readyState === XMLHttpRequest.DONE)
-        {
-            if (xhr.status === 200 || xhr.status === 0)
-            {
-                this.onreadystatechange = null;
-
-                if (typeof onComplete === "function")
-                {
-                    file.loaded = true;
-                    onComplete.call(this, file, xhr);
-                }
-            }
-            else
-            {
-                throw "FORGE.Loader._xhr : Could not load " + file.url;
-            }
-        }
-        else if (xhr.readyState === XMLHttpRequest.LOADING)
-        {
-            if (onProgress !== null && typeof onProgress !== "undefined")
-            {
-                if (length === 0)
-                {
-                    length = xhr.getResponseHeader("Content-Length");
-                }
-
-                if (typeof onProgress !== "undefined")
-                {
-                    onProgress(
-                    {
-                        "total": length,
-                        "loaded": xhr.responseText.length
-                    });
-                }
-            }
-        }
-        else if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED)
-        {
-            if (onProgress !== null && typeof onProgress !== "undefined")
-            {
-                length = xhr.getResponseHeader("Content-Length");
-            }
-        }
-
-    }.bind(this);
-
-    xhr.onerror = function()
-    {
-        if (typeof onError === "function")
-        {
-            onError.call(this, file, xhr);
-        }
-    }.bind(this);
-
-    xhr.send();
 };
 
 /**
