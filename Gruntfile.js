@@ -85,6 +85,7 @@ module.exports = function(grunt)
         "src/render/fx/FXManager.js",
         "src/render/fx/ShaderPass.js",
 
+        "src/render/shader/Shader.js",
         "src/render/shader/ShaderChunk.js",
         "build/tmp/forge.glsl.js",
         "src/render/shader/ShaderLib.js",
