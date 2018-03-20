@@ -411,7 +411,7 @@ module.exports = function(grunt)
                         var pathComponents = filepath.split("/");
                         var filename = pathComponents[pathComponents.length - 1].split(".")[0];
 
-                        var out = JSON.stringify(src .replace( /[ \t]*\/\/.*\n/g, "" )
+                        var out = JSON.stringify(src.replace( /[ \t]*\/\/.*\n/g, "" )
                                                 .replace( /[ \t]*\/\*[\s\S]*?\*\//g, "" )
                                                 .replace( /\n{2,}/g, "\n" )
                         );
