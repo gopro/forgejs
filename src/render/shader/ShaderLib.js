@@ -238,26 +238,68 @@ FORGE.ShaderLib = {
 
 //jscs:enable
 
+
+/**
+ * Parses include of a shader
+ * @method FORGE.ShaderLib.parseIncludes
+ * @param  {string} string - The shader string to parse
+ * @return {string} Returns the parsed shaders with its includes
+ */
 FORGE.ShaderLib.parseIncludes = function(string)
 {
+    // Pattern for #include <chunck-name>
     var pattern = /#include +<([\w\d.]+)>/g;
 
-    function replace( match, include )
+    // Replace includes by chunks
+    // Will look for the chunk into FORGE.ShaderChunk then on THREE.ShaderChunk
+    function replace(match, include)
     {
-        var r = FORGE.ShaderChunk[include];
+        var chunk = FORGE.ShaderChunk[include];
 
-        if (typeof r === "undefined")
+        if (typeof chunk === "undefined")
         {
-            r = THREE.ShaderChunk[include];
+            chunk = THREE.ShaderChunk[include];
 
-            if (typeof r === "undefined")
+            if (typeof chunk === "undefined")
             {
-                throw new Error( "Can not resolve #include <" + include + ">" );
+                throw new Error("FORGE.ShaderLib : Can not resolve #include <" + include + ">");
             }
         }
 
-        return FORGE.ShaderLib.parseIncludes(r);
+        // Call the parse include recusively on the chunk itself
+        return FORGE.ShaderLib.parseIncludes(chunk);
     }
 
-    return string.replace( pattern, replace );
+    return string.replace(pattern, replace);
 };
+
+/**
+ * Clean a shader chunk from its comments
+ * @method FORGE.ShaderLib.cleanChunk
+ * @param  {string} string - The shader chunk to clean
+ * @return {string} Returns the cleaned shader chunk
+ */
+FORGE.ShaderLib.cleanChunk = function(string)
+{
+    return JSON.stringify(string.replace( /[ \t]*\/\/.*\n/g, "" )
+                                .replace( /[ \t]*\/\*[\s\S]*?\*\//g, "" )
+                                .replace( /\n{2,}/g, "\n" )
+    );
+};
+
+/**
+ * add a shader chunk to the FORGE.ShaderChunk namespace if it does not already exists
+ * @method FORGE.ShaderLib.cleanChunk
+ * @param  {string} string - The shader chunk to add
+ * @param  {string} name - The name of the shader chunk to add, must be unique
+ */
+FORGE.ShaderLib.addChunk = function(string, name)
+{
+    if (typeof FORGE.ShaderChunk[name] !== "undefined")
+    {
+        throw new Error("FORGE.ShaderLib : Can not add a chunk named " + name + ", exists already!");
+    }
+
+    FORGE.ShaderChunk[name] = FORGE.ShaderLib.cleanChunk(string);
+};
+
