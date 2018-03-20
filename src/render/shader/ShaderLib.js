@@ -34,10 +34,6 @@ FORGE.ShaderLib = {
             /** @type {FORGEUniform} */
             uniforms:
             {
-                tMediaFormat : { type: "i", value: 0 },
-                tMediaFormatTransition : { type: "i", value: 0 },
-                tTransition: { type: "i", value: 0 },
-                tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
                 tTextureRatio: { type: "f", value: 1.0 },
                 tViewport: { type: "v4", value: new THREE.Vector4() },

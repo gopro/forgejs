@@ -54,20 +54,19 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
     switch (this._media.source.format)
     {
         case FORGE.MediaFormat.EQUIRECTANGULAR:
-        default:
             material.uniforms.tMediaFormat.value = 0;
         break;
 
         case FORGE.MediaFormat.CUBE:
             material.uniforms.tMediaFormat.value = 1;
         break;
-
-        case FORGE.MediaFormat.FLAT:
-            material.uniforms.tMediaFormat.value = 2;
-        break;
     }
 
-    material.uniforms.tTransition.value = 0;
+    // To be cleaned
+    if ("tTransition" in material.uniforms)
+    {
+        material.uniforms.tTransition.value = 0;
+    }
 
     material.needsUpdate = true;
 
