@@ -3,14 +3,16 @@
  * @param  {vec3} rtp - spherical coordinates (.x = radius, .y = azimuth, .z = elevation)
  * @return {vec3} cartesian coordinates xyz
  */
-vec3 toCartesian(in vec3 rtp) {
+vec3 sphericalToCartesian(in vec3 rtp)
+{
     float r = rtp.x;
     float theta = rtp.y;
     float phi = rtp.z;
     float x = r * cos(phi) * sin(theta);
     float y = r * sin(phi);
     float z = r * cos(phi) * cos(theta);
-    return vec3(x,y,z);
+
+    return vec3(x, y, z);
 }
 
 /**
@@ -18,9 +20,11 @@ vec3 toCartesian(in vec3 rtp) {
  * @param  {vec3} pt - cartesian coordinates xyz
  * @return {object} rtp spherical coordinates (.x = radius, .y = azimuth, .z = elevation)
  */
-vec3 toSpherical(in vec3 pt) {
+vec3 cartesianToSpherical(in vec3 pt)
+{
     float r = length(pt);
     float theta = -atan(pt.x, pt.z);
     float phi = asin(pt.y / r);
-    return vec3(r,theta,phi);
+
+    return vec3(r, theta, phi);
 }

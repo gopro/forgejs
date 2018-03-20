@@ -9,10 +9,9 @@
 
 varying vec2 vQuadrilateralCoords;
 
-void main() {
+void main()
+{
     vec4 camPt = modelViewMatrix * vec4( position, 1.0 );
-
     gl_Position = projectionMatrix * camPt;
-
     vQuadrilateralCoords = quadrilateralCoords;
 }

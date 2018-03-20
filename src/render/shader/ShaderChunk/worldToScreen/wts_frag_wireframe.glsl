@@ -5,7 +5,7 @@
  * Compute distance to the edge to find what should be displayed
  */
 
-#extension GL_OES_standard_derivatives : enable 
+#extension GL_OES_standard_derivatives : enable
 
 #include <defines>
 
@@ -17,9 +17,10 @@ uniform vec3 tColor;
 
 varying vec2 vQuadrilateralCoords;
 
-void main() {
+void main()
+{
     // Wireframe should be drawn when barycentric coords of
-    // opposite corner is near zero. 
+    // opposite corner is near zero.
     // Compute quadratic sum of partial derivatives to get a fixed
     // width and a threshold giving a smooth profile.
     vec2 dfdx = dFdx(vQuadrilateralCoords);

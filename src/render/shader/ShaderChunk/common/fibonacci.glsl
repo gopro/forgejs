@@ -76,7 +76,7 @@ void fibspheren(vec3 p, float n,
     vec2 bk1 = calcbk(f[1], n);
 
     mat2 b = mat2(bk, bk1);
-    mat2 invb = inverse(b);
+    mat2 invb = inverseMat2(b);
 
     // change of basis for point sp to local grid uv
     float z0 = 1.0 - 1.0 / n;

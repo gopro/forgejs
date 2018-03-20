@@ -11,7 +11,8 @@ uniform sampler2D tTexture;
 
 varying vec2 vUv;
 
-void main() {
+void main()
+{
     vec4 texel = texture2D( tTexture, vUv );
     gl_FragColor = vec4(texel.rgb, texel.a * tOpacity);
 }

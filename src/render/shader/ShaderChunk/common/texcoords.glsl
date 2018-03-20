@@ -1,11 +1,12 @@
 /**
  * Get equirectangular texel coordinates from spherical point
  * Theta equals 0 at center of the equirectangular texture, -pi at left and +pi at right
- * @param  {vec3} spherePT - spherical pt
+ * @param  {vec3} spherePT - spherical point
  * @return {vec2} texture coordinates
  */
-vec2 equirectangularTexCoords(in vec3 spherePT) {
-    spherePT = vec3(1.0, toSpherical(spherePT).yz);
+vec2 equirectangularTexCoords(in vec3 spherePT)
+{
+    spherePT = vec3(1.0, cartesianToSpherical(spherePT).yz);
     spherePT.y = wrap(spherePT.y + PI, -PI, PI);
     return 0.5 + spherePT.yz / vec2(TWO_PI, PI);
 }
@@ -13,10 +14,11 @@ vec2 equirectangularTexCoords(in vec3 spherePT) {
 /**
  * Get cubeface texel coordinates from spherical point
  * Theta equals 0 at center of the equirectangular texture, -pi at left and +pi at right
- * @param  {vec3} spherePT - spherical pt
+ * @param  {vec3} spherePT - spherical point
  * @return {vec2} texture coordinates
  */
-vec2 cubefaceTexCoords(in vec3 spherePT) {
+vec2 cubefaceTexCoords(in vec3 spherePT)
+{
     spherePT = normalize(spherePT);
     vec2 faceCoords, colrow;
 
@@ -37,56 +39,64 @@ vec2 cubefaceTexCoords(in vec3 spherePT) {
     vec2 v_flip = vec2(1.0, -1.0);
 
     // Front / Back
-    if (all(lessThanEqual(abs(proj_z), v_unit))) {
+    if (all(lessThanEqual(abs(proj_z), v_unit)))
+    {
         float direction = dot(spherePT, vec3(0., 0., 1.));
 
         // Back
-        if (direction > 0.0) {
+        if (direction > 0.0)
+        {
             colrow = vec2(2.0, 0.0);
             faceCoords = -proj_z * v_flip;
         }
         // Front
-        else {
+        else
+        {
             colrow = vec2(1.0, 0.0);
             faceCoords = -proj_z;
         }
     }
 
     // Left / Right
-    else
-    if (all(lessThanEqual(abs(proj_x), v_unit))) {
+    else if (all(lessThanEqual(abs(proj_x), v_unit)))
+    {
         float direction = dot(spherePT, vec3(1., 0., 0.));
 
         // Left
-        if (direction > 0.0) {
+        if (direction > 0.0)
+        {
             colrow = vec2(0.0, 1.0);
             faceCoords = proj_x;
         }
         // Right
-        else {
+        else
+        {
             colrow = vec2(1.0, 1.0);
             faceCoords = proj_x * v_flip;
         }
     }
 
     // Up / Down
-    else
-    if (all(lessThanEqual(abs(proj_y), v_unit))) {
+    else if (all(lessThanEqual(abs(proj_y), v_unit)))
+    {
         float direction = dot(spherePT, vec3(0., 1., 0.));
 
         // Up
-        if (direction > 0.0) {
+        if (direction > 0.0)
+        {
             colrow = vec2(2.0, 1.0);
             faceCoords = proj_y;
         }
         // Down
-        else {
+        else
+        {
             colrow = vec2(0.0, 0.0);
             faceCoords = -proj_y * v_flip;
         }
     }
 
-    else {
+    else
+    {
         discard;
     }
 
@@ -100,9 +110,10 @@ vec2 cubefaceTexCoords(in vec3 spherePT) {
  * @param  {vec3} spherePT - point on a sphere (cartesian coordinates)
  * @return {vec2} UV texture coordinates
  */
-vec2 getTexCoords(vec3 spherePT, int mediaFormat) {
-
-    if (mediaFormat == 1) {
+vec2 getTexCoords(vec3 spherePT, int mediaFormat)
+{
+    if (mediaFormat == 1)
+    {
         return cubefaceTexCoords(spherePT);
     }
 

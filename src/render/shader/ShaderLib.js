@@ -25,8 +25,8 @@ FORGE.ShaderLib = {
                 tProjectionScale: { type: "f", value: 1.0 }
             },
 
-            vertexShader: FORGE.ShaderChunk.stw_vert_proj,
-            fragmentShader: FORGE.ShaderChunk.stw_frag_proj_rectilinear
+            vertexShader: FORGE.ShaderChunk.stw_vert_main,
+            fragmentShader: FORGE.ShaderChunk.stw_frag_rectilinear_main
         },
 
         flat:
@@ -45,8 +45,8 @@ FORGE.ShaderLib = {
                 tRepeatY: { type: "i", value: 0 }
             },
 
-            vertexShader: FORGE.ShaderChunk.stw_vert_proj,
-            fragmentShader: FORGE.ShaderChunk.stw_frag_proj_flat
+            vertexShader: FORGE.ShaderChunk.stw_vert_main,
+            fragmentShader: FORGE.ShaderChunk.stw_frag_flat_main
         },
 
         gopro:
@@ -67,8 +67,8 @@ FORGE.ShaderLib = {
                 tProjectionScale: { type: "f", value: 1.0 }
             },
 
-            vertexShader: FORGE.ShaderChunk.stw_vert_proj,
-            fragmentShader: FORGE.ShaderChunk.stw_frag_proj_gopro
+            vertexShader: FORGE.ShaderChunk.stw_vert_main,
+            fragmentShader: FORGE.ShaderChunk.stw_frag_gopro_main
         }
     },
 

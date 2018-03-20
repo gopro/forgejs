@@ -17,7 +17,8 @@ uniform float tProjectionDistance;
 
 varying vec2 vQuadrilateralCoords;
 
-void main() {
+void main()
+{
     vec4 spherePt = normalize(modelViewMatrix * vec4( position, 1.0 ));
     float radius = 1.0 - 0.5 * tProjectionDistance;
     float offset = radius - 1.0;

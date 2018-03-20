@@ -12,10 +12,14 @@ uniform vec3 tColor;
 
 varying vec2 vUv;
 
-void main() {
-    if (tUseTextureAlpha == 1) {
+void main()
+{
+    if (tUseTextureAlpha == 1)
+    {
         vec4 texel = texture2D( tTexture, vUv );
-        if (texel.a < 0.001) {
+
+        if (texel.a < 0.001)
+        {
             discard;
         }
     }
