@@ -30,7 +30,6 @@ void main()
     vec2 screenPT = getScreenPoint(gl_FragCoord, tViewport);
 
     // Get texel in spherical coordinates
-    // vec2 sTexel = sReference + (tFov * 0.5) * screenToNDC(getScreenPt());
     vec2 sTexel = sReference + (tFov * 0.5) * screenToNDC(screenPT, tViewport);
 
     // Get texture coordinates
