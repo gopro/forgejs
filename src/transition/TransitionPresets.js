@@ -73,7 +73,7 @@ FORGE.TransitionPresets.SPHERICAL =
 
     background:
     {
-        type: 1,
+        type: 2,
         easing: FORGE.Easing.LINEAR,
         duration: 2000
     },

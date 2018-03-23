@@ -253,7 +253,7 @@ FORGE.Transition.prototype._backgroundStart = function()
 
             if (typeof backgroundRenderer.setMediaTransition === "function")
             {
-                backgroundRenderer.setMediaTransition(sceneToMedia, 5);
+                backgroundRenderer.setMediaTransition(sceneToMedia, this._background.type);
             }
         }
 
