@@ -82,7 +82,8 @@ FORGE.ObjectMaterial.prototype._build = function()
         vertexShader: vertexShader,
         side: THREE.FrontSide,
         needsUpdate: true,
-        transparent: this._transparent
+        transparent: this._transparent,
+        name: this._uid //@todo refactor : This is useful for the onBeforeRender to determine if we are in picking phase
     });
 
     return material;
