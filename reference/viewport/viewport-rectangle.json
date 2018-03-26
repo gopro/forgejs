@@ -1,0 +1,42 @@
+{
+    "id": "viewport-rectangle",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ViewportRectangleConfig",
+    "description": "The viewport rectangle configuration",
+    "type": "object",
+
+    "properties": {
+
+        "x":
+        {
+            "type": "number",
+            "title": "X",
+            "description": "The x coordinate of the rectangle in percentage of the screen.",
+            "example": "50"
+        },
+
+        "y":
+        {
+            "type": "number",
+            "title": "Y",
+            "description": "The y coordinate of the rectangle in percentage of the screen.",
+            "example": "50"
+        },
+
+        "width":
+        {
+            "type": "number",
+            "title": "Width",
+            "description": "The width of the rectangle in percentage of the screen.",
+            "example": "50"
+        },
+
+        "height":
+        {
+            "type": "number",
+            "title": "Height",
+            "description": "The height of the rectangle in percentage of the screen.",
+            "example": "50"
+        }
+    }
+}

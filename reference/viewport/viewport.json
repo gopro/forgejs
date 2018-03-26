@@ -1,0 +1,29 @@
+{
+    "id": "viewport",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ViewportConfig",
+    "description": "The viewport configuration",
+    "type": "object",
+
+    "properties": {
+
+        "background": {
+            "type": "string",
+            "title": "Background",
+            "description": "The background color of the viewport.",
+            "example": "black"
+        },
+
+        "rectangle": {
+            "$ref": "viewport-rectangle"
+        },
+
+        "view": {
+            "$ref": "view"
+        },
+
+        "camera": {
+            "$ref": "camera"
+        }
+    }
+}
