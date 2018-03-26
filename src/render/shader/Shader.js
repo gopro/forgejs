@@ -126,7 +126,7 @@ FORGE.Shader.prototype.destroy = function()
 /**
  * Get the raw shader material.
  * @name FORGE.Shader#material
- * @type {THREE.RawShader}
+ * @type {THREE.RawShaderMaterial}
  * @readonly
  */
 Object.defineProperty(FORGE.Shader.prototype, "material",

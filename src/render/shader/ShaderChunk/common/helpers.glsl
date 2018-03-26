@@ -12,7 +12,7 @@ float wrap(in float x, in float min, in float max)
 }
 
 /**
- * get current fragment in screen space
+ * get current fragment in screen space for a given viewport
  * @return {vec2} fragment
  */
 vec2 getScreenPoint(vec4 coords, vec4 viewport)
