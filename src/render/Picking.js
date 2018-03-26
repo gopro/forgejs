@@ -251,7 +251,7 @@ FORGE.Picking.prototype._getObjectAtNormalizedPosition = function(posn)
                                     1,
                                     data );
 
-    var id = FORGE.Picking.colorTo3DObjectID(new THREE.Color(data[0], data[1], data[2]));
+    var id = FORGE.Picking.colorTo3DObjectID(new THREE.Color(data[0] / 255, data[1] / 255, data[2] / 255));
     return this._objectRenderer.getPickableObjectWithId(id);
 };
 
