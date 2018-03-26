@@ -55,11 +55,10 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
     {
         case FORGE.MediaFormat.EQUIRECTANGULAR:
             material.uniforms.tMediaFormat.value = 0;
-        break;
+            break;
 
         case FORGE.MediaFormat.CUBE:
             material.uniforms.tMediaFormat.value = 1;
-        break;
     }
 
     // To be cleaned
@@ -123,15 +122,15 @@ FORGE.BackgroundShaderRenderer.prototype.setMediaTransition = function(media, tr
             case FORGE.MediaFormat.EQUIRECTANGULAR:
             default:
                 this._mesh.material.uniforms.tMediaFormatTransition.value = 0;
-            break;
+                break;
 
             case FORGE.MediaFormat.CUBE:
                 this._mesh.material.uniforms.tMediaFormatTransition.value = 1;
-            break;
+                break;
 
             case FORGE.MediaFormat.FLAT:
                 this._mesh.material.uniforms.tMediaFormatTransition.value = 2;
-            break;
+                break;
         }
     }
 };
