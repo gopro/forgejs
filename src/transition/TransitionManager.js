@@ -294,10 +294,11 @@ FORGE.TransitionManager.prototype.get = function(uid)
 FORGE.TransitionManager.prototype.destroy = function()
 {
     var transitions = FORGE.UID.get(null, "Transition");
+    var transition;
 
     while (transitions.length > 0)
     {
-        var transition = transitions.pop();
+        transition = transitions.pop();
         transition.destroy();
         transition = null;
     }
