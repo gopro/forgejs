@@ -19,7 +19,7 @@
         "items": {
             "type": "array",
             "title": "Items",
-            "description": "Custom trnsition configurations. Each member is an instance of <a href=\"#transition\">transition config</a>.",
+            "description": "Custom transition configurations. Each member is an instance of <a href=\"#transition\">transition config</a>.",
             "items": {
                 "$ref": "transition"
             }
