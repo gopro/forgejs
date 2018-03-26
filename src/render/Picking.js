@@ -106,7 +106,7 @@ FORGE.Picking.colorFromObjectID = function(id)
  */
 FORGE.Picking.colorTo3DObjectID = function(color)
 {
-    return ((color.r & 0x0000ff) << 16) | ((color.g & 0x0000ff) << 8) + (color.b & 0x0000ff);
+    return color.getHex();
 };
 
 /**
