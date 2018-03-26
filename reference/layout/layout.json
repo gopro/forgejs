@@ -1,0 +1,26 @@
+{
+    "id": "layout",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "TransitionConfig",
+    "description": "Layout configuration.",
+    "type": "object",
+
+    "properties": {
+
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the layout.",
+            "example": "transition-0"
+        },
+
+        "viewports": {
+            "type": "array",
+            "title": "Viewpots",
+            "description": "Array of <a href=\"#viewport\">viewports</a> configuration that compose the layout</a>.",
+            "items": {
+                "$ref": "viewport"
+            }
+        }
+    }
+}

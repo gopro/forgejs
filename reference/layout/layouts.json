@@ -1,0 +1,26 @@
+{
+    "id": "layouts",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "LayoutsConfig",
+    "description": "Global layouts configuration.",
+    "type": "object",
+
+    "properties": {
+
+        "default": {
+            "type": "string",
+            "title": "Default",
+            "description": "The default layout uid.",
+            "exemple": "layout-0"
+        },
+
+        "items": {
+            "type": "array",
+            "title": "Items",
+            "description": "Custom layout configurations. Each member is an instance of <a href=\"#layout\">layout config</a>.",
+            "items": {
+                "$ref": "layout"
+            }
+        }
+    }
+}
