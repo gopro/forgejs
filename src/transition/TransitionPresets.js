@@ -23,16 +23,9 @@ FORGE.TransitionPresets.SLIDE =
 {
     uid: "forge-transition-preset-slide",
 
-    background:
-    {
-        type: null,
-        easing: null,
-        duration: 0
-    },
-
     screen:
     {
-        material: { type: "slide" },
+        type: "slide",
         easing: FORGE.Easing.LINEAR,
         duration: 2000
     }
@@ -47,16 +40,9 @@ FORGE.TransitionPresets.BLEND =
 {
     uid: "forge-transition-preset-blend",
 
-    background:
-    {
-        type: null,
-        easing: null,
-        duration: 0
-    },
-
     screen:
     {
-        material: { type: "blend" },
+        type: "blend",
         easing: FORGE.Easing.LINEAR,
         duration: 2000
     }
@@ -76,12 +62,5 @@ FORGE.TransitionPresets.SPHERICAL =
         type: 2,
         easing: FORGE.Easing.LINEAR,
         duration: 2000
-    },
-
-    screen:
-    {
-        material: { type: "basic" },
-        easing: null,
-        duration: 0
     }
 };

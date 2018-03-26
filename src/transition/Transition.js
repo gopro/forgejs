@@ -44,17 +44,17 @@ FORGE.Transition = function(viewer, config)
     this._ratio = 0;
 
     /**
-     * Screen material configuration for this transition.
-     * @name FORGE.Transition#_screen
-     * @type {ScreenMaterialConfig}
+     * Background transition configuration.
+     * @name FORGE.Transition#_background
+     * @type {TransitionBackgroundConfig}
      * @private
      */
     this._background = null;
 
     /**
-     * Screen material configuration for this transition.
+     * Screen transition configuration.
      * @name FORGE.Transition#_screen
-     * @type {ScreenMaterialConfig}
+     * @type {TransitionScreenConfig}
      * @private
      */
     this._screen = null;
@@ -296,7 +296,7 @@ FORGE.Transition.prototype._screenStart = function()
     // If there is no screen transition config or its duration equal 0 then skip to screen complete
     if (this.has(this._phase) === true)
     {
-        this._viewer.renderer.screen.load(this._screen.material);
+        this._viewer.renderer.screen.load({ "type" : this._screen.type });
 
         this._tween.easing = this._screen.easing;
         this._tween.to({ ratio: 1 }, this._screen.duration).start();

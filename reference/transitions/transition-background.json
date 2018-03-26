@@ -1,0 +1,31 @@
+{
+    "id": "transition-background",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "TransitionBackgroundConfig",
+    "description": "Transition background configuration.",
+    "type": "object",
+
+    "properties": {
+
+        "type": {
+            "type": "number",
+            "title": "Type",
+            "description": "The type of the transition. At the time we have 5 hardcoded transitions in background shaders.",
+            "example": "5"
+        },
+
+        "easing": {
+            "type": "string",
+            "title": "Easing",
+            "description": "The easing formula used for the transition tween",
+            "example": "linear"
+        },
+
+        "duration": {
+            "type": "number",
+            "title": "Duration",
+            "description": "The of the transition in milliseconds",
+            "example": "2000"
+        }
+    }
+}

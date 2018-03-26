@@ -1,0 +1,25 @@
+{
+    "id": "transition",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "TransitionConfig",
+    "description": "Transition configuration.",
+    "type": "object",
+
+    "properties": {
+
+        "uid": {
+            "type": "string",
+            "title": "UID",
+            "description": "The UID of the transition.",
+            "example": "transition-0"
+        },
+
+        "background": {
+            "$ref": "transition-background"
+        },
+
+        "screen": {
+            "$ref": "transition-screen"
+        }
+    }
+}

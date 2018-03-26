@@ -1,0 +1,31 @@
+{
+    "id": "transition-screen",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "TransitionScreenConfig",
+    "description": "Transition screen configuration.",
+    "type": "object",
+
+    "properties": {
+
+        "type": {
+            "type": "string",
+            "title": "Type",
+            "description": "The type of the transition. At the time we have 'slide', 'blend' and 'none'.",
+            "example": "slide"
+        },
+
+        "easing": {
+            "type": "string",
+            "title": "Easing",
+            "description": "The easing formula used for the transition tween",
+            "example": "linear"
+        },
+
+        "duration": {
+            "type": "number",
+            "title": "Duration",
+            "description": "The of the transition in milliseconds",
+            "example": "2000"
+        }
+    }
+}

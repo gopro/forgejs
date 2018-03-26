@@ -1,0 +1,28 @@
+{
+    "id": "transitions",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "TransitionsConfig",
+    "description": "Global transitions configuration.",
+    "type": "object",
+
+    "properties": {
+
+        "default": {
+            "type": "array",
+            "title": "Default",
+            "description": "The default transitions uids by order of preference.",
+            "items": {
+                "type": "string"
+            }
+        },
+
+        "items": {
+            "type": "array",
+            "title": "Items",
+            "description": "Custom trnsition configurations. Each member is an instance of <a href=\"#transition\">transition config</a>.",
+            "items": {
+                "$ref": "transition"
+            }
+        }
+    }
+}
