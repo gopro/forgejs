@@ -214,7 +214,7 @@ FORGE.Scene.prototype._parseConfig = function(config)
     // Else if its a layout object, then add it to the layout manager and use it!
     else if (typeof config.layout === "object" && config.layout !== null)
     {
-        var layout = this._viewer.layouts.addConfig(config.layout);
+        var layout = this._viewer.layouts.addItem(config.layout);
         this._layoutUid = layout.uid;
     }
 

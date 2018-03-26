@@ -15,14 +15,6 @@ FORGE.LayoutManager = function(viewer)
     this._viewer = viewer;
 
     /**
-     * layouts config array.
-     * @name FORGE.LayoutManager#_layouts
-     * @type {Array<FORGE.Layout>}
-     * @private
-     */
-    this._layouts = null;
-
-    /**
      * Default layout UID
      * @name  FORGE.LayoutManager#_defaultUid
      * @type {string}
@@ -45,28 +37,59 @@ FORGE.LayoutManager.prototype.constructor = FORGE.LayoutManager;
  */
 FORGE.LayoutManager.prototype._boot = function()
 {
-   this._layouts = [];
-
-    var preset, layout;
+   // Add presets items
     for (i in FORGE.LayoutPresets)
     {
-        preset = FORGE.LayoutPresets[i];
-        layout = new FORGE.Layout(this._viewer, preset);
-        this._layouts.push(layout);
+        new FORGE.Layout(this._viewer, FORGE.LayoutPresets[i]);
+    }
+};
+
+/**
+ * Parse a main configuration.
+ * @method FORGE.LayoutManager#_parseConfig
+ * @param {LayoutsConfig} config - The main layouts configuration.
+ * @private
+ */
+FORGE.LayoutManager.prototype._parseConfig = function(config)
+{
+    if (typeof config === "undefined" || config === null)
+    {
+        return;
     }
 
-    // Set the preset single as the default layout
-    this._defaultUid = FORGE.LayoutPresets.SINGLE.uid;
+    // If there are items then add them
+    if (Array.isArray(config.items) === true)
+    {
+        for (var i = 0, ii = config.items.length; i < ii; i++)
+        {
+            this.addItem(config.items[i]);
+        }
+    }
+
+    this._defaultUid = (FORGE.UID.isTypeOf(config.default, "Layout") === true) ? config.default : FORGE.LayoutPresets.SINGLE.uid;
 };
 
 
 /**
- * Add layouts configuration
- * @method FORGE.LayoutManager#addConfig
+ * Load the main layouts configuration
+ * @method FORGE.LayoutManager#loadConfig
+ * @param {LayoutsConfig} config - The main layouts module configuration.
+ */
+FORGE.LayoutManager.prototype.loadConfig = function(config)
+{
+    this._config = config;
+
+    this._parseConfig(config);
+};
+
+
+/**
+ * Add layout item configuration
+ * @method FORGE.LayoutManager#addItem
  * @param {(Array<LayoutConfig>|LayoutConfig)} config - Array of layout configurations or a single layout configuration.
  * @return {FORGE.Layout} Returns the last created layout object.
  */
-FORGE.LayoutManager.prototype.addConfig = function(config)
+FORGE.LayoutManager.prototype.addItem = function(config)
 {
     var layout = null;
 
@@ -76,14 +99,12 @@ FORGE.LayoutManager.prototype.addConfig = function(config)
         for (var i = 0, ii = config.length; i < ii; i++)
         {
             layout = new FORGE.Layout(this._viewer, config[i]);
-            this._layouts.push(layout);
         }
     }
     // If it is a single layout
     else
     {
         layout = new FORGE.Layout(this._viewer, /** @type {LayoutConfig} */ (config));
-        this._layouts.push(layout);
     }
 
     return layout;
@@ -105,17 +126,16 @@ FORGE.LayoutManager.prototype.get = function(uid)
  */
 FORGE.LayoutManager.prototype.destroy = function()
 {
-    if (FORGE.Utils.isArrayOf(this._layouts, "Layout"))
+    var layouts = FORGE.UID.get(null, "Layout");
+    var layout;
+
+    while (layouts.length > 0)
     {
-        while (this._layouts.length > 0)
-        {
-            var layout = this._layouts.pop();
-            layout.destroy();
-            layout = null;
-        }
+        layout = layouts.pop();
+        layout.destroy();
+        layout = null;
     }
 
-    this._layouts = null;
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
