@@ -259,7 +259,8 @@ FORGE.Transition.prototype._backgroundStart = function()
 
         // ==================================================================
 
-        this._tween.to({ ratio: 1 }, this._background.duration, FORGE.Easing.LINEAR).start();
+        this._tween.easing = this._background.easing;
+        this._tween.to({ ratio: 1 }, this._background.duration).start();
     }
     else
     {
@@ -296,7 +297,9 @@ FORGE.Transition.prototype._screenStart = function()
     if (this.has(this._phase) === true)
     {
         this._viewer.renderer.screen.load(this._screen.material);
-        this._tween.to({ ratio: 1 }, this._screen.duration, FORGE.Easing.LINEAR).start();
+
+        this._tween.easing = this._screen.easing;
+        this._tween.to({ ratio: 1 }, this._screen.duration).start();
     }
     else
     {
