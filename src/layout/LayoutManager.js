@@ -37,11 +37,14 @@ FORGE.LayoutManager.prototype.constructor = FORGE.LayoutManager;
  */
 FORGE.LayoutManager.prototype._boot = function()
 {
-   // Add presets items
+    // Add presets items
     for (i in FORGE.LayoutPresets)
     {
         new FORGE.Layout(this._viewer, FORGE.LayoutPresets[i]);
     }
+
+    // Set the single viewport as the default one
+    this._defaultUid = FORGE.LayoutPresets.SINGLE.uid;
 };
 
 /**
@@ -66,9 +69,12 @@ FORGE.LayoutManager.prototype._parseConfig = function(config)
         }
     }
 
-    this._defaultUid = (FORGE.UID.isTypeOf(config.default, "Layout") === true) ? config.default : FORGE.LayoutPresets.SINGLE.uid;
+    // Set the default layout if it exists and is a valid layout
+    if (FORGE.UID.isTypeOf(config.default, "Layout") === true)
+    {
+        this._defaultUid = config.default;
+    }
 };
-
 
 /**
  * Load the main layouts configuration
@@ -81,7 +87,6 @@ FORGE.LayoutManager.prototype.loadConfig = function(config)
 
     this._parseConfig(config);
 };
-
 
 /**
  * Add layout item configuration
