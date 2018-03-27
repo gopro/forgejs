@@ -66,43 +66,6 @@ FORGE.EventDispatcher.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.EventDispatcher.prototype.constructor = FORGE.EventDispatcher;
 
 /**
- * Create the listeners array an push a new listener into it.
- *
- * @method FORGE.EventDispatcher#_addListener
- * @private
- * @param {Function} listener - The listener to add.
- * @param {boolean} isOnce - Is the dispatcher should trigger this listener only one time?
- * @param {Object} context - The context in which the listener will be executed.
- * @param {number=} priority - The priority of the event.
- */
-FORGE.EventDispatcher.prototype._addListener = function(listener, isOnce, context, priority)
-{
-    if(typeof listener !== "function")
-    {
-        this.warn("You're trying to add an undefined listener");
-        return;
-    }
-
-    if(this.has(listener, context) === true)
-    {
-        this.warn("You're trying to add a duplicate listener for this context");
-        return;
-    }
-
-    var lis = new FORGE.Listener(this, listener, isOnce, context, priority);
-
-    //register the listener with priority
-    this._registerListener(lis);
-
-    if(this._memorize === true && this._active === true && this._dispatched === true)
-    {
-        lis.execute(this._previousData);
-    }
-
-    return listener;
-};
-
-/**
  * Internal method to insert the listener into the array according to its priority.
  *
  * @method FORGE.EventDispatcher#_registerListener
@@ -169,6 +132,42 @@ FORGE.EventDispatcher.prototype._indexOfListener = function(listener, context)
 };
 
 /**
+ * Create the listeners array an push a new listener into it.
+ *
+ * @method FORGE.EventDispatcher#addListener
+ * @param {Function} listener - The listener to add.
+ * @param {boolean} isOnce - Is the dispatcher should trigger this listener only one time?
+ * @param {Object} context - The context in which the listener will be executed.
+ * @param {number=} priority - The priority of the event.
+ */
+FORGE.EventDispatcher.prototype.addListener = function(listener, isOnce, context, priority)
+{
+    if(typeof listener !== "function")
+    {
+        this.warn("You're trying to add an undefined listener");
+        return;
+    }
+
+    if(this.has(listener, context) === true)
+    {
+        this.warn("You're trying to add a duplicate listener for this context");
+        return;
+    }
+
+    var lis = new FORGE.Listener(this, listener, isOnce, context, priority);
+
+    //register the listener with priority
+    this._registerListener(lis);
+
+    if(this._memorize === true && this._active === true && this._dispatched === true)
+    {
+        lis.execute(this._previousData);
+    }
+
+    return listener;
+};
+
+/**
  * Add an event listener function.
  *
  * @method FORGE.EventDispatcher#add
@@ -178,7 +177,7 @@ FORGE.EventDispatcher.prototype._indexOfListener = function(listener, context)
  */
 FORGE.EventDispatcher.prototype.add = function(listener, context, priority)
 {
-    this._addListener(listener, false, context, priority);
+    this.addListener(listener, false, context, priority);
 };
 
 /**
@@ -191,7 +190,7 @@ FORGE.EventDispatcher.prototype.add = function(listener, context, priority)
  */
 FORGE.EventDispatcher.prototype.addOnce = function(listener, context, priority)
 {
-    this._addListener(listener, true, context, priority);
+    this.addListener(listener, true, context, priority);
 };
 
 /**
