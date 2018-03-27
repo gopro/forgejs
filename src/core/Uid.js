@@ -97,10 +97,17 @@ FORGE.UID = (function(c)
         if (typeof object === "object" && typeof object.uid === "string")
         {
             var uid = object.uid;
+            var className = object.className;
 
             if (FORGE.UID.exists(uid) === false)
             {
                 this._objects[uid] = object;
+
+                if (this._onRegister !== null)
+                {
+                    this._onRegister.dispatch({ uid: uid, className: className });
+                }
+
                 return true;
             }
             else
@@ -128,6 +135,13 @@ FORGE.UID = (function(c)
         if (typeof object === "object" && typeof object.uid === "string")
         {
             var uid = object.uid;
+            var className = object.className;
+
+            if (this._onUnregister !== null)
+            {
+                this._onUnregister.dispatch({ uid: uid, className: className });
+            }
+
             this._objects[uid] = null;
             delete this._objects[uid];
             return;
@@ -249,6 +263,42 @@ FORGE.UID = (function(c)
         return (typeof this._objects[uid] !== "undefined" && this._objects[uid] !== null);
     };
 
+    /**
+     * Get the onRegister event dispatcher.
+     * @name  FORGE.Tags#onRegister
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "onRegister",
+    {
+        get: function()
+        {
+            if (this._onRegister === null)
+            {
+                this._onRegister = new FORGE.EventDispatcher(this);
+            }
+
+            return this._onRegister;
+        }
+    });
+
+    /**
+     * Get the onUnregister event dispatcher.
+     * @name  FORGE.Tags#onUnregister
+     * @readonly
+     */
+    Object.defineProperty(Tmp.prototype, "onUnregister",
+    {
+        get: function()
+        {
+            if (this._onUnregister === null)
+            {
+                this._onUnregister = new FORGE.EventDispatcher(this);
+            }
+
+            return this._onUnregister;
+        }
+    });
+
     return new Tmp();
 
 })(function()
@@ -262,6 +312,22 @@ FORGE.UID = (function(c)
          * @private
          */
         this._objects = {};
+
+        /**
+         * Event dispatcher for the onRegister event.
+         * @name FORGE.UID#_onRegister
+         * @type {FORGE.EventDispatcher}
+         * @private
+         */
+        this._onRegister = null;
+
+        /**
+         * Event dispatcher for the onUnregister event.
+         * @name FORGE.UID#_onUnregister
+         * @type {FORGE.EventDispatcher}
+         * @private
+         */
+        this._onUnregister = null;
 
         FORGE.BaseObject.call(this, "UID");
     };
