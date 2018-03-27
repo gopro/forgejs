@@ -171,6 +171,21 @@ Object.defineProperty(FORGE.Listener.prototype, "context", {
 });
 
 /**
+ * Get the isOnce flag.
+ * @name FORGE.Listener#isOnce
+ * @readonly
+ * @type {Object}
+ */
+Object.defineProperty(FORGE.Listener.prototype, "isOnce", {
+
+    /** @this {FORGE.Listener} */
+    get: function ()
+    {
+        return this._isOnce;
+    }
+});
+
+/**
  * Get the priority number.
  * @name FORGE.Listener#priority
  * @readonly
