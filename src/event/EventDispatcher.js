@@ -213,15 +213,26 @@ FORGE.EventDispatcher.prototype.remove = function(listener, context)
 
 /**
  * Check if this event dispatcher has a specific listener.
- *
+ * If called with no arguments just tell if there are any listeners.
  * @method FORGE.EventDispatcher#has
  * @param  {Function} listener - listener function to check.
  * @param  {Object} context - listener context to check.
- * @return {boolean} Returns true if the dispatcher has the listener, false if not.
+ * @return {boolean} Returns true if the dispatcher has the/any listener, false if not.
  */
 FORGE.EventDispatcher.prototype.has = function(listener, context)
 {
-    return this._indexOfListener(listener, context) !== -1;
+    result = false;
+
+    if (typeof listener === "function")
+    {
+        result = this._indexOfListener(listener, context) !== -1;
+    }
+    else
+    {
+        result = this._listeners.length > 0;
+    }
+
+    return result;
 };
 
 /**
