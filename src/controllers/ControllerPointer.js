@@ -205,9 +205,9 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
 
 
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-
     var viewport = this._viewer.renderer.activeViewport;
     var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
+
     if (viewportPosition === null)
     {
         return;
@@ -235,9 +235,9 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
 FORGE.ControllerPointer.prototype._panMoveHandler = function(event)
 {
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-
     var viewport = this._viewer.renderer.activeViewport;
     var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
+
     if (viewportPosition === null || this._viewer.controllers.enabled === false || viewportPosition === null)
     {
         return;
@@ -509,7 +509,8 @@ FORGE.ControllerPointer.prototype._wheelHandler = function(event)
     if(this._zoom.toPointer === true)
     {
         var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-        var viewportPosition = this._viewer.viewport.viewportManager.getRelativeMousePosition(screenPosition);
+        var viewport = this._viewer.renderer.activeViewport;
+        var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
 
         if (viewportPosition === null)
         {
