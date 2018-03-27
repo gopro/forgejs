@@ -326,6 +326,8 @@ FORGE.Camera.DEFAULT_CONFIG =
  */
 FORGE.Camera.prototype._boot = function()
 {
+    this._register();
+
     this._viewport.onReady.addOnce(this._viewportReadyHandler, this);
 
     this._resetChangelog();
