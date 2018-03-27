@@ -320,6 +320,21 @@ Object.defineProperty(FORGE.EventDispatcher.prototype, "emitter",
 });
 
 /**
+* Get the array of listeners associated to this event dispatcher.
+* @name FORGE.EventDispatcher#listeners
+* @readonly
+* @type {?Array<FORGE.Listener>}
+*/
+Object.defineProperty(FORGE.EventDispatcher.prototype, "listeners",
+{
+    /** @this {FORGE.EventDispatcher} */
+    get: function()
+    {
+        return this._listeners;
+    }
+});
+
+/**
 * Get and set the memorize flag associated to this event dispatcher.
 * @name FORGE.EventDispatcher#memorized
 * @type {boolean}
