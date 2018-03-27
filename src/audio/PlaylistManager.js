@@ -165,7 +165,7 @@ FORGE.PlaylistManager.prototype.boot = function()
     this._tracks = [];
 
     this._viewer.audio.onEnable.add(this._enableSoundHandler, this);
-    this._viewer.story.onSceneLoadStart.add(this._sceneLoadStartHandler, this);
+    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
 };
 
 /**
@@ -190,10 +190,10 @@ FORGE.PlaylistManager.prototype._enableSoundHandler = function()
 
 /**
  * Event handler for scene start.
- * @method FORGE.PlaylistManager#_sceneLoadStartHandler
+ * @method FORGE.PlaylistManager#_sceneLoadCompleteHandler
  * @private
  */
-FORGE.PlaylistManager.prototype._sceneLoadStartHandler = function()
+FORGE.PlaylistManager.prototype._sceneLoadCompleteHandler = function()
 {
     if(typeof this._viewer.story.scene.config.playlists !== "undefined")
     {
@@ -703,7 +703,7 @@ FORGE.PlaylistManager.prototype.destroy = function()
     this.stop();
 
     this._viewer.audio.onEnable.remove(this._enableSoundHandler, this);
-    this._viewer.story.onSceneLoadStart.remove(this._sceneLoadStartHandler, this);
+    this._viewer.story.onSceneLoadComplete.remove(this._sceneLoadCompleteHandler, this);
 
     this._viewer = null;
     this._config = null;

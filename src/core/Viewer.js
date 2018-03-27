@@ -424,7 +424,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._transitions = new FORGE.TransitionManager(this);
     this._renderer = new FORGE.Renderer(this);
     this._controllers = new FORGE.ControllerManager(this);
-    // this._playlists = new FORGE.PlaylistManager(this);
+    this._playlists = new FORGE.PlaylistManager(this);
     this._plugins = new FORGE.PluginManager(this);
     this._hotspots = new FORGE.HotspotManager(this);
     this._actions = new FORGE.ActionManager(this);
@@ -435,7 +435,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._audio.boot();
     this._raf.boot();
     this._story.boot();
-    // this._playlists.boot();
+    this._playlists.boot();
     this._plugins.boot();
 
     this.log("ForgeJS " + FORGE.VERSION);
