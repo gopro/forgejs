@@ -46,7 +46,7 @@ FORGE.MediaManager.prototype.add = function(config)
     if(FORGE.UID.exists(config.uid) === true)
     {
         this.warn("Media "+config.uid+" already exists");
-        return config.uid;
+        return FORGE.UID.get(config.uid);
     }
 
     switch(config.type)
