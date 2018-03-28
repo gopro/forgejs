@@ -429,7 +429,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._hotspots = new FORGE.HotspotManager(this);
     this._actions = new FORGE.ActionManager(this);
     this._layouts = new FORGE.LayoutManager(this);
-    // this._director = new FORGE.Director(this);
+    this._director = new FORGE.Director(this);
     this._fxs = new FORGE.FXManager(this);
     this._system.boot();
     this._audio.boot();
