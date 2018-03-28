@@ -178,7 +178,7 @@ FORGE.HotspotDOM.prototype._boot = function()
     this._parseConfig(this._config);
     this._register();
 
-    this._viewer.view.onChange.add(this._viewChangeHandler, this);
+    // this._viewer.view.onChange.add(this._viewChangeHandler, this);
 };
 
 /**

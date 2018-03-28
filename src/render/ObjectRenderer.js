@@ -81,7 +81,11 @@ FORGE.ObjectRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
 
-    this._objects = this._sceneRenderer.scene.objects;
+    // Take only hotspot 3d type > to refactor
+    this._objects = this._sceneRenderer.scene.objects.filter(function(o)
+    {
+        return o.className === "Hotspot3D";
+    });
 
     for (var i = 0; i < this._objects.length; i++)
     {
