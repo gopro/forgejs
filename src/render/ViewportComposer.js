@@ -118,7 +118,7 @@ FORGE.ViewportComposer.prototype._boot = function()
     this._viewportComposer.addPass(new THREE.ShaderPass(THREE.CopyShader));
 
     // Create the main composer writing the rendered texture into the render target specified by the caller
-    this._sceneComposer = new THREE.EffectComposer(this._viewer.renderer.webGLRenderer, this._viewport.scene.renderTarget);
+    this._sceneComposer = new THREE.EffectComposer(this._viewer.renderer.webGLRenderer, this._viewport.sceneRenderer.target);
     this._sceneComposer.addPass(new THREE.TexturePass(this._viewportComposer.writeBuffer.texture));
     this._sceneComposer.addPass(new THREE.ShaderPass(THREE.CopyShader));
 };

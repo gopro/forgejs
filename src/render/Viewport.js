@@ -323,6 +323,22 @@ Object.defineProperty(FORGE.Viewport.prototype, "rectangle",
 
 /**
  * @todo  remove this accessor !!!
+ * Get the sceneRenderer
+ * @name  FORGE.Viewport#sceneRenderer
+ * @type {FORGE.SceneRenderer}
+ * @readonly
+ */
+Object.defineProperty(FORGE.Viewport.prototype, "sceneRenderer",
+{
+    /** @this {FORGE.ViewportManager} */
+    get: function()
+    {
+        return this._sceneRenderer;
+    }
+});
+
+/**
+ * @todo  remove this accessor !!!
  * Get the viewport manager
  * @name  FORGE.Viewport#viewportManager
  * @type {FORGE.ViewportManager}
