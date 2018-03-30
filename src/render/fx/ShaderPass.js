@@ -9,14 +9,6 @@
 FORGE.ShaderPass = function(shader, textureID)
 {
     /**
-     * Current time computed by accumultating render delta
-     * @name FORGE.ShaderPass#_time
-     * @type {number}
-     * @private
-     */
-    this._time = 0;
-
-    /**
      * Bypass flag
      * @name FORGE.ShaderPass#_bypass
      * @type {boolean}
@@ -48,14 +40,12 @@ FORGE.ShaderPass.prototype.constructor = FORGE.ShaderPass;
  */
 FORGE.ShaderPass.prototype.render = function(renderer, writeBuffer, readBuffer, delta, maskActive)
 {
-    this._time += delta;
-
     if ("time" in this.uniforms)
     {
-        this.uniforms["time"].value = this._time;
+        this.uniforms["time"].value = delta;
     }
 
-    if (this._bypass)
+    if (this._bypass === true)
     {
         this._copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
     }
@@ -72,14 +62,14 @@ FORGE.ShaderPass.prototype.render = function(renderer, writeBuffer, readBuffer, 
 FORGE.ShaderPass.prototype.destroy = function()
 {
     this.textureID = null;
-    
+
     this._copyPass = null;
 
     this.scene.remove(this.quad);
     this.scene = null;
 
     FORGE.Utils.destroyMesh(this.quad);
-    
+
     this.material = null;
     this.uniforms = null;
     this.camera = null;
