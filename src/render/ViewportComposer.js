@@ -1,44 +1,44 @@
 /**
  * ViewportComposer class.
  *
- * This class is responsible of adding FX passes once background and objects 
+ * This class is responsible of adding FX passes once background and objects
  * have been rendered. FX definition is passed at construction time and comes
  * from the scene configuration. FX passes are created by the FX Manager object.
  *
- * 
+ *
  * Viewport composer relies on the THREE.EffectComposer object
- * 
+ *
  * THREE.EffectComposer is a collection of passes (render, texture, shader)
  * and 2 WebGLRenderTarget objects for the render to texture. They are called
  * the readBuffer and the writeBuffer.
  *
  * If a render target object is passed at creation time, it becomes the writeBuffer
  * and a clone is created to become the readBuffer.
- * 
+ *
  * Thus if the goal is to get a texture out of the EffectComposer, it must
  * be passed at construction time. Once render is done, the caller should lookup
  * the content of the writeBuffer.
- * 
+ *
  * Passes have types depending on their goal and write their output into different buffers
- * 
+ *
  * - Texture Pass renders an input texture into the readBuffer
- * 
+ *
  * - Shader Pass apply shader code, using optional input texture from the
  *   readBuffer and draws to the writeBuffer. Once draw is done, buffers are swapped.
  *
  *
  * Viewport Composer requires two instances of Effect Composer to deal with different sizes of
  * render targets for viewport and final scene composing.
- * 
+ *
  * The first (viewportComposer) creates its internal render target itself, sizing them with the
  * viewport size. We ensure the render() call ends up with a writeBuffer ready to be used as
  * the input texture for the second composer (sceneComposer).
- * 
+ *
  * The second (sceneComposer) in only consisting only in a TexturePass and a ShaderPass set up
  * with a CopyShader. Its goal is to simply copy the rendered texture into the scene target. The
  * TexturePass is getting its content from the viewportComposer writeBuffer directly.
  *
- * 
+ *
  * The assumption is made that render() method is called once background and object rendering has
  * been done. Caller should have use the texture property to draw these parts into the right
  * render target.
@@ -47,7 +47,7 @@
  * could have changed) by calling setSize() method. Internally setting renderTarget size will only
  * have effect if it has changed so calling every frame has no real cost.
  *
- * 
+ *
  * @constructor FORGE.ViewportComposer
  * @param {FORGE.Viewer} viewer - viewer reference
  * @param {FORGE.Viewport} viewport - viewport reference
@@ -153,7 +153,7 @@ FORGE.ViewportComposer.prototype.render = function()
  * paying an attention to ownership: sceneComposer should not dispose its
  * writeBuffer at it is owned by the scene object. Any other render target
  * is released.
- * 
+ *
  * @method FORGE.ViewportComposer#destroy
  */
 FORGE.ViewportComposer.prototype.destroy = function()

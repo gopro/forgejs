@@ -131,8 +131,8 @@ FORGE.FX.prototype._createTypedPass = function(config)
     {
         for (var param in config.params)
         {
-            pass[param] = config.params[param];    
-        }        
+            pass[param] = config.params[param];
+        }
     }
 
     return pass;
@@ -163,7 +163,7 @@ FORGE.FX.prototype._createShaderPass = function(config)
  * Create pass
  * @method FORGE.FX#_createPass
  * @param {FXConfig} config - fx configuration
- * @return {THREE.Pass} shader pass 
+ * @return {THREE.Pass} shader pass
  * @private
  */
 FORGE.FX.prototype.createPass = function()
