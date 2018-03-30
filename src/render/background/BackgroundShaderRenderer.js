@@ -51,17 +51,21 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
         side: THREE.FrontSide
     });
 
-    switch (this._media.source.format)
+    //@todo To be cleaned
+    if ("tMediaFormat" in material.uniforms)
     {
-        case FORGE.MediaFormat.EQUIRECTANGULAR:
-            material.uniforms.tMediaFormat.value = 0;
-            break;
+        switch (this._media.source.format)
+        {
+            case FORGE.MediaFormat.EQUIRECTANGULAR:
+                material.uniforms.tMediaFormat.value = 0;
+                break;
 
-        case FORGE.MediaFormat.CUBE:
-            material.uniforms.tMediaFormat.value = 1;
+            case FORGE.MediaFormat.CUBE:
+                material.uniforms.tMediaFormat.value = 1;
+        }
     }
 
-    // To be cleaned
+    //@todo To be cleaned
     if ("tTransition" in material.uniforms)
     {
         material.uniforms.tTransition.value = 0;
