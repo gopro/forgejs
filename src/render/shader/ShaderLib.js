@@ -19,6 +19,7 @@ FORGE.ShaderLib = {
                 tTextureTransition: { type: "t", value: null },
                 tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
+                tTextureResolution: { type: "v2", value: new THREE.Vector2() },
                 tViewport: { type: "v4", value: new THREE.Vector4() },
                 tViewportRatio: { type: "f", value: 1.0 },
                 tModelViewMatrixInverse: { type: "m4", value: new THREE.Matrix4() },
@@ -39,6 +40,7 @@ FORGE.ShaderLib = {
                 tTransition: { type: "i", value: 0 },
                 tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
+                tTextureResolution: { type: "v2", value: new THREE.Vector2() },
                 tTextureRatio: { type: "f", value: 1.0 },
                 tViewport: { type: "v4", value: new THREE.Vector4() },
                 tViewportRatio: { type: "f", value: 1.0 },
@@ -58,12 +60,17 @@ FORGE.ShaderLib = {
             /** @type {FORGEUniform} */
             uniforms:
             {
+                tAAPass : { type: "i", value: 1 },
+                tAAOffset : { type: "v2", value: new THREE.Vector2() },
+                tAATexture : { type: "t", value: null },
+
                 tMediaFormat : { type: "i", value: 0 },
                 tMediaFormatTransition : { type: "i", value: 0 },
                 tTransition: { type: "i", value: 0 },
                 tTextureTransition: { type: "t", value: null },
                 tMixRatio: { type: "f", value: 0.0 },
                 tTexture: { type: "t", value: null },
+                tTextureResolution: { type: "v2", value: new THREE.Vector2() },
                 tViewport: { type: "v4", value: new THREE.Vector4() },
                 tViewportRatio: { type: "f", value: 1.0 },
                 tModelViewMatrixInverse: { type: "m4", value: new THREE.Matrix4() },

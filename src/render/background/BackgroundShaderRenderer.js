@@ -9,6 +9,12 @@
  */
 FORGE.BackgroundShaderRenderer = function(viewer, viewport)
 {
+    /**
+     * Render target for antialiasing
+     * @type {THREE.WebGLRenderTarget}
+     */
+    this._aaRenderTarget = null;
+
     FORGE.BackgroundTextureRenderer.call(this, viewer, viewport, "BackgroundShaderRenderer");
 };
 
@@ -26,6 +32,8 @@ FORGE.BackgroundShaderRenderer.prototype._boot = function()
 
     // Override camera with some orthographic for quad rendering
     this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
+
+    this._aaRenderTarget = new THREE.WebGLRenderTarget(this._viewport.size.width, this._viewport.size.height, {format: THREE.RGBFormat});
 
     this._bootComplete();
 };
@@ -68,6 +76,7 @@ FORGE.BackgroundShaderRenderer.prototype._createMaterial = function()
     }
 
     material.uniforms.tTransition.value = 0;
+    material.uniforms.tTextureResolution.value = new THREE.Vector2(this._media.displayObject.originalWidth, this._media.displayObject.originalHeight);
 
     material.needsUpdate = true;
 
@@ -152,6 +161,29 @@ FORGE.BackgroundShaderRenderer.prototype.render = function(target)
         }
     }
 
+    // First pass
+    this._mesh.material.uniforms.tAAPass.value = 1;
+    this._mesh.material.uniforms.tAATexture.value = null;
+    this._mesh.material.uniforms.tAAOffset.value = new THREE.Vector2(0.5, 0.5);
+
+    FORGE.BackgroundTextureRenderer.prototype.render.call(this, this._aaRenderTarget);
+
+    this._mesh.material.uniforms.tAAPass.value = 2;
+    this._mesh.material.uniforms.tAATexture.value = this._aaRenderTarget.texture;
+    this._mesh.material.uniforms.tAAOffset.value = new THREE.Vector2();
+
     FORGE.BackgroundTextureRenderer.prototype.render.call(this, target);
 };
+
+/**
+ * Destroy routine
+ * @method FORGE.BackgroundShaderRenderer#destroy
+ */
+FORGE.BackgroundShaderRenderer.prototype.destroy = function()
+{
+    this._aaRenderTarget.dispose();
+    this._aaRenderTarget = null;
+
+    FORGE.BackgroundTextureRenderer.prototype.destroy.call(this);
+}
 

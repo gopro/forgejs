@@ -16,6 +16,8 @@ uniform vec3 tColor;
 uniform vec3 tColorTransition;
 
 uniform sampler2D tTexture;
+uniform vec2 tTextureResolution;
+
 uniform vec4 tViewport;
 uniform float tViewportRatio;
 uniform mat4 tModelViewMatrixInverse;
