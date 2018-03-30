@@ -1,6 +1,18 @@
 /**
  * Fragment shader reverse projection - screen to world
  * GoPro view projection
+ *
+ * Anti-aliasing experiments
+ *
+ * Online bibliography is abondant but 2 good inputs to understand the algorithms
+ * https://blog.demofox.org/2015/04/23/4-rook-antialiasing-rgss/
+ * https://blog.demofox.org/2015/04/22/quincunx-antialiasing/
+ *
+ * All renderings are done. Then the screen is split in 4 quarters to show each processing
+ * No antialias in 2 quarters, RGSS and quincunx.
+ *
+ * BackgroundShaderRenderer should also be considered to understand how the job is done
+ * for the quincunx case (2 render passes with offset)
  */
 
 #include <defines>
