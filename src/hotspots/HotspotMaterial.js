@@ -246,7 +246,7 @@ FORGE.HotspotMaterial.presets.DEBUG =
 FORGE.HotspotMaterial.prototype._parseConfig = function(config)
 {
     this._opacity = (typeof config.opacity === "number") ? FORGE.Math.clamp(config.opacity, 0, 1) : 1;
-    this._transparent = (typeof config.transparent === "boolean") ? config.transparent : false;
+    this._transparent = (typeof config.transparent === "boolean") ? config.transparent : (this._opacity < 1) ? true : false;
     this._update = (typeof config.update === "boolean") ? config.update : false;
     this._side = (typeof config.side === "string") ? config.side : FORGE.HotspotMaterial.sides.DOUBLE;
     this._pickEverywhere = (typeof config.pickEverywhere === "boolean") ? config.pickEverywhere : false;
