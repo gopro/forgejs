@@ -16,60 +16,96 @@ FORGE.FXManager = function(viewer)
      */
     this._viewer = viewer;
 
+
     /**
-     * The FX list.
-     * @name FORGE.FXManager#_fxs
-     * @type {Array<string>}
+     * Initial configuration of the fx manager.
+     * @name FORGE.FXManager#_config
+     * @type {FXsConfig}
      * @private
      */
-    this._fxs = null;
+    this._config = null;
+
+    /**
+     * Enabled flag of the fx manager.
+     * @name FORGE.FXManager#_enabled
+     * @type {boolean}
+     * @private
+     */
+    this._enabled = true;
 
     FORGE.BaseObject.call(this, "FXManager");
-
-    this._boot();
 };
 
 FORGE.FXManager.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.FXManager.prototype.constructor = FORGE.FXManager;
 
 /**
- * Boot sequence
- * @method FORGE.FXManager#_boot
+ * Parse a main configuration.
+ * @method FORGE.FXManager#_parseConfig
+ * @param {FXsConfig} config - The main fxs configuration.
  * @private
  */
-FORGE.FXManager.prototype._boot = function()
+FORGE.FXManager.prototype._parseConfig = function(config)
 {
-    this._fxs = [];
-};
-
-/**
- * FX configuration parsing
- * @method FORGE.FXManager#addConfig
- * @param {FXManagerConfig} config FX configuration
- */
-FORGE.FXManager.prototype.addConfig = function(config)
-{
-    if (typeof config === "undefined")
+    if (typeof config === "undefined" || config === null)
     {
         return;
     }
 
-    if (typeof config === 'object' && !Array.isArray(config))
-    {
-        config = [config];
-    }
+    // Set the enabled flag, default is true
+    this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
 
-    for (var i=0, ii=config.length; i<ii; i++)
+    // If there are items then add them
+    if (Array.isArray(config.items) === true)
     {
-        var fx = new FORGE.FX(config[i]);
-        if (fx.pass === null)
+        for (var i = 0, ii = config.items.length; i < ii; i++)
         {
-            this.warn("Impossible to create fx pass of type " + config.type);
-            continue;
+            this.addItem(config.items[i]);
         }
-
-        this._fxs.push(fx);
     }
+};
+
+/**
+ * Load the main fxs configuration
+ * @method FORGE.FXManager#loadConfig
+ * @param {FXsConfig} config - The main fx module configuration.
+ */
+FORGE.FXManager.prototype.loadConfig = function(config)
+{
+    this._config = config;
+
+    this._parseConfig(config);
+};
+
+/**
+ * Add a FX configuration
+ * @method FORGE.FXManager#addItem
+ * @param {FXConfig} FX configuration
+ */
+FORGE.FXManager.prototype.addItem = function(config)
+{
+    if (typeof config === "undefined" || config === null)
+    {
+        return;
+    }
+
+    var fx = null;
+
+    // If it is an array of fx
+    if (Array.isArray(config) === true)
+    {
+        for (var i = 0, ii = config.length; i < ii; i++)
+        {
+            fx = new FORGE.FX(/** @type {TransitionConfig} */ (config[i]));
+        }
+    }
+    // If it is a single fx
+    else
+    {
+        fx = new FORGE.FX(/** @type {TransitionConfig} */ (config));
+    }
+
+    return fx;
 };
 
 /**
@@ -79,7 +115,14 @@ FORGE.FXManager.prototype.addConfig = function(config)
 FORGE.FXManager.prototype.getFXPassByUID = function(uid)
 {
     var fx = FORGE.UID.get(uid);
-    return fx.createPass();
+    var pass = null;
+
+    if (typeof fx !== "undefined")
+    {
+        pass =  fx.createPass();
+    }
+
+    return pass;
 };
 
 /**
@@ -88,29 +131,37 @@ FORGE.FXManager.prototype.getFXPassByUID = function(uid)
  */
 FORGE.FXManager.prototype.destroy = function()
 {
-    this._config = null;
+    var fxs = FORGE.UID.get(null, "FX²");
+    var fx;
 
-    while (this._fxs.length > 0)
+    while (fxs.length > 0)
     {
-        var fx = this._fxs.pop();
+        fx = fxs.pop();
         fx.destroy();
+        fx = null;
     }
 
-    this._fxs = null;
+    this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);
 };
 
 /**
- * Get the fx list.
- * @name FORGE.FXManager#all
- * @type {Array<THREE.Pass>}
+ * Get and set the enabled flag.
+ * @name FORGE.FXManager#enabled
+ * @type {boolean}
  */
-Object.defineProperty(FORGE.FXManager.prototype, "all",
+Object.defineProperty(FORGE.FXManager.prototype, "enabled",
 {
-    /** @this {FORGE.FXManager} */
+    /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._fxs;
+        return this._enabled;
+    },
+
+    /** @this {FORGE.Viewer} */
+    set: function(value)
+    {
+        this._enabled = Boolean(value);
     }
 });

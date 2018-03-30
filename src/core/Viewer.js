@@ -544,7 +544,7 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
 
     if (typeof config.fx === "object")
     {
-        this._fxs.addConfig(config.fx);
+        this._fxs.loadConfig(config.fx);
     }
 
     if (typeof config.director === "object")

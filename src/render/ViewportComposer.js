@@ -110,7 +110,11 @@ FORGE.ViewportComposer.prototype._boot = function()
     for (var i=0, ii=this._viewport.fx.length; i<ii; i++)
     {
         var pass = this._viewer.fxs.getFXPassByUID(this._viewport.fx[i]);
-        this._viewportComposer.addPass(pass);
+
+        if (pass !== null)
+        {
+            this._viewportComposer.addPass(pass);
+        }
     }
 
     // Add a final copy pass to ensure composer always ends up rendering in its write buffer

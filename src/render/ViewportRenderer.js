@@ -198,7 +198,7 @@ FORGE.ViewportRenderer.prototype.switchToShaderRenderer = function()
  */
 FORGE.ViewportRenderer.prototype.render = function(objectRenderer, target)
 {
-    if (this._composer !== null)
+    if (this._composer !== null && this._viewer.fxs.enabled === true)
     {
         this._composer.setSize(this._viewport.rectangle.size);
         this._renderToTarget(objectRenderer, this._composer.texture);
