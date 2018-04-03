@@ -226,6 +226,49 @@ FORGE.Transition.prototype._tweenCompleteHandler = function()
 };
 
 /**
+ * Synchronize media time between two scenes
+ * @method  FORGE.Transition#_synchronize
+ */
+FORGE.Transition.prototype._synchronize = function()
+{
+    var sceneFrom = FORGE.UID.get(this._fromUid);
+    var sceneTo = FORGE.UID.get(this._toUid);
+
+    if (typeof sceneFrom !== "undefined" && sceneFrom.media.type === FORGE.MediaType.VIDEO && sceneTo.sync.indexOf(this._fromUid) !== -1)
+    {
+        var videoFrom = sceneFrom.media.displayObject;
+        var videoTo = sceneTo.media.displayObject;
+
+        videoTo.currentTime = videoFrom.currentTime;
+
+        this._synchronizeComplete();
+        // videoTo.onCanPlay.addOnce(this._canPlayThroughHandler, this);
+    }
+    else
+    {
+        this._synchronizeComplete();
+    }
+};
+
+/**
+ * Synchronized media can play through handler
+ * @method  FORGE.Transition#_canPlayThroughHandler
+ */
+FORGE.Transition.prototype._canPlayThroughHandler = function()
+{
+    this._synchronizeComplete();
+};
+
+/**
+ * Synchronize complete
+ * @method  FORGE.Transition#_synchronizeComplete
+ */
+FORGE.Transition.prototype._synchronizeComplete = function()
+{
+    this._backgroundStart();
+};
+
+/**
  * Starts the background transition.
  * @method  FORGE.Transition#_backgroundStart
  */
@@ -380,13 +423,12 @@ FORGE.Transition.prototype.start = function(sceneToUid)
     this.log("start "+this._uid);
 
     this._running = true;
+    this._ratio = 0;
 
     this._fromUid = this._viewer.story.sceneUid;
     this._toUid = sceneToUid;
 
-    this._ratio = 0;
-
-    this._backgroundStart();
+    this._synchronize();
 };
 
 /**
