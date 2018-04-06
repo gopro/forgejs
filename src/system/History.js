@@ -206,6 +206,16 @@ FORGE.History.prototype._isStateValid = function(state)
 };
 
 /**
+ * Load the history configuration.
+ * @method FORGE.History#loadConfig
+ * @param {HistoryConfig} config - The configuration to add
+ */
+FORGE.History.prototype.loadConfig = function(config)
+{
+    this._parseConfig(config);
+};
+
+/**
  * Generate a hash for the current scene with the i18n slug name and the scene uid.
  * @method FORGE.History#generateHash
  * @param  {FORGE.Scene|Object} scene - The scene for which you want to generate a hash.
@@ -241,16 +251,6 @@ FORGE.History.prototype.generateHash = function(scene, keep)
     }
 
     return "#" + scene.slug + "&uid=" + scene.uid + result;
-};
-
-/**
- * Add the history configuration.
- * @method FORGE.History#addConfig
- * @param {HistoryConfig} config - The configuration to add
- */
-FORGE.History.prototype.addConfig = function(config)
-{
-    this._parseConfig(config);
 };
 
 /**

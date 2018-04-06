@@ -47,10 +47,7 @@ FORGE.FXManager.prototype.constructor = FORGE.FXManager;
  */
 FORGE.FXManager.prototype._parseConfig = function(config)
 {
-    if (typeof config === "undefined" || config === null)
-    {
-        return;
-    }
+    this._config = config;
 
     // Set the enabled flag, default is true
     this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
@@ -72,9 +69,10 @@ FORGE.FXManager.prototype._parseConfig = function(config)
  */
 FORGE.FXManager.prototype.loadConfig = function(config)
 {
-    this._config = config;
-
-    this._parseConfig(config);
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseConfig(config);
+    }
 };
 
 /**

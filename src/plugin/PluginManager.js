@@ -372,13 +372,16 @@ FORGE.PluginManager.prototype._onInstanceCreateHandler = function(event)
 };
 
 /**
- * Add plugins configuration.
- * @method FORGE.PluginManager#addConfig
- * @param {PluginsConfig} config - The config to add
+ * Load plugins main configuration.
+ * @method FORGE.PluginManager#loadConfig
+ * @param {PluginsConfig} config - The config to load
  */
-FORGE.PluginManager.prototype.addConfig = function(config)
+FORGE.PluginManager.prototype.loadConfig = function(config)
 {
-    this._parseMainConfig(config);
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseMainConfig(config);
+    }
 };
 
 /**

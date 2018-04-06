@@ -488,18 +488,18 @@ FORGE.Story.prototype._setGroupUid = function(uid)
 
 /**
  * Load a JSON story configuration.
- * @method FORGE.Story#load
+ * @method FORGE.Story#loadConfig
  * @param  {(string|StoryConfig)} config - The URL of the configuration JSON file to load or a story configuration object.
  */
-FORGE.Story.prototype.load = function(config)
+FORGE.Story.prototype.loadConfig = function(config)
 {
-    this.log("load");
+    this.log("loadConfig");
 
     if(typeof config === "string")
     {
         this._viewer.load.json("forge.story.config", config, this._configLoadComplete, this);
     }
-    else if (typeof config === "object")
+    else if (typeof config === "object" && config !== null)
     {
         this._parseConfig(config);
     }

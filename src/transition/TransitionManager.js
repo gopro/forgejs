@@ -76,10 +76,7 @@ FORGE.TransitionManager.prototype._boot = function()
  */
 FORGE.TransitionManager.prototype._parseConfig = function(config)
 {
-    if (typeof config === "undefined" || config === null)
-    {
-        return;
-    }
+    this._config = config;
 
     // If default is a string then push it into the default array
     if (typeof config.default === "string")
@@ -225,9 +222,10 @@ FORGE.TransitionManager.prototype._isLegal = function(fromUid, toUid, transition
  */
 FORGE.TransitionManager.prototype.loadConfig = function(config)
 {
-    this._config = config;
-
-    this._parseConfig(config);
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseConfig(config);
+    }
 };
 
 /**

@@ -55,11 +55,6 @@ FORGE.LayoutManager.prototype._boot = function()
  */
 FORGE.LayoutManager.prototype._parseConfig = function(config)
 {
-    if (typeof config === "undefined" || config === null)
-    {
-        return;
-    }
-
     // If there are items then add them
     if (Array.isArray(config.items) === true)
     {
@@ -83,9 +78,10 @@ FORGE.LayoutManager.prototype._parseConfig = function(config)
  */
 FORGE.LayoutManager.prototype.loadConfig = function(config)
 {
-    this._config = config;
-
-    this._parseConfig(config);
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseConfig(config);
+    }
 };
 
 /**

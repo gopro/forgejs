@@ -182,13 +182,13 @@ FORGE.ControllerManager.prototype.update = function()
 };
 
 /**
- * Add a config to the manager.
- * @method FORGE.ControllerManager#addConfig
+ * Load a config to the manager.
+ * @method FORGE.ControllerManager#loadConfig
  * @param {ControllersConfig} config - The config you want to add.
  */
-FORGE.ControllerManager.prototype.addConfig = function(config)
+FORGE.ControllerManager.prototype.loadConfig = function(config)
 {
-    config = (typeof config !== "undefined") ? config : FORGE.ControllerManager.DEFAULT_CONFIG;
+    config = (typeof config === "object" && config !== null) ? config : FORGE.ControllerManager.DEFAULT_CONFIG;
 
     this._parseConfig(config);
 };

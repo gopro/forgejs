@@ -458,72 +458,36 @@ FORGE.Viewer.prototype._mainConfigLoadComplete = function(file)
  */
 FORGE.Viewer.prototype._parseMainConfig = function(config)
 {
-    // Final assignement of the config
+    // Final assignement of the main config
     this._mainConfig = config;
 
+    // Parse the viewer object config
     this._parseConfig(config.viewer);
 
-    if (typeof config.i18n === "object")
-    {
-        this._i18n.addConfig(config.i18n); //force the parse of the main config
-    }
+    // Load the config of the other modules
+    this._i18n.loadConfig(config.i18n);
+    this._controllers.loadConfig(config.controllers);
+    this._history.loadConfig(config.history);
+    this._audio.loadConfig(config.audio);
+    this._playlists.loadConfig(config.playlists);
+    this._actions.loadConfig(config.actions);
+    this._layouts.loadConfig(config.layouts);
+    this._transitions.loadConfig(config.transitions);
+    this._fxs.loadConfig(config.fx);
+    this._director.loadConfig(config.director);
+    this._plugins.loadConfig(config.plugins);
+    this._story.loadConfig(config.story);
 
-    // @todo Need to align architecture.
-    this._controllers.addConfig(config.controllers);
-    this._history.addConfig(config.history);
-
-    if (typeof config.audio === "object")
-    {
-        this._audio.addConfig(config.audio);
-    }
-
-    if (typeof config.playlists === "object")
-    {
-        this._playlists.addConfig(config.playlists);
-    }
-
-    if (typeof config.actions === "object")
-    {
-        this._actions.addConfig(config.actions);
-    }
-
-    if (typeof config.layouts === "object")
-    {
-        this._layouts.loadConfig(config.layouts);
-    }
-
-    if (typeof config.transitions === "object")
-    {
-        this._transitions.loadConfig(config.transitions);
-    }
-
-    if (typeof config.fx === "object")
-    {
-        this._fxs.loadConfig(config.fx);
-    }
-
-    if (typeof config.director === "object")
-    {
-        this._director.load(config.director);
-    }
-
+    // @todo to refactor
     if (typeof config.hotspots === "object")
     {
         this._hotspots.addTracks(config.hotspots);
     }
 
-    if (typeof config.plugins === "object")
-    {
-        this._plugins.addConfig(config.plugins);
-    }
-
-    if (typeof config.story === "object")
-    {
-        this._story.load(config.story);
-    }
-
+    // Start the raf
     this._raf.start();
 
+    // Tadaaaaa!
     if (this._onMainConfigLoadComplete !== null)
     {
         this._onMainConfigLoadComplete.dispatch();

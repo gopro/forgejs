@@ -360,14 +360,16 @@ FORGE.SoundManager.prototype._applyConfig = function(config)
 
 /**
  * Add a sound config to the manager.
- * @method FORGE.SoundManager#addConfig
+ * @method FORGE.SoundManager#loadConfig
  * @param {AudioConfig} config - The config you want to add.
  */
-FORGE.SoundManager.prototype.addConfig = function(config)
+FORGE.SoundManager.prototype.loadConfig = function(config)
 {
-    this._parseConfig(config);
-
-    this._initSounds();
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseConfig(config);
+        this._initSounds();
+    }
 };
 
 /**

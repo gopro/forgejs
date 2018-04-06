@@ -278,15 +278,17 @@ FORGE.PlaylistManager.prototype._applyConfig = function(config)
 };
 
 /**
- * Add a playlist config to the manager.
- * @method FORGE.PlaylistManager#addConfig
+ * Load a playlist config to the manager.
+ * @method FORGE.PlaylistManager#loadConfig
  * @param {AudioPlaylistsConfig} config - The config you want to add.
  */
-FORGE.PlaylistManager.prototype.addConfig = function(config)
+FORGE.PlaylistManager.prototype.loadConfig = function(config)
 {
-    this._parseConfig(config);
-
-    this._initPlaylist();
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseConfig(config);
+        this._initPlaylist();
+    }
 };
 
 /**

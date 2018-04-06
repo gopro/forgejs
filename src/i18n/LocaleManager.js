@@ -100,12 +100,15 @@ FORGE.LocaleManager.prototype._boot = function()
 
 /**
  * Add i18n configuration data.
- * @method FORGE.LocaleManager#addConfig
+ * @method FORGE.LocaleManager#loadConfig
  * @param {I18nConfig} config - The configuration data.
  */
-FORGE.LocaleManager.prototype.addConfig = function(config)
+FORGE.LocaleManager.prototype.loadConfig = function(config)
 {
-    this._parseConfig(config);
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseConfig(config);
+    }
 };
 
 /**

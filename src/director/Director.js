@@ -118,12 +118,12 @@ FORGE.Director.prototype._boot = function()
 };
 
 /**
- * Load director's cut configuration.
- *
- * @method FORGE.Director#load
- * @param {HotspotTrackConfig} config - The animation config to load.
+ * Parse director main configuration.
+ * @method FORGE.Director#_parseConfig
+ * @param {DirectorConfig} config - The main director configuration.
+ * @private
  */
-FORGE.Director.prototype.load = function(config)
+FORGE.Director.prototype._parseConfig = function(config)
 {
     // Register tracks, no need to store them here
     if (config.tracks !== null && Array.isArray(config.tracks))
@@ -505,6 +505,20 @@ FORGE.Director.prototype._synchronizeWithVideo = function(time)
     else
     {
         this._viewer.camera.animation.play(this._track, time);
+    }
+};
+
+/**
+ * Load director's cut configuration.
+ *
+ * @method FORGE.Director#loadConfig
+ * @param {DirectorConfig} config - The main director config to load.
+ */
+FORGE.Director.prototype.loadConfig = function(config)
+{
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseConfig(config);
     }
 };
 

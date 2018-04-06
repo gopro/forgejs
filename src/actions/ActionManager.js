@@ -56,12 +56,15 @@ FORGE.ActionManager.prototype._parseConfig = function(config)
 
 /**
  * Add actions configuration
- * @method FORGE.ActionManager#addConfig
+ * @method FORGE.ActionManager#loadConfig
  * @param {(Array<ActionConfig>|ActionConfig)} config - Array of action configurations or a single action configuration.
  */
-FORGE.ActionManager.prototype.addConfig = function(config)
+FORGE.ActionManager.prototype.loadConfig = function(config)
 {
-    this._parseConfig(config);
+    if (typeof config === "object" && config !== null)
+    {
+        this._parseConfig(config);
+    }
 };
 
 /**
