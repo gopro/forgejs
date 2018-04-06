@@ -109,8 +109,9 @@ FORGE.Director.prototype._boot = function()
     // Start the cut once the scene is loaded
     this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
 
-    // Add controllers after viewer is ready
-    this._viewer.onReady.add(this._onViewerReady, this);
+    // Listen to controllers
+    this._viewer.controllers.onControlStart.add(this._controlStartHandler, this);
+    this._viewer.controllers.onControlEnd.add(this._controlEndHandler, this);
 
     // Bind onVisibilityChange handler
     this._onVisibilityChangeBind = this._onVisibilityChange.bind(this);
@@ -132,17 +133,6 @@ FORGE.Director.prototype.load = function(config)
             new FORGE.DirectorTrack(config.tracks[i]);
         }
     }
-};
-
-/**
- * Viewer ready handler
- * @method FORGE.Director#_onViewerReady
- * @private
- */
-FORGE.Director.prototype._onViewerReady = function()
-{
-    this._viewer.controllers.onControlStart.add(this._controlStartHandler, this);
-    this._viewer.controllers.onControlEnd.add(this._controlEndHandler, this);
 };
 
 /**
@@ -581,7 +571,6 @@ FORGE.Director.prototype.destroy = function()
 {
     this._clearEvents();
 
-    this._viewer.onReady.remove(this._onViewerReady, this);
     this._viewer = null;
 
     this._tracks = null;

@@ -303,14 +303,6 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._ready = false;
 
     /**
-     * Event dispatcher for the viewer on ready event. Dispatched after the boot sequence.
-     * @name  FORGE.Viewer#_onReady
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onReady = null;
-
-    /**
      * Event dispatcher for the on pause event.
      * @name  FORGE.Viewer#_onPause
      * @type {FORGE.EventDispatcher}
@@ -436,11 +428,6 @@ FORGE.Viewer.prototype._boot = function(config)
     }
 
     this._ready = true;
-
-    if (this._onReady !== null)
-    {
-        this._onReady.dispatch();
-    }
 
     if (typeof config !== "undefined" && config !== null)
     {
@@ -957,12 +944,6 @@ FORGE.Viewer.prototype.destroy = function()
 
     this._parent = null;
     this._callbacks = null;
-
-    if (this._onReady !== null)
-    {
-        this._onReady.destroy();
-        this._onReady = null;
-    }
 
     if (this._onPause !== null)
     {
@@ -1635,26 +1616,6 @@ Object.defineProperty(FORGE.Viewer.prototype, "vr",
     set: function(value)
     {
         this._renderer.vr.enabled = value;
-    }
-});
-
-/**
- * Get the "onReady" {@link FORGE.EventDispatcher} of the viewer.
- * @name FORGE.Viewer#onReady
- * @readonly
- * @type {FORGE.EventDispatcher}
- */
-Object.defineProperty(FORGE.Viewer.prototype, "onReady",
-{
-    /** @this {FORGE.Viewer} */
-    get: function()
-    {
-        if (this._onReady === null)
-        {
-            this._onReady = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onReady;
     }
 });
 
