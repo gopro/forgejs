@@ -225,21 +225,6 @@ FORGE.Media.prototype.destroy = function()
 };
 
 /**
- * Get the media config.
- * @name  FORGE.Media#config
- * @type {SceneMediaConfig}
- * @readonly
- */
-Object.defineProperty(FORGE.Media.prototype, "config",
-{
-    /** @this {FORGE.Media} */
-    get: function()
-    {
-        return this._config;
-    }
-});
-
-/**
  * Get the media type.
  * @name  FORGE.Media#type
  * @type {string}
