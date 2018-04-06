@@ -267,15 +267,13 @@ FORGE.TransitionManager.prototype.to = function(sceneUid, transitionUid)
         return this.current;
     }
 
-    transitionUid = this._resolve(this._viewer.story.sceneUid, sceneUid, transitionUid);
+    this._currentUid = this._resolve(this._viewer.story.sceneUid, sceneUid, transitionUid);
 
     // Get the transition object to use
-    var transition = this.get(transitionUid);
+    var transition = this.get(this._currentUid);
     transition.reset();
     transition.onComplete.addOnce(this._transitionCompleteHandler, this);
     transition.start(sceneUid);
-
-    this._currentUid = transition.uid;
 
     return transition;
 };
