@@ -262,6 +262,11 @@ FORGE.TransitionManager.prototype.addItem = function(config)
  */
 FORGE.TransitionManager.prototype.to = function(sceneUid, transitionUid)
 {
+    if (this._currentUid !== "")
+    {
+        return this.current;
+    }
+
     transitionUid = this._resolve(this._viewer.story.sceneUid, sceneUid, transitionUid);
 
     // Get the transition object to use
