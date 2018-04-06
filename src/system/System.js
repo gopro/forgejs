@@ -30,15 +30,17 @@ FORGE.System = function(viewer)
      * @private
      */
     this._visibilityChangeBind = null;
+
+    this._boot();
 };
 
 FORGE.System.prototype.constructor = FORGE.System;
 
 /**
  * Boot sequence.
- * @method FORGE.System#boot
+ * @method FORGE.System#_boot
  */
-FORGE.System.prototype.boot = function()
+FORGE.System.prototype._boot = function()
 {
     // bind visibility change event
     this._visibilityChangeBind = this._visibilityChangeHandler.bind(this);

@@ -65,6 +65,8 @@ FORGE.PluginManager = function(viewer)
      * @private
      */
     this._onInstanceCreate = null;
+
+    this._boot();
 };
 
 FORGE.PluginManager.prototype = Object.create(FORGE.BaseObject.prototype);
@@ -367,16 +369,6 @@ FORGE.PluginManager.prototype._onInstanceCreateHandler = function(event)
     {
         this._onInstanceCreate.dispatch(plugin);
     }
-};
-
-/**
- * Boot sequence.
- * @method FORGE.PluginManager#_boot
- * @private
- */
-FORGE.PluginManager.prototype.boot = function()
-{
-    this._boot();
 };
 
 /**

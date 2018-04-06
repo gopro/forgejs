@@ -196,6 +196,8 @@ FORGE.SoundManager = function(viewer)
     this._onEnable = null;
 
     FORGE.BaseObject.call(this, "SoundManager");
+
+    this._boot();
 };
 
 FORGE.SoundManager.prototype = Object.create(FORGE.BaseObject.prototype);
@@ -207,7 +209,7 @@ FORGE.SoundManager.prototype.constructor = FORGE.SoundManager;
  * @private
  * @suppress {deprecated}
  */
-FORGE.SoundManager.prototype.boot = function()
+FORGE.SoundManager.prototype._boot = function()
 {
     this._sounds = [];
 

@@ -162,10 +162,27 @@ FORGE.Story = function(viewer)
 
     FORGE.BaseObject.call(this, "Story");
 
+    this._boot();
 };
 
 FORGE.Story.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.Story.prototype.constructor = FORGE.Story;
+
+/**
+ * Boot sequence.
+ * @method FORGE.Story#_boot
+ */
+FORGE.Story.prototype._boot = function()
+{
+    this.log("FORGE.Story.boot();");
+
+    this._scenes = [];
+    this._groups = [];
+
+    this._name = new FORGE.LocaleString(this._viewer);
+    this._slug = new FORGE.LocaleString(this._viewer);
+    this._description = new FORGE.LocaleString(this._viewer);
+};
 
 /**
  * Event handler for the configuration JSON load complete.
@@ -467,22 +484,6 @@ FORGE.Story.prototype._setGroupUid = function(uid)
             this._events.onGroupChange.dispatch();
         }
     }
-};
-
-/**
- * Boot sequence.
- * @method FORGE.Story#boot
- */
-FORGE.Story.prototype.boot = function()
-{
-    this.log("FORGE.Story.boot();");
-
-    this._scenes = [];
-    this._groups = [];
-
-    this._name = new FORGE.LocaleString(this._viewer);
-    this._slug = new FORGE.LocaleString(this._viewer);
-    this._description = new FORGE.LocaleString(this._viewer);
 };
 
 /**

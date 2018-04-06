@@ -60,15 +60,17 @@ FORGE.RequestAnimationFrame = function(viewer)
      * @private
      */
     this._owner = null;
+
+    this._boot();
 };
 
 FORGE.RequestAnimationFrame.prototype.constructor = FORGE.RequestAnimationFrame;
 
 /**
  * Boot sequence.
- * @method FORGE.RequestAnimationFrame#boot
+ * @method FORGE.RequestAnimationFrame#_boot
  */
-FORGE.RequestAnimationFrame.prototype.boot = function()
+FORGE.RequestAnimationFrame.prototype._boot = function()
 {
     var vendors =
     [

@@ -24,10 +24,10 @@ FORGE.Viewer = function(parent, config, callbacks)
     /**
      * The main config of the FORGE project
      * @name  FORGE.Viewer#_mainConfig
-     * @type {(MainConfig|string)}
+     * @type {(MainConfig)}
      * @private
      */
-    this._mainConfig = config;
+    this._mainConfig = null;
 
     /**
      * The viewer configuration or its URL.
@@ -350,8 +350,7 @@ FORGE.Viewer = function(parent, config, callbacks)
      */
     this._callbacks = callbacks || null;
 
-    var bootBind = this._boot.bind(this);
-    window.setTimeout(bootBind, 0);
+    this._boot(config);
 };
 
 FORGE.Viewer.prototype = Object.create(FORGE.BaseObject.prototype);
@@ -381,16 +380,11 @@ FORGE.Viewer.DEFAULT_CONFIG =
 /**
  * Boot sequence.
  * @method FORGE.Viewer#_boot
- * @param {Function} callback - Callback function.
+ * @param {(MainConfig|string)} config - The main config url or object to auto load at boot time
  * @private
  */
-FORGE.Viewer.prototype._boot = function(callback)
+FORGE.Viewer.prototype._boot = function(config)
 {
-    /**
-     * WARNING THE ORDER OF THE BOOT SEQUENCE MATTERS A LOT!
-     * DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOURE DOING
-     */
-
     if(this._alive === false)
     {
         return;
@@ -398,6 +392,7 @@ FORGE.Viewer.prototype._boot = function(callback)
 
     this._uid = "FORGE-instance-" + String(FORGE.VIEWERS.length);
     FORGE.VIEWERS.push(this._uid);
+
     this._register();
 
     this.log("FORGE.Viewer.boot();");
@@ -408,6 +403,7 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._createCanvas();
 
     this._system = new FORGE.System(this);
+    this._story = new FORGE.Story(this);
     this._clock = new FORGE.Clock(this);
     this._audio = new FORGE.SoundManager(this);
     this._keyboard = new FORGE.Keyboard(this);
@@ -418,7 +414,6 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._tween = new FORGE.TweenManager(this);
     this._raf = new FORGE.RequestAnimationFrame(this);
     this._i18n = new FORGE.LocaleManager(this);
-    this._story = new FORGE.Story(this);
     this._media = new FORGE.MediaManager(this);
     this._history = new FORGE.History(this);
     this._transitions = new FORGE.TransitionManager(this);
@@ -431,20 +426,8 @@ FORGE.Viewer.prototype._boot = function(callback)
     this._layouts = new FORGE.LayoutManager(this);
     this._director = new FORGE.Director(this);
     this._fxs = new FORGE.FXManager(this);
-    this._system.boot();
-    this._audio.boot();
-    this._raf.boot();
-    this._story.boot();
-    this._playlists.boot();
-    this._plugins.boot();
 
     this.log("ForgeJS " + FORGE.VERSION);
-
-    //Call the boot method argument callback
-    if (typeof callback === "function")
-    {
-        callback.call();
-    }
 
     //Call the viewer constructor callback
     if (this._callbacks !== null && typeof this._callbacks.boot === "function")
@@ -459,24 +442,9 @@ FORGE.Viewer.prototype._boot = function(callback)
         this._onReady.dispatch();
     }
 
-    this._loadConfig(this._mainConfig);
-};
-
-/**
- * Load the main configuration of the viewer.
- * @method FORGE.Viewer#_loadConfig
- * @param  {?(MainConfig|string)} config - The config object or its URL
- * @private
- */
-FORGE.Viewer.prototype._loadConfig = function(config)
-{
-    if (typeof config === "string")
+    if (typeof config !== "undefined" && config !== null)
     {
-        this._load.json(this._uid + "-configuration", config, this._mainConfigLoadComplete, this);
-    }
-    else if (config !== null && typeof config === "object")
-    {
-        this._parseMainConfig(config);
+        this.loadMainConfig(config);
     }
 };
 
@@ -699,6 +667,24 @@ FORGE.Viewer.prototype._updateRendering = function()
     if (this._callbacks !== null && typeof this._callbacks.afterRender === "function")
     {
         this._callbacks.afterRender.call(this);
+    }
+};
+
+/**
+ * Load the main configuration of the viewer.
+ * @method FORGE.Viewer#loadMainConfig
+ * @param  {?(MainConfig|string)} config - The config object or its URL
+ * @private
+ */
+FORGE.Viewer.prototype.loadMainConfig = function(config)
+{
+    if (typeof config === "string")
+    {
+        this._load.json(this._uid + "-configuration", config, this._mainConfigLoadComplete, this);
+    }
+    else if (config !== null && typeof config === "object")
+    {
+        this._parseMainConfig(config);
     }
 };
 

@@ -150,6 +150,7 @@ FORGE.PlaylistManager = function(viewer)
 
     FORGE.BaseObject.call(this, "PlaylistManager");
 
+    this._boot();
 };
 
 FORGE.PlaylistManager.prototype = Object.create(FORGE.BaseObject.prototype);
@@ -157,9 +158,9 @@ FORGE.PlaylistManager.prototype.constructor = FORGE.PlaylistManager;
 
 /**
  * Boot sequence.
- * @method FORGE.PlaylistManager#boot
+ * @method FORGE.PlaylistManager#_boot
  */
-FORGE.PlaylistManager.prototype.boot = function()
+FORGE.PlaylistManager.prototype._boot = function()
 {
     this._playlists = [];
     this._tracks = [];
