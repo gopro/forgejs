@@ -4,12 +4,11 @@
  * @constructor FORGE.Viewer
  * @param {HTMLElement|string} parent - The parent element.
  * @param {(MainConfig|string)} config - Object that represents the project configuration, it can be an object or a json configuration url.
- * @param {?ViewerCallbacks} callbacks - On boot callbacks
  * @extends {FORGE.BaseObject}
  *
  * @todo Create a FORGE.Config Object to define default values, that can be overrided by the config param.
  */
-FORGE.Viewer = function(parent, config, callbacks)
+FORGE.Viewer = function(parent, config)
 {
     FORGE.BaseObject.call(this, "Viewer");
 
@@ -303,7 +302,7 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._ready = false;
 
     /**
-     * Event dispatcher for the on pause event.
+     * Event dispatcher for the onPause event.
      * @name  FORGE.Viewer#_onPause
      * @type {FORGE.EventDispatcher}
      * @private
@@ -311,12 +310,36 @@ FORGE.Viewer = function(parent, config, callbacks)
     this._onPause = null;
 
     /**
-     * Event dispatcher for the on resume event.
+     * Event dispatcher for the onResume event.
      * @name  FORGE.Viewer#_onResume
      * @type {FORGE.EventDispatcher}
      * @private
      */
     this._onResume = null;
+
+    /**
+     * Event dispatcher for the onUpdate event.
+     * @name  FORGE.Viewer#_onUpdate
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onUpdate = null;
+
+    /**
+     * Event dispatcher for the onBeforeRender event.
+     * @name  FORGE.Viewer#_onBeforeRender
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onBeforeRender = null;
+
+    /**
+     * Event dispatcher for the onAfterRender event.
+     * @name  FORGE.Viewer#onAfterRender
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onAfterRender = null;
 
     /**
      * Event dispatcher for the on config load complete event.
@@ -333,14 +356,6 @@ FORGE.Viewer = function(parent, config, callbacks)
      * @private
      */
     this._onMainConfigLoadComplete = null;
-
-    /**
-     * Callback function for the viewer.
-     * @name FORGE.Viewer#_callbacks
-     * @type {?ViewerCallbacks}
-     * @private
-     */
-    this._callbacks = callbacks || null;
 
     this._boot(config);
 };
@@ -420,12 +435,6 @@ FORGE.Viewer.prototype._boot = function(config)
     this._fxs = new FORGE.FXManager(this);
 
     this.log("ForgeJS " + FORGE.VERSION);
-
-    //Call the viewer constructor callback
-    if (this._callbacks !== null && typeof this._callbacks.boot === "function")
-    {
-        this._callbacks.boot.call();
-    }
 
     this._ready = true;
 
@@ -592,9 +601,9 @@ FORGE.Viewer.prototype._updateLogic = function()
 
     this._tween.update();
 
-    if (this._callbacks !== null && typeof this._callbacks.update === "function")
+    if (this._onUpdate !== null)
     {
-        this._callbacks.update.call();
+        this._onUpdate.dispatch();
     }
 };
 
@@ -605,9 +614,9 @@ FORGE.Viewer.prototype._updateLogic = function()
  */
 FORGE.Viewer.prototype._updateRendering = function()
 {
-    if (this._callbacks !== null && typeof this._callbacks.beforeRender === "function")
+    if (this._onBeforeRender !== null)
     {
-        this._callbacks.beforeRender.call(this);
+        this._onBeforeRender.dispatch();
     }
 
     if (this._renderer !== null)
@@ -615,9 +624,9 @@ FORGE.Viewer.prototype._updateRendering = function()
         this._renderer.render();
     }
 
-    if (this._callbacks !== null && typeof this._callbacks.afterRender === "function")
+    if (this._onAfterRender !== null)
     {
-        this._callbacks.afterRender.call(this);
+        this._onAfterRender.dispatch();
     }
 };
 
@@ -680,9 +689,7 @@ FORGE.Viewer.prototype.pause = function(internal)
 
     if (this._onPause !== null)
     {
-        this._onPause.dispatch({
-            "internal": internal
-        });
+        this._onPause.dispatch({"internal": internal});
     }
 };
 
@@ -708,9 +715,7 @@ FORGE.Viewer.prototype.resume = function(internal)
 
     if (this._onResume !== null)
     {
-        this._onResume.dispatch({
-            "internal": internal
-        });
+        this._onResume.dispatch({"internal": internal});
     }
 };
 
@@ -907,7 +912,6 @@ FORGE.Viewer.prototype.destroy = function()
     }
 
     this._parent = null;
-    this._callbacks = null;
 
     if (this._onPause !== null)
     {
@@ -919,6 +923,24 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._onResume.destroy();
         this._onResume = null;
+    }
+
+    if (this._onUpdate !== null)
+    {
+        this._onUpdate.destroy();
+        this._onUpdate = null;
+    }
+
+    if (this._onBeforeRender !== null)
+    {
+        this._onBeforeRender.destroy();
+        this._onBeforeRender = null;
+    }
+
+    if (this._onAfterRender !== null)
+    {
+        this._onAfterRender.destroy();
+        this._onAfterRender = null;
     }
 
     if (this._onConfigLoadComplete !== null)
@@ -1620,6 +1642,66 @@ Object.defineProperty(FORGE.Viewer.prototype, "onResume",
         }
 
         return this._onResume;
+    }
+});
+
+/**
+ * Get the "onUpdate" {@link FORGE.EventDispatcher} of the viewer.
+ * @name FORGE.Viewer#onUpdate
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "onUpdate",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        if (this._onUpdate === null)
+        {
+            this._onUpdate = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onUpdate;
+    }
+});
+
+/**
+ * Get the "onBeforeRender" {@link FORGE.EventDispatcher} of the viewer.
+ * @name FORGE.Viewer#onBeforeRender
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "onBeforeRender",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        if (this._onBeforeRender === null)
+        {
+            this._onBeforeRender = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onBeforeRender;
+    }
+});
+
+/**
+ * Get the "onAfterRender" {@link FORGE.EventDispatcher} of the viewer.
+ * @name FORGE.Viewer#onAfterRender
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "onAfterRender",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        if (this._onAfterRender === null)
+        {
+            this._onAfterRender = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onAfterRender;
     }
 });
 
