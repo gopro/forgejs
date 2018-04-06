@@ -157,7 +157,7 @@ Object.defineProperty(FORGE.Sprite.prototype, "animations",
  * Get the curretn animation of this Sprite.
  * @name  FORGE.Sprite#animation
  * @readonly
- * @type {FORGE.Animation}
+ * @type {FORGE.SpriteAnimation}
  */
 Object.defineProperty(FORGE.Sprite.prototype, "animation",
 {
