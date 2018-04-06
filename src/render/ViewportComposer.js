@@ -107,9 +107,9 @@ FORGE.ViewportComposer.prototype._boot = function()
 {
     this._viewportComposer = new THREE.EffectComposer(this._viewer.renderer.webGLRenderer);
 
-    for (var i=0, ii=this._viewport.fx.length; i<ii; i++)
+    for (var i=0, ii=this._viewport.fxUids.length; i<ii; i++)
     {
-        var pass = this._viewer.fxs.getFXPassByUID(this._viewport.fx[i]);
+        var pass = this._viewer.fxs.getFXPassByUID(this._viewport.fxUids[i]);
 
         if (pass !== null)
         {

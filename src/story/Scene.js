@@ -127,12 +127,12 @@ FORGE.Scene = function(viewer)
     this._objectsUid = [];
 
     /**
-     * FX manager.
-     * @name  FORGE.Viewer#_fxs
-     * @type {FORGE.FXManager}
+     * FX uids associated to this scene
+     * @name FORGE.Viewport#_fxUids
+     * @type {Array<string>}
      * @private
      */
-    this._fxs = null;
+    this._fxUids = [];
 
     /**
      * Load start event dispatcher.
@@ -202,6 +202,16 @@ FORGE.Scene.prototype._parseConfig = function(config)
     this._mediaUid = this._viewer.media.add(config.media).uid;
     this._sync = (FORGE.Utils.isArrayOf(config.sync, "string") === true) ? config.sync : [];
     this._transitions = config.transitions || {};
+
+    // Special effects attached to the scene
+    if (typeof config.fx === "string" && config.fx !== "")
+    {
+        this._fxUids = [config.fx];
+    }
+    else if (Array.isArray(config.fx) === true)
+    {
+        this._fxUids = config.fx;
+    }
 
     // Set the default layout
     this._layoutUid = this._viewer.layouts.defaultUid;
@@ -285,10 +295,8 @@ FORGE.Scene.prototype._configLoadComplete = function(file)
  */
 FORGE.Scene.prototype._mediaLoadCompleteHandler = function()
 {
-    //which transition to engage ?
-    // .....
-
     // Ask the transition manager to engage the transition to this scene
+    // The transition manager will determine the best transition to engage
     var transition = this._viewer.transitions.to(this._uid);
 
     // Listen to the end of the transition to dispatch the scene load complete
@@ -840,6 +848,21 @@ Object.defineProperty(FORGE.Scene.prototype, "layout",
     {
         var layout = FORGE.UID.get(this._layoutUid);
         return layout;
+    }
+});
+
+/**
+ * Get the fx uids.
+ * @name  FORGE.Scene#fxUids
+ * @readonly
+ * @type {Array<string>}
+ */
+Object.defineProperty(FORGE.Scene.prototype, "fxUids",
+{
+    /** @this {FORGE.Scene} */
+    get: function()
+    {
+        return this._fxUids;
     }
 });
 

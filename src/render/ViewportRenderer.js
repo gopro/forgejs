@@ -57,7 +57,7 @@ FORGE.ViewportRenderer.prototype._boot = function()
 {
     this._createBackgroundRenderer();
 
-    if (this._viewport.fx.length > 0)
+    if (this._viewport.fxUids.length > 0)
     {
         this._createComposer();
     }

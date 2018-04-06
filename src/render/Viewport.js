@@ -65,12 +65,12 @@ FORGE.Viewport = function(viewer, sceneRenderer, config)
     this._viewManager = null;
 
     /**
-     * FX Pipeline definition
-     * @name FORGE.Viewport#_fx
+     * FX uids associated to this viewport
+     * @name FORGE.Viewport#_fxUids
      * @type {Array<string>}
      * @private
      */
-    this._fx = null;
+    this._fxUids = [];
 
     /**
      * Is this viewport is used for VR?
@@ -173,21 +173,18 @@ FORGE.Viewport.prototype._parseConfig = function(config)
     var background = typeof viewportBG === "string" ? viewportBG : typeof sceneBG === "string" ? sceneBG : viewerBG;
     this._background = new THREE.Color(background);
 
-    //@ todo : find better for fx parse (An fx manager that deals with configs would be cool)
-    this._fx = [];
+    // Special effects attached to the viewport
+    if (typeof config.fx === "string" && config.fx !== "")
+    {
+        this._fxUids = [config.fx];
+    }
+    else if (Array.isArray(config.fx) === true)
+    {
+        this._fxUids = config.fx;
+    }
 
-    if (typeof config.fx !== "undefined")
-    {
-        this._fx = config.fx;
-    }
-    else if (typeof this._sceneRenderer.scene.config.fx !== "undefined")
-    {
-        this._fx = this._sceneRenderer.scene.config.fx;
-    }
-    else if (typeof this._viewer.story.config.fx !== "undefined")
-    {
-        this._fx = this._viewer.story.config.fx;
-    }
+    // Concat the fx of the scene
+    this._fxUids = this._fxUids.concat(this._sceneRenderer.scene.fxUids);
 };
 
 /**
@@ -277,7 +274,7 @@ FORGE.Viewport.prototype.destroy = function()
     this._viewManager = null;
     this._sceneRenderer = null;
 
-    this._fx = null;
+    this._fxUids = null;
     this._rectangle = null;
     this._background = null;
     this._viewer = null;
@@ -287,16 +284,16 @@ FORGE.Viewport.prototype.destroy = function()
 
 /**
  * Get the FX pipeline definition
- * @name  FORGE.Viewport#fx
+ * @name  FORGE.Viewport#fxUids
  * @readonly
  * @type {Array<string>}
  */
-Object.defineProperty(FORGE.Viewport.prototype, "fx",
+Object.defineProperty(FORGE.Viewport.prototype, "fxUids",
 {
     /** @this {FORGE.Viewport} */
     get: function()
     {
-        return this._fx;
+        return this._fxUids;
     }
 });
 
