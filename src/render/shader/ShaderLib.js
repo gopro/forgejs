@@ -281,10 +281,10 @@ FORGE.ShaderLib.parseIncludes = function(string)
  */
 FORGE.ShaderLib.cleanChunk = function(string)
 {
-    return JSON.stringify(string.replace( /[ \t]*\/\/.*\n/g, "" )
-                                .replace( /[ \t]*\/\*[\s\S]*?\*\//g, "" )
-                                .replace( /\n{2,}/g, "\n" )
-    );
+    return string.replace( /[ \t]*\/\/.*\n/g, "" )
+                 .replace( /[ \t]*\/\*[\s\S]*?\*\//g, "" )
+                 .replace( /\n{2,}/g, "\n" );
+
 };
 
 /**
