@@ -401,6 +401,21 @@ Object.defineProperty(FORGE.ViewBase.prototype, "fovMax",
 });
 
 /**
+ * Get projection scale.
+ * @name FORGE.ViewBase#projectionScale
+ * @type {number}
+ * @readonly
+ */
+Object.defineProperty(FORGE.ViewBase.prototype, "projectionScale",
+{
+    /** @this {FORGE.ViewBase} */
+    get: function()
+    {
+        return this._projectionScale;
+    }
+});
+
+/**
  * Shader screen to world
  * @name FORGE.ViewBase#shaderSTW
  * @type {ScreenToWorldProgram}
