@@ -1,0 +1,15 @@
+{
+    "id": "fx",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "FXConfig",
+    "description": "An instance of the <a href=\"#fx\">fx object</a>.",
+    "type": "object",
+
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Global enabled flag for the fx module"
+        }
+    }
+}

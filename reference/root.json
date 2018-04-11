@@ -38,8 +38,8 @@
             "$ref": "playlist"
         },
 
-        "postProcessing": {
-            "$ref": "postprocessing"
+        "fx": {
+            "$ref": "fx"
         },
 
         "story": {
