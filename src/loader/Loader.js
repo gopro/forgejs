@@ -539,7 +539,7 @@ FORGE.Loader.prototype._glslLoadComplete = function(file, xhr)
     {
         file.data = xhr.responseText;
 
-        FORGE.ShaderLib.addChunk(file.data, file.key);
+        FORGE.ShaderLib.add(file.data, file.key);
 
         if (typeof file.onCompleteCallback === "function" && file.onCompleteContext !== null)
         {
