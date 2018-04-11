@@ -275,11 +275,11 @@ FORGE.ShaderLib.parseIncludes = function(string)
 
 /**
  * Clean a shader chunk from its comments
- * @method FORGE.ShaderLib.cleanChunk
+ * @method FORGE.ShaderLib.clean
  * @param  {string} string - The shader chunk to clean
  * @return {string} Returns the cleaned shader chunk
  */
-FORGE.ShaderLib.cleanChunk = function(string)
+FORGE.ShaderLib.clean = function(string)
 {
     return string.replace( /[ \t]*\/\/.*\n/g, "" )
                  .replace( /[ \t]*\/\*[\s\S]*?\*\//g, "" )
@@ -288,18 +288,35 @@ FORGE.ShaderLib.cleanChunk = function(string)
 };
 
 /**
- * add a shader chunk to the FORGE.ShaderChunk namespace if it does not already exists
- * @method FORGE.ShaderLib.cleanChunk
+ * Add a shader chunk to the FORGE.ShaderChunk namespace if it does not already exists
+ * @method FORGE.ShaderLib.add
  * @param  {string} string - The shader chunk to add
  * @param  {string} name - The name of the shader chunk to add, must be unique
  */
-FORGE.ShaderLib.addChunk = function(string, name)
+FORGE.ShaderLib.add = function(string, name)
 {
     if (typeof FORGE.ShaderChunk[name] !== "undefined")
     {
         throw new Error("FORGE.ShaderLib : Can not add a chunk named " + name + ", exists already!");
     }
 
-    FORGE.ShaderChunk[name] = FORGE.ShaderLib.cleanChunk(string);
+    FORGE.ShaderChunk[name] = FORGE.ShaderLib.clean(string);
 };
 
+/**
+ * Get a shader chunk
+ * @method FORGE.ShaderLib.get
+ * @param  {string} name - The name of the shader chunk to get.
+ * @param  {boolean} parseIncludes - Does the shader have to parse its includes?
+ */
+FORGE.ShaderLib.get = function(name, parseIncludes)
+{
+    var shader = FORGE.ShaderChunk[name];
+
+    if (parseIncludes !== false)
+    {
+        shader = FORGE.ShaderLib.parseIncludes(shader);
+    }
+
+    return shader;
+};
