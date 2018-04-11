@@ -594,9 +594,9 @@ FORGE.Viewer.prototype._updateLogic = function()
         this._keyboard.update();
         this._gamepad.update();
         this._audio.update();
-        this._plugins.update();
         this._hotspots.update();
         this._controllers.update();
+        this._plugins.update();
     }
 
     this._tween.update();
