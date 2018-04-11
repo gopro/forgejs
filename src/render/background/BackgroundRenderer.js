@@ -144,3 +144,17 @@ Object.defineProperty(FORGE.BackgroundRenderer.prototype, "scene",
         return this._scene;
     }
 });
+
+/**
+ * Get background threejs camera.
+ * @name FORGE.BackgroundRenderer#camera
+ * @type {THREE.Camera}
+ */
+Object.defineProperty(FORGE.BackgroundRenderer.prototype, "camera",
+{
+    /** @this {FORGE.BackgroundRenderer} */
+    get: function()
+    {
+        return this._camera;
+    }
+});
