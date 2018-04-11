@@ -51,15 +51,6 @@ FORGE.FXManager.prototype._parseConfig = function(config)
 
     // Set the enabled flag, default is true
     this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
-
-    // If there are items then add them
-    if (Array.isArray(config.items) === true)
-    {
-        for (var i = 0, ii = config.items.length; i < ii; i++)
-        {
-            this.addItem(config.items[i]);
-        }
-    }
 };
 
 /**
@@ -76,37 +67,6 @@ FORGE.FXManager.prototype.loadConfig = function(config)
 };
 
 /**
- * Add a FX configuration
- * @method FORGE.FXManager#addItem
- * @param {FXConfig} FX configuration
- */
-FORGE.FXManager.prototype.addItem = function(config)
-{
-    if (typeof config === "undefined" || config === null)
-    {
-        return;
-    }
-
-    var fx = null;
-
-    // If it is an array of fx
-    if (Array.isArray(config) === true)
-    {
-        for (var i = 0, ii = config.length; i < ii; i++)
-        {
-            fx = new FORGE.FX(/** @type {TransitionConfig} */ (config[i]));
-        }
-    }
-    // If it is a single fx
-    else
-    {
-        fx = new FORGE.FX(/** @type {TransitionConfig} */ (config));
-    }
-
-    return fx;
-};
-
-/**
  * Get a FX shader pass with given UID
  * @method FORGE.FXManager#getFXPassByUID
  */
@@ -117,7 +77,10 @@ FORGE.FXManager.prototype.getFXPassByUID = function(uid)
 
     if (typeof fx !== "undefined")
     {
-        pass =  fx.createPass();
+        if (fx.className === "Plugin")
+        {
+            pass =  fx.instance.pass;
+        }
     }
 
     return pass;
@@ -129,15 +92,6 @@ FORGE.FXManager.prototype.getFXPassByUID = function(uid)
  */
 FORGE.FXManager.prototype.destroy = function()
 {
-    var fxs = FORGE.UID.get(null, "FX²");
-    var fx;
-
-    while (fxs.length > 0)
-    {
-        fx = fxs.pop();
-        fx.destroy();
-        fx = null;
-    }
 
     this._viewer = null;
 
