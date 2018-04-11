@@ -40,11 +40,6 @@ FORGE.ShaderPass.prototype.constructor = FORGE.ShaderPass;
  */
 FORGE.ShaderPass.prototype.render = function(renderer, writeBuffer, readBuffer, delta, maskActive)
 {
-    if ("time" in this.uniforms)
-    {
-        this.uniforms["time"].value = delta;
-    }
-
     if (this._bypass === true)
     {
         this._copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
