@@ -160,12 +160,8 @@ FORGE.Viewport.prototype._parseConfig = function(config)
     this._uid = config.uid;
     this._register();
 
-    var w = (config.rectangle.width / 100) * this._viewer.width;
-    var h = (config.rectangle.height / 100) * this._viewer.height;
-    var x = (config.rectangle.x / 100) * this._viewer.width;
-    var y = ((100 - config.rectangle.y) / 100) * this._viewer.height - h;
-
-    this._rectangle = new FORGE.Rectangle(x, y, w, h);
+    this._rectangle = new FORGE.Rectangle();
+    this.updateRectangle(this._rectangle);
 
     var viewerBG = this._viewer.background;
     var sceneBG = this._sceneRenderer.scene.background;
@@ -219,13 +215,14 @@ FORGE.Viewport.prototype._loadViewConfig = function(config)
 
 /**
  * @method FORGE.Viewport#updateRectangle
+ * @param {FORGE.Rectangle} rectangle - The rectangle to update
  */
-FORGE.Viewport.prototype.updateRectangle = function()
+FORGE.Viewport.prototype.updateRectangle = function(rectangle)
 {
-    this._rectangle.w = (this._config.rectangle.width / 100) * this._viewer.width;
-    this._rectangle.h = (this._config.rectangle.height / 100) * this._viewer.height;
-    this._rectangle.x = (this._config.rectangle.x / 100) * this._viewer.width;
-    this._rectangle.y = ((100 - this._config.rectangle.y) / 100) * this._viewer.height - this._rectangle.h;
+    rectangle.w = (this._config.rectangle.width / 100) * this._viewer.width;
+    rectangle.h = (this._config.rectangle.height / 100) * this._viewer.height;
+    rectangle.x = (this._config.rectangle.x / 100) * this._viewer.width;
+    rectangle.y = (this._config.rectangle.y / 100) * this._viewer.height;
 };
 
 /**
@@ -238,8 +235,14 @@ FORGE.Viewport.prototype.render = function(objectRenderer, target)
 {
     this._camera.update();
 
-    target.viewport.set(this._rectangle.x, this._rectangle.y, this._rectangle.width, this._rectangle.height);
-    target.scissor.set(this._rectangle.x, this._rectangle.y, this._rectangle.width, this._rectangle.height);
+    // We have to revert the y origin for the scissor!
+    var x = this._rectangle.x;
+    var y = this._viewer.height - this._rectangle.height - this._rectangle.y;
+    var w = this._rectangle.width;
+    var h = this._rectangle.height;
+
+    target.viewport.set(x, y, w, h);
+    target.scissor.set(x, y, w, h);
     target.scissorTest = true ;
 
     this._viewer.renderer.webGLRenderer.setClearColor(this._background);

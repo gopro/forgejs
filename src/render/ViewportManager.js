@@ -172,7 +172,7 @@ FORGE.ViewportManager.prototype._renewActiveViewport = function(event)
 {
     var px = event.data.clientX || event.data.center.x;
     var py = event.data.clientY || event.data.center.y;
-    var point = new THREE.Vector2(px, this._viewer.height - py);
+    var point = new THREE.Vector2(px, py);
     var index = this._getViewportIndexContainingPoint(point);
 
     if (index === -1)
