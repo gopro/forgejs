@@ -170,9 +170,13 @@ FORGE.MediaVideo.prototype.update = function()
 /**
  * MediaVideo load
  * @method FORGE.MediaVideo#load
+ * @param {SceneMediaOptionsConfig} options - Options of the Media if you want to overrides the default ones.
  */
-FORGE.MediaVideo.prototype.load = function()
+FORGE.MediaVideo.prototype.load = function(options)
 {
+    // We can override the default options at the loading time
+    this._options = FORGE.Utils.extendSimpleObject(this._options, options);
+
     if (typeof this._source.streaming !== "undefined" && this._source.streaming.toLowerCase() === FORGE.VideoFormat.DASH)
     {
         this._video = new FORGE.VideoDash(this._viewer);
