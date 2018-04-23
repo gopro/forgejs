@@ -29,15 +29,6 @@ FORGE.SceneRendererPool = function(viewer)
      */
     this._pool = null;
 
-    /**
-     * Active scene UID
-     * @todo : at the moment it will always be set to the first scene
-     * @name FORGE.SceneRendererPool#_activeSceneUID
-     * @type {FORGE.UID}
-     * @private
-     */
-    this._activeSceneUID = null;
-
     FORGE.BaseObject.call(this, "SceneRendererPool");
 
     this._boot();
@@ -89,8 +80,6 @@ FORGE.SceneRendererPool.prototype.add = function(sceneUID)
     {
         this._pool[sceneUID] = new FORGE.SceneRenderer(this._viewer, sceneUID);
     }
-
-    this._activeSceneUID = sceneUID;
 };
 
 /**
@@ -190,6 +179,7 @@ Object.defineProperty(FORGE.SceneRendererPool.prototype, "activeViewport",
     /** @this {FORGE.SceneRendererPool} */
     get: function()
     {
-        return this._pool[this._activeSceneUID].viewports.active;
+        var sceneUid = this._viewer.story.sceneUid;
+        return this._pool[sceneUid].viewports.active;
     }
 });
