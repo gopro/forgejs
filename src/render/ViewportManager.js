@@ -40,6 +40,14 @@ FORGE.ViewportManager = function(viewer, sceneRenderer)
     this._viewports = null;
 
     /**
+     * Flag to know if the pointer is down
+     * @name FORGE.ViewportManager#_pointerDown
+     * @type {boolean}
+     * @private
+     */
+    this._pointerDown = false;
+
+    /**
      * Index of active viewport, where the controller is active.
      * @name FORGE.ViewportManager#_index
      * @type {number}
@@ -74,17 +82,82 @@ FORGE.ViewportManager.prototype._boot = function()
     // Parse config for the rendering
     this._setLayout(this._sceneRenderer.scene.layoutUid);
 
-    // @todo enable this finally instead of all the canvas pointers
-    // this._viewer.controllers.onActivate.add(this._renewActiveViewport, this)
-    this._viewer.canvas.pointer.onTap.add(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onDoubleTap.add(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onPanStart.add(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onPinchStart.add(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onPressStart.add(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onRotateStart.add(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onWheel.add(this._renewActiveViewport, this);
+    this._startWatchPointer();
 
     this._viewer.canvas.onResize.add(this._canvasResizeHandler, this);
+};
+
+/**
+ * Start pointer watch for active viewport
+ * @name FORGE.ViewportManager#_startWatchPointer
+ * @private
+ */
+FORGE.ViewportManager.prototype._startWatchPointer = function()
+{
+    this._viewer.canvas.pointer.onMove.add(this._pointerMoveHandler, this);
+    this._viewer.canvas.pointer.onPanStart.add(this._pointerPanStartHandler, this);
+    this._viewer.canvas.pointer.onPanEnd.add(this._pointerPanEndHandler, this);
+};
+
+/**
+ * Stop pointer watch for active viewport
+ * @name FORGE.ViewportManager#_stopWatchPointer
+ * @private
+ */
+FORGE.ViewportManager.prototype._stopWatchPointer = function()
+{
+    this._viewer.canvas.pointer.onMove.remove(this._pointerMoveHandler, this);
+    this._viewer.canvas.pointer.onPanStart.remove(this._pointerPanStartHandler, this);
+    this._viewer.canvas.pointer.onPanEnd.remove(this._pointerPanEndHandler, this);
+};
+
+/**
+ * Pointer move handler
+ * @name FORGE.ViewportManager#_pointerMoveHandler
+ * @param {FORGE.Event} event
+ * @private
+ */
+FORGE.ViewportManager.prototype._pointerMoveHandler = function(event)
+{
+    if (this._pointerDown == true)
+    {
+        return false;
+    }
+
+    var point = FORGE.Pointer.getRelativeMousePosition(event.data);
+    var index = this._getViewportIndexContainingPoint(point);
+
+    if (index === -1)
+    {
+        return false;
+    }
+
+    this._index = index;
+
+    if (this._onActiveViewportChange !== null)
+    {
+        this._onActiveViewportChange.dispatch();
+    }
+};
+
+/**
+ * Pointer pan start handler
+ * @name FORGE.ViewportManager#_pointerPanStartHandler
+ * @private
+ */
+FORGE.ViewportManager.prototype._pointerPanStartHandler = function()
+{
+    this._pointerDown = true;
+};
+
+/**
+ * Pointer pan end handler
+ * @name FORGE.ViewportManager#_pointerPanEndHandler
+ * @private
+ */
+FORGE.ViewportManager.prototype._pointerPanEndHandler = function()
+{
+    this._pointerDown = false;
 };
 
 /**
@@ -164,31 +237,6 @@ FORGE.ViewportManager.prototype._getViewportIndexContainingPoint = function(poin
 };
 
 /**
- * Renew active viewport if needed with pointer event.
- * @method FORGE.ViewportManager#_renewActiveViewport
- * @private
- */
-FORGE.ViewportManager.prototype._renewActiveViewport = function(event)
-{
-    var px = event.data.clientX || event.data.center.x;
-    var py = event.data.clientY || event.data.center.y;
-    var point = new THREE.Vector2(px, py);
-    var index = this._getViewportIndexContainingPoint(point);
-
-    if (index === -1)
-    {
-        return;
-    }
-
-    this._index = index;
-
-    if (this._onActiveViewportChange !== null)
-    {
-        this._onActiveViewportChange.dispatch();
-    }
-};
-
-/**
  * Render routine.
  * @method FORGE.ViewportManager#render
  * @param {FORGE.ObjectRenderer} objectRenderer - object renderer
@@ -228,13 +276,7 @@ FORGE.ViewportManager.prototype.getRelativeMousePosition = function(mouse)
  */
 FORGE.ViewportManager.prototype.destroy = function(webGLRenderer, target)
 {
-    this._viewer.canvas.pointer.onTap.remove(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onDoubleTap.remove(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onPanStart.remove(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onPinchStart.remove(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onPressStart.remove(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onRotateStart.remove(this._renewActiveViewport, this);
-    this._viewer.canvas.pointer.onWheel.remove(this._renewActiveViewport, this);
+    this._stopWatchPointer();
 
     this._viewer.canvas.onResize.remove(this._canvasResizeHandler, this);
 
