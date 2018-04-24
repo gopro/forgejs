@@ -184,12 +184,6 @@ FORGE.ControllerPointer.prototype._parseConfig = function(config)
     this._enabled = (typeof config.enabled === "boolean") ? config.enabled : true;
 };
 
-/**
- * Pan start event handler.
- * @method FORGE.ControllerPointer#_panStartHandler
- * @param {FORGE.Event} event - Event object
- * @private
- */
 FORGE.ControllerPointer.prototype._panStartHandler = function(event)
 {
     if(this._viewer.controllers.enabled === false)
@@ -203,17 +197,9 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
     this._active = true;
     this._panning = true;
 
-
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-    var viewport = this._viewer.renderer.activeViewport;
-    var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
 
-    if (viewportPosition === null)
-    {
-        return;
-    }
-
-    this._positionStart = new THREE.Vector2(viewportPosition.x, viewportPosition.y);
+    this._positionStart = new THREE.Vector2(screenPosition.x, screenPosition.y);
     this._positionPrevious.copy(this._positionStart);
     this._positionCurrent.copy(this._positionStart);
     this._velocity.set(0, 0);
@@ -226,25 +212,17 @@ FORGE.ControllerPointer.prototype._panStartHandler = function(event)
     this._viewer.controllers.notifyControlStart(this);
 };
 
-/**
- * Pan move event handler.
- * @method FORGE.ControllerPointer#_panMoveHandler
- * @param {FORGE.Event} event - Event object
- * @private
- */
 FORGE.ControllerPointer.prototype._panMoveHandler = function(event)
 {
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
-    var viewport = this._viewer.renderer.activeViewport;
-    var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
 
-    if (viewportPosition === null || this._viewer.controllers.enabled === false || viewportPosition === null)
+    if (this._viewer.controllers.enabled === false)
     {
         return;
     }
 
     this._positionPrevious.copy(this._positionCurrent);
-    this._positionCurrent.set(viewportPosition.x, viewportPosition.y);
+    this._positionCurrent.set(screenPosition.x, screenPosition.y);
     // this.log("Current position: " + this._positionCurrent.x + ", " + this._positionCurrent.y);
 
     if(this._orientation.drag === true && this._panning === true)
@@ -279,20 +257,6 @@ FORGE.ControllerPointer.prototype._panEndHandler = function()
 };
 
 /**
- * Active viewport change handler.
- * @method FORGE.ControllerPointer#_onSceneActiveViewportChange
- * @param {FORGE.Event} event - new scene active viewport
- * @private
- */
-FORGE.ControllerPointer.prototype._onSceneActiveViewportChange = function(event)
-{
-    // If panning was in progress, end it for current previous viewport and start it for the new viewport
-
-
-    FORGE.ControllerBase.prototype._onSceneActiveViewportChange.call(this, event);
-};
-
-/**
  * Update the camera from the mouse position.
  * @method FORGE.ControllerPointer#_updateCameraWithDrag
  * @private
@@ -306,8 +270,12 @@ FORGE.ControllerPointer.prototype._updateCameraWithDrag = function()
         return;
     }
 
-    var stw0 = this._viewer.view.screenToWorld(this._positionPrevious);
-    var stw1 = this._viewer.view.screenToWorld(this._positionCurrent);
+    var viewport = this._viewer.renderer.activeViewport;
+    var viewportPositionPrevious = viewport.viewportManager.getRelativeMousePosition(this._positionPrevious);
+    var viewportPositionCurrent = viewport.viewportManager.getRelativeMousePosition(this._positionCurrent);
+
+    var stw0 = this._viewer.view.screenToWorld(viewportPositionPrevious);
+    var stw1 = this._viewer.view.screenToWorld(viewportPositionCurrent);
 
     // If the screen point do not match any world position, return
     if(stw0 === null || stw1 === null)
