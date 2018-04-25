@@ -145,14 +145,6 @@ FORGE.Story = function(viewer)
     this._onSceneLoadError = null;
 
     /**
-     * On scene preview event dispatcher.
-     * @name FORGE.Story#_onScenePreview
-     * @type {FORGE.EventDispatcher}
-     * @private
-     */
-    this._onScenePreview = null;
-
-    /**
      * On group change event dispatcher.
      * @name FORGE.Story#_onGroupChange
      * @type {FORGE.EventDispatcher}
@@ -721,12 +713,6 @@ FORGE.Story.prototype.destroy = function()
         this._onSceneLoadError = null;
     }
 
-    if(this._onScenePreview !== null)
-    {
-        this._onScenePreview.destroy();
-        this._onScenePreview = null;
-    }
-
     if(this._onGroupChange !== null)
     {
         this._onGroupChange.destroy();
@@ -1084,27 +1070,6 @@ Object.defineProperty(FORGE.Story.prototype, "onSceneLoadError",
         }
 
         return this._onSceneLoadError;
-    }
-});
-
-/**
- * Get the onScenePreview {@link FORGE.EventDispatcher}.
- * @name  FORGE.Story#onScenePreview
- * @readonly
- * @type {FORGE.EventDispatcher}
- * @todo  This event is currently not dispatched
- */
-Object.defineProperty(FORGE.Story.prototype, "onScenePreview",
-{
-    /** @this {FORGE.Story} */
-    get: function()
-    {
-        if(this._onScenePreview === null)
-        {
-            this._onScenePreview = new FORGE.EventDispatcher(this);
-        }
-
-        return this._onScenePreview;
     }
 });
 
