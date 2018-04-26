@@ -94,6 +94,7 @@ FORGE.SceneRenderer.prototype._boot = function()
  */
 FORGE.SceneRenderer.prototype.render = function()
 {
+    this._renderTarget.setSize(this._viewer.canvas.width, this._viewer.canvas.height);
     this._viewportManager.render(this._objectRenderer, this._renderTarget);
 };
 
