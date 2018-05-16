@@ -164,7 +164,10 @@ FORGE.ViewportRenderer.prototype._renderToTarget = function(objectRenderer, targ
         return;
     }
 
+    this._viewer.renderer.webGLRenderer.vr.enabled = this._viewer.vr;
     this._backgroundRenderer.render(target);
+
+    this._viewer.renderer.webGLRenderer.vr.enabled = this._viewer.vr;
     this._viewer.renderer.webGLRenderer.clearTarget(target, false, true, false);
     objectRenderer.render(this._viewport, target);
 };

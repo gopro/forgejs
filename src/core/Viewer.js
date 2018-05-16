@@ -302,6 +302,14 @@ FORGE.Viewer = function(parent, config)
     this._ready = false;
 
     /**
+     * VR flag to know if the viewer is ready
+     * @name  FORGE.Viewer#_vr
+     * @type {boolean}
+     * @private
+     */
+    this._vr = false;
+
+    /**
      * Event dispatcher for the onPause event.
      * @name  FORGE.Viewer#_onPause
      * @type {FORGE.EventDispatcher}
@@ -380,6 +388,7 @@ FORGE.Viewer.DEFAULT_CONFIG =
         antialias: true,
         alpha: true,
         premultipliedAlpha: false,
+        preserveDrawingBuffer: false,
         stencil: false
     }
 };
@@ -1595,13 +1604,13 @@ Object.defineProperty(FORGE.Viewer.prototype, "vr",
     /** @this {FORGE.Viewer} */
     get: function()
     {
-        return this._renderer.vr.enabled;
+        return this._vr;
     },
 
     /** @this {FORGE.Viewer} */
     set: function(value)
     {
-        this._renderer.vr.enabled = value;
+        this._vr = value;
     }
 });
 

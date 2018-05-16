@@ -75,6 +75,7 @@ FORGE.BackgroundRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
     this._scene.name = "BackgroundRenderer";
+    this._scene.onAfterRender = this._SceneAfterRender.bind(this);
 
     // Debug for the three.js inspector browser extension.
     if (FORGE.BackgroundRenderer.DEBUG === true)
@@ -85,6 +86,22 @@ FORGE.BackgroundRenderer.prototype._boot = function()
     this._media = this._viewport.scene.media;
 
     this._camera = this._viewport.camera.main;
+};
+
+/**
+ * Function called by WebGL Renderer once the scene ghas been renderer.
+ * @method FORGE.BackgroundRenderer#_SceneAfterRender
+ * @param {THREE.WebGLRenderer} renderer - WebGL renderer
+ * @param {THREE.Scene} scene - rendered scene
+ * @param {THREE.Camera} camera - camera used to render the scene
+ * @private
+ */
+FORGE.BackgroundRenderer.prototype._SceneAfterRender = function(renderer, scene, camera)
+{
+    // Renderer has not submitted the frame to the VR headset yet
+    // Turn off the vr flag to as we are rendering to a texture.
+    // The screen renderer will be in charge of submitting the frame
+    renderer.vr.enabled = false;
 };
 
 /**

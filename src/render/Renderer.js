@@ -107,6 +107,13 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
     options.canvas = canvas;
     options.antialias = true;
 
+    // VR display mirroring (headset replicated on screen) is enabled when preserveDrawingBuffer is true
+    // This means WebGL cannot swap its buffers but will always copy them, with a performance cost
+    // This subject has been discussed, here is a link to prepare discussion about this setting
+    // https://stackoverflow.com/questions/27746091/preservedrawingbuffer-false-is-it-worth-the-effort
+    // It may be the responsibility of the user to set in WebGL config in JSON definition
+    options.preserveDrawingBuffer = false;
+
     // WebGLRenderer will draw any component supported by WebGL
     try
     {

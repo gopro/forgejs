@@ -80,11 +80,28 @@ FORGE.ScreenRenderer.prototype._boot = function()
     this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
     this._scene = new THREE.Scene();
     this._quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2));
+    this._scene.name = "ScreenRenderer";
+    this._scene.onAfterRender = this._SceneAfterRender.bind(this);
 
     this._scene.add(this._quad);
 
     // this.material = new FORGE.ScreenMaterial(this._viewer);
     this._createMaterial(FORGE.ScreenRenderer.DEFAULT_MATERIAL);
+};
+
+/**
+ * Function called by WebGL Renderer once the scene ghas been renderer.
+ * @method FORGE.ScreenRenderer#_SceneAfterRender
+ * @param {THREE.WebGLRenderer} renderer - WebGL renderer
+ * @param {THREE.Scene} scene - rendered scene
+ * @param {THREE.Camera} camera - camera used to render the scene
+ * @private
+ */
+FORGE.ScreenRenderer.prototype._SceneAfterRender = function(renderer, scene, camera)
+{
+    // Once all the scene renderers have rendered into textures, it's time
+    // to submit the frame when vr is turned on.
+    renderer.vr.enabled = this._viewer.vr;
 };
 
 /**
@@ -151,6 +168,7 @@ FORGE.ScreenRenderer.prototype.render = function()
     this._material.update();
 
     this._viewer.renderer.webGLRenderer.setViewport(0, 0, this._viewer.width, this._viewer.height);
+    this._viewer.renderer.webGLRenderer.vr.enabled = false;
     this._viewer.renderer.webGLRenderer.render(this._scene, this._camera);
 };
 

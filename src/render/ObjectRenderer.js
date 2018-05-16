@@ -80,6 +80,8 @@ FORGE.ObjectRenderer.prototype.constructor = FORGE.ObjectRenderer;
 FORGE.ObjectRenderer.prototype._boot = function()
 {
     this._scene = new THREE.Scene();
+    this._scene.name = "ObjectRenderer";
+    this._scene.onAfterRender = this._SceneAfterRender.bind(this);
 
     // Take only hotspot 3d type > to refactor
     this._objects = this._sceneRenderer.scene.objects.filter(function(o)
@@ -97,6 +99,22 @@ FORGE.ObjectRenderer.prototype._boot = function()
     this._picking = new FORGE.Picking(this._viewer, this);
 
     this._sceneRenderer.scene.onUnloadComplete.addOnce(this._sceneUnloadCompleteHandler, this);
+};
+
+/**
+ * Function called by WebGL Renderer once the scene ghas been renderer.
+ * @method FORGE.ObjectRenderer#_SceneAfterRender
+ * @param {THREE.WebGLRenderer} renderer - WebGL renderer
+ * @param {THREE.Scene} scene - rendered scene
+ * @param {THREE.Camera} camera - camera used to render the scene
+ * @private
+ */
+FORGE.ObjectRenderer.prototype._SceneAfterRender = function(renderer, scene, camera)
+{
+    // Renderer has not submitted the frame to the VR headset yet
+    // Turn off the vr flag to as we are rendering to a texture.
+    // The screen renderer will be in charge of submitting the frame
+    renderer.vr.enabled = false;
 };
 
 /**
