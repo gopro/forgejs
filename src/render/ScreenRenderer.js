@@ -81,7 +81,7 @@ FORGE.ScreenRenderer.prototype._boot = function()
     this._scene = new THREE.Scene();
     this._quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2));
     this._scene.name = "ScreenRenderer";
-    this._scene.onAfterRender = this._SceneAfterRender.bind(this);
+    this._scene.onAfterRender = this._sceneAfterRender.bind(this);
 
     this._scene.add(this._quad);
 
@@ -91,13 +91,13 @@ FORGE.ScreenRenderer.prototype._boot = function()
 
 /**
  * Function called by WebGL Renderer once the scene ghas been renderer.
- * @method FORGE.ScreenRenderer#_SceneAfterRender
+ * @method FORGE.ScreenRenderer#_sceneAfterRender
  * @param {THREE.WebGLRenderer} renderer - WebGL renderer
  * @param {THREE.Scene} scene - rendered scene
  * @param {THREE.Camera} camera - camera used to render the scene
  * @private
  */
-FORGE.ScreenRenderer.prototype._SceneAfterRender = function(renderer, scene, camera)
+FORGE.ScreenRenderer.prototype._sceneAfterRender = function(renderer, scene, camera)
 {
     // Once all the scene renderers have rendered into textures, it's time
     // to submit the frame when vr is turned on.
