@@ -66,6 +66,17 @@ FORGE.Math.radToDeg = function(rad)
 };
 
 /**
+ * Return greater power of two
+ * @method FORGE.Math.greaterPOT
+ * @param  {number} value - input number value
+ * @return {number} greater power of two
+ */
+FORGE.Math.greaterPOT = function(value)
+{
+    return Math.pow(2, Math.floor(Math.log2(value)) + 1);
+};
+
+/**
  * Returns the value of a number rounded to the nearest decimal value
  *
  * @method FORGE.Math.round10
