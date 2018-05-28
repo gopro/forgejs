@@ -97,11 +97,26 @@ FORGE.RequestAnimationFrame.prototype._boot = function()
  */
 FORGE.RequestAnimationFrame.prototype.start = function(owner)
 {
-    this._owner = (typeof owner !== "undefined" && (owner === window || owner instanceof VRDisplay)) ? owner : window;
+    this._owner = (typeof owner !== "undefined" && (owner === window || owner instanceof VRDisplay || owner instanceof THREE.WebGLRenderer)) ? owner : window;
 
     this._running = true;
 
-    if (typeof this._owner.requestAnimationFrame === "undefined" || this._viewer.config.update === "timeout")
+    if (this._owner instanceof THREE.WebGLRenderer)
+    {
+        this._isSetTimeOut = false;
+
+        this._onLoop = function (time)
+        {
+            if(this._running === true)
+            {
+                this._viewer.update(time);
+            }
+            return;
+        };
+
+        this._owner.animate(this._onLoop.bind(this));
+    }
+    else if (this._viewer.config.update === "timeout")
     {
         this._isSetTimeOut = true;
 
@@ -139,7 +154,11 @@ FORGE.RequestAnimationFrame.prototype.start = function(owner)
  */
 FORGE.RequestAnimationFrame.prototype.stop = function()
 {
-    if (this._isSetTimeOut)
+    if (this._owner instanceof THREE.WebGLRenderer)
+    {
+        this._owner.animate(null);
+    }
+    else if (this._isSetTimeOut)
     {
         clearTimeout(this._timeOutID);
     }

@@ -126,6 +126,7 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
     }
 
     this._webGLRenderer.autoClear = false;
+    this._viewer.raf.start(this._webGLRenderer);
 };
 
 /**

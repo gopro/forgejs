@@ -503,7 +503,7 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
     }
 
     // Start the raf
-    this._raf.start();
+    // this._raf.start();
 
     // Tadaaaaa!
     if (this._onMainConfigLoadComplete !== null)
