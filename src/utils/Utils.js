@@ -659,6 +659,11 @@ FORGE.Utils.watchObjectProperty = function(object, property, timeout, interval) 
  */
 FORGE.Utils.destroyMesh = function(mesh)
 {
+    if (mesh.parent !== null)
+    {
+        mesh.parent.remove(mesh);
+    }
+
     mesh.userData = null;
 
     mesh.onBeforeRender = null;
