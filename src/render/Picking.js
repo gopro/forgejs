@@ -127,7 +127,18 @@ FORGE.Picking.prototype._boot = function()
     this._targetDownScale = 5;
     this._targetMinHeight = 64;
 
+    this._viewer.story.onSceneLoadComplete.add(this._onSceneLoadComplete, this);
+};
+
+/**
+ * Scene load complete handler
+ * @method FORGE.Picking#_onSceneLoadComplete
+ * @private
+ */
+FORGE.Picking.prototype._onSceneLoadComplete = function()
+{
     this._addHandlers();
+    this._viewer.onVRChange.add(this._addHandlers, this);
 };
 
 /**
@@ -135,16 +146,21 @@ FORGE.Picking.prototype._boot = function()
  * @method FORGE.Picking#_addHandlers
  * @private
  */
-FORGE.Picking.prototype._addHandlers = function(event)
+FORGE.Picking.prototype._addHandlers = function()
 {
-    if (this._viewer.canvas.pointer.onClick.has(this._canvasPointerClickHandler, this) === false)
-    {
-        this._viewer.canvas.pointer.onClick.add(this._canvasPointerClickHandler, this);
-    }
+    this._removeHandlers();
 
-    if (this._viewer.canvas.pointer.onMove.has(this._canvasPointerMoveHandler, this) === false)
+    if (this._viewer.vr === false)
     {
-        this._viewer.canvas.pointer.onMove.add(this._canvasPointerMoveHandler, this);
+        if (this._viewer.canvas.pointer.onClick.has(this._canvasPointerClickHandler, this) === false)
+        {
+            this._viewer.canvas.pointer.onClick.add(this._canvasPointerClickHandler, this);
+        }
+
+        if (this._viewer.canvas.pointer.onMove.has(this._canvasPointerMoveHandler, this) === false)
+        {
+            this._viewer.canvas.pointer.onMove.add(this._canvasPointerMoveHandler, this);
+        }
     }
 };
 
@@ -153,7 +169,7 @@ FORGE.Picking.prototype._addHandlers = function(event)
  * @method FORGE.Picking#_removeHandlers
  * @private
  */
-FORGE.Picking.prototype._removeHandlers = function(event)
+FORGE.Picking.prototype._removeHandlers = function()
 {
     this._viewer.canvas.pointer.onClick.remove(this._canvasPointerClickHandler, this);
     this._viewer.canvas.pointer.onMove.remove(this._canvasPointerMoveHandler, this);
@@ -168,6 +184,8 @@ FORGE.Picking.prototype._removeHandlers = function(event)
 FORGE.Picking.prototype._canvasPointerClickHandler = function(event)
 {
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
+
+    this.log("Pointer click event (" + screenPosition.x + ", " + screenPosition.y + ")");
 
     var viewport = this._viewer.renderer.activeViewport;
     var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
@@ -199,37 +217,7 @@ FORGE.Picking.prototype._canvasPointerMoveHandler = function(event)
     var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
     var viewportSize = viewport.rectangle.size;
 
-    var object = this._getObjectAtNormalizedPosition(viewportPosition.divide(viewportSize.vector2));
-    if (typeof object === "undefined" || !object.interactive)
-    {
-        // Case: one object was hovered and no object is hovered now
-        if (this._hovered !== null)
-        {
-            if (typeof this._hovered.out === "function")
-            {
-                this._hovered.out();
-                this._hovered = null;
-            }
-        }
-
-        return;
-    }
-
-    // Test if hovered object is still the same, if it has changed, call previous out function
-    if (this._hovered !== null && this._hovered !== object)
-    {
-        if (typeof this._hovered.out === "function")
-        {
-            this._hovered.out();
-        }
-    }
-
-    this._hovered = object;
-
-    if (typeof this._hovered.over === "function")
-    {
-        this._hovered.over();
-    }
+    this._checkPointerNormalizedSpace(viewportPosition.divide(viewportSize.vector2));
 };
 
 /**
@@ -256,6 +244,62 @@ FORGE.Picking.prototype._getObjectAtNormalizedPosition = function(posn)
 };
 
 /**
+ * Camera change handler
+ * @method FORGE.Picking#_checkPointerNormalizedSpace
+ * @param {THREE.Vector2} positon - normalized position
+ * @private
+ */
+FORGE.Picking.prototype._checkPointerNormalizedSpace = function(position)
+{
+    var gaze = this._viewer.renderer.activeViewport.camera.gaze;
+
+    var object = this._getObjectAtNormalizedPosition(position);
+    if (typeof object === "undefined" || !object.interactive)
+    {
+        // Case: one object was hovered and no object is hovered now
+        if (this._hovered !== null)
+        {
+            if (typeof this._hovered.out === "function")
+            {
+                this._hovered.out();
+                this._hovered = null;
+            }
+        }
+
+        if (this._viewer.vr === true)
+        {
+            gaze.stop();
+        }
+
+        return;
+    }
+
+    // Test if hovered object is still the same, if it has changed, call previous out function
+    var sameObject = this._hovered === object;
+    if (this._hovered !== null && !sameObject)
+    {
+        if (typeof this._hovered.out === "function")
+        {
+            this._hovered.out();
+        }
+    }
+
+    if (!sameObject)
+    {
+        if (this._viewer.vr === true)
+        {
+            gaze.start(this);
+        }
+    }
+    this._hovered = object;
+
+    if (typeof this._hovered.over === "function")
+    {
+        this._hovered.over();
+    }
+};
+
+/**
  * Dump picking texture to the scene target
  * @method FORGE.Picking#render
  * @param {THREE.WebGLRenderTarget} target - draw target
@@ -266,6 +310,9 @@ FORGE.Picking.prototype._dumpTexture = function(target)
     var geometry = new THREE.PlaneBufferGeometry(1, 1);
     var material = new THREE.MeshBasicMaterial({color:new THREE.Color(0xffffff), map: this._renderTarget});
     var quad = new THREE.Mesh(geometry, material);
+    quad.position.x = -0.4;
+    quad.position.y = 0.4;
+    quad.scale.set(0.4, 0.4, 0.4);
     var scene = new THREE.Scene();
     scene.add(quad);
 
@@ -273,21 +320,47 @@ FORGE.Picking.prototype._dumpTexture = function(target)
 };
 
 /**
- * Render routine
- * @method FORGE.Picking#render
+ * Click object
+ * @method FORGE.Picking#click
+ */
+FORGE.Picking.prototype.click = function()
+{
+    if (this._hovered === null)
+    {
+        return;
+    }
+
+    this._hovered.click();
+};
+
+/**
+ * Update routine
+ * @method FORGE.Picking#update
  * @param {FORGE.Viewport} viewport - current rendering viewport
  */
-FORGE.Picking.prototype.render = function(viewport)
+FORGE.Picking.prototype.update = function(viewport)
 {
     var view = viewport.view.current;
+
     var camera = viewport.camera.main;
+
+    // In VR, we need to get VR camera to extract framedata orientation
+    // Render will not enable VR to prevent from splitting the picking drawpass
+    var cameraVR = this._viewer.renderer.webGLRenderer.vr.getCamera( camera );
+    if (cameraVR.isArrayCamera)
+    {
+        var cameraL = cameraVR.cameras[0];
+        camera.matrixWorld.copy(cameraL.matrixWorld);
+        camera.matrixWorldInverse.copy(cameraL.matrixWorldInverse);
+    }
+
     var scene = this._objectRenderer.scene;
 
     var h = Math.max(this._targetMinHeight, viewport.rectangle.height / this._targetDownScale);
     var w = h * viewport.rectangle.ratio;
 
     // SetSize won't do anything if size does not change, otherwise it will
-    // dispose the internal WebGL texture object and next render will recreate it
+    // dispose the internal WebGL texture object and next update will recreate it
     // with the new size stored
     this._renderTarget.setSize(w, h);
 
@@ -302,7 +375,13 @@ FORGE.Picking.prototype.render = function(viewport)
     // Restore scene params
     scene.overrideMaterial = null;
 
-    // this._dumpTexture(viewport.scene.renderTarget);
+    // this._dumpTexture(viewport.sceneRenderer.target);
+
+    // When VR is on, we check the center of the screen for each frame
+    if (this._viewer.vr === true)
+    {
+        this._checkPointerNormalizedSpace(new THREE.Vector2(0.5, 0.5));
+    }
 };
 
 /**
@@ -311,10 +390,12 @@ FORGE.Picking.prototype.render = function(viewport)
  */
 FORGE.Picking.prototype.destroy = function()
 {
+    this._viewer.story.onSceneLoadComplete.remove(this._onSceneLoadComplete, this);
+    this._viewer.onVRChange.remove(this._addHandlers, this);
+    this._removeHandlers();
+
     this._renderTarget.dispose();
     this._renderTarget = null;
-
-    this._removeHandlers();
 
     this._hovered = null;
     this._objectRenderer = null;
