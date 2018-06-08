@@ -251,8 +251,22 @@ FORGE.HotspotMaterial.prototype._parseConfig = function(config)
     this._side = (typeof config.side === "string") ? config.side : FORGE.HotspotMaterial.sides.DOUBLE;
     this._pickEverywhere = (typeof config.pickEverywhere === "boolean") ? config.pickEverywhere : false;
 
-    var color = (typeof config.color === "string") ? config.color : 0xff0000;
+    var color = (typeof config.color === "string") ? config.color : 0xffffff;
     this._color = new THREE.Color(color);
+
+    // Before setting up, create a default mesh material
+    // It will be overriden later if needed
+    // As state changing reloads the configuration parsing
+    // apply new material only if there is none
+    if (this._material === null)
+    {
+        this._material = new THREE.MeshBasicMaterial({
+            opacity: this._opacity,
+            transparent: this._transparent,
+            color: this._color,
+            side: this.getThreeSide()
+        });
+    }
 
     // Hotspot with image as background
     if (typeof config.image !== "undefined" && config.image !== null)
@@ -572,7 +586,7 @@ FORGE.HotspotMaterial.prototype._setupComplete = function()
 /**
  * Get the side of the hotspot material
  * @method FORGE.HotspotMaterial#getThreeSide
- * @return {number} [description]
+ * @return {number} THREEjs side enum value
  */
 FORGE.HotspotMaterial.prototype.getThreeSide = function()
 {
@@ -619,6 +633,10 @@ FORGE.HotspotMaterial.prototype.update = function()
         this._material.uniforms.tTexture.value = this._texture;
         this._material.uniforms.tOpacity.value = this._opacity;
     }
+    else if (typeof this._material.map !== "undefined")
+    {
+        this._material.map = this._texture;
+    }
 
     if(this._texture !== null && this._update === true)
     {
@@ -627,7 +645,6 @@ FORGE.HotspotMaterial.prototype.update = function()
 
     return [this._material, this._texture, this._opacity];
 };
-
 
 /**
  * Set texture frame

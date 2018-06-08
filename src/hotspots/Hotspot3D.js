@@ -281,6 +281,12 @@ FORGE.Hotspot3D.prototype._stateLoadCompleteHandler = function()
     this._mesh.geometry = this._geometry.geometry;
     this._mesh.visible = this._visible;
 
+    if (this._mesh.material.isMeshBasicMaterial)
+    {
+        this._mesh.material.dispose();
+    }
+    this._mesh.material = this._material.material;
+
     this._updatePosition();
 
     if (this._animation.autoPlay === true && document[FORGE.Device.visibilityState] === "visible")
