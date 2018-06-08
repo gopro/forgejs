@@ -24,12 +24,13 @@ FORGE.CameraGaze = function(viewer, config)
     this._config = config;
 
     /**
-     * THREE object
-     * @name FORGE.CameraGaze#_object
-     * @type {THREE.Object3D}
+     * FORGE click interface
+     * Object implementing click function when an object is selected by gaze
+     * @name FORGE.CameraGaze#_clickInterface
+     * @type {FORGE.BaseObject}
      * @private
      */
-    this._object = null;
+    this._clickInterface = null;
 
     /**
      * Flag to know if the gaze cursor is hovering an object
@@ -79,12 +80,29 @@ FORGE.CameraGaze.prototype.constructor = FORGE.CameraGaze;
 FORGE.CameraGaze.prototype._boot = function()
 {
     this._timer = this._viewer.clock.create(false);
+    this._viewer.onVRChange.add(this._onVRChangeHandler, this);
 
-    this._object = new THREE.Object3D();
-    this._object.name = "CameraGaze";
-    this._object.position.z = -2;
+    var geometry = new THREE.SphereBufferGeometry(0.01, 4, 4);
+    var material = new THREE.MeshBasicMaterial({transparent:true, opacity:0.0, side: THREE.DoubleSide, depthTest:false});
+    this._object = new THREE.Mesh(geometry, material);
+    this._object.frustumCulling = false;
+    this._object.name = "Gaze container";
 
-    this._createCursor();
+    this._object.position.set(0,0,-10);
+};
+
+/**
+ * VR change handler.
+ * @method FORGE.CameraGaze#_onVRChangeHandler
+ * @private
+ */
+FORGE.CameraGaze.prototype._onVRChangeHandler = function()
+{
+    if (this._viewer.vr === false)
+    {
+        this._destroyRing("vrcursor");
+        this._destroyRing("vrprogress");
+    }
 };
 
 /**
@@ -120,15 +138,23 @@ FORGE.CameraGaze.prototype._createRingGeometry = function(innerRadius, outerRadi
  */
 FORGE.CameraGaze.prototype._createCursor = function()
 {
+    if (this._object.getObjectByName("vrcursor") !== undefined)
+    {
+        return;
+    }
+
     var material = new THREE.MeshBasicMaterial(
     {
         color: this._config.cursor.color,
         opacity: this._config.cursor.opacity,
+        side: THREE.DoubleSide,
         transparent: true
     });
 
     var ring = new THREE.Mesh(this._createRingGeometry(this._config.cursor.innerRadius, this._config.cursor.outerRadius), material);
-    ring.name = "cursor";
+    ring.name = "vrcursor";
+    ring.renderOrder = 1;
+    ring.scale.set(0.02, 0.02, 0.02);
 
     this._object.add(ring);
 };
@@ -143,7 +169,7 @@ FORGE.CameraGaze.prototype._updateProgressRing = function(progress)
 {
     this._progress = progress;
 
-    this._destroyRing("progress");
+    this._destroyRing("vrprogress");
 
     this._createProgress();
 };
@@ -155,6 +181,8 @@ FORGE.CameraGaze.prototype._updateProgressRing = function(progress)
  */
 FORGE.CameraGaze.prototype._createProgress = function()
 {
+    this.log("create progress");
+
     var material = new THREE.MeshBasicMaterial(
     {
         color: this._config.progress.color,
@@ -164,9 +192,13 @@ FORGE.CameraGaze.prototype._createProgress = function()
     });
 
     var thetaLength = (this._progress / 100) * FORGE.Math.TWOPI;
+    var geometry = this._createRingGeometry(this._config.progress.innerRadius, this._config.progress.outerRadius, 32, 1, (Math.PI / 2), thetaLength);
 
-    var ring = new THREE.Mesh(this._createRingGeometry(this._config.progress.innerRadius, this._config.progress.outerRadius, 32, 1, (Math.PI / 2), thetaLength), material);
-    ring.name = "progress";
+    var ring = new THREE.Mesh(geometry, material);
+    ring.renderOrder = 2;
+    ring.material.depthTest = false;
+    ring.name = "vrprogress";
+    ring.scale.set(0.02, 0.02, 0.02);
     ring.rotateY(Math.PI);
 
     this._object.add(ring);
@@ -180,23 +212,15 @@ FORGE.CameraGaze.prototype._createProgress = function()
  */
 FORGE.CameraGaze.prototype._destroyRing = function(name)
 {
-    var ring = null;
+    this.log("destroy ring " + name);
 
-    for (var i = 0, ii = this._object.children.length; i < ii; i++)
+    var ring = this._object.getObjectByName(name);
+    if (ring === undefined)
     {
-        if (this._object.children[i].name === name)
-        {
-            ring = this._object.children[i];
-        }
+        return;
     }
 
-    if (ring !== null)
-    {
-        this._object.remove(ring);
-
-        ring.geometry.dispose();
-        ring.material.dispose();
-    }
+    FORGE.Utils.destroyMesh(ring);
 };
 
 /**
@@ -206,9 +230,11 @@ FORGE.CameraGaze.prototype._destroyRing = function(name)
  */
 FORGE.CameraGaze.prototype._timerCompleteHandler = function()
 {
-    this.stop();
+    this.log("timer complete, call click");
 
-    this._viewer.renderer.pickingManager.click();
+    this._clickInterface.click();
+
+    this.stop();
 };
 
 /**
@@ -220,25 +246,35 @@ FORGE.CameraGaze.prototype.load = function(config)
 {
     this._config = config;
 
-    this._destroyRing("progress");
-    this._destroyRing("cursor");
+    this._destroyRing("vrprogress");
 
-    this._createCursor();
-
-    if (this._hovering === true && this._progress !== 0)
+    if (this._object.getObjectByName("vrcursor") === undefined)
     {
-        this._createProgress();
+        this._createCursor("vrcursor");
     }
 };
 
 /**
  * Starts the gaze timer, this is called from the raycaster.
  * @method FORGE.CameraGaze#start
+ * @param {FORGE.BaseObject} interface - interface implementing click method
  */
-FORGE.CameraGaze.prototype.start = function()
+FORGE.CameraGaze.prototype.start = function(interface)
 {
-    this.log("startGazeAnimation");
+    if (this._viewer.vr === false)
+    {
+        return;
+    }
 
+    this.log("start");
+
+    if (typeof interface.click === "undefined")
+    {
+        this.log("Interface cannot trigger click, gaze rejected.");
+        return;
+    }
+
+    this._clickInterface = interface;
     this._hovering = true;
 
     this._updateProgressRing(0);
@@ -259,24 +295,17 @@ FORGE.CameraGaze.prototype.start = function()
  */
 FORGE.CameraGaze.prototype.stop = function()
 {
-    this.log("stopGazeAnimation");
+    this.log("stop");
 
     this._hovering = false;
+    this._clickInterface = null;
 
     this._timer.stop();
     this._timerEvent = null;
 
     this._progress = 0;
 
-    var ring = this._object.children[1];
-
-    if (typeof ring !== "undefined" && ring !== null)
-    {
-        this._object.remove(ring);
-
-        ring.geometry.dispose();
-        ring.material.dispose();
-    }
+    this._destroyRing("vrprogress");
 };
 
 /**
@@ -302,22 +331,8 @@ FORGE.CameraGaze.prototype.destroy = function()
 {
     this.stop();
 
-    if (this._object !== null)
-    {
-        if (typeof this._object.geometry !== "undefined" && this._object.geometry !== null)
-        {
-            this._object.geometry.dispose();
-        }
-
-        if (typeof this._object.material !== "undefined" && this._object.material !== null)
-        {
-            this._object.material.dispose();
-        }
-
-        this._object = null;
-    }
-
-    this._scene = null;
+    this._clickInterface = null;
+    this._object = null;
 };
 
 /**
@@ -344,7 +359,7 @@ Object.defineProperty(FORGE.CameraGaze.prototype, "visible",
  * 3D object
  * @name FORGE.CameraGaze#object
  * @readonly
- * @type {THREE.Mesh}
+ * @type {THREE.Object3D}
  */
 Object.defineProperty(FORGE.CameraGaze.prototype, "object",
 {
@@ -354,3 +369,4 @@ Object.defineProperty(FORGE.CameraGaze.prototype, "object",
         return this._object;
     }
 });
+
