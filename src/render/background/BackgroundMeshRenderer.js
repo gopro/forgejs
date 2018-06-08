@@ -98,6 +98,7 @@ FORGE.BackgroundMeshRenderer.prototype._createMesh = function()
     var material = this._createMaterial();
 
     this._mesh = new THREE.Mesh(geometry, material);
+    this._mesh.name = "Background Mesh";
 
     this._scene.add(this._mesh);
 };
