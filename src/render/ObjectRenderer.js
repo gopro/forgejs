@@ -190,6 +190,9 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
         var material = object.material;
         var mesh = object.mesh;
 
+        // Disable frustum culling in VR
+        mesh.frustumCulled = !this._viewer.vr;
+
         if(object.alive === false)
         {
             return;
@@ -214,6 +217,10 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
             // Assign the right material reference
             var shaderType = material.type === FORGE.HotspotMaterial.types.GRAPHICS ? FORGE.ObjectMaterialType.COLOR : FORGE.ObjectMaterialType.MAP;
             var objectMaterial = this._viewer.renderer.materials.get(view.type, shaderType, material.transparent);
+            if (typeof mesh.material !== "undefined" && mesh.material !== null)
+            {
+                mesh.material.dispose();
+            }
             mesh.material = objectMaterial.shaderMaterial;
         }
 
@@ -237,11 +244,11 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
 
     // If scene is active and viewport is active and there are pickable objects
     // @todo add a test for scene active (this._viewer.activeScene === this._scene)
-    if (this._viewer.renderer.activeViewport === viewport &&
-        pickable.length > 0)
-    // if (this._viewer.story.scene.activeViewport === viewport && pickable.length > 0)
+    // if (this._viewer.renderer.activeViewport === viewport && pickable.length > 0)
+    // if (this._viewer.renderer.activeViewport === viewport)
+    if (this._viewer.renderer.activeViewport === viewport && pickable.length > 0)
     {
-        this._picking.render(viewport);
+        this._picking.update(viewport);
     }
 
     // Update viewport and view references for checks in the next call
