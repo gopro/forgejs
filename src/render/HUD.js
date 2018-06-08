@@ -5,9 +5,9 @@
  * @param {FORGE.Viewer} viewer - reference on the viewer.
  * @extends {FORGE.Scene3D}
  */
-FORGE.HUD = function(viewer)
+FORGE.HUD = function(viewer, interactive)
 {
-    FORGE.Scene3D.call(this, viewer, "HUD");
+    FORGE.Scene3D.call(this, viewer, interactive, "HUD");
 };
 
 FORGE.HUD.prototype = Object.create(FORGE.Scene3D.prototype);
@@ -24,9 +24,9 @@ FORGE.HUD.prototype._boot = function()
 
     this._scene.name = "HUD-" + this._scene.id;
 
-    var geometry = new THREE.SphereBufferGeometry(1, 4, 4);
-    var material = new THREE.MeshBasicMaterial({transparent:true, opacity:0.0, side: THREE.DoubleSide, depthTest:false});
-    this._object = new THREE.Mesh(geometry, material);
+    this._object = new THREE.Object3D();
+    this._object.name = "HUD container";
+
     this._object.matrixAutoUpdate = false;
     this._object.frustumCulled = false;
     this._object.renderOrder = 1;
@@ -42,6 +42,19 @@ FORGE.HUD.prototype._boot = function()
  */
 FORGE.HUD.prototype._sceneBeforeRender = function(renderer, scene, camera)
 {
+    if (this._viewer.vr === true && camera.isArrayCamera)
+    {
+        var position = new THREE.Vector3();
+        var scale = new THREE.Vector3();
+        var quaternion = new THREE.Quaternion();
+
+        camera.cameras[0].matrixWorld.decompose( position, quaternion, scale );
+        var rotation = new THREE.Matrix4().makeRotationFromQuaternion( quaternion );
+        this._object.matrix.copy(rotation);
+        this._object.updateMatrixWorld();
+    }
+
+    FORGE.Scene3D.prototype._sceneBeforeRender.call(this, renderer, scene, camera);
 };
 
 /**
@@ -51,7 +64,10 @@ FORGE.HUD.prototype._sceneBeforeRender = function(renderer, scene, camera)
  */
 FORGE.HUD.prototype._raycast = function(position, action)
 {
-    FORGE.Scene3D.prototype._raycast.call(this, position, action, this._object.children);
+    if (this._object.children.length > 0)
+    {
+        FORGE.Scene3D.prototype._raycast.call(this, position, action, this._object.children);
+    }
 };
 
 /**
@@ -92,7 +108,11 @@ FORGE.HUD.prototype.add = function(object)
 
         mesh.frustumCulled = false;
         mesh.renderOrder = this._object.renderOrder;
-        mesh.material.depthTest = false;
+
+        if (mesh.isMesh)
+        {
+            mesh.material.depthTest = false;
+        }
 
     }.bind(this));
 
@@ -110,9 +130,25 @@ FORGE.HUD.prototype.render = function()
         return;
     }
 
-    this._object.matrix.copy(this._cameraRef.matrixWorld);
-    this._object.updateMatrixWorld();
+    // In VR camera is not updated with VR Pose object. Only internal
+    // WebVRManager cameras are up to date
+    if (this._viewer.vr === false)
+    {
+        this._object.matrix.copy(this._cameraRef.matrixWorld);
+        this._object.updateMatrixWorld();
+    }
 
     FORGE.Scene3D.prototype.render.call(this);
+};
+
+/**
+ * Destroy routine
+ * @method FORGE.HUD#destroy
+ */
+FORGE.HUD.prototype.destroy = function()
+{
+    this._object = null;
+
+    FORGE.Scene3D.prototype.destoy.call(this);
 };
 
