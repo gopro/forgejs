@@ -6,7 +6,7 @@
  * @param {string=} className - Class name for objects that extends Object3D
  * @extends {FORGE.BaseObject}
  */
-FORGE.Scene3D = function(viewer, className)
+FORGE.Scene3D = function(viewer, interactive, className)
 {
     /**
      * The viewer reference.
@@ -15,6 +15,14 @@ FORGE.Scene3D = function(viewer, className)
      * @private
      */
     this._viewer = viewer;
+
+    /**
+     * True if scene is interactive, i.e. needs a raycaster
+     * @name FORGE.Scene3D#_interactive
+     * @type {boolean}
+     * @private
+     */
+    this._interactive = typeof interactive === "boolean" ? interactive : true;
 
     /**
      * 3D scene
@@ -49,16 +57,22 @@ FORGE.Scene3D = function(viewer, className)
     this._raycaster = null;
 
     /**
-     * Object intersected by raycast.
-     * @name FORGE.Scene3D#_intersected
+     * Object hovered by raycast.
+     * @name FORGE.Scene3D#_hovered
      * @type {THREE.Object3D}
      * @private
      */
-    this._intersected = null;
+    this._hovered = null;
 
+    /**
+     * Camera gaze reference.
+     * @name FORGE.Scene3D#_gaze
+     * @type {FORGE.CameraGaze}
+     * @private
+     */
     this._gaze = null;
 
-    FORGE.BaseObject.call(this, className);
+    FORGE.BaseObject.call(this, className || "Scene3D");
 
     this._boot();
 };
@@ -83,9 +97,12 @@ FORGE.Scene3D.prototype._boot = function()
     this._scene.onBeforeRender = this._sceneBeforeRender.bind(this);
     this._scene.onAfterRender = this._sceneAfterRender.bind(this);
 
-    this._raycaster = new THREE.Raycaster();
-    this._viewer.canvas.pointer.onTap.add(this._tapHandler, this);
-    this._viewer.canvas.pointer.onMove.add(this._moveHandler, this);
+    if (this._interactive)
+    {
+        this._raycaster = new THREE.Raycaster();
+        this._viewer.canvas.pointer.onTap.add(this._tapHandler, this);
+        this._viewer.canvas.pointer.onMove.add(this._moveHandler, this);
+    }
 };
 
 /**
@@ -121,8 +138,13 @@ FORGE.Scene3D.prototype._moveHandler = function(event)
  * @method FORGE.Scene3D#_sceneBeforeRender
  * @private
  */
-FORGE.Scene3D.prototype._sceneBeforeRender = function()
+FORGE.Scene3D.prototype._sceneBeforeRender = function(renderer, scene, camera)
 {
+    // VR needs a constant raycast for interactive scenes
+    if (this._interactive && this._viewer.vr)
+    {
+        this._raycast(new THREE.Vector2(0, 0), "over", null, camera);
+    }
 };
 
 /**
@@ -176,81 +198,118 @@ FORGE.Scene3D.prototype._sceneUnloadStartHandler = function()
  * @param {THREE.Vector2} position - raycast screen position (coords in -1 .. +1)
  * @param {string} action - requested action (click, move)
  * @param {Array<THREE.Object3D>} objects - objects with possible ray intersection (scene children if undefined)
+ * @param {THREE.Camera} camera - camera
  */
-FORGE.Scene3D.prototype._raycast = function(position, action, objects)
+FORGE.Scene3D.prototype._raycast = function(position, action, objects, camera)
 {
     objects = Array.isArray(objects) ? objects : this._scene.children;
+    camera = camera instanceof THREE.Camera ? camera : this._cameraRef;
 
-    if (this._cameraRef === null || objects.length === 0)
+    if (camera === null || objects.length === 0)
     {
         return;
     }
 
-    this._raycaster.setFromCamera(position, this._cameraRef);
-    var intersects = this._raycaster.intersectObjects(objects, true);
-
-    var currentIntersectedHotspot = null;
-    if (this._intersected !== null)
+    // Compute the ray
+    // In VR, we compute the ray by extracting the rotation from one camera
+    if (this._viewer.vr === true && camera.isArrayCamera)
     {
-        currentIntersectedHotspot = FORGE.UID.get(this._intersected.userData.hotspotUID, "FORGE.Hotspot3D");
-        if (typeof currentIntersectedHotspot === "undefined" || Array.isArray(currentIntersectedHotspot))
-        {
-            currentIntersectedHotspot = null;
-        }
+        var origin = new THREE.Vector3();
+
+        var direction = new THREE.Vector3(0, 0, -1);
+        var position = new THREE.Vector3();
+        var scale = new THREE.Vector3();
+        var quaternion = new THREE.Quaternion();
+
+        camera.cameras[0].matrixWorld.decompose( position, quaternion, scale );
+        direction.applyQuaternion( quaternion );
+
+        this._raycaster.set(origin, direction);
+    }
+    else
+    {
+        this._raycaster.setFromCamera(position, camera);
     }
 
-    if (intersects.length > 0)
+    // Get intersect objects
+    var intersects = this._raycaster.intersectObjects(objects, true);
+
+    // Current state: one hotspot is hovered or not (this._hovered of type FORGE.Hotspot3D)
+
+    // Ray intersects objects or not
+    // If not, trigger out event for hovered if any and erase reference
+    // Else consider first object and get the hotspot
+    // If object is not a hotspot or is not interactive, return
+    // Else compare the hotspot with the hovered reference
+    // If same, trigger click but not over
+    // If different, trigger action for the new one and store hovered reference
+
+    // In VR, gaze starts when a new object is hovered and stops when hovered
+    // reference changes
+
+    if (intersects.length === 0)
+    {
+        if (this._hovered !== null)
+        {
+            this._hovered.out();
+            this._hovered = null;
+
+            if (this._viewer.vr === true)
+            {
+                this._gaze.stop();
+            }
+        }
+    }
+    else
     {
         var object = intersects[0].object;
-
-        var hotspot = FORGE.UID.get(object.userData.hotspotUID, "FORGE.Hotspot3D");
-        if (hotspot !== undefined && Array.isArray(hotspot) === false)
+        var hotspot = FORGE.UID.get(intersects[0].object.userData.hotspotUID, "FORGE.Hotspot3D");
+        if (hotspot === undefined || Array.isArray(hotspot) || hotspot.interactive === false)
         {
-           hotspot[action].call(hotspot);
-        }
-
-        if (this._intersected !== object)
-        {
-            if (currentIntersectedHotspot !== null)
+            if (this._viewer.vr === true)
             {
-               currentIntersectedHotspot.out();
+                this._gaze.stop();
             }
 
-            this._intersected = object;
+            if (this._hovered !== null)
+            {
+                this._hovered.out();
+                this._hovered = null;
+            }
+
+            return;
+        }
+
+        if (hotspot === this._hovered)
+        {
+            if (action === "click")
+            {
+                hotspot.click();
+            }
+        }
+        else
+        {
+            if (this._hovered !== null)
+            {
+                this._hovered.out();
+            }
+
+            hotspot[action]();
+            this._hovered = hotspot;
 
             if (this._viewer.vr === true)
             {
                 this._gaze.start(this);
             }
         }
-
-        // this.log("Raycast intersection : " + object.id);
-    }
-    else
-    {
-        if (this._intersected !== null)
-        {
-            if (currentIntersectedHotspot !== null)
-            {
-               currentIntersectedHotspot.out();
-            }
-
-            this._intersected = null;
-        }
-
-        if (this._viewer.vr === true)
-        {
-            this._gaze.stop();
-        }
     }
 };
 
 FORGE.Scene3D.prototype.click = function()
 {
-    var hotspot = FORGE.UID.get(this._intersected.userData.hotspotUID);
-    if (hotspot !== undefined && typeof hotspot.click === "function")
+    if (this._hovered !== null && typeof this._hovered.click === "function")
     {
-        hotspot.click();
+        this._hovered.click();
     }
 };
 
@@ -302,8 +361,12 @@ FORGE.Scene3D.prototype.render = function()
 FORGE.Scene3D.prototype.destroy = function()
 {
     this._viewer.story.onSceneLoadComplete.remove(this._sceneLoadCompleteHandler, this);
-    this._viewer.canvas.pointer.onMove.remove(this._moveHandler, this);
-    this._viewer.canvas.pointer.onTap.remove(this._tapHandler, this);
+
+    if (this._interactive)
+    {
+        this._viewer.canvas.pointer.onMove.remove(this._moveHandler, this);
+        this._viewer.canvas.pointer.onTap.remove(this._tapHandler, this);
+    }
 
     while (this._scene.children.length > 0)
     {
@@ -312,7 +375,7 @@ FORGE.Scene3D.prototype.destroy = function()
     }
 
     this._raycaster = null;
-    this._intersected = null;
+    this._hovered = null;
 
     this._renderTargetRef = null;
     this._cameraRef = null;
@@ -348,6 +411,49 @@ Object.defineProperty(FORGE.Scene3D.prototype, "children",
     get: function()
     {
         return this._scene.children;
+    }
+});
+
+/**
+ * Interactive flag
+ * @name FORGE.Scene3D#interactive
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.Scene3D.prototype, "interactive",
+{
+    /** @this {FORGE.Scene3D} */
+    get: function()
+    {
+        return this._interactive;
+    },
+
+    /** @this {FORGE.Scene3D} */
+    set: function(value)
+    {
+        this._interactive = value;
+
+        if (value === false)
+        {
+            if (this._viewer.canvas.pointer.onMove.has(this._moveHandler, this))
+            {
+                this._viewer.canvas.pointer.onMove.remove(this._moveHandler, this);
+            }
+            if (this._viewer.canvas.pointer.onTap.has(this._tapHandler, this))
+            {
+                this._viewer.canvas.pointer.onTap.remove(this._tapHandler, this);
+            }
+        }
+        else
+        {
+            if (this._viewer.canvas.pointer.onMove.has(this._moveHandler, this) === false)
+            {
+                this._viewer.canvas.pointer.onMove.add(this._moveHandler, this);
+            }
+            if (this._viewer.canvas.pointer.onTap.has(this._tapHandler, this) === false)
+            {
+                this._viewer.canvas.pointer.onTap.add(this._tapHandler, this);
+            }
+        }
     }
 });
 
