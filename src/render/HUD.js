@@ -3,11 +3,12 @@
  *
  * @constructor FORGE.HUD
  * @param {FORGE.Viewer} viewer - reference on the viewer.
+ * @param {Scene3DConfig} config - scene configuration.
  * @extends {FORGE.Scene3D}
  */
-FORGE.HUD = function(viewer, interactive)
+FORGE.HUD = function(viewer, config)
 {
-    FORGE.Scene3D.call(this, viewer, interactive, "HUD");
+    FORGE.Scene3D.call(this, viewer, config, "HUD");
 };
 
 FORGE.HUD.prototype = Object.create(FORGE.Scene3D.prototype);

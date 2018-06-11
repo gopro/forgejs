@@ -51,6 +51,22 @@ FORGE.Renderer = function(viewer)
     this._materialPool = null;
 
     /**
+     * 3D scenes array
+     * @name FORGE.Renderer#_scenes3D
+     * @type {Array<FORGE.Scene3D>}
+     * @private
+     */
+    this._scenes3D = null;
+
+    /**
+     * Scene hosting the camera gaze for VR pointing
+     * @name FORGE.Renderer#_gazeScene
+     * @type {FORGE.HUD}
+     * @private
+     */
+    this._gazeScene = null;
+
+    /**
      * Active viewport has changed
      * @name FORGE.Renderer#_onActiveViewportChange
      * @type {FORGE.EventDispatcher}
@@ -91,7 +107,37 @@ FORGE.Renderer.prototype._boot = function()
 
     this._screenRenderer = new FORGE.ScreenRenderer(this._viewer);
 
+    this._scenes3D = [];
+
+    this._gazeScene = new FORGE.HUD(this._viewer);
+
     this._viewer.onConfigLoadComplete.add(this._onViewerConfigLoadComplete, this, 1000);
+
+    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
+};
+
+/**
+ * Scene load complete event handler
+ * @method FORGE.Renderer#_sceneLoadCompleteHandler
+ * @param {FORGE.Event} event - event
+ * @private
+ */
+FORGE.Renderer.prototype._sceneLoadCompleteHandler = function(event)
+{
+    this._viewer.story.scene.onUnloadStart.add(this._sceneUnloadStartHandler, this);
+    this._gazeScene.add(this._viewer.camera.gaze.object);
+};
+
+/**
+ * Scene unload start event handler
+ * @method FORGE.Renderer#_sceneUnloadStartHandler
+ * @param {FORGE.Event} event - event
+ * @private
+ */
+FORGE.Renderer.prototype._sceneUnloadStartHandler = function(event)
+{
+    this._viewer.scene.onUnloadStart.remove(this._sceneUnloadStartHandler, this);
+    this._gazeScene.clear();
 };
 
 /**
@@ -137,7 +183,62 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
 FORGE.Renderer.prototype.render = function()
 {
     this._sceneRendererPool.render();
+
+    for (var i = 0; i<this._scenes3D.length; i++)
+    {
+        this._scenes3D[i].render();
+    }
+
+    if (this._viewer.vr)
+    {
+        this._gazeScene.render();
+    }
+
     this._screenRenderer.render();
+};
+
+/**
+ * Create and get a 3D scene
+ * @method FORGE.Renderer#createScene3D
+ * @param {Scene3DConfig} config - scene3D class name (Scene3D by default)
+ * @return {FORGE.Scene3D} new scene
+ */
+FORGE.Renderer.prototype.createScene3D = function(config)
+{
+    var type = "Scene3D";
+    if (typeof config !== "undefined")
+    {
+        type = typeof config.type === "string" && typeof FORGE[config.type] === "function" ? config.type : type;
+    }
+
+    var scene = new FORGE[type](this._viewer, config);
+    this._scenes3D.push(scene);
+
+    return scene;
+};
+
+/**
+ * Remove and destroy a 3D scene
+ * @method FORGE.Renderer#destroyScene3D
+ * @param {FORGE.Scene} scene - scene
+ * @return {boolean} true if scene has been found and destroyed, false otherwise
+ */
+FORGE.Renderer.prototype.destroyScene3D = function(scene)
+{
+    var idx = this._scenes3D.findIndex(function(element)
+    {
+        return scene.uid === element.uid;
+    });
+
+    if (idx === -1)
+    {
+        return false;
+    }
+
+    this._scenes3D.slice(idx, 1);
+    scene.destroy();
+
+    return true;
 };
 
 /**
@@ -159,12 +260,23 @@ FORGE.Renderer.prototype.notifyActiveViewportChange = function()
 FORGE.Renderer.prototype.destroy = function()
 {
     this._viewer.onConfigLoadComplete.remove(this._onViewerConfigLoadComplete, this);
+    this._viewer.story.onSceneLoadComplete.remove(this._sceneLoadCompleteHandler, this);
+    this._viewer.story.scene.onUnloadStart.remove(this._sceneUnloadStartHandler, this);
 
     if (this._onActiveViewportChange !== null)
     {
         this._onActiveViewportChange.destroy();
         this._onActiveViewportChange = null;
     }
+
+    while (this._scenes3D.length > 0)
+    {
+        this._scenes3D.pop().destroy();
+    }
+    this._scenes3D = null;
+
+    this._gazeScene.destroy();
+    this._gazeScene = null;
 
     this._webGLRenderer.dispose();
     this._webGLRenderer = null;
@@ -238,6 +350,34 @@ Object.defineProperty(FORGE.Renderer.prototype, "materials",
     get: function()
     {
         return this._materialPool;
+    }
+});
+
+/**
+ * Get the 3D scene.
+ * @name FORGE.Renderer#scene3D
+ * @type {THREE.Scene}
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "scene3D",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._scene3D;
+    }
+});
+
+/**
+ * Get the HUD scene.
+ * @name FORGE.Renderer#hud
+ * @type {THREE.Scene}
+ */
+Object.defineProperty(FORGE.Renderer.prototype, "hud",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        return this._hud;
     }
 });
 

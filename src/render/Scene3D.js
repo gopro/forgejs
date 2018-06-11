@@ -3,10 +3,11 @@
  *
  * @constructor FORGE.Scene3D
  * @param {FORGE.Viewer} viewer - reference on the viewer.
+ * @param {Scene3DConfig} config - scene configuration.
  * @param {string=} className - Class name for objects that extends Object3D
  * @extends {FORGE.BaseObject}
  */
-FORGE.Scene3D = function(viewer, interactive, className)
+FORGE.Scene3D = function(viewer, config, className)
 {
     /**
      * The viewer reference.
@@ -17,12 +18,30 @@ FORGE.Scene3D = function(viewer, interactive, className)
     this._viewer = viewer;
 
     /**
-     * True if scene is interactive, i.e. needs a raycaster
+     * Scene configuration.
+     * @name FORGE.Scene3D#_config
+     * @type {Scene3DConfig}
+     * @private
+     */
+    this._config = typeof config !== "undefined" ? config : {};
+
+    /**
+     * Interactive flag
+     * Default value: false
      * @name FORGE.Scene3D#_interactive
      * @type {boolean}
      * @private
      */
-    this._interactive = typeof interactive === "boolean" ? interactive : true;
+    this._interactive = true;
+
+    /**
+     * Render flag
+     * Default value: true
+     * @name FORGE.Scene3D#_render
+     * @type {boolean}
+     * @private
+     */
+    this._render = true;
 
     /**
      * 3D scene
@@ -81,6 +100,18 @@ FORGE.Scene3D.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.Scene3D.prototype.constructor = FORGE.Scene3D;
 
 /**
+ * Parse configuration
+ * @method FORGE.Scene3D#_parseConfig
+ * @param {Scene3DConfig} config - scene configuration
+ * @private
+ */
+FORGE.Scene3D.prototype._parseConfig = function(config)
+{
+    this._interactive = typeof config.interactive === "boolean" ? config.interactive : false;
+    this._render = typeof config.enabled === "boolean" ? config.enabled : true;
+};
+
+/**
  * Boot routine
  * @method FORGE.Scene3D#_boot
  * @private
@@ -89,7 +120,7 @@ FORGE.Scene3D.prototype._boot = function()
 {
     this._register();
 
-    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
+    this._parseConfig(this._config);
 
     this._scene = new THREE.Scene();
     this._scene.frustumCulled = false;
@@ -97,12 +128,46 @@ FORGE.Scene3D.prototype._boot = function()
     this._scene.onBeforeRender = this._sceneBeforeRender.bind(this);
     this._scene.onAfterRender = this._sceneAfterRender.bind(this);
 
+    this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
+
     if (this._interactive)
     {
-        this._raycaster = new THREE.Raycaster();
-        this._viewer.canvas.pointer.onTap.add(this._tapHandler, this);
+        this._addHandlers();
+    }
+};
+
+/**
+ * Add event handlers for interactivity
+ * @method FORGE.Scene3D#_addHandlers
+ * @private
+ */
+FORGE.Scene3D.prototype._addHandlers = function()
+{
+    if (this._viewer.canvas.pointer.onMove.has(this._moveHandler, this) === false)
+    {
         this._viewer.canvas.pointer.onMove.add(this._moveHandler, this);
     }
+
+    if (this._viewer.canvas.pointer.onTap.has(this._tapHandler, this) === false)
+    {
+        this._viewer.canvas.pointer.onTap.add(this._tapHandler, this);
+    }
+
+    if (this._raycaster === null)
+    {
+        this._raycaster = new THREE.Raycaster();
+    }
+};
+
+/**
+ * Remove event handlers for interactivity
+ * @method FORGE.Scene3D#_removeHandlers
+ * @private
+ */
+FORGE.Scene3D.prototype._removeHandlers = function()
+{
+    this._viewer.canvas.pointer.onMove.remove(this._moveHandler, this);
+    this._viewer.canvas.pointer.onTap.remove(this._tapHandler, this);
 };
 
 /**
@@ -344,7 +409,7 @@ FORGE.Scene3D.prototype.add = function(object)
  */
 FORGE.Scene3D.prototype.render = function()
 {
-    if (this._cameraRef === null)
+    if (this._render === false || this._cameraRef === null)
     {
         return;
     }
@@ -362,11 +427,7 @@ FORGE.Scene3D.prototype.destroy = function()
 {
     this._viewer.story.onSceneLoadComplete.remove(this._sceneLoadCompleteHandler, this);
 
-    if (this._interactive)
-    {
-        this._viewer.canvas.pointer.onMove.remove(this._moveHandler, this);
-        this._viewer.canvas.pointer.onTap.remove(this._tapHandler, this);
-    }
+    this._removeHandlers();
 
     while (this._scene.children.length > 0)
     {
@@ -432,28 +493,34 @@ Object.defineProperty(FORGE.Scene3D.prototype, "interactive",
     {
         this._interactive = value;
 
-        if (value === false)
+        if (value === true)
         {
-            if (this._viewer.canvas.pointer.onMove.has(this._moveHandler, this))
-            {
-                this._viewer.canvas.pointer.onMove.remove(this._moveHandler, this);
-            }
-            if (this._viewer.canvas.pointer.onTap.has(this._tapHandler, this))
-            {
-                this._viewer.canvas.pointer.onTap.remove(this._tapHandler, this);
-            }
+            this._addHandlers();
         }
         else
         {
-            if (this._viewer.canvas.pointer.onMove.has(this._moveHandler, this) === false)
-            {
-                this._viewer.canvas.pointer.onMove.add(this._moveHandler, this);
-            }
-            if (this._viewer.canvas.pointer.onTap.has(this._tapHandler, this) === false)
-            {
-                this._viewer.canvas.pointer.onTap.add(this._tapHandler, this);
-            }
+            this._removeHandlers();
         }
+    }
+});
+
+/**
+ * Enabled flag
+ * @name FORGE.Scene3D#enabled
+ * @type {boolean}
+ */
+Object.defineProperty(FORGE.Scene3D.prototype, "enabled",
+{
+    /** @this {FORGE.Scene3D} */
+    get: function()
+    {
+        return this._render;
+    },
+
+    /** @this {FORGE.Scene3D} */
+    set: function(value)
+    {
+        this._render = value;
     }
 });
 
