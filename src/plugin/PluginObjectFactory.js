@@ -234,10 +234,10 @@ FORGE.PluginObjectFactory.prototype.button = function(config)
  * @param {?(string|FORGE.VideoQuality|Array<(FORGE.VideoQuality|string)>)=} config - The video configuration object
  * @param {string=} streaming - The video streaming format. Can be "HTML5" or "DASH".
  * @param {string=} qualityMode - The video quality mode. Can be "auto" or "manual".
- * @param {boolean=} ambisonic - 3D sound including ambisonics. For "HTML5" video only.
+ * @param {number=} ambisonicOrder - Ambisonic order to use for FOA/HOA renderer. For "HTML5" video only.
  * @return {(FORGE.VideoHTML5|FORGE.VideoDash)} Returns the created FORGE.Video object.
  */
-FORGE.PluginObjectFactory.prototype.video = function(key, config, streaming, qualityMode, ambisonic)
+FORGE.PluginObjectFactory.prototype.video = function(key, config, streaming, qualityMode, ambisonicOrder)
 {
     var video;
 
@@ -247,7 +247,7 @@ FORGE.PluginObjectFactory.prototype.video = function(key, config, streaming, qua
     }
     else
     {
-        video = new FORGE.VideoHTML5(this._viewer, key, config, qualityMode, ambisonic);
+        video = new FORGE.VideoHTML5(this._viewer, key, config, qualityMode, ambisonicOrder);
     }
 
     video.onDestroy.addOnce(this._destroyObjectHandler, this);
