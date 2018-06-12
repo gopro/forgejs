@@ -394,6 +394,16 @@ FORGE.Scene3D.prototype.clear = function()
  */
 FORGE.Scene3D.prototype.add = function(object)
 {
+    if (arguments.length > 1)
+    {
+        for (var i=0; i<arguments.length; i++)
+        {
+            this.add(arguments[i]);
+        }
+
+        return
+    }
+
     var mesh = object;
     if (object instanceof FORGE.Object3D)
     {

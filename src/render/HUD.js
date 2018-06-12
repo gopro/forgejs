@@ -99,6 +99,16 @@ FORGE.HUD.prototype.clear = function()
  */
 FORGE.HUD.prototype.add = function(object)
 {
+    if (arguments.length > 1)
+    {
+        for (var i=0; i<arguments.length; i++)
+        {
+            this.add(arguments[i]);
+        }
+
+        return
+    }
+
     object.traverse(function(mesh)
     {
         if (typeof mesh.userData.hotspotUID !== "undefined")
@@ -117,7 +127,7 @@ FORGE.HUD.prototype.add = function(object)
 
     }.bind(this));
 
-    this._object.add(object);
+    this._object.add(object)
 };
 
 /**
