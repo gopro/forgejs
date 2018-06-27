@@ -110,11 +110,11 @@ FORGE.SceneRenderer.prototype.destroy = function()
         this._renderTarget = null;
     }
 
-    this._viewportManager.destroy();
-    this._viewportManager = null;
-
     this._objectRenderer.destroy();
     this._objectRenderer = null;
+
+    this._viewportManager.destroy();
+    this._viewportManager = null;
 
     this._viewer = null;
 };
