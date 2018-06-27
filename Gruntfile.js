@@ -65,6 +65,10 @@ module.exports = function(grunt)
         "src/render/SceneLoader.js",
         "src/render/SceneRenderer.js",
         "src/render/SceneRendererPool.js",
+        "src/render/Scene3D.js",
+        "src/render/DockScene3D.js",
+        "src/render/HUD.js",
+        "src/render/HUDOrthographic.js",
 
         "src/transition/TransitionManager.js",
         "src/transition/TransitionPresets.js",
@@ -105,6 +109,7 @@ module.exports = function(grunt)
 
         "src/3d/Object3D.js",
         "src/3d/Tile.js",
+        "src/3d/TextObject3D.js",
 
         "src/hotspots/HotspotManager.js",
         "src/hotspots/HotspotDOM.js",
