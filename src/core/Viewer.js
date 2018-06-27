@@ -365,6 +365,14 @@ FORGE.Viewer = function(parent, config)
      */
     this._onMainConfigLoadComplete = null;
 
+    /**
+     * Event dispatcher for the on VR change event.
+     * @name  FORGE.Viewer#_onVRChange
+     * @type {FORGE.EventDispatcher}
+     * @private
+     */
+    this._onVRChange = null;
+
     this._boot(config);
 };
 
@@ -959,6 +967,12 @@ FORGE.Viewer.prototype.destroy = function()
     {
         this._onMainConfigLoadComplete.destroy();
         this._onMainConfigLoadComplete = null;
+    }
+
+    if (this._onVRChange !== null)
+    {
+        this._onVRChange.destroy();
+        this._onVRChange = null;
     }
 
     FORGE.VIEWERS.splice(this._uid, 1);
@@ -1608,6 +1622,11 @@ Object.defineProperty(FORGE.Viewer.prototype, "vr",
     set: function(value)
     {
         this._vr = value;
+
+        if (this._onVRChange !== null)
+        {
+            this._onVRChange.dispatch();
+        }
     }
 });
 
@@ -1748,6 +1767,26 @@ Object.defineProperty(FORGE.Viewer.prototype, "onMainConfigLoadComplete",
         }
 
         return this._onMainConfigLoadComplete;
+    }
+});
+
+/**
+ * Get the "onVRChange" {@link FORGE.EventDispatcher} of the viewer.
+ * @name FORGE.Viewer#onVRChange
+ * @readonly
+ * @type {FORGE.EventDispatcher}
+ */
+Object.defineProperty(FORGE.Viewer.prototype, "onVRChange",
+{
+    /** @this {FORGE.Viewer} */
+    get: function()
+    {
+        if (this._onVRChange === null)
+        {
+            this._onVRChange = new FORGE.EventDispatcher(this);
+        }
+
+        return this._onVRChange;
     }
 });
 
