@@ -304,17 +304,17 @@ FORGE.Camera.DEFAULT_CONFIG =
         delay: 2000,
         cursor:
         {
-            innerRadius: 0.02,
-            outerRadius: 0.04,
+            innerRadius: 12,
+            outerRadius: 24,
             color: 0xffffff,
             opacity: 0.5
         },
         progress:
         {
-            innerRadius: 0.02,
-            outerRadius: 0.04,
-            color: 0xff0000,
-            opacity: 0.5
+            innerRadius: 12,
+            outerRadius: 24,
+            color: 0xff3800,
+            opacity: 0.8
         }
     }
 };
