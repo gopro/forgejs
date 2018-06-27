@@ -219,10 +219,17 @@ FORGE.Viewport.prototype._loadViewConfig = function(config)
  */
 FORGE.Viewport.prototype.updateRectangle = function(rectangle)
 {
-    rectangle.w = (this._config.rectangle.width / 100) * this._viewer.width;
-    rectangle.h = (this._config.rectangle.height / 100) * this._viewer.height;
-    rectangle.x = (this._config.rectangle.x / 100) * this._viewer.width;
-    rectangle.y = (this._config.rectangle.y / 100) * this._viewer.height;
+    if (typeof rectangle === "undefined")
+    {
+        rectangle = this._rectangle;
+    }
+
+    var canvas = this._viewer.canvas.dom;
+
+    rectangle.w = (this._config.rectangle.width / 100) * canvas.width;
+    rectangle.h = (this._config.rectangle.height / 100) * canvas.height;
+    rectangle.x = (this._config.rectangle.x / 100) * canvas.width;
+    rectangle.y = (this._config.rectangle.y / 100) * canvas.height;
 };
 
 /**

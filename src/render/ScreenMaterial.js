@@ -112,8 +112,9 @@ FORGE.ScreenMaterial.prototype.update = function()
         this._shaderMaterial.uniforms.tTextureOne.value = renderer.texture;
     }
 
-    this._shaderMaterial.uniforms.tResolution.value.x = this._viewer.width;
-    this._shaderMaterial.uniforms.tResolution.value.y = this._viewer.height;
+    var canvas = this._viewer.canvas.dom;
+    this._shaderMaterial.uniforms.tResolution.value.x = canvas.width;
+    this._shaderMaterial.uniforms.tResolution.value.y = canvas.height;
 };
 
 /**

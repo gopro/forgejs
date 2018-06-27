@@ -85,7 +85,6 @@ FORGE.ScreenRenderer.prototype._boot = function()
 
     this._scene.add(this._quad);
 
-    // this.material = new FORGE.ScreenMaterial(this._viewer);
     this._createMaterial(FORGE.ScreenRenderer.DEFAULT_MATERIAL);
 };
 
@@ -167,8 +166,10 @@ FORGE.ScreenRenderer.prototype.render = function()
 
     this._material.update();
 
-    this._viewer.renderer.webGLRenderer.setViewport(0, 0, this._viewer.width, this._viewer.height);
+    var canvas = this._viewer.canvas.dom;
+
     this._viewer.renderer.webGLRenderer.vr.enabled = false;
+    this._viewer.renderer.webGLRenderer.setViewport(0, 0, canvas.width, canvas.height);
     this._viewer.renderer.webGLRenderer.render(this._scene, this._camera);
 };
 
