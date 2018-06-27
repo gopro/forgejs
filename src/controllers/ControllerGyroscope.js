@@ -146,7 +146,7 @@ FORGE.ControllerGyroscope.prototype._displayChangeHandler = function()
  */
 FORGE.ControllerGyroscope.prototype._viewChangeHandler = function()
 {
-    this._paused = this._viewer.story.scene.activeViewport.sceneRenderer.view.type !== FORGE.ViewType.RECTILINEAR;
+    this._paused = this._viewer.renderer.activeViewport.sceneRenderer.view.type !== FORGE.ViewType.RECTILINEAR;
 };
 
 /**
