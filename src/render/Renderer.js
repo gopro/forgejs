@@ -158,7 +158,7 @@ FORGE.Renderer.prototype._onViewerConfigLoadComplete = function()
     // This subject has been discussed, here is a link to prepare discussion about this setting
     // https://stackoverflow.com/questions/27746091/preservedrawingbuffer-false-is-it-worth-the-effort
     // It may be the responsibility of the user to set in WebGL config in JSON definition
-    options.preserveDrawingBuffer = false;
+    // options.preserveDrawingBuffer = false;
 
     // WebGLRenderer will draw any component supported by WebGL
     try

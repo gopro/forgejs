@@ -175,7 +175,7 @@ FORGE.BackgroundMeshRenderer.prototype._onViewChanged = function()
  */
 FORGE.BackgroundMeshRenderer.prototype.render = function(target)
 {
-    if (this._ready == false)
+    if (this._ready === false)
     {
         return;
     }

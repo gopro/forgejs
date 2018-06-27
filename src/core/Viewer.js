@@ -502,9 +502,6 @@ FORGE.Viewer.prototype._parseMainConfig = function(config)
         this._hotspots.addTracks(config.hotspots);
     }
 
-    // Start the raf
-    // this._raf.start();
-
     // Tadaaaaa!
     if (this._onMainConfigLoadComplete !== null)
     {
