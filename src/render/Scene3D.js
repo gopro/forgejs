@@ -35,6 +35,15 @@ FORGE.Scene3D = function(viewer, config, className)
     this._interactive = true;
 
     /**
+     * Pending interactive flag
+     * Default value: false
+     * @name FORGE.Scene3D#_interactivePending
+     * @type {boolean}
+     * @private
+     */
+    this._interactivePending = false;
+
+    /**
      * Render flag
      * Default value: true
      * @name FORGE.Scene3D#_render
@@ -124,7 +133,7 @@ FORGE.Scene3D.prototype._boot = function()
 
     this._scene = new THREE.Scene();
     this._scene.frustumCulled = false;
-    this._scene.name = "Scene3D-" + this.id;
+    this._scene.name = this._className + "-" + this.id;
     this._scene.onBeforeRender = this._sceneBeforeRender.bind(this);
     this._scene.onAfterRender = this._sceneAfterRender.bind(this);
 
@@ -132,7 +141,14 @@ FORGE.Scene3D.prototype._boot = function()
 
     if (this._interactive)
     {
-        this._addHandlers();
+        if (this._render)
+        {
+            this._addHandlers();
+        }
+        else
+        {
+            this._interactivePending = true;
+        }
     }
 };
 
@@ -205,11 +221,30 @@ FORGE.Scene3D.prototype._moveHandler = function(event)
  */
 FORGE.Scene3D.prototype._sceneBeforeRender = function(renderer, scene, camera)
 {
+    if (this._viewer.vr)
+    {
+        var matrixWorldInverse = camera.isArrayCamera ? camera.cameras[0].matrixWorldInverse : camera.matrixWorldInverse;
+        var euler = FORGE.Math.rotationMatrixToEuler(matrixWorldInverse);
+        this._viewer.camera.lookAt(FORGE.Math.radToDeg(euler.yaw), FORGE.Math.radToDeg(euler.pitch),
+            FORGE.Math.radToDeg(euler.roll));
+    }
+
     // VR needs a constant raycast for interactive scenes
     if (this._interactive && this._viewer.vr)
     {
         this._raycast(new THREE.Vector2(0, 0), "over", null, camera);
     }
+};
+
+/**
+ * Set render property
+ * @method FORGE.Scene3D#_setRender
+ * @param {boolean} value - render value
+ * @private
+ */
+FORGE.Scene3D.prototype._setRender = function(value)
+{
+    this._render = Boolean(value);
 };
 
 /**
@@ -327,9 +362,28 @@ FORGE.Scene3D.prototype._raycast = function(position, action, objects, camera)
     }
     else
     {
-        var object = intersects[0].object;
-        var hotspot = FORGE.UID.get(intersects[0].object.userData.hotspotUID, "FORGE.Hotspot3D");
-        if (hotspot === undefined || Array.isArray(hotspot) || hotspot.interactive === false)
+        // Get first interactive object
+        // var object = intersects[0].object;
+
+        var hotspot = null;
+        var i = 0;
+        while (hotspot === null && i < intersects.length)
+        {
+            var object = intersects[i].object;
+            if (typeof object.userData.hotspotUID !== "undefined")
+            {
+                var hs = FORGE.UID.get(object.userData.hotspotUID, "FORGE.Hotspot3D");
+                if (hs !== undefined && Array.isArray(hs) === false && hs.interactive === true)
+                {
+                    hotspot = hs;
+                }
+            }
+
+            ++i;
+        }
+
+        // var hotspot = FORGE.UID.get(intersects[0].object.userData.hotspotUID, "FORGE.Hotspot3D");
+        if (hotspot === null || hotspot === undefined || Array.isArray(hotspot) || hotspot.interactive === false)
         {
             if (this._viewer.vr === true)
             {
@@ -501,9 +555,9 @@ Object.defineProperty(FORGE.Scene3D.prototype, "interactive",
     /** @this {FORGE.Scene3D} */
     set: function(value)
     {
-        this._interactive = value;
+        this._interactive = Boolean(value);
 
-        if (value === true)
+        if (this._interactive)
         {
             this._addHandlers();
         }
@@ -530,7 +584,22 @@ Object.defineProperty(FORGE.Scene3D.prototype, "enabled",
     /** @this {FORGE.Scene3D} */
     set: function(value)
     {
-        this._render = value;
+        this._setRender(value);
+
+        // Stop or restart interactivity depending according to previous state
+        // Use property setter to ensure all underlying actions are done properly
+        if (this._render === false)
+        {
+            this._interactivePending = this._interactive;
+            this.interactive = false;
+        }
+        else
+        {
+            if (this._interactivePending)
+            {
+                this.interactive = true;
+            }
+        }
     }
 });
 

@@ -23,8 +23,6 @@ FORGE.HUD.prototype._boot = function()
 {
     FORGE.Scene3D.prototype._boot.call(this);
 
-    this._scene.name = "HUD-" + this._scene.id;
-
     this._object = new THREE.Object3D();
     this._object.name = "HUD container";
 
@@ -59,9 +57,10 @@ FORGE.HUD.prototype._sceneBeforeRender = function(renderer, scene, camera)
 };
 
 /**
- * Raycast routine
+ * Raycast
  * @method FORGE.HUD#_raycast
  * @param {THREE.Vector2} position - raycast screen position (coords in -1 .. +1)
+ * @param {string} action - action triggered by raycaster
  */
 FORGE.HUD.prototype._raycast = function(position, action)
 {
@@ -127,7 +126,7 @@ FORGE.HUD.prototype.add = function(object)
 
     }.bind(this));
 
-    this._object.add(object)
+    this._object.add(object);
 };
 
 /**
@@ -160,6 +159,6 @@ FORGE.HUD.prototype.destroy = function()
 {
     this._object = null;
 
-    FORGE.Scene3D.prototype.destoy.call(this);
+    FORGE.Scene3D.prototype.destroy.call(this);
 };
 

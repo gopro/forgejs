@@ -23,9 +23,7 @@ FORGE.HUDOrthographic.prototype._boot = function()
 {
     FORGE.HUD.prototype._boot.call(this);
 
-    this._scene.name = "HUDOrthographic-" + this._scene.id;
-
-    var h = 100;
+    var h = this._viewer.canvas.height;
     var w = h * this._viewer.canvas.width / this._viewer.canvas.height;
 
     var camera = new THREE.OrthographicCamera();
@@ -116,24 +114,25 @@ FORGE.HUDOrthographic.prototype.anchorMesh = function(mesh, anchor)
     var x = mesh.position.x,
         y = mesh.position.y;
 
+    var xOffset = 0.5 * (camWidth - meshSize.x);
+    var yOffset = 0.5 * (camHeight - meshSize.y);
+
     if (anchors.indexOf("right") !== -1)
     {
-        x = 0.5 * (camWidth - meshSize.x);
+        x = xOffset;
     }
-    else
-    if (anchors.indexOf("left") !== -1)
+    else if (anchors.indexOf("left") !== -1)
     {
-        x = -0.5 * (camWidth - meshSize.x);
+        x = -xOffset;
     }
 
     if (anchors.indexOf("top") !== -1)
     {
-        y = 0.5 * (camHeight - meshSize.y);
+        y = yOffset;
     }
-    else
-    if (anchors.indexOf("bottom") !== -1)
+    else if (anchors.indexOf("bottom") !== -1)
     {
-        y = -0.5 * (camHeight - meshSize.y);
+        y = -yOffset;
     }
 
     mesh.position.set(x, y, mesh.position.z);
