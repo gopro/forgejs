@@ -133,7 +133,7 @@ FORGE.Scene3D.prototype._boot = function()
 
     this._scene = new THREE.Scene();
     this._scene.frustumCulled = false;
-    this._scene.name = this._className + "-" + this.id;
+    this._scene.name = this._className + "-" + this._scene.id;
     this._scene.onBeforeRender = this._sceneBeforeRender.bind(this);
     this._scene.onAfterRender = this._sceneAfterRender.bind(this);
 
