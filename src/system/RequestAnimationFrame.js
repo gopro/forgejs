@@ -114,7 +114,7 @@ FORGE.RequestAnimationFrame.prototype.start = function(owner)
             return;
         };
 
-        this._owner.animate(this._onLoop.bind(this));
+        this._owner.setAnimationLoop(this._onLoop.bind(this));
     }
     else if (this._viewer.config.update === "timeout")
     {
@@ -156,7 +156,7 @@ FORGE.RequestAnimationFrame.prototype.stop = function()
 {
     if (this._owner instanceof THREE.WebGLRenderer)
     {
-        this._owner.animate(null);
+        this._owner.setAnimationLoop(null);
     }
     else if (this._isSetTimeOut)
     {
