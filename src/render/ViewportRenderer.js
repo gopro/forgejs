@@ -33,6 +33,14 @@ FORGE.ViewportRenderer = function(viewer, viewport)
     this._backgroundRenderer = null;
 
     /**
+     * Background renderer function reference.
+     * @name FORGE.ViewportRenderer#_backgroundRendererRef
+     * @type {function}
+     * @private
+     */
+    this._backgroundRendererRef = null;
+
+    /**
      * Scene effect Composer.
      * @name FORGE.ViewportRenderer#_composer
      * @type {FORGE.ViewportComposer}
@@ -61,6 +69,20 @@ FORGE.ViewportRenderer.prototype._boot = function()
     {
         this._createComposer();
     }
+
+    this._viewer.onVRChange.add(this._onVRChangeHandler, this);
+};
+
+/**
+ * VR change handler.
+ * @method FORGE.ViewportRenderer#_onVRChangeHandler
+ * @param {FORGE.Event} event - VR change event
+ * @private
+ */
+FORGE.ViewportRenderer.prototype._onVRChangeHandler = function(event)
+{
+    // Recreate background renderer if needed to be VR compatible
+    this._createBackgroundRenderer();
 };
 
 /**
@@ -96,58 +118,72 @@ FORGE.ViewportRenderer.prototype._createComposer = function()
 FORGE.ViewportRenderer.prototype._createBackgroundRenderer = function()
 {
     var media = this._viewport.scene.media;
-    var backgroundRendererRef;
 
-    if (media.type === FORGE.MediaType.UNDEFINED)
+    // Default background renderer when there is no media
+    var backgroundRendererRef = FORGE.BackgroundRenderer;
+
+    if (media.type === FORGE.MediaType.GRID)
     {
-        backgroundRendererRef = FORGE.BackgroundRenderer;
+        backgroundRendererRef = FORGE.BackgroundGridRenderer;
     }
-    else
+
+    // Multi resolution is checked before other meshes as it is a special case of cube format
+    else if (media.type === FORGE.MediaType.TILED)
     {
-        if (media.type === FORGE.MediaType.GRID)
-        {
-            backgroundRendererRef = FORGE.BackgroundGridRenderer;
-        }
+        backgroundRendererRef = FORGE.BackgroundPyramidRenderer;
+    }
 
-        // Multi resolution is checked before other meshes as it is a special case of cube format
-        else if (media.type === FORGE.MediaType.TILED)
+    else if(media.type === FORGE.MediaType.IMAGE || media.type === FORGE.MediaType.VIDEO)
+    {
+        if (media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
         {
-            backgroundRendererRef = FORGE.BackgroundPyramidRenderer;
-        }
-
-        else if(media.type === FORGE.MediaType.IMAGE || media.type === FORGE.MediaType.VIDEO)
-        {
-            if (media.source.format === FORGE.MediaFormat.EQUIRECTANGULAR)
+            // Background shader or mesh with sphere geometry
+            // Default choice: using a shader renderer allows spherical transitions between scenes
+            // Performance fallback: mesh sphere renderer
+            if (this._viewer.vr === true)
             {
-                // Background shader or mesh with sphere geometry
-                // Default choice: using a shader renderer allows spherical transitions between scenes
-                // Performance fallback: mesh sphere renderer
-                if (this._viewport.vr === true)
-                {
-                    backgroundRendererRef = FORGE.BackgroundSphereRenderer;
-                }
-                else
-                {
-                    backgroundRendererRef = FORGE.BackgroundShaderRenderer;
-                }
+                backgroundRendererRef = FORGE.BackgroundSphereRenderer;
             }
-
-            // Flat media format (beware: flat view is another thing)
-            else if (media.source.format === FORGE.MediaFormat.FLAT)
+            else
             {
                 backgroundRendererRef = FORGE.BackgroundShaderRenderer;
             }
+        }
 
-            // Cube: mesh with cube geometry
-            // Todo: add cube texel picking in shader to allow shader renderer usage and support spherical transitions
-            else if (media.source.format === FORGE.MediaFormat.CUBE)
+        // Flat media format (beware: flat view is another thing)
+        else if (media.source.format === FORGE.MediaFormat.FLAT)
+        {
+            if (this._viewer.vr === true)
             {
-                backgroundRendererRef = FORGE.BackgroundCubeRenderer;
+                backgroundRendererRef = FORGE.BackgroundPlaneRenderer;
             }
+            else
+            {
+                backgroundRendererRef = FORGE.BackgroundShaderRenderer;
+            }
+        }
+
+        // Cube: mesh with cube geometry
+        // Todo: add cube texel picking in shader to allow shader renderer usage and support spherical transitions
+        else if (media.source.format === FORGE.MediaFormat.CUBE)
+        {
+            backgroundRendererRef = FORGE.BackgroundCubeRenderer;
         }
     }
 
+    // Destroys the current background renderer if exists and type has changed
+    if (this._backgroundRenderer !== null &&
+        this._backgroundRendererRef !== backgroundRendererRef)
+    {
+        this.log(this._backgroundRenderer.className + " destroyed");
+        this._backgroundRenderer.destroy();
+    }
+
+    this._backgroundRendererRef = backgroundRendererRef;
+
+    // this.log("Create background renderer");
     this._backgroundRenderer = new backgroundRendererRef(this._viewer, this._viewport);
+    this.log(this._backgroundRenderer.className + " created");
 };
 
 /**
@@ -170,27 +206,6 @@ FORGE.ViewportRenderer.prototype._renderToTarget = function(objectRenderer, targ
     this._viewer.renderer.webGLRenderer.vr.enabled = this._viewer.vr;
     this._viewer.renderer.webGLRenderer.clearTarget(target, false, true, false);
     objectRenderer.render(this._viewport, target);
-};
-
-/**
- * Destroy the current background renderer and force a background shader renderer.
- * @method FORGE.ViewportRenderer#switchToShaderRenderer
- * @private
- */
-FORGE.ViewportRenderer.prototype.switchToShaderRenderer = function()
-{
-    // If the current background renderer is not a shader renderer
-    if (this._backgroundRenderer.className !== "BackgroundShaderRenderer")
-    {
-        // Destroys the current background renderer
-        if (this._backgroundRenderer !== null)
-        {
-            this._backgroundRenderer.destroy();
-        }
-
-        // Recreate a background shader renderer
-        this._backgroundRenderer = new FORGE.BackgroundShaderRenderer(this._viewer, this._viewport);
-    }
 };
 
 /**
@@ -219,6 +234,10 @@ FORGE.ViewportRenderer.prototype.render = function(objectRenderer, target)
  */
 FORGE.ViewportRenderer.prototype.destroy = function()
 {
+    this._viewer.onVRChange.remove(this._onVRChangeHandler, this);
+
+    this._backgroundRendererRef = null;
+
     this._config = null;
     this._viewer = null;
 
