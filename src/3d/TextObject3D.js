@@ -131,7 +131,7 @@ FORGE.TextObject3D.prototype._setupMesh = function()
     texture.needsUpdate = true;
 
     this._mesh.material = new THREE.MeshBasicMaterial({map: texture, transparent: true});
-    this._mesh.geometry = new THREE.PlaneGeometry(canvas.width, canvas.height, 2, 2);
+    this._mesh.geometry = new THREE.PlaneBufferGeometry(canvas.width, canvas.height, 2, 2);
 };
 
 /**
