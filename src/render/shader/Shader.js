@@ -85,7 +85,7 @@ FORGE.Shader.prototype._build = function()
     [
         "precision highp float;",
 
-        "varying vec2 vUv;",
+        "varying vec2 vUVCoord;",
 
         "uniform sampler2D tTextureOne;",
         "uniform vec2 tResolution;",
