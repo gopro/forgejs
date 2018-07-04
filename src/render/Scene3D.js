@@ -424,6 +424,10 @@ FORGE.Scene3D.prototype._raycast = function(position, action, objects, camera)
     }
 };
 
+/**
+ * Click method
+ * @method FORGE.Scene3D#click
+ */
 FORGE.Scene3D.prototype.click = function()
 {
     if (this._hovered !== null && typeof this._hovered.click === "function")
