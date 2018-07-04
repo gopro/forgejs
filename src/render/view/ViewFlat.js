@@ -106,6 +106,25 @@ FORGE.ViewFlat.prototype._updateViewParams = function()
 };
 
 /**
+ * Get uniforms definition to inject in shader.
+ *
+ * @method FORGE.ViewFlat#getUniformsDef
+ * @return {string} glsl uniforms definition
+ */
+FORGE.ViewFlat.prototype.getUniformsDef = function()
+{
+    var uList = FORGE.ViewBase.prototype.getUniformsDef.call(this).split("\n");
+
+    return uList.concat([
+        "uniform int tRepeatX;",
+        "uniform int tRepeatY;",
+        "uniform float tYaw;",
+        "uniform float tPitch;",
+        "uniform float tFov;"
+    ]).join("\n");
+};
+
+/**
  * Update uniforms.
  *
  * @method FORGE.ViewFlat#updateUniforms

@@ -57,6 +57,21 @@ FORGE.ViewRectilinear.prototype._updateViewParams = function()
 };
 
 /**
+ * Get uniforms definition to inject in shader.
+ *
+ * @method FORGE.ViewRectilinear#getUniformsDef
+ * @return {string} glsl uniforms definition
+ */
+FORGE.ViewRectilinear.prototype.getUniformsDef = function()
+{
+    var uList = FORGE.ViewBase.prototype.getUniformsDef.call(this).split("\n");
+
+    return uList.concat([
+        "uniform float tProjectionScale;"
+    ]).join("\n");
+};
+
+/**
  * Update uniforms.
  *
  * @method FORGE.ViewRectilinear#updateUniforms

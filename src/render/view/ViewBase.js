@@ -203,6 +203,17 @@ FORGE.ViewBase.prototype._fragmentToScreen = function(fragment)
 };
 
 /**
+ * Get uniforms definition to inject in shader.
+ *
+ * @method FORGE.ViewBase#getUniformsDef
+ * @return {string} glsl uniforms definition
+ */
+FORGE.ViewBase.prototype.getUniformsDef = function()
+{
+    return "";
+};
+
+/**
  * Update uniforms.
  * Abstract method that should be implemented by subclass.
  *
