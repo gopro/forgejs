@@ -10,13 +10,13 @@ uniform sampler2D tTexture;
 uniform int tUseTextureAlpha;
 uniform vec3 tColor;
 
-varying vec2 vUv;
+varying vec2 vUVCoord;
 
 void main()
 {
     if (tUseTextureAlpha == 1)
     {
-        vec4 texel = texture2D( tTexture, vUv );
+        vec4 texel = texture2D( tTexture, vUVCoord );
 
         if (texel.a < 0.001)
         {

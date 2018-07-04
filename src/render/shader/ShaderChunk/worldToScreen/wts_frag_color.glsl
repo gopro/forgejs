@@ -9,7 +9,7 @@
 uniform float tOpacity;
 uniform vec3 tColor;
 
-varying vec2 vUv;
+varying vec2 vUVCoord;
 
 void main()
 {

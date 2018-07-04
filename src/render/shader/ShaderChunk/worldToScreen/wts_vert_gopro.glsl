@@ -15,7 +15,7 @@
 
 uniform float tProjectionDistance;
 
-varying vec2 vUv;
+varying vec2 vUVCoord;
 
 void main()
 {
@@ -27,5 +27,5 @@ void main()
 
     gl_Position = projectionMatrix * spherePt;
 
-    vUv = uv;
+    vUVCoord = uv;
 }

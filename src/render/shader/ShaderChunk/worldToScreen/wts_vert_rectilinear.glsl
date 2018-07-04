@@ -7,11 +7,11 @@
 #include <vert_attributes>
 #include <uniforms>
 
-varying vec2 vUv;
+varying vec2 vUVCoord;
 
 void main()
 {
     vec4 camPt = modelViewMatrix * vec4( position, 1.0 );
     gl_Position = projectionMatrix * camPt;
-    vUv = uv;
+    vUVCoord = uv;
 }
