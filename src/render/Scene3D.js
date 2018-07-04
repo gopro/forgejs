@@ -446,6 +446,100 @@ FORGE.Scene3D.prototype.clear = function()
 };
 
 /**
+ * Called by WebGLRenderer initMaterial method before compiling the material of a mesh
+ * @method FORGE.Scene3D#_materialOnBeforeCompile
+ * @param {THREE.Material} shader - shader object (properties: name, uniforms, vertexShader, fragmentShader)
+ * @param {THREE.WebGLRenderer} renderer - renderer
+ * @private
+ */
+FORGE.Scene3D.prototype._materialOnBeforeCompile = function(shader, renderer)
+{
+    this.log("Material onBeforeCompile");
+
+    var view = this._viewer.view.current;
+
+    // First add new uniforms from the view object
+    var uniforms = view.getUniformsDef();
+    shader.vertexShader = uniforms + "\n" + shader.vertexShader;
+
+    // Then get the shader material with this view and extract the vertex shader code
+    // to inject it in final shader
+    var objMaterial = this._viewer.renderer.materials.get(
+        view.type,
+        FORGE.ObjectMaterialType.MAP,
+        true);
+
+    var src_pattern = /\#include \<project_vertex\>/g;
+    var project = objMaterial.shaderMaterial.vertexShader.split("main")[1].split("}")[0].split("{")[1];
+    shader.vertexShader = shader.vertexShader.replace(src_pattern, project);
+};
+
+/**
+ * Update uniforms values for the object updated with Forge material specifics
+ * Called by WebGLRenderer before rendering the object
+ * @method FORGE.Scene3D#_meshOnBeforeRender
+ * @param {THREE.WebGLRenderer} renderer - renderer
+ * @param {THREE.Scene} scene - scene
+ * @param {THREE.Camera} camera - camera
+ * @param {THREE.Geometry} geometry - geometry
+ * @param {THREE.Material} material - material
+ * @param {THREE.Group} group - group
+ * @private
+ */
+FORGE.Scene3D.prototype._meshOnBeforeRender = function(renderer, scene, camera, geometry, material, group)
+{
+    if (typeof material.program === "undefined")
+    {
+        return;
+    }
+
+    var gl = this._viewer.renderer.webGLRenderer.getContext();
+    gl.useProgram(material.program.program);
+
+    var uMap = material.program.getUniforms().map;
+
+    // Create uniforms dict from program uniforms map to feed view updateParams method
+    var uniforms = {};
+    for (var u in uMap)
+    {
+        uniforms[u] = {value:null};
+    }
+
+    this._viewer.view.current.updateUniforms(uniforms);
+
+    // Now all uniforms are set, all non null can be applied to the map
+    for (var u in uMap)
+    {
+        if (uniforms[u].value !== null)
+        {
+            uMap[u].setValue(gl, uniforms[u].value);
+        }
+    }
+};
+
+/**
+ * Prepare mesh to be compliant with ForgeJS specifics
+ * @method FORGE.Scene3D#_prepareMesh
+ * @param {THREE.Object3D} object - 3D object
+ * @private
+ */
+FORGE.Scene3D.prototype._prepareMesh = function(object)
+{
+    if (object.isMesh === false)
+    {
+        return;
+    }
+
+    // Use onBeforeRender callback to update uniforms value for the object
+    // updated with Forge material specifics
+    object.onBeforeRender = this._meshOnBeforeRender.bind(this);
+
+    // Use onBeforeCompile callback to inject Forge projection code into
+    // the vertex shader of the object material
+    object.material.onBeforeCompile = this._materialOnBeforeCompile.bind(this);
+};
+
+/**
  * Add a new object to the scene
  * @method FORGE.Scene3D#add
  * @param {THREE.Object3D} object - 3D object
@@ -467,6 +561,8 @@ FORGE.Scene3D.prototype.add = function(object)
     {
         mesh = object.mesh;
     }
+
+    mesh.traverse(this._prepareMesh.bind(this));
 
     this._scene.add(mesh);
 };
