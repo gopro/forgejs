@@ -87,6 +87,7 @@ FORGE.CameraGaze.prototype._boot = function()
     this._object = new THREE.Mesh(geometry, material);
     this._object.frustumCulling = false;
     this._object.name = "Gaze container";
+    this._object.renderOrder = 100;
 
     this._object.position.set(0,0,-10);
 };
@@ -140,7 +141,7 @@ FORGE.CameraGaze.prototype._createCursor = function()
 {
     if (this._object.getObjectByName("vrcursor") !== undefined)
     {
-        return;
+        this._destroyRing("vrcursor");
     }
 
     var material = new THREE.MeshBasicMaterial(
@@ -148,13 +149,23 @@ FORGE.CameraGaze.prototype._createCursor = function()
         color: this._config.cursor.color,
         opacity: this._config.cursor.opacity,
         side: THREE.DoubleSide,
+        depthTest: false,
         transparent: true
     });
 
-    var ring = new THREE.Mesh(this._createRingGeometry(this._config.cursor.innerRadius, this._config.cursor.outerRadius), material);
+    var thetaLength = (1 - (this._progress / 100)) * FORGE.Math.TWOPI;
+    var thetaStart = Math.PI * 0.5 - thetaLength;
+
+    var geometry = this._createRingGeometry(this._config.progress.innerRadius, this._config.progress.outerRadius, 32, 1, thetaStart, thetaLength);
+
+    var ring = new THREE.Mesh(geometry, material);
+
+
     ring.name = "vrcursor";
-    ring.renderOrder = 1;
+    ring.renderOrder = this._object.renderOrder + 1;
+
     ring.scale.set(0.02, 0.02, 0.02);
+    ring.rotateY(Math.PI);
 
     this._object.add(ring);
 };
@@ -169,8 +180,9 @@ FORGE.CameraGaze.prototype._updateProgressRing = function(progress)
 {
     this._progress = progress;
 
-    this._destroyRing("vrprogress");
+    this._createCursor();
 
+    this._destroyRing("vrprogress");
     this._createProgress();
 };
 
@@ -187,17 +199,18 @@ FORGE.CameraGaze.prototype._createProgress = function()
     {
         color: this._config.progress.color,
         opacity: this._config.progress.opacity,
-        transparent: true,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        depthTest: false,
+        transparent: true
     });
 
     var thetaLength = (this._progress / 100) * FORGE.Math.TWOPI;
     var geometry = this._createRingGeometry(this._config.progress.innerRadius, this._config.progress.outerRadius, 32, 1, (Math.PI / 2), thetaLength);
 
     var ring = new THREE.Mesh(geometry, material);
-    ring.renderOrder = 2;
-    ring.material.depthTest = false;
     ring.name = "vrprogress";
+    ring.renderOrder = this._object.renderOrder + 2;
+
     ring.scale.set(0.02, 0.02, 0.02);
     ring.rotateY(Math.PI);
 
@@ -304,8 +317,8 @@ FORGE.CameraGaze.prototype.stop = function()
     this._timerEvent = null;
 
     this._progress = 0;
-
     this._destroyRing("vrprogress");
+    this._createCursor();
 };
 
 /**
