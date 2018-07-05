@@ -117,7 +117,11 @@ FORGE.HUD.prototype.add = function(object)
         }
 
         mesh.frustumCulled = false;
-        mesh.renderOrder = this._object.renderOrder;
+
+        if (mesh.renderOrder === 0)
+        {
+            mesh.renderOrder = this._object.renderOrder;
+        }
 
         if (mesh.isMesh)
         {
