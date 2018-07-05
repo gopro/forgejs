@@ -100,6 +100,15 @@ FORGE.Scene3D = function(viewer, config, className)
      */
     this._gaze = null;
 
+    /**
+     * FORGE click interface
+     * Object implementing click function when an object is selected by gaze
+     * @name FORGE.CameraGaze#_clickInterface
+     * @type {FORGE.ClickInterface}
+     * @private
+     */
+    this._clickInterface = null;
+
     FORGE.BaseObject.call(this, className || "Scene3D");
 
     this._boot();
@@ -136,6 +145,8 @@ FORGE.Scene3D.prototype._boot = function()
     this._scene.name = this._className + "-" + this._scene.id;
     this._scene.onBeforeRender = this._sceneBeforeRender.bind(this);
     this._scene.onAfterRender = this._sceneAfterRender.bind(this);
+
+    this._clickInterface = new FORGE.ClickInterface(this._click.bind(this));
 
     this._viewer.story.onSceneLoadComplete.add(this._sceneLoadCompleteHandler, this);
 
@@ -418,7 +429,7 @@ FORGE.Scene3D.prototype._raycast = function(position, action, objects, camera)
 
             if (this._viewer.vr === true)
             {
-                this._gaze.start(this);
+                this._gaze.start(this._clickInterface);
             }
         }
     }
@@ -426,9 +437,10 @@ FORGE.Scene3D.prototype._raycast = function(position, action, objects, camera)
 
 /**
  * Click method
- * @method FORGE.Scene3D#click
+ * @method FORGE.Scene3D#_click
+ * @private
  */
-FORGE.Scene3D.prototype.click = function()
+FORGE.Scene3D.prototype._click = function()
 {
     if (this._hovered !== null && typeof this._hovered.click === "function")
     {
@@ -598,6 +610,8 @@ FORGE.Scene3D.prototype.destroy = function()
         var mesh = this._scene.children.pop();
         FORGE.Utils.destroyMesh(mesh);
     }
+
+    this._clickInterface = null;
 
     this._raycaster = null;
     this._hovered = null;

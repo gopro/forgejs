@@ -63,6 +63,8 @@ FORGE.ObjectRenderer = function(viewer, sceneRenderer)
      */
     this._picking = null;
 
+    this._pickingInterface = null;
+
     FORGE.BaseObject.call(this, "ObjectRenderer");
 
     this._boot();
@@ -96,7 +98,9 @@ FORGE.ObjectRenderer.prototype._boot = function()
         this._scene.add(mesh);
     }
 
-    this._picking = new FORGE.Picking(this._viewer, this);
+    this._pickingInterface = new FORGE.PickingInterface(this._scene, this._getPickableObjectWithId.bind(this));
+
+    this._picking = new FORGE.Picking(this._viewer, this._pickingInterface);
 
     this._sceneRenderer.scene.onUnloadComplete.addOnce(this._sceneUnloadCompleteHandler, this);
 };
@@ -137,8 +141,8 @@ FORGE.ObjectRenderer.prototype._sceneUnloadCompleteHandler = function()
  * Retrieve the list of all pickable objects
  * That means ready and interactive
  * @method FORGE.ObjectRenderer#_getPickableObjects
- * @private
  * @return {Array<FORGE.Object3D>} list of all pickable objects
+ * @private
  */
 FORGE.ObjectRenderer.prototype._getPickableObjects = function()
 {
@@ -154,8 +158,9 @@ FORGE.ObjectRenderer.prototype._getPickableObjects = function()
  * @method FORGE.ObjectRenderer#getInteractiveObjectWithId
  * @param {number} id - object id
  * @return {FORGE.Object3D} object3D or undefined if not found
+ * @private
  */
-FORGE.ObjectRenderer.prototype.getPickableObjectWithId = function(id)
+FORGE.ObjectRenderer.prototype._getPickableObjectWithId = function(id)
 {
     return this._getPickableObjects().find(function(object)
     {
@@ -262,6 +267,8 @@ FORGE.ObjectRenderer.prototype.render = function(viewport, target)
  */
 FORGE.ObjectRenderer.prototype.destroy = function()
 {
+    this._pickingInterface = null;
+
     if (this._picking !== null)
     {
         this._picking.destroy();
@@ -298,7 +305,6 @@ Object.defineProperty(FORGE.ObjectRenderer.prototype, "all",
         return this._objects;
     }
 });
-
 
 /**
  * Get background scene.

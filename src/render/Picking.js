@@ -25,10 +25,10 @@
  * @constructor FORGE.Picking
  *
  * @param {FORGE.Viewer} viewer - {@link FORGE.Viewer} reference
- * @param {FORGE.ObjectRenderer} objectRenderer - {@link FORGE.ObjectRenderer} reference
+ * @param {FORGE.PickingInterface} pickingInterface - picking interface object
  * @extends {FORGE.BaseObject}
  */
-FORGE.Picking = function(viewer, objectRenderer)
+FORGE.Picking = function(viewer, pickingInterface)
 {
     /**
      * Viewer reference
@@ -39,12 +39,13 @@ FORGE.Picking = function(viewer, objectRenderer)
     this._viewer = viewer;
 
     /**
-     * Object renderer reference
-     * @name FORGE.Picking#_objectRenderer
-     * @type {FORGE.ObjectRenderer}
+     * FORGE picking interface
+     * Object exposing a scene and pickable objects
+     * @name FORGE.Picking#_pickInterface
+     * @type {FORGE.BaseObject}
      * @private
      */
-    this._objectRenderer = objectRenderer;
+    this._pickingInterface = pickingInterface;
 
     /**
      * Hovered object (null if none)
@@ -126,6 +127,8 @@ FORGE.Picking.prototype._boot = function()
     // but increase performances
     this._targetDownScale = 5;
     this._targetMinHeight = 64;
+
+    this._clickInterface = new FORGE.ClickInterface(this._click.bind(this));
 
     this._viewer.story.onSceneLoadComplete.add(this._onSceneLoadComplete, this);
 };
@@ -240,7 +243,8 @@ FORGE.Picking.prototype._getObjectAtNormalizedPosition = function(posn)
                                     data );
 
     var id = FORGE.Picking.colorTo3DObjectID(new THREE.Color(data[0] / 255, data[1] / 255, data[2] / 255));
-    return this._objectRenderer.getPickableObjectWithId(id);
+
+    return this._pickingInterface.fnObjectWithId(id);
 };
 
 /**
@@ -288,7 +292,7 @@ FORGE.Picking.prototype._checkPointerNormalizedSpace = function(position)
     {
         if (this._viewer.vr === true)
         {
-            gaze.start(this);
+            gaze.start(this._clickInterface);
         }
     }
     this._hovered = object;
@@ -321,9 +325,10 @@ FORGE.Picking.prototype._dumpTexture = function(target)
 
 /**
  * Click object
- * @method FORGE.Picking#click
+ * @method FORGE.Picking#_click
+ * @private
  */
-FORGE.Picking.prototype.click = function()
+FORGE.Picking.prototype._click = function()
 {
     if (this._hovered === null)
     {
@@ -354,7 +359,7 @@ FORGE.Picking.prototype.update = function(viewport)
         camera.matrixWorldInverse.copy(cameraL.matrixWorldInverse);
     }
 
-    var scene = this._objectRenderer.scene;
+    var scene = this._pickingInterface.scene;
 
     var h = Math.max(this._targetMinHeight, viewport.rectangle.height / this._targetDownScale);
     var w = h * viewport.rectangle.ratio;
@@ -390,6 +395,8 @@ FORGE.Picking.prototype.update = function(viewport)
  */
 FORGE.Picking.prototype.destroy = function()
 {
+    this._clickInterface = null;
+
     this._viewer.story.onSceneLoadComplete.remove(this._onSceneLoadComplete, this);
     this._viewer.onVRChange.remove(this._addHandlers, this);
     this._removeHandlers();
@@ -398,7 +405,7 @@ FORGE.Picking.prototype.destroy = function()
     this._renderTarget = null;
 
     this._hovered = null;
-    this._objectRenderer = null;
+    this._pickingInterface = null;
     this._viewer = null;
 
     FORGE.BaseObject.prototype.destroy.call(this);

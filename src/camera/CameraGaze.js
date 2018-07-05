@@ -27,7 +27,7 @@ FORGE.CameraGaze = function(viewer, config)
      * FORGE click interface
      * Object implementing click function when an object is selected by gaze
      * @name FORGE.CameraGaze#_clickInterface
-     * @type {FORGE.BaseObject}
+     * @type {FORGE.ClickInterface}
      * @private
      */
     this._clickInterface = null;
@@ -232,7 +232,7 @@ FORGE.CameraGaze.prototype._timerCompleteHandler = function()
 {
     this.log("timer complete, call click");
 
-    this._clickInterface.click();
+    this._clickInterface.fnClick();
 
     this.stop();
 };
@@ -257,9 +257,9 @@ FORGE.CameraGaze.prototype.load = function(config)
 /**
  * Starts the gaze timer, this is called from the raycaster.
  * @method FORGE.CameraGaze#start
- * @param {FORGE.BaseObject} interface - interface implementing click method
+ * @param {FORGE.ClickInterface} clickInterface - click interface
  */
-FORGE.CameraGaze.prototype.start = function(interface)
+FORGE.CameraGaze.prototype.start = function(clickInterface)
 {
     if (this._viewer.vr === false)
     {
@@ -268,13 +268,13 @@ FORGE.CameraGaze.prototype.start = function(interface)
 
     this.log("start");
 
-    if (typeof interface.click === "undefined")
+    if (!(clickInterface instanceof FORGE.ClickInterface))
     {
         this.log("Interface cannot trigger click, gaze rejected.");
         return;
     }
 
-    this._clickInterface = interface;
+    this._clickInterface = clickInterface;
     this._hovering = true;
 
     this._updateProgressRing(0);
