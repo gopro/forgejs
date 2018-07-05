@@ -542,13 +542,16 @@ FORGE.Scene3D.prototype._prepareMesh = function(object)
         return;
     }
 
-    // Use onBeforeRender callback to update uniforms value for the object
-    // updated with Forge material specifics
-    object.onBeforeRender = this._meshOnBeforeRender.bind(this);
+    if (object.isMesh)
+    {
+        // Use onBeforeRender callback to update uniforms value for the object
+        // updated with Forge material specifics
+        object.onBeforeRender = this._meshOnBeforeRender.bind(this);
 
-    // Use onBeforeCompile callback to inject Forge projection code into
-    // the vertex shader of the object material
-    object.material.onBeforeCompile = this._materialOnBeforeCompile.bind(this);
+        // Use onBeforeCompile callback to inject Forge projection code into
+        // the vertex shader of the object material
+        object.material.onBeforeCompile = this._materialOnBeforeCompile.bind(this);
+    }
 };
 
 /**
