@@ -97,7 +97,8 @@ FORGE.RequestAnimationFrame.prototype._boot = function()
  */
 FORGE.RequestAnimationFrame.prototype.start = function(owner)
 {
-    this._owner = (typeof owner !== "undefined" && (owner === window || owner instanceof VRDisplay || owner instanceof THREE.WebGLRenderer)) ? owner : window;
+    var webVROwner = FORGE.Device.webVR === true && owner instanceof VRDisplay;
+    this._owner = (typeof owner !== "undefined" && (owner === window || webVROwner === true || owner instanceof THREE.WebGLRenderer)) ? owner : window;
 
     this._running = true;
 
