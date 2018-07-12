@@ -118,6 +118,8 @@ FORGE.HotspotGeometry.prototype._parseConfig = function(config)
             break;
     }
 
+    this._geometry.name = "Hotspot3D-geometry-" + this._type;
+
     // apply init offset values
     this._geometry.applyMatrix( new THREE.Matrix4().makeTranslation( this._offset.x, this._offset.y, this._offset.z ) );
 };
