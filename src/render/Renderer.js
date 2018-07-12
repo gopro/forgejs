@@ -184,14 +184,16 @@ FORGE.Renderer.prototype.render = function()
 {
     this._sceneRendererPool.render();
 
-    for (var i = 0; i<this._scenes3D.length; i++)
-    {
-        this._scenes3D[i].render();
-    }
+    if (this._sceneRendererPool.all.length > 0) {
+        for (var i = 0; i<this._scenes3D.length; i++)
+        {
+            this._scenes3D[i].render();
+        }
 
-    if (this._viewer.vr)
-    {
-        this._gazeScene.render();
+        if (this._viewer.vr)
+        {
+            this._gazeScene.render();
+        }
     }
 
     this._screenRenderer.render();
