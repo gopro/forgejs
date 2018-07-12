@@ -677,12 +677,14 @@ FORGE.Utils.destroyMesh = function(mesh)
             mesh.material.map = null;
         }
 
+        mesh.material.userData = null;
         mesh.material.dispose();
         mesh.material = null;
     }
 
     if (mesh.geometry !== null)
     {
+        mesh.geometry.userData = null;
         mesh.geometry.dispose();
         mesh.geometry = null;
     }
