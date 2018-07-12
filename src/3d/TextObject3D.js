@@ -107,8 +107,8 @@ FORGE.TextObject3D.prototype._setupMesh = function()
     var textHeight = textWidth / Math.max(1, Math.floor(this._text.length / 2));
 
     var margin = 10;
-    canvas.width = FORGE.Math.greaterPOT(textWidth + 2 * margin);
-    canvas.height = FORGE.Math.greaterPOT(textHeight + 2 * margin);
+    canvas.width = FORGE.Math.higherPOT(textWidth + 2 * margin);
+    canvas.height = FORGE.Math.higherPOT(textHeight + 2 * margin);
 
     context.font = this._font;
 

@@ -66,7 +66,18 @@ FORGE.Math.radToDeg = function(rad)
 };
 
 /**
- * Return greater power of two
+ * Return the first lower (or equal) power of two value
+ * @method FORGE.Math.lowerOrEqualPOT
+ * @param  {number} value - input number value
+ * @return {number} lowerOrEqual power of two
+ */
+FORGE.Math.lowerOrEqualPOT = function(value)
+{
+    return Math.pow(2, Math.floor(Math.log2(value)));
+};
+
+/**
+ * Return the first higher power of two value
  * @method FORGE.Math.greaterPOT
  * @param  {number} value - input number value
  * @return {number} greater power of two
