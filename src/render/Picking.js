@@ -42,10 +42,19 @@ FORGE.Picking = function(viewer, pickingInterface)
      * FORGE picking interface
      * Object exposing a scene and pickable objects
      * @name FORGE.Picking#_pickInterface
-     * @type {FORGE.BaseObject}
+     * @type {FORGE.PickingInterface}
      * @private
      */
     this._pickingInterface = pickingInterface;
+
+    /**
+     * FORGE gaze interface
+     * Object exposing a click method when gazing over an object
+     * @name FORGE.Picking#_gazeInterface
+     * @type {FORGE.GazeInterface}
+     * @private
+     */
+    this._gazeInterface = null;
 
     /**
      * Hovered object (null if none)
@@ -69,7 +78,7 @@ FORGE.Picking = function(viewer, pickingInterface)
      * @type {number}
      * @private
      */
-    this._targetDownScale = 0;
+    this._targetDownScale = 1;
 
     /**
      * Render target minimum height when scaling
@@ -79,6 +88,14 @@ FORGE.Picking = function(viewer, pickingInterface)
      */
     this._targetMinHeight = 0;
 
+    /**
+     * Ready flag
+     * @name FORGE.Picking#_ready
+     * @type {boolean}
+     * @private
+     */
+    this._ready = false;
+
     FORGE.BaseObject.call(this, "Picking");
 
     this._boot();
@@ -86,6 +103,8 @@ FORGE.Picking = function(viewer, pickingInterface)
 
 FORGE.Picking.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.Picking.prototype.constructor = FORGE.Picking;
+
+FORGE.Picking.DUMP = false;
 
 /**
  * Create a color with unique identifier of an object3D
@@ -95,6 +114,11 @@ FORGE.Picking.prototype.constructor = FORGE.Picking;
  */
 FORGE.Picking.colorFromObjectID = function(id)
 {
+    if (FORGE.Picking.DUMP === true || this.DUMP === true)
+    {
+        return new THREE.Color("red");
+    }
+
     return new THREE.Color(id);
 };
 
@@ -128,7 +152,7 @@ FORGE.Picking.prototype._boot = function()
     this._targetDownScale = 5;
     this._targetMinHeight = 64;
 
-    this._clickInterface = new FORGE.ClickInterface(this._click.bind(this));
+    this._gazeInterface = new FORGE.GazeInterface(this._click.bind(this));
 
     this._viewer.story.onSceneLoadComplete.add(this._onSceneLoadComplete, this);
 };
@@ -140,6 +164,7 @@ FORGE.Picking.prototype._boot = function()
  */
 FORGE.Picking.prototype._onSceneLoadComplete = function()
 {
+    this._ready = true;
     this._addHandlers();
     this._viewer.onVRChange.add(this._addHandlers, this);
 };
@@ -186,6 +211,11 @@ FORGE.Picking.prototype._removeHandlers = function()
  */
 FORGE.Picking.prototype._canvasPointerClickHandler = function(event)
 {
+    if (this._pickingInterface.enabled === false)
+    {
+        return;
+    }
+
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
 
     this.log("Pointer click event (" + screenPosition.x + ", " + screenPosition.y + ")");
@@ -194,8 +224,9 @@ FORGE.Picking.prototype._canvasPointerClickHandler = function(event)
     var viewportPosition = viewport.viewportManager.getRelativeMousePosition(screenPosition);
     var viewportSize = viewport.rectangle.size;
 
-    var object = this._getObjectAtNormalizedPosition(viewportPosition.divide(viewportSize.vector2));
-    if (typeof object === "undefined" || !object.interactive)
+    var pos = viewportPosition.divide(viewportSize.vector2);
+    var object = this._getObjectAtNormalizedPosition(pos);
+    if (typeof object === "undefined")
     {
         return;
     }
@@ -214,6 +245,11 @@ FORGE.Picking.prototype._canvasPointerClickHandler = function(event)
  */
 FORGE.Picking.prototype._canvasPointerMoveHandler = function(event)
 {
+    if (this._pickingInterface.enabled === false)
+    {
+        return;
+    }
+
     var screenPosition = FORGE.Pointer.getRelativeMousePosition(event.data);
 
     var viewport = this._viewer.renderer.activeViewport;
@@ -292,7 +328,7 @@ FORGE.Picking.prototype._checkPointerNormalizedSpace = function(position)
     {
         if (this._viewer.vr === true)
         {
-            gaze.start(this._clickInterface);
+            gaze.start(this._gazeInterface);
         }
     }
     this._hovered = object;
@@ -312,11 +348,11 @@ FORGE.Picking.prototype._dumpTexture = function(target)
 {
     var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
     var geometry = new THREE.PlaneBufferGeometry(1, 1);
-    var material = new THREE.MeshBasicMaterial({color:new THREE.Color(0xffffff), map: this._renderTarget});
+    var material = new THREE.MeshBasicMaterial({color:new THREE.Color(0xffffff), map: this._renderTarget.texture});
     var quad = new THREE.Mesh(geometry, material);
-    quad.position.x = -0.4;
-    quad.position.y = 0.4;
-    quad.scale.set(0.4, 0.4, 0.4);
+    quad.position.x = -0.35;
+    quad.position.y = 0.35;
+    quad.scale.set(0.7, 0.7, 0.7);
     var scene = new THREE.Scene();
     scene.add(quad);
 
@@ -330,7 +366,7 @@ FORGE.Picking.prototype._dumpTexture = function(target)
  */
 FORGE.Picking.prototype._click = function()
 {
-    if (this._hovered === null)
+    if (this._hovered === null || typeof this._hovered.click !== "function")
     {
         return;
     }
@@ -341,13 +377,17 @@ FORGE.Picking.prototype._click = function()
 /**
  * Update routine
  * @method FORGE.Picking#update
- * @param {FORGE.Viewport} viewport - current rendering viewport
  */
-FORGE.Picking.prototype.update = function(viewport)
+FORGE.Picking.prototype.update = function(camera)
 {
-    var view = viewport.view.current;
+    if (this._ready === false)
+    {
+        return;
+    }
 
-    var camera = viewport.camera.main;
+    var viewport = this._viewer.renderer.activeViewport;
+    var view = viewport.view.current;
+    var camera = camera || viewport.camera.main;
 
     // In VR, we need to get VR camera to extract framedata orientation
     // Render will not enable VR to prevent from splitting the picking drawpass
@@ -359,20 +399,21 @@ FORGE.Picking.prototype.update = function(viewport)
         camera.matrixWorldInverse.copy(cameraL.matrixWorldInverse);
     }
 
-    var scene = this._pickingInterface.scene;
-
-    var h = Math.max(this._targetMinHeight, viewport.rectangle.height / this._targetDownScale);
-    var w = h * viewport.rectangle.ratio;
+    var h = FORGE.Math.lowerOrEqualPOT(Math.max(this._targetMinHeight, viewport.rectangle.height / this._targetDownScale));
+    var w = FORGE.Math.lowerOrEqualPOT(h * viewport.rectangle.ratio);
 
     // SetSize won't do anything if size does not change, otherwise it will
     // dispose the internal WebGL texture object and next update will recreate it
     // with the new size stored
     this._renderTarget.setSize(w, h);
 
+    var scene = this._pickingInterface.scene;
+
     var objectMaterial = this._viewer.renderer.materials.get(view.type, FORGE.ObjectMaterialType.PICK);
     scene.overrideMaterial = objectMaterial.shaderMaterial;
 
     view.updateUniforms(scene.overrideMaterial.uniforms);
+
 
     this._viewer.renderer.webGLRenderer.clearTarget(this._renderTarget, true, true, false);
     this._viewer.renderer.webGLRenderer.render(scene, camera, this._renderTarget, false);
@@ -380,7 +421,10 @@ FORGE.Picking.prototype.update = function(viewport)
     // Restore scene params
     scene.overrideMaterial = null;
 
-    // this._dumpTexture(viewport.sceneRenderer.target);
+    if (FORGE.Picking.DUMP === true || this.DUMP === true)
+    {
+        this._dumpTexture(viewport.sceneRenderer.target);
+    }
 
     // When VR is on, we check the center of the screen for each frame
     if (this._viewer.vr === true)
@@ -395,7 +439,7 @@ FORGE.Picking.prototype.update = function(viewport)
  */
 FORGE.Picking.prototype.destroy = function()
 {
-    this._clickInterface = null;
+    this._gazeInterface = null;
 
     this._viewer.story.onSceneLoadComplete.remove(this._onSceneLoadComplete, this);
     this._viewer.onVRChange.remove(this._addHandlers, this);
