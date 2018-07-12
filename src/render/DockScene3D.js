@@ -221,11 +221,11 @@ FORGE.DockScene3D.prototype.add = function(object)
 {
     FORGE.Scene3D.prototype.add.call(this, object);
 
-    object.traverse(function(mesh)
+    object.traverse(function(obj)
     {
-        if (mesh.isMesh)
+        if (obj.isMesh)
         {
-            mesh.userData.opacity = mesh.material.opacity;
+            obj.userData.opacity = obj.material.opacity;
         }
     }.bind(this));
 };
