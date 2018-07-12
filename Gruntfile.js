@@ -48,6 +48,9 @@ module.exports = function(grunt)
         "src/media/MediaVideo.js",
         "src/media/MediaTiled.js",
 
+        "src/render/GazeInterface.js",
+        "src/render/PickingInterface.js",
+
         "src/render/Renderer.js",
         "src/render/ScreenRenderer.js",
         "src/render/ScreenMaterial.js",
@@ -61,8 +64,6 @@ module.exports = function(grunt)
         "src/render/ObjectMaterialPool.js",
         "src/render/ObjectMaterialType.js",
         "src/render/ObjectMaterial.js",
-        "src/render/ClickInterface.js",
-        "src/render/PickingInterface.js",
         "src/render/Picking.js",
         "src/render/SceneLoader.js",
         "src/render/SceneRenderer.js",
