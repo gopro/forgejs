@@ -125,6 +125,23 @@ FORGE.ViewFlat.prototype.getUniformsDef = function()
 };
 
 /**
+ * Get uniforms default values.
+ *
+ * @method FORGE.ViewFlat#getUniformsDefaults
+ * @return {array} glsl uniforms default values
+ */
+FORGE.ViewFlat.prototype.getUniformsDefaults = function()
+{
+    return {
+        "tRepeatX": false,
+        "tRepeatY": false,
+        "tYaw": 0,
+        "tPitch": 0,
+        "tFov": 90
+    };
+};
+
+/**
  * Update uniforms.
  *
  * @method FORGE.ViewFlat#updateUniforms

@@ -214,6 +214,17 @@ FORGE.ViewBase.prototype.getUniformsDef = function()
 };
 
 /**
+ * Get uniforms default values.
+ *
+ * @method FORGE.ViewBase#getUniformsDefaults
+ * @return {array} glsl uniforms default values
+ */
+FORGE.ViewBase.prototype.getUniformsDefaults = function()
+{
+    return {};
+};
+
+/**
  * Update uniforms.
  * Abstract method that should be implemented by subclass.
  *

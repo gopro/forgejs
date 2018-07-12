@@ -72,6 +72,19 @@ FORGE.ViewRectilinear.prototype.getUniformsDef = function()
 };
 
 /**
+ * Get uniforms default values.
+ *
+ * @method FORGE.ViewRectilinear#getUniformsDefaults
+ * @return {array} glsl uniforms default values
+ */
+FORGE.ViewRectilinear.prototype.getUniformsDefaults = function()
+{
+    return {
+        "tProjectionScale": 1
+    };
+};
+
+/**
  * Update uniforms.
  *
  * @method FORGE.ViewRectilinear#updateUniforms

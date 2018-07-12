@@ -101,6 +101,20 @@ FORGE.ViewGoPro.prototype.getUniformsDef = function()
 };
 
 /**
+ * Get uniforms default values.
+ *
+ * @method FORGE.ViewGoPro#getUniformsDefaults
+ * @return {array} glsl uniforms default values
+ */
+FORGE.ViewGoPro.prototype.getUniformsDefaults = function()
+{
+    return {
+        "tProjectionDistance": 0,
+        "tProjectionScale": 1
+    };
+};
+
+/**
  * Update uniforms.
  *
  * @method FORGE.ViewGoPro#updateUniforms
