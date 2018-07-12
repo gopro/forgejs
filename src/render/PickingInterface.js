@@ -5,16 +5,19 @@
  * @constructor FORGE.PickingInterface
  * @param {THREE.Scene} scene - scene
  * @param {function} fnObjectWithId - function retrieving a pickagble object with its id
+ * @param {boolean} enabled - picking enabled
  *
  * @extends {FORGE.BaseObject}
  */
-FORGE.PickingInterface = function(scene, fnObjectWithId)
+FORGE.PickingInterface = function(scene, fnObjectWithId, enabled)
 {
     FORGE.BaseObject.call(this, "PickingInterface");
 
     this._scene = scene;
 
     this._fnObjectWithId = fnObjectWithId;
+
+    this._enabled = enabled;
 };
 
 FORGE.PickingInterface.prototype = Object.create(FORGE.BaseObject.prototype);
@@ -58,5 +61,26 @@ Object.defineProperty(FORGE.PickingInterface.prototype, "fnObjectWithId",
     get: function()
     {
         return this._fnObjectWithId;
+    }
+});
+
+/**
+ * Get/set the picking enabling.
+ * @name FORGE.PickingInterface#enabled
+ * @type {boolean}
+ * @readonly
+ */
+Object.defineProperty(FORGE.PickingInterface.prototype, "enabled",
+{
+    /** @this {FORGE.PickingInterface} */
+    get: function()
+    {
+        return this._enabled;
+    },
+
+    /** @this {FORGE.PickingInterface} */
+    set: function(value)
+    {
+        this._enabled = value;
     }
 });
