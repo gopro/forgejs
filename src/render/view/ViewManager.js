@@ -64,10 +64,39 @@ FORGE.ViewManager = function(viewer, viewport)
     this._onChange = null;
 
     FORGE.BaseObject.call(this, "ViewManager");
+
+    this._boot();
 };
 
 FORGE.ViewManager.prototype = Object.create(FORGE.BaseObject.prototype);
 FORGE.ViewManager.prototype.constructor = FORGE.ViewManager;
+
+/**
+ * Boot sequence
+ * @method FORGE.ViewManager#_boot
+ * @private
+ */
+FORGE.ViewManager.prototype._boot = function()
+{
+    this._viewer.onVRChange.add(this._onVRChangeHandler, this);
+};
+
+/**
+ * VR change handler.
+ * @method FORGE.ViewManager#_onVRChangeHandler
+ * @private
+ */
+FORGE.ViewManager.prototype._onVRChangeHandler = function()
+{
+    if (this._viewer.vr === true)
+    {
+        this._enableVR();
+    }
+    else
+    {
+        this._disableVR();
+    }
+};
 
 /**
  * Set the view type
@@ -161,9 +190,10 @@ FORGE.ViewManager.prototype.load = function(config)
 
 /**
  * Enable VR backup the view type then force to rectilinear
- * @method FORGE.ViewManager#enableVR
+ * @method FORGE.ViewManager#_enableVR
+ * @private
  */
-FORGE.ViewManager.prototype.enableVR = function()
+FORGE.ViewManager.prototype._enableVR = function()
 {
     this._viewTypeBackup = this._view.type;
     this._viewOptionsBackup = this._view.options;
@@ -172,9 +202,10 @@ FORGE.ViewManager.prototype.enableVR = function()
 
 /**
  * Disable VR restore the view type.
- * @method FORGE.ViewManager#disableVR
+ * @method FORGE.ViewManager#_disableVR
+ * @private
  */
-FORGE.ViewManager.prototype.disableVR = function()
+FORGE.ViewManager.prototype._disableVR = function()
 {
     if(this._viewTypeBackup !== "")
     {
@@ -214,6 +245,8 @@ FORGE.ViewManager.prototype.screenToWorld = function(screenPt)
  */
 FORGE.ViewManager.prototype.destroy = function()
 {
+    this._viewer.onVRChange.remove(this._onVRChangeHandler, this);
+
     this._viewer = null;
 
     if (this._view !== null)
