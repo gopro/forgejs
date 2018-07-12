@@ -26,11 +26,11 @@ FORGE.CameraGaze = function(viewer, config)
     /**
      * FORGE click interface
      * Object implementing click function when an object is selected by gaze
-     * @name FORGE.CameraGaze#_clickInterface
-     * @type {FORGE.ClickInterface}
+     * @name FORGE.CameraGaze#_gazeInterface
+     * @type {FORGE.GazeInterface}
      * @private
      */
-    this._clickInterface = null;
+    this._gazeInterface = null;
 
     /**
      * Flag to know if the gaze cursor is hovering an object
@@ -245,7 +245,7 @@ FORGE.CameraGaze.prototype._timerCompleteHandler = function()
 {
     this.log("timer complete, call click");
 
-    this._clickInterface.fnClick();
+    this._gazeInterface.fnClick();
 
     this.stop();
 };
@@ -270,9 +270,9 @@ FORGE.CameraGaze.prototype.load = function(config)
 /**
  * Starts the gaze timer, this is called from the raycaster.
  * @method FORGE.CameraGaze#start
- * @param {FORGE.ClickInterface} clickInterface - click interface
+ * @param {FORGE.GazeInterface} gazeInterface - click interface
  */
-FORGE.CameraGaze.prototype.start = function(clickInterface)
+FORGE.CameraGaze.prototype.start = function(gazeInterface)
 {
     if (this._viewer.vr === false)
     {
@@ -281,13 +281,13 @@ FORGE.CameraGaze.prototype.start = function(clickInterface)
 
     this.log("start");
 
-    if (!(clickInterface instanceof FORGE.ClickInterface))
+    if (!(gazeInterface instanceof FORGE.GazeInterface))
     {
         this.log("Interface cannot trigger click, gaze rejected.");
         return;
     }
 
-    this._clickInterface = clickInterface;
+    this._gazeInterface = gazeInterface;
     this._hovering = true;
 
     this._updateProgressRing(0);
@@ -311,7 +311,7 @@ FORGE.CameraGaze.prototype.stop = function()
     this.log("stop");
 
     this._hovering = false;
-    this._clickInterface = null;
+    this._gazeInterface = null;
 
     this._timer.stop();
     this._timerEvent = null;
@@ -344,7 +344,7 @@ FORGE.CameraGaze.prototype.destroy = function()
 {
     this.stop();
 
-    this._clickInterface = null;
+    this._gazeInterface = null;
     this._object = null;
 };
 
