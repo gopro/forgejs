@@ -24,7 +24,7 @@ The [issue tracker](https://github.com/gopro/forgejs/issues) is the best place t
 - Consult the list of things that **won't** be implemented.
 - Read up on what type of feature requests are accepted.
 - See if anybody has not requested the feature yet.
-- If it hasn't beed requested yet, submit a new request as an issue.
+- If it hasn't been requested yet, submit a new request as an issue.
 
 ### Submitting a pull-request
 
