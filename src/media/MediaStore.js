@@ -40,7 +40,7 @@ FORGE.MediaStore = function(viewer, config, preview)
     this._preview = preview;
 
     /**
-     * A map containing all {@link FORGE.MediaTexture}, with the key being constitued
+     * A map containing all {@link FORGE.MediaTexture}, with the key being constituted
      * from the level, face, x and y properties defining the texture
      * @name FORGE.MediaStore#_textures
      * @type {?FORGE.Map}
