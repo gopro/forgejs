@@ -52,7 +52,7 @@
         "order": {
             "type": "string",
             "title": "Order",
-            "description": "Order of the layout in the cubemap media, ie where are the faces in the media, starting from the top left of the media. Needs to be a 6-char string, constitued with all of the following letter: <ul><li>R for Right</li><li>L for Left</li><li>U for Up</li><li>D for Down</li><li>B for Back</li><li>F for Front</li></ul>",
+            "description": "Order of the layout in the cubemap media, ie where are the faces in the media, starting from the top left of the media. Needs to be a 6-char string, constituted with all of the following letter: <ul><li>R for Right</li><li>L for Left</li><li>U for Up</li><li>D for Down</li><li>B for Back</li><li>F for Front</li></ul>",
             "default": "RLUDBF"
         },
 

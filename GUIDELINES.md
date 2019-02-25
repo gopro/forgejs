@@ -29,7 +29,7 @@ The following annotations are those which matter the most when using the compile
 
 ### Available types
 
-All built-in types can be used in the JSDoc, along with all declared types of ForgeJS. But there is a trap with the built-in types: a `number` is not the same as a `Number` (note the capitalized N). The first one is only a value, while the latter is an Object. They don't represent at all the same thing for the compiler, so be aware of capitalized type. This constraint don't exist with the ForgeJS objects.
+All built-in types can be used in the JSDoc, along with all declared types of ForgeJS. But there is a trap with the built-in types: a `number` is not the same as a `Number` (note the capitalized N). The first one is only a value, while the latter is an Object. They don't represent at all the same thing for the compiler, so be aware of capitalized type. This constraint doesn't exist with the ForgeJS objects.
 
 If a type is missing, like a custom Object (for example, special JSON format), it can be declared as follows :
 
@@ -47,7 +47,7 @@ A missing type can be added in the appropriate file in `externs/forge`. In order
 
 ## Reference
 
-Everytime the structure of the `config.json` changes, it needs to be updated in the appropriate file in `reference/`. It can be either adding new properties to an object, or adding a new object. This reference follows the [JSON Schema](http://json-schema.org/), a xsd-like document to describe and annotate JSON documents.
+Every time the structure of the `config.json` changes, it needs to be updated in the appropriate file in `reference/`. It can be either adding new properties to an object, or adding a new object. This reference follows the [JSON Schema](http://json-schema.org/), a xsd-like document to describe and annotate JSON documents.
 
 ### Describing a property
 
@@ -71,7 +71,7 @@ In the field `properties` of the object to edit, there are an object for each pr
 }
 ```
 
-Beside the key of the property, corresponding to the one that will be present in the `config.json` file, a property is constitued essentially of these four properties :
+Beside the key of the property, corresponding to the one that will be present in the `config.json` file, a property is constituted essentially of these four properties :
 
 - `type` can be `string`, `number`, `boolean`, or more complex values
 - `title` is the name of the property appearing in the documentation
@@ -101,7 +101,7 @@ A new object is added to its relevant folder, in `reference/`. The structure is 
 - `id` is the identifier of the object
 - `$schema` is the JSON Schema reference
 - `title` is the name of the object, as used in the sources (with the `@type` tag)
-- `description` is the description appearing in the documention
+- `description` is the description appearing in the documentation
 - `type` is always `object`
 
 Properties are then added as described above.
@@ -121,7 +121,7 @@ When describing a property being another object, add the reference as follows, w
 
 
 
-## Others recommandations
+## Others recommendations
 
 ### Inline implicit cast
 
@@ -245,7 +245,7 @@ Do not comment big chunk of code, as "archive" or "backup". Either use the `@dep
 
 ### `Object.defineProperty` and `@this`
 
-When using the `Object.defineProperty` on a class, in case the `this` keyword is used, the `getter` and `setter` should be preceded by the `@this` annotation like this, mentionning the class the property is being defined on :
+When using the `Object.defineProperty` on a class, in case the `this` keyword is used, the `getter` and `setter` should be preceded by the `@this` annotation like this, mentioning the class the property is being defined on :
 
 ```js
 /**
