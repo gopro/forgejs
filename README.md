@@ -51,6 +51,7 @@ The easiest way to learn how to build a project with ForgeJS is to practice with
 2. Install nodejs and npm on your machine (download [here](http://nodejs.org)).
 3. Install the grunt-cli npm package (`npm install -g grunt grunt-cli` will install grunt globally on your machine).
 4. Install the node dev dependencies of the project (`cd forgejs && npm install`).
+5. Profit
 
 ### Build ForgeJS
 
